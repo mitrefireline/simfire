@@ -17,12 +17,15 @@ def main():
     game_tiles = make_game_tiles()
     game_tiles_sprites = pygame.sprite.RenderPlain(game_tiles.tolist())
 
-    fire_manager = FireManager(cfg.fire_init_pos, cfg.fire_size)
+    fire_manager = FireManager(cfg.fire_init_pos, cfg.fire_size,
+                               cfg.max_fire_duration, cfg.rate_of_spread)
 
     running = True
     while running:
         fire_sprites = fire_manager.sprites
-        running = game.update(game_tiles_sprites, fire_sprites)
+        fire_map = fire_manager.fire_map
+        running = game.update(game_tiles.tolist(), fire_sprites, fire_map)
+        fire_manager.update()
 
     pygame.quit()
 

@@ -22,17 +22,21 @@ class Tile:
     '''
     Class that records the location of each terrain tile for a FuelArray. 
     '''
-    # Tile length in x-direction (ft)
+    # x coordinate of the top-left corner of the tile in the array
     x: float
-    # Tile length in y-direction (ft)
+    # y coordinate of the top-left corner of the tile in the array
     y: float
     # Tile elevation (ft)
     z: float
+    # Tile width in the x direction (ft)
+    w: float
+    # Tile height in the y direction (ft)
+    h: float
     # Area of the tile (ft^2)
     area: float = field(init=False)
     
     def __post_init__(self):
-        self.area = self.x * self.y
+        self.area = self.w * self.h
 
 
 @dataclass
@@ -51,12 +55,7 @@ class FuelArray:
     # Dead fuel moisture of extinction
     M_x: float
     # Surface-area-to-volume ratio (ft^2/ft^3)
-    sigma: float = field(init=False)
-    
-    def __post_init__(self):
-        # Can simplify to 1/delta since the assumption is each tile has
-        # constant fuel array height
-        self.sigma = 1 / self.delta
+    sigma: float
 
 
 @dataclass
@@ -67,5 +66,8 @@ class Environment:
     '''
     # Moisture Content
     M_f: float
-    # Wind Velocity at midflame height (ft/min)
+    # Wind speed at midflame height (ft/min)
     U: float
+    # Wind direction at midflame height (degrees)
+    # 0 is North, 90 is East, 180 is South, 270 is West
+    U_dir: float

@@ -35,11 +35,11 @@ class Terrain(pygame.sprite.Sprite):
         self.tiles = np.array(tiles)
         self.terrain_size = cfg.terrain_size
 
-        self.scren_size = (cfg.screen_size, cfg.screen_size)
+        self.screen_size = (cfg.screen_size, cfg.screen_size)
         self.texture = self._load_texture()
-        self.image = self._make_terrain_image()
+        self.image, self.fuel_arrs = self._make_terrain_image()
         # The rectangle for this sprite is the entire game
-        self.rect = pygame.Rect(0, 0, *self.scren_size)
+        self.rect = pygame.Rect(0, 0, *self.screen_size)
 
         # This sprite should always have layer 1 since it will always
         # be behind every other sprite
@@ -79,11 +79,14 @@ class Terrain(pygame.sprite.Sprite):
 
         return texture
 
-    def _make_terrain_image(self) -> pygame.Surface:
+    def _make_terrain_image(self) -> Tuple[pygame.Surface, np.ndarray]:
         '''
         Stitch together all of the FuelArray tiles in self.tiles to create
         the terrain image. This starts as a numpy array, but is then converted
         to a pygame.Surface for compatibility with pygame. 
+
+        Additionally, stitch together the FuelArrays into a tiled
+        numpy array that aligns with out_surf for use with a FireManager.
 
         Arguments:
             None
@@ -91,8 +94,13 @@ class Terrain(pygame.sprite.Sprite):
         Returns:
             out_surf: The pygame.Surface of the stitched together terrain
                       tiles
+            fuel_arrs: A (screen_size x screen_size) array containing the
+                       FuelArray data at the pixel level. This allows for finer
+                       resolution for the FireManager to work at the pixel
+                       level
         '''
-        image = np.zeros(self.scren_size+(3,))
+        image = np.zeros(self.screen_size+(3,))
+        fuel_arrs = np.zeros(self.screen_size, dtype=np.dtype(FuelArray))
 
         for i in range(self.tiles.shape[0]):
             for j in range(self.tiles.shape[1]):
@@ -101,12 +109,13 @@ class Terrain(pygame.sprite.Sprite):
                 w = self.terrain_size
                 h = self.terrain_size
 
-                updated_texture = self._update_texture_dryness(self.tiles[i][j])
+                updated_texture = self._update_texture_dryness(self.tiles[j][i])
                 image[y:y+h, x:x+w] = updated_texture
+                fuel_arrs[y:y+h, x:x+w] = self.tiles[j][i]
         
         out_surf = pygame.surfarray.make_surface(image)
 
-        return out_surf
+        return out_surf, fuel_arrs
     
     def _update_texture_dryness(self, fuel_arr: FuelArray) -> np.ndarray:
         '''

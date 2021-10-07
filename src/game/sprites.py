@@ -1,51 +1,113 @@
-from typing import Tuple
+from typing import Sequence, Tuple
 
 import numpy as np
+from PIL import Image
 import pygame
 
-from .image import load_image, set_image_dryness
+from .image import load_image
 from .. import config as cfg
 from ..enums import BurnStatus
 from ..world.parameters import FuelArray
 
 
-class GameTile(pygame.sprite.Sprite):
-    def __init__(self, fuel_array: FuelArray, size: int,
-                 pos: Tuple[int, int]) -> None:
+class Terrain(pygame.sprite.Sprite):
+    '''
+    Use the FuelArray tiles to make terrain. This sprite is just the
+    entire background that the fire appears on. This sprite stitches the
+    tiles together initially and then updates their color based on burn
+    status.
+    '''
+    def __init__(self, tiles: Sequence[Sequence[FuelArray]]) -> None:
+        '''
+        Initialize the class by loading the tile textures and stitching
+        together the whole terrain image. 
+
+        Arguments:
+            tiles: The 2D nested sequences of FuelArrays that comprise the
+                   terrain.
+
+        Returns:
+            None 
+        '''
         super().__init__()
 
-        self.fuel_array = fuel_array
-        self.size = size
-        self.pos = pos
+        self.tiles = np.array(tiles)
+        self.terrain_size = cfg.terrain_size
 
-        self.image = load_image('assets/textures/terrain.jpg')
-        self.image = pygame.transform.scale(self.image, (self.size, self.size))
-        self.update_image_dryness()
+        self.scren_size = (cfg.screen_size, cfg.screen_size)
+        self.texture = self._load_texture()
+        self.image = self._make_terrain_image()
+        # The rectangle for this sprite is the entire game
+        self.rect = pygame.Rect(0, 0, *self.scren_size)
 
-        self.rect = self.image.get_rect()
-        move_x = self.size * self.pos[1]
-        move_y = self.size * self.pos[0]
-        self.rect = self.rect.move(move_x, move_y)
-
+        # This sprite should always have layer 1 since it will always
+        # be behind every other sprite
         self.layer = 1
-    
+
     def update(self, fire_map: np.ndarray) -> None:
         '''
-        Check if fire is touching Tile and update what it looks like
+        Change any burned squares to brown using fire_map, which
+        contains pixel-wise values for tile burn status.
+
+        Arguments:
+            fire_map: A map containing enumerated values for unburned,
+                      burning, and burned tile status
+        
+        Returns: None
         '''
-        # Crop the fire_map to only the region of this tile
-        x, y, w, h = self.rect
-        fire_map = fire_map[y:y+h, x:x+w]
-        # Update the pixels only if there is any burned area
-        if np.any(fire_map == BurnStatus.BURNED):
-            self.update_image_burned_area(fire_map)
-
-    def update_image_burned_area(self, fire_map: np.ndarray) -> None:
-        burn_map = fire_map == BurnStatus.BURNED
+        burned_idxs = (fire_map == BurnStatus.BURNED)
+        # This method will update self.image in-place with arr
         arr = pygame.surfarray.pixels3d(self.image)
-        arr[burn_map] = (139, 69, 19)
+        arr[burned_idxs] =(139, 69, 19)
 
-    def update_image_dryness(self) -> None:
+    def _load_texture(self) -> np.ndarray:
+        '''
+        Load the terrain tile texture, resize it to the correct
+        shape, and convert to numpy
+
+        Arguments:
+            None
+
+        Returns:
+            None 
+        '''
+        out_size = (self.terrain_size, self.terrain_size)
+        texture = Image.open('assets/textures/terrain.jpg')
+        texture = texture.resize(out_size)
+        texture = np.array(texture)
+
+        return texture
+
+    def _make_terrain_image(self) -> pygame.Surface:
+        '''
+        Stitch together all of the FuelArray tiles in self.tiles to create
+        the terrain image. This starts as a numpy array, but is then converted
+        to a pygame.Surface for compatibility with pygame. 
+
+        Arguments:
+            None
+
+        Returns:
+            out_surf: The pygame.Surface of the stitched together terrain
+                      tiles
+        '''
+        image = np.zeros(self.scren_size+(3,))
+
+        for i in range(self.tiles.shape[0]):
+            for j in range(self.tiles.shape[1]):
+                x = j*self.terrain_size
+                y = i*self.terrain_size
+                w = self.terrain_size
+                h = self.terrain_size
+
+                updated_texture = self._update_texture_dryness(self.tiles[i][j])
+                image[y:y+h, x:x+w] = updated_texture
+        
+        out_surf = pygame.surfarray.make_surface(image)
+
+        return out_surf
+    
+    def _update_texture_dryness(self, fuel_arr: FuelArray) -> None:
         '''
         Determine the percent change to make the terrain look drier (i.e.
         more red/yellow/brown) by using the fuel array values. Then, update
@@ -53,29 +115,39 @@ class GameTile(pygame.sprite.Sprite):
         in-place.
 
         Arguments:
-            None
+            fuel_arr: The fuel array with parameters that specify how
+                      "dry" the texture should look
 
         Returns:
-            None
+            arr: The texture with RGB calues modified to look drier based
+                 on the parameters of fuel_arr
         '''
         # Add the numbers after normalization
         # M_x is inverted because a lower value is more flammable
-        color_change_pct = self.fuel_array.w_0 / cfg.w_0_max + \
-                           self.fuel_array.delta / cfg.delta_max + \
-                           (cfg.M_x_max - self.fuel_array.M_x) / cfg.M_x_max
+        color_change_pct = fuel_arr.w_0 / cfg.w_0_max + \
+                           fuel_arr.delta / cfg.delta_max + \
+                           (cfg.M_x_max - fuel_arr.M_x) / cfg.M_x_max
         # Divide by 3 since there are 3 values
         color_change_pct /= 3
 
-        arr = pygame.surfarray.pixels3d(self.image)
-        arr[...,0] = np.clip((1+color_change_pct)*arr[...,0], 0, 255).astype(np.uint8)
-        arr[...,0] = np.clip(0.75*(1+color_change_pct)*arr[...,0], 0, 255).astype(np.uint8)
-        return
+        arr = self.texture.copy()
+        arr[...,0] = np.clip((0.5+color_change_pct)*arr[...,0], 0, 255).astype(np.uint8)
+        arr[...,1] = np.clip(0.25*(1+color_change_pct)*arr[...,1], 0, 255).astype(np.uint8)
 
-        set_image_dryness(self.image, color_change_pct)
+        return arr
 
 
 class Fire(pygame.sprite.Sprite):
+    '''
+    This sprite represents a fire burning on one pixel of the terrain. Its
+    image is generally kept very small to make rendering easier. All fire
+    spreading is handled by the FireManager it is attached to.
+    '''
     def __init__(self, pos: Tuple[int, int], size: int) -> None:
+        '''
+        Initialize the class by recording the position and size of the sprite
+        and loading/resizing its texture 
+        '''
         super().__init__()
 
         self.pos = pos
@@ -87,11 +159,11 @@ class Fire(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect = self.rect.move(self.pos[1], self.pos[0])
 
+        # Layer 2 so that it appears on top of the terrain
         self.layer: int = 2
 
         # Record how many frames this sprite has been alive
         self.duration: int = 0
-
 
     def update(self) -> None:
         '''

@@ -2,8 +2,8 @@ from typing import Tuple
 import numpy as np
 
 # Game/Screen parameters
-screen_size: int = 100
-terrain_size: int = 10
+screen_size: int = 225
+terrain_size: int = 15
 fire_size: int = 2
 
 # Fuel Array Parameters

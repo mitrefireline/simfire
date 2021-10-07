@@ -5,7 +5,7 @@ import pygame
 
 import src.config as cfg
 from src.game.Game import Game
-from src.game.managers import FireManager
+from src.game.managers import ConstantSpreadFireManager
 from src.game.sprites import Terrain
 from src.world.parameters import FuelArray, Tile
 
@@ -22,7 +22,7 @@ def main():
                   for i in range(cfg.terrain_size)]
     terrain = Terrain(fuel_arrs)
 
-    fire_manager = FireManager(cfg.fire_init_pos, cfg.fire_size,
+    fire_manager = ConstantSpreadFireManager(cfg.fire_init_pos, cfg.fire_size,
                                cfg.max_fire_duration, cfg.rate_of_spread)
 
     running = True

@@ -6,7 +6,8 @@ import pygame
 
 from .image import load_image
 from .. import config as cfg
-from ..enums import BurnStatus
+from ..enums import BurnStatus, DRY_TERRAIN_BROWN_IMG, \
+    FIRE_TEXTURE_PATH, SpriteLayer, TERRAIN_TEXTURE_PATH
 from ..world.parameters import FuelArray
 
 
@@ -42,7 +43,7 @@ class Terrain(pygame.sprite.Sprite):
 
         # This sprite should always have layer 1 since it will always
         # be behind every other sprite
-        self.layer = 1
+        self.layer = SpriteLayer.TERRAIN
 
     def update(self, fire_map: np.ndarray) -> None:
         '''
@@ -58,7 +59,7 @@ class Terrain(pygame.sprite.Sprite):
         burned_idxs = (fire_map == BurnStatus.BURNED)
         # This method will update self.image in-place with arr
         arr = pygame.surfarray.pixels3d(self.image)
-        arr[burned_idxs] =(139, 69, 19)
+        arr[burned_idxs] = (139, 69, 19)
 
     def _load_texture(self) -> np.ndarray:
         '''
@@ -72,7 +73,7 @@ class Terrain(pygame.sprite.Sprite):
             None 
         '''
         out_size = (self.terrain_size, self.terrain_size)
-        texture = Image.open('assets/textures/terrain.jpg')
+        texture = Image.open(TERRAIN_TEXTURE_PATH)
         texture = texture.resize(out_size)
         texture = np.array(texture)
 
@@ -107,20 +108,20 @@ class Terrain(pygame.sprite.Sprite):
 
         return out_surf
     
-    def _update_texture_dryness(self, fuel_arr: FuelArray) -> None:
+    def _update_texture_dryness(self, fuel_arr: FuelArray) -> np.ndarray:
         '''
         Determine the percent change to make the terrain look drier (i.e.
-        more red/yellow/brown) by using the fuel array values. Then, update
-        the image using the pygame surfarray functionality to modify the image
-        in-place.
+        more red/yellow/brown) by using the FuelArray values. Then, update
+        the texture color using PIL and image blending with a preset
+        yellow-brown color/image.
 
         Arguments:
-            fuel_arr: The fuel array with parameters that specify how
+            fuel_arr: The FuelArray with parameters that specify how
                       "dry" the texture should look
 
         Returns:
-            arr: The texture with RGB calues modified to look drier based
-                 on the parameters of fuel_arr
+            new_texture: The texture with RGB calues modified to look drier based
+                         on the parameters of fuel_arr
         '''
         # Add the numbers after normalization
         # M_x is inverted because a lower value is more flammable
@@ -131,10 +132,11 @@ class Terrain(pygame.sprite.Sprite):
         color_change_pct /= 3
 
         arr = self.texture.copy()
-        arr[...,0] = np.clip((0.5+color_change_pct)*arr[...,0], 0, 255).astype(np.uint8)
-        arr[...,1] = np.clip(0.25*(1+color_change_pct)*arr[...,1], 0, 255).astype(np.uint8)
+        arr_img = Image.fromarray(arr)
+        texture_img = Image.blend(arr_img, DRY_TERRAIN_BROWN_IMG, color_change_pct/2)
+        new_texture = np.array(texture_img)
 
-        return arr
+        return new_texture
 
 
 class Fire(pygame.sprite.Sprite):
@@ -153,14 +155,14 @@ class Fire(pygame.sprite.Sprite):
         self.pos = pos
         self.size = size
 
-        self.image = load_image('assets/textures/flames.png')
+        self.image = load_image(FIRE_TEXTURE_PATH)
         self.image = pygame.transform.scale(self.image, (self.size, self.size))
 
         self.rect = self.image.get_rect()
         self.rect = self.rect.move(self.pos[1], self.pos[0])
 
         # Layer 2 so that it appears on top of the terrain
-        self.layer: int = 2
+        self.layer: int = SpriteLayer.FIRE
 
         # Record how many frames this sprite has been alive
         self.duration: int = 0

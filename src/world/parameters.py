@@ -19,6 +19,9 @@ class FuelParticle:
 
 @dataclass
 class Tile:
+    '''
+    Class that records the location of each terrain tile for a FuelArray. 
+    '''
     # Tile length in x-direction (ft)
     x: float
     # Tile length in y-direction (ft)
@@ -36,7 +39,8 @@ class Tile:
 class FuelArray:
     '''
     These parameters relate to the fuel in a tile. Need a Tile as a
-    parameter to get area and volume information.
+    parameter to get area and volume information. All other parameters relate
+    to the fuel on the tile.
     '''
     # Tile on which the fuel exists
     tile: Tile

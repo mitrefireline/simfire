@@ -1,27 +1,28 @@
 from typing import Tuple
+
 import numpy as np
+
+from .world.parameters import FuelArray
+from .world.presets import Chaparral, ShortGrass
 
 # Game/Screen parameters
 # Screen size in pixels
 screen_size: int = 225
-# Terrain size in pixels
+# Number of terrain tiles in each row/column
 terrain_size: int = 15
 # Fire/flame szie in pixels
 fire_size: int = 2
 # The amount of feet 1 pixel represents (ft)
-pixel_scale = 10
+pixel_scale = 500
 # Copmute the size of each terrain tile in feet
 terrain_scale = terrain_size * pixel_scale
 
-# Fuel Array Parameters
-w_0_max: float = 7
-delta_max: float = 7
-M_x_max: float = 0.2
-sigma_max: float = 2000
-w_0: np.ndarray = np.random.choice([0.5, w_0_max], p=[0, 1], size=(terrain_size, terrain_size))
-delta: np.ndarray = np.random.choice([0.5, delta_max], p=[0, 1], size=(terrain_size, terrain_size))
-M_x: np.ndarray = np.random.choice([0.1, M_x_max], p=[1, 0], size=(terrain_size, terrain_size))
-sigma: np.ndarray = np.random.choice([750, sigma_max], p=[0, 1], size=(terrain_size, terrain_size))
+# Create FuelArray tiles to make the terrain/map
+chaparral_row = (Chaparral,) * terrain_size
+short_grass_row = (ShortGrass,) * terrain_size
+terrain_map: Tuple[Tuple[FuelArray]] = ((chaparral_row,)*(terrain_size//2) \
+                                        + (short_grass_row,)*(terrain_size//2) \
+                                        + (short_grass_row,)*(terrain_size%2))
 
 # Fire Manager Parameters
 # (x, y) starting coordinates
@@ -31,9 +32,9 @@ max_fire_duration: int = 10
 
 # Environment Parameters:
 # Moisture Content
-M_f: float = 0.099
+M_f: float = 0.03
 # Wind Speed (ft/min)
 # ft/min = 88*mi/hour
 U: float = 88 * 5
 # Wind Direction (degrees clockwise from north)
-U_dir: float = 135
+U_dir: float = 45

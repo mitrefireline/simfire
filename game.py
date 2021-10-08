@@ -15,9 +15,9 @@ def main():
     game = Game(cfg.screen_size)
 
     fuel_arrs = [[FuelArray(Tile(j, i, 0),
-                            cfg.w_0[j, i],
-                            cfg.delta[j, i],
-                            cfg.M_x[j, i]) \
+                            cfg.fuel.w_0[j, i],
+                            cfg.fuel.delta[j, i],
+                            cfg.fuel.M_x[j, i]) \
                   for j in range(cfg.terrain_size)] \
                   for i in range(cfg.terrain_size)]
     terrain = Terrain(fuel_arrs)

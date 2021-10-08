@@ -40,14 +40,10 @@ class Tile:
 
 
 @dataclass
-class FuelArray:
+class Fuel:
     '''
-    These parameters relate to the fuel in a tile. Need a Tile as a
-    parameter to get area and volume information. All other parameters relate
-    to the fuel on the tile.
+    Class that describes the parameters of a fuel type 
     '''
-    # Tile on which the fuel exists
-    tile: Tile
     # Oven-dry Fuel Load (lb/ft^2)
     w_0: float
     # Fuel bed depth (ft)
@@ -59,12 +55,26 @@ class FuelArray:
 
 
 @dataclass
+class FuelArray:
+    '''
+    These parameters relate to the fuel in a tile. Need a Tile as a
+    parameter to get area and volume information. Need a Fuel parameter
+    to get information on how the FuelArray will burn.
+    '''
+    # Tile on which the fuel exists
+    tile: Tile
+    # Fuel properties that describe the FuelArray
+    fuel: Fuel
+
+
+@dataclass
 class Environment:
     '''
     These parameters relate to the environment of the tile. For now we'll
     assume these values are constant over a small area.
     '''
-    # Moisture Content
+    # Fuel Moisture (amount of water in fuel/vegetation)
+    # 1-3% for SoCal, usually never more than 8% for SoCal
     M_f: float
     # Wind speed at midflame height (ft/min)
     U: float

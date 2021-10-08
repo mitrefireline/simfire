@@ -14,30 +14,30 @@ def compute_rate_of_spread(loc: Tuple[float, float, float],
     # Mineral Damping Coefficient
     eta_S = min(0.174 * fuel_particle.S_e**-0.19, 1)
     # Moisture Damping Coefficient
-    r_M = min(environment.M_f / fuel_arr.M_x, 1)
+    r_M = min(environment.M_f / fuel_arr.fuel.M_x, 1)
     eta_M = 1 - 2.59*r_M + 5.11*r_M**2 - 3.52*r_M**3
     # Net Fuel Load (lb/ft^2)
-    w_n = fuel_arr.w_0 * (1 - fuel_particle.S_T)
+    w_n = fuel_arr.fuel.w_0 * (1 - fuel_particle.S_T)
     # Oven-dry Bulk Density (lb/ft^3)
-    p_b = fuel_arr.w_0 / fuel_arr.delta
+    p_b = fuel_arr.fuel.w_0 / fuel_arr.fuel.delta
     # Packing Ratio
     B = p_b / fuel_particle.p_p
     # Optimum Packing Ratio
-    B_op = 3.348 * fuel_arr.sigma**-0.8189
+    B_op = 3.348 * fuel_arr.fuel.sigma**-0.8189
     # Maximum Reaction Velocity (1/min)
-    gamma_prime_max = fuel_arr.sigma**1.5 / (495 + 0.0594*fuel_arr.sigma**1.5)
-    A = 133 * fuel_arr.sigma**-0.7913
+    gamma_prime_max = fuel_arr.fuel.sigma**1.5 / (495 + 0.0594*fuel_arr.fuel.sigma**1.5)
+    A = 133 * fuel_arr.fuel.sigma**-0.7913
     # Optimum Reaction Velocity (1/min)
     gamma_prime = gamma_prime_max * (B/B_op)**A * exp(A*(1-B/B_op))
     # Reaction Intensity (BTU/ft^2-min)
     I_R = gamma_prime * w_n * fuel_particle.h * eta_M * eta_S
     # Propagating Flux Ratio
-    xi = exp((0.792 + 0.681*fuel_arr.sigma**0.5) * (B + 0.1)) / (192 + 0.25*fuel_arr.sigma)
+    xi = exp((0.792 + 0.681*fuel_arr.fuel.sigma**0.5) * (B + 0.1)) / (192 + 0.25*fuel_arr.fuel.sigma)
 
     # Wind Factor
-    c = 7.47 * exp(-0.133*fuel_arr.sigma**0.55)
-    b = 0.02526 * fuel_arr.sigma**0.54
-    e = 0.715 * exp(-3.59e-4 * fuel_arr.sigma)
+    c = 7.47 * exp(-0.133*fuel_arr.fuel.sigma**0.55)
+    b = 0.02526 * fuel_arr.fuel.sigma**0.54
+    e = 0.715 * exp(-3.59e-4 * fuel_arr.fuel.sigma)
     # Need to find wind component in direction of travel
     # Switch order of y-component subtraction since image y coordintates
     # increase from top to bottom
@@ -64,7 +64,7 @@ def compute_rate_of_spread(loc: Tuple[float, float, float],
     phi_s = 5.275 * B**-0.3 * (new_loc[2]-loc[2])**2
 
     # Effective Heating Number
-    epsilon = exp(-138/fuel_arr.sigma)
+    epsilon = exp(-138/fuel_arr.fuel.sigma)
     # Heat of Preignition (BTU/lb)
     Q_ig = 250 + 1116*environment.M_f
 

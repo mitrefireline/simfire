@@ -134,9 +134,9 @@ class Terrain(pygame.sprite.Sprite):
         '''
         # Add the numbers after normalization
         # M_x is inverted because a lower value is more flammable
-        color_change_pct = fuel_arr.w_0 / cfg.w_0_max + \
-                           fuel_arr.delta / cfg.delta_max + \
-                           (cfg.M_x_max - fuel_arr.M_x) / cfg.M_x_max
+        color_change_pct = fuel_arr.fuel.w_0 /  0.2296+ \
+                           fuel_arr.fuel.delta / 7 + \
+                           (0.2 - fuel_arr.fuel.M_x) / 0.2
         # Divide by 3 since there are 3 values
         color_change_pct /= 3
 

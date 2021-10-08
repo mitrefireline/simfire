@@ -39,15 +39,20 @@ def compute_rate_of_spread(loc: Tuple[float, float, float],
     b = 0.02526 * fuel_arr.sigma**0.54
     e = 0.715 * exp(-3.59e-4 * fuel_arr.sigma)
     # Need to find wind component in direction of travel
-    angle_of_travel = atan2(new_loc[1]-loc[1], new_loc[0]-loc[0])
+    # Switch order of y-component subtraction since image y coordintates
+    # increase from top to bottom
+    angle_of_travel = atan2(loc[1]-new_loc[1], new_loc[0]-loc[0])
     # Subtract 90 degrees because this angle is North-oriented
-    wind_angle_radians = radians(environment.U_dir-90)
+    wind_angle_radians = radians(90-environment.U_dir)
     wind_along_angle_of_travel = environment.U * \
-                                 cos(angle_of_travel+wind_angle_radians)
+                                 cos(wind_angle_radians-angle_of_travel)
     # This is the wind speed in in this direction
     U = wind_along_angle_of_travel
     # Negative wind leads to trouble with calculation and doesn't
     # physically make sense
+    import math
+    theta_t_d = math.degrees(angle_of_travel)
+    theta_w_d = math.degrees(wind_angle_radians)
     U = max(U, 0)
     phi_w = c * U**b * (B/B_op)**-e
 

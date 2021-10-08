@@ -97,12 +97,12 @@ class FireManager():
         new_locs = ((x+1, y), (x+1, y+1), (x, y+1), (x-1, y+1),
                             (x-1, y), (x-1, y-1), (x, y-1), (x+1, y-1))
         # Make sure each new location/pixel is:
-        #   UNBURNED
         #   Within the game screen boundaries
+        #   UNBURNED
         filter_func = lambda p: \
-            self.fire_map[p[1], p[0]]==BurnStatus.UNBURNED \
-            and p[0] < self.fire_map.shape[1] and p[0] >=0 \
-            and p[1] < self.fire_map.shape[0] and p[1] >=0
+            p[0] < self.fire_map.shape[1] and p[0] >=0 \
+            and p[1] < self.fire_map.shape[0] and p[1] >=0 \
+            and self.fire_map[p[1], p[0]]==BurnStatus.UNBURNED
         new_locs = tuple(filter(filter_func, new_locs))
         return new_locs
 

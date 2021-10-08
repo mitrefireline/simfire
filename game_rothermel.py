@@ -5,27 +5,29 @@ import pygame
 
 import src.config as cfg
 from src.game.Game import Game
-from src.game.managers import ConstantSpreadFireManager
+from src.game.managers import RothermelFireManager
 from src.game.sprites import Terrain
-from src.world.parameters import FuelArray, Tile
+from src.world.parameters import Environment, FuelArray, FuelParticle, Tile
 
 
 def main():
     pygame.init()
     game = Game(cfg.screen_size)
 
-    fuel_arrs = [[FuelArray(Tile(j, i, 0),
+    fuel_particle = FuelParticle()
+    fuel_arrs = [[FuelArray(Tile(j, i, 0, cfg.terrain_scale, cfg.terrain_scale),
                             cfg.w_0[j, i],
                             cfg.delta[j, i],
-                            cfg.M_x[j, i]) \
+                            cfg.M_x[j, i],
+                            cfg.sigma[j,i]) \
                   for j in range(cfg.terrain_size)] \
                   for i in range(cfg.terrain_size)]
     terrain = Terrain(fuel_arrs)
+    environment = Environment(cfg.M_f, cfg.U, cfg.U_dir)
 
-    # The number of frames it takes the fire to spread 1 pixel
-    rate_of_spread = 5
-    fire_manager = ConstantSpreadFireManager(cfg.fire_init_pos, cfg.fire_size,
-                               cfg.max_fire_duration, cfg.rate_of_spread)
+    fire_manager = RothermelFireManager(cfg.fire_init_pos, cfg.fire_size,
+        cfg.max_fire_duration, cfg.pixel_scale, fuel_particle, terrain,
+        environment)
 
     running = True
     while running:

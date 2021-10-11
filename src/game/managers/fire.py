@@ -3,10 +3,10 @@ from typing import List, Tuple
 import numpy as np
 import pygame
 
-from .sprites import Fire, Terrain
-from ..enums import BurnStatus
-from ..world.parameters import Environment, FuelParticle
-from ..world.rothermel import compute_rate_of_spread
+from ..sprites import Fire, Terrain
+from ...enums import BurnStatus
+from ...world.parameters import Environment, FuelParticle
+from ...world.rothermel import compute_rate_of_spread
 
 NewLocsType = Tuple[Tuple[int, int], Tuple[int, int], Tuple[int, int], Tuple[int, int],
                     Tuple[int, int], Tuple[int, int], Tuple[int, int], Tuple[int, int]]
@@ -99,6 +99,7 @@ class FireManager():
 
     def _filter_function(self, loc: Tuple[int, int]) -> bool:
         '''Used in `self.get_new_locs` as the filter function for the new locations
+
         Make sure each new location/pixel is:
           - Within the game screen boundaries
           - UNBURNED

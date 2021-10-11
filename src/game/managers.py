@@ -1,20 +1,15 @@
-from dataclasses import dataclass
-from typing import List, Sequence, Tuple
+from typing import List, Tuple
 
 import numpy as np
 import pygame
-from pygame import sprite
 
 from .sprites import Fire, Terrain
 from ..enums import BurnStatus
 from ..world.parameters import Environment, FuelParticle
 from ..world.rothermel import compute_rate_of_spread
 
-
-NewLocsType = Tuple[Tuple[int, int], Tuple[int, int],
-                    Tuple[int, int], Tuple[int, int],
-                    Tuple[int, int], Tuple[int, int],
-                    Tuple[int, int], Tuple[int, int]]
+NewLocsType = Tuple[Tuple[int, int], Tuple[int, int], Tuple[int, int], Tuple[int, int],
+                    Tuple[int, int], Tuple[int, int], Tuple[int, int], Tuple[int, int]]
 
 
 class FireManager():
@@ -28,7 +23,7 @@ class FireManager():
         '''
         Initialize the class by recording the initial fire location and size.
         Create the fire sprite and fire_map and mark the location of the
-        initial fire. 
+        initial fire.
 
         Arguments:
             init_pos: The (x,y) location of the initial fire
@@ -40,7 +35,7 @@ class FireManager():
                                for before going out. This is moslty useful so
                                that fires that have spread and are now on the
                                interior do not have to keep being rendered.
-        
+
         Returns:
             None
         '''
@@ -58,7 +53,7 @@ class FireManager():
 
     def update(self) -> None:
         '''
-        Method that describes how the fires in self.sprites should spread. 
+        Method that describes how the fires in self.sprites should spread.
         '''
         pass
 
@@ -70,14 +65,14 @@ class FireManager():
         '''
         # Use the expired sprites to mark self.fire_map as burned
         expired_sprites = list(
-            filter(lambda x: x.duration>=self.max_fire_duration, self.sprites))
+            filter(lambda x: x.duration >= self.max_fire_duration, self.sprites))
         for sprite in expired_sprites:
             x, y, _, _ = sprite.rect
             self.fire_map[y, x] = BurnStatus.BURNED
 
         # Remove the expired sprites
         self.sprites = list(
-            filter(lambda x: x.duration<self.max_fire_duration, self.sprites))
+            filter(lambda x: x.duration < self.max_fire_duration, self.sprites))
 
     def _get_new_locs(self, x: int, y: int) -> NewLocsType:
         '''
@@ -88,23 +83,30 @@ class FireManager():
         Parameters:
             x: The x coordinate of the location
             y: The y coordinate of the location
-        
+
         Returns:
             new_coords: A tuple of tuple of ints containing the adjacent
                         pixel locations that are UNBURNED and within the
                         scope of the game screen
         '''
-        new_locs = ((x+1, y), (x+1, y+1), (x, y+1), (x-1, y+1),
-                            (x-1, y), (x-1, y-1), (x, y-1), (x+1, y-1))
+        new_locs = ((x + 1, y), (x + 1, y + 1), (x, y + 1), (x - 1, y + 1), (x - 1, y),
+                    (x - 1, y - 1), (x, y - 1), (x + 1, y - 1))
         # Make sure each new location/pixel is:
         #   Within the game screen boundaries
         #   UNBURNED
-        filter_func = lambda p: \
-            p[0] < self.fire_map.shape[1] and p[0] >=0 \
-            and p[1] < self.fire_map.shape[0] and p[1] >=0 \
-            and self.fire_map[p[1], p[0]]==BurnStatus.UNBURNED
-        new_locs = tuple(filter(filter_func, new_locs))
+        new_locs = tuple(filter(self._filter_function, new_locs))
         return new_locs
+
+    def _filter_function(self, loc: Tuple[int, int]) -> bool:
+        '''Used in `self.get_new_locs` as the filter function for the new locations
+        Make sure each new location/pixel is:
+          - Within the game screen boundaries
+          - UNBURNED
+        '''
+        in_boundaries = loc[0] < self.fire_map.shape[1] and loc[0] >= 0 \
+                        and loc[1] < self.fire_map.shape[0] and loc[1] >= 0 \
+                        and self.fire_map[loc[1], loc[0]] == BurnStatus.UNBURNED
+        return in_boundaries
 
 
 class RothermelFireManager(FireManager):
@@ -112,14 +114,13 @@ class RothermelFireManager(FireManager):
     This FireManager will spread the fire based on the basic Rothermel
     model (https://www.fs.fed.us/rm/pubs_series/rmrs/gtr/rmrs_gtr371.pdf).
     '''
-    def __init__(self, init_pos: Tuple[int, int], fire_size: int,
-                 max_fire_duration: int, pixel_scale: int,
-                 fuel_particle: FuelParticle, terrain: Terrain,
+    def __init__(self, init_pos: Tuple[int, int], fire_size: int, max_fire_duration: int,
+                 pixel_scale: int, fuel_particle: FuelParticle, terrain: Terrain,
                  environment: Environment) -> None:
         '''
         Initialize the class by recording the initial fire location and size.
         Create the fire sprite and fire_map and mark the location of the
-        initial fire. 
+        initial fire.
 
         Arguments:
             init_pos: The (x,y) location of the initial fire
@@ -139,7 +140,7 @@ class RothermelFireManager(FireManager):
             fuel_particle: The parameters that describe the fuel particle
             terrain: The Terrain that describes the simulation/game
             environment: The Environment that describes the simulation/game
-        
+
         Returns:
             None
         '''
@@ -180,12 +181,11 @@ class RothermelFireManager(FireManager):
                 loc = (x, y, fuel_arr.tile.z)
                 fuel_arr_new = self.terrain.fuel_arrs[y, x]
                 loc_new = (x_new, y_new, fuel_arr_new.tile.z)
-                rate_of_spread = compute_rate_of_spread(loc, loc_new,
-                                                        fuel_arr_new,
+                rate_of_spread = compute_rate_of_spread(loc, loc_new, fuel_arr_new,
                                                         self.fuel_particle,
                                                         self.environment)
                 self.burn_amounts[y, x] += rate_of_spread
-                if self.burn_amounts[y,x] > self.pixel_scale:
+                if self.burn_amounts[y, x] > self.pixel_scale:
                     new_sprite = Fire((x_new, y_new), self.fire_size)
                     self.sprites.append(new_sprite)
                     self.fire_map[y_new, x_new] = BurnStatus.BURNING
@@ -193,15 +193,14 @@ class RothermelFireManager(FireManager):
 
 class ConstantSpreadFireManager(FireManager):
     '''
-    This FireManager will spread fire at a constant rate in all directions. 
+    This FireManager will spread fire at a constant rate in all directions.
     '''
-    def __init__(self, init_pos: Tuple[int, int], fire_size: int,
-                 max_fire_duration: int,
+    def __init__(self, init_pos: Tuple[int, int], fire_size: int, max_fire_duration: int,
                  rate_of_spread: int) -> None:
         '''
         Initialize the class by recording the initial fire location and size.
         Create the fire sprite and fire_map and mark the location of the
-        initial fire. 
+        initial fire.
 
         Arguments:
             init_pos: The (x,y) location of the initial fire
@@ -215,7 +214,7 @@ class ConstantSpreadFireManager(FireManager):
                                interior do not have to keep being rendered.
             rate_of_spread: The number of frames that must pass before a fire
                             can spread to adjacent pixels.
-        
+
         Returns:
             None
         '''

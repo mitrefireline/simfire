@@ -11,7 +11,7 @@ class Game():
     '''
     Class that controls the game. This class will initalize the game
     and allow for terrain, fire, and other sprites to be rendered and
-    interact. 
+    interact.
     '''
     def __init__(self, screen_size: int) -> None:
         '''
@@ -31,10 +31,7 @@ class Game():
         self.background = self.background.convert()
         self.background.fill((0, 0, 0))
 
-    def update(self,
-               terrain, 
-               fire_sprites: Sequence[Fire],
-               fire_map: np.ndarray) -> bool:
+    def update(self, terrain, fire_sprites: Sequence[Fire], fire_map: np.ndarray) -> bool:
         '''
         Update the game display using the provided terrain, sprites, and
         environment data. Most of the logic for the game is handled within

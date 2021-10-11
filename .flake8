@@ -1,2 +1,4 @@
 [flake8]
 max-line-length = 90
+# Ignoring E127, W504 because it conflicts with yapf's pep8 formatting
+ignore = E127, W504, W503

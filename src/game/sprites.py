@@ -21,14 +21,14 @@ class Terrain(pygame.sprite.Sprite):
     def __init__(self, tiles: Sequence[Sequence[FuelArray]]) -> None:
         '''
         Initialize the class by loading the tile textures and stitching
-        together the whole terrain image. 
+        together the whole terrain image.
 
         Arguments:
             tiles: The 2D nested sequences of FuelArrays that comprise the
                    terrain.
 
         Returns:
-            None 
+            None
         '''
         super().__init__()
 
@@ -53,7 +53,7 @@ class Terrain(pygame.sprite.Sprite):
         Arguments:
             fire_map: A map containing enumerated values for unburned,
                       burning, and burned tile status
-        
+
         Returns: None
         '''
         burned_idxs = (fire_map == BurnStatus.BURNED)
@@ -70,7 +70,7 @@ class Terrain(pygame.sprite.Sprite):
             None
 
         Returns:
-            None 
+            None
         '''
         out_size = (self.terrain_size, self.terrain_size)
         texture = Image.open(TERRAIN_TEXTURE_PATH)
@@ -83,7 +83,7 @@ class Terrain(pygame.sprite.Sprite):
         '''
         Stitch together all of the FuelArray tiles in self.tiles to create
         the terrain image. This starts as a numpy array, but is then converted
-        to a pygame.Surface for compatibility with pygame. 
+        to a pygame.Surface for compatibility with pygame.
 
         Additionally, stitch together the FuelArrays into a tiled
         numpy array that aligns with out_surf for use with a FireManager.
@@ -99,24 +99,24 @@ class Terrain(pygame.sprite.Sprite):
                        resolution for the FireManager to work at the pixel
                        level
         '''
-        image = np.zeros(self.screen_size+(3,))
+        image = np.zeros(self.screen_size + (3, ))
         fuel_arrs = np.zeros(self.screen_size, dtype=np.dtype(FuelArray))
 
         for i in range(self.tiles.shape[0]):
             for j in range(self.tiles.shape[1]):
-                x = j*self.terrain_size
-                y = i*self.terrain_size
+                x = j * self.terrain_size
+                y = i * self.terrain_size
                 w = self.terrain_size
                 h = self.terrain_size
 
                 updated_texture = self._update_texture_dryness(self.tiles[j][i])
-                image[y:y+h, x:x+w] = updated_texture
-                fuel_arrs[y:y+h, x:x+w] = self.tiles[j][i]
-        
+                image[y:y + h, x:x + w] = updated_texture
+                fuel_arrs[y:y + h, x:x + w] = self.tiles[j][i]
+
         out_surf = pygame.surfarray.make_surface(image)
 
         return out_surf, fuel_arrs
-    
+
     def _update_texture_dryness(self, fuel_arr: FuelArray) -> np.ndarray:
         '''
         Determine the percent change to make the terrain look drier (i.e.
@@ -134,7 +134,7 @@ class Terrain(pygame.sprite.Sprite):
         '''
         # Add the numbers after normalization
         # M_x is inverted because a lower value is more flammable
-        color_change_pct = fuel_arr.fuel.w_0 /  0.2296+ \
+        color_change_pct = fuel_arr.fuel.w_0 / 0.2296 + \
                            fuel_arr.fuel.delta / 7 + \
                            (0.2 - fuel_arr.fuel.M_x) / 0.2
         # Divide by 3 since there are 3 values
@@ -142,7 +142,7 @@ class Terrain(pygame.sprite.Sprite):
 
         arr = self.texture.copy()
         arr_img = Image.fromarray(arr)
-        texture_img = Image.blend(arr_img, DRY_TERRAIN_BROWN_IMG, color_change_pct/2)
+        texture_img = Image.blend(arr_img, DRY_TERRAIN_BROWN_IMG, color_change_pct / 2)
         new_texture = np.array(texture_img)
 
         return new_texture
@@ -157,7 +157,7 @@ class Fire(pygame.sprite.Sprite):
     def __init__(self, pos: Tuple[int, int], size: int) -> None:
         '''
         Initialize the class by recording the position and size of the sprite
-        and loading/resizing its texture 
+        and loading/resizing its texture
         '''
         super().__init__()
 
@@ -185,7 +185,7 @@ class Fire(pygame.sprite.Sprite):
             None
 
         Returns:
-            None 
+            None
         '''
         # Increment the duration
         self.duration += 1

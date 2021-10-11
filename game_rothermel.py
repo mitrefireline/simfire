@@ -1,6 +1,3 @@
-from typing import Tuple
-
-import numpy as np
 import pygame
 
 import src.config as cfg
@@ -15,17 +12,17 @@ def main():
     game = Game(cfg.screen_size)
 
     fuel_particle = FuelParticle()
-    
-    fuel_arrs = [[FuelArray(Tile(j, i, 0, cfg.terrain_scale, cfg.terrain_scale),
-                            cfg.terrain_map[i][j]) \
-                  for j in range(cfg.terrain_size)] \
-                 for i in range(cfg.terrain_size)]
+
+    fuel_arrs = [[
+        FuelArray(Tile(j, i, 0, cfg.terrain_scale, cfg.terrain_scale),
+                  cfg.terrain_map[i][j]) for j in range(cfg.terrain_size)
+    ] for i in range(cfg.terrain_size)]
     terrain = Terrain(fuel_arrs)
     environment = Environment(cfg.M_f, cfg.U, cfg.U_dir)
 
     fire_manager = RothermelFireManager(cfg.fire_init_pos, cfg.fire_size,
-        cfg.max_fire_duration, cfg.pixel_scale, fuel_particle, terrain,
-        environment)
+                                        cfg.max_fire_duration, cfg.pixel_scale,
+                                        fuel_particle, terrain, environment)
 
     running = True
     while running:

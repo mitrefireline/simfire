@@ -1,6 +1,3 @@
-from typing import Tuple
-
-import numpy as np
 import pygame
 
 import src.config as cfg
@@ -14,18 +11,15 @@ def main():
     pygame.init()
     game = Game(cfg.screen_size)
 
-    fuel_arrs = [[FuelArray(Tile(j, i, 0),
-                            cfg.fuel.w_0[j, i],
-                            cfg.fuel.delta[j, i],
-                            cfg.fuel.M_x[j, i]) \
-                  for j in range(cfg.terrain_size)] \
-                  for i in range(cfg.terrain_size)]
+    fuel_arrs = [[
+        FuelArray(Tile(j, i, 0), cfg.fuel.w_0[j, i], cfg.fuel.delta[j, i],
+                  cfg.fuel.M_x[j, i]) for j in range(cfg.terrain_size)
+    ] for i in range(cfg.terrain_size)]
     terrain = Terrain(fuel_arrs)
 
     # The number of frames it takes the fire to spread 1 pixel
-    rate_of_spread = 5
     fire_manager = ConstantSpreadFireManager(cfg.fire_init_pos, cfg.fire_size,
-                               cfg.max_fire_duration, cfg.rate_of_spread)
+                                             cfg.max_fire_duration, cfg.rate_of_spread)
 
     running = True
     while running:

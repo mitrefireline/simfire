@@ -20,7 +20,7 @@ class FuelParticle:
 @dataclass
 class Tile:
     '''
-    Class that records the location of each terrain tile for a FuelArray. 
+    Class that records the location of each terrain tile for a FuelArray.
     '''
     # x coordinate of the top-left corner of the tile in the array
     x: float
@@ -34,7 +34,7 @@ class Tile:
     h: float
     # Area of the tile (ft^2)
     area: float = field(init=False)
-    
+
     def __post_init__(self):
         self.area = self.w * self.h
 
@@ -42,7 +42,7 @@ class Tile:
 @dataclass
 class Fuel:
     '''
-    Class that describes the parameters of a fuel type 
+    Class that describes the parameters of a fuel type
     '''
     # Oven-dry Fuel Load (lb/ft^2)
     w_0: float

@@ -1,0 +1,22 @@
+image: "python:latest"
+
+before_script:
+  - python --version
+  - pip install -r requirements.txt
+
+stages:
+  Static Analysis
+
+flake8:
+  stage: Static Analysis
+  script:
+    - flake8 .
+  only:
+    - merge_requests
+
+yapf:
+  stage: Static Analysis
+  script:
+    - if [ `yapf -r ./ -d | wc -l` -gt 0 ] ; then false ; else true ;fi
+  only:
+    - merge_requests

@@ -1,7 +1,10 @@
-from typing import List, Tuple
+from dataclasses import astuple
+from typing import List, Sequence, Tuple
 
 import numpy as np
 import pygame
+
+from src.config import U_dir
 
 from .sprites import Fire, Terrain
 from ..enums import BurnStatus
@@ -153,7 +156,7 @@ class RothermelFireManager(FireManager):
         # Keep track of how much each pixel has burned.
         # This is needed since each pixel represents a specific number of feet
         # and it might take more than one update to burn
-        self.burn_amounts = np.zeros_like(self.fire_map)
+        self.burn_amounts = np.zeros_like(self.fire_map, dtype=np.float32)
 
     def update(self) -> None:
         '''
@@ -171,24 +174,95 @@ class RothermelFireManager(FireManager):
         # Remove all fires that are past the max duration
         self._prune_sprites()
         num_sprites = len(self.sprites)
+        loc_x = []
+        loc_y = []
+        loc_z = []
+        new_loc_x = []
+        new_loc_y = []
+        new_loc_z = []
+        w_0 = []
+        delta = []
+        M_x = []
+        sigma = []
+        h = []
+        S_T = []
+        S_e = []
+        p_p = []
+        M_f = []
+        U = []
+        U_dir = []
         for sprite_idx in range(num_sprites):
             sprite = self.sprites[sprite_idx]
             x, y, _, _ = sprite.rect
             fuel_arr = self.terrain.fuel_arrs[y, x]
+            z = fuel_arr.tile.z
             new_locs = self._get_new_locs(x, y)
+            num_locs = len(new_locs)
+            if num_locs == 0:
+                continue
+                
 
-            for x_new, y_new in new_locs:
-                loc = (x, y, fuel_arr.tile.z)
-                fuel_arr_new = self.terrain.fuel_arrs[y, x]
-                loc_new = (x_new, y_new, fuel_arr_new.tile.z)
-                rate_of_spread = compute_rate_of_spread(loc, loc_new, fuel_arr_new,
-                                                        self.fuel_particle,
-                                                        self.environment)
-                self.burn_amounts[y, x] += rate_of_spread
-                if self.burn_amounts[y, x] > self.pixel_scale:
-                    new_sprite = Fire((x_new, y_new), self.fire_size)
-                    self.sprites.append(new_sprite)
-                    self.fire_map[y_new, x_new] = BurnStatus.BURNING
+            new_locs_uzip = tuple(zip(*new_locs))
+            new_loc_x.extend(new_locs_uzip[0])
+            new_loc_y.extend(new_locs_uzip[1])
+            new_loc_z.extend([arr.tile.z for arr in \
+                self.terrain.fuel_arrs[new_locs_uzip[::-1]]])
+            loc_x.extend([x]*num_locs)
+            loc_y.extend([y]*num_locs)
+            loc_z.extend([z]*num_locs)
+
+            n_w_0, n_delta, n_M_x, n_sigma = list(zip(*[astuple(arr.fuel) \
+                for arr in self.terrain.fuel_arrs[new_locs_uzip[::-1]]]))
+            w_0.extend(n_w_0)
+            delta.extend(n_delta)
+            M_x.extend(n_M_x)
+            sigma.extend(n_sigma)
+
+            # Set the FuelParticle parameters into arrays
+            h.extend([self.fuel_particle.h]*num_locs)
+            S_T.extend([self.fuel_particle.S_T]*num_locs)
+            S_e.extend([self.fuel_particle.S_e]*num_locs)
+            p_p.extend([self.fuel_particle.p_p]*num_locs)
+
+            # Set the Environment parameters into arrays
+            M_f.extend([self.environment.M_f]*num_locs)
+            U.extend([self.environment.U]*num_locs)
+            U_dir.extend([self.environment.U_dir]*num_locs)
+        
+        loc_x = np.array(loc_x, dtype=np.float32)
+        loc_y = np.array(loc_y, dtype=np.float32)
+        loc_z = np.array(loc_z, dtype=np.float32)
+        new_loc_x = np.array(new_loc_x, dtype=np.float32)
+        new_loc_y = np.array(new_loc_y, dtype=np.float32)
+        new_loc_z = np.array(new_loc_z, dtype=np.float32)
+        w_0 = np.array(w_0, dtype=np.float32)
+        delta = np.array(delta, dtype=np.float32)
+        M_x = np.array(M_x, dtype=np.float32)
+        sigma = np.array(sigma, dtype=np.float32)
+        h = np.array(h, dtype=np.float32)
+        S_T = np.array(S_T, dtype=np.float32)
+        S_e = np.array(S_e, dtype=np.float32)
+        p_p = np.array(p_p, dtype=np.float32)
+        M_f = np.array(M_f, dtype=np.float32)
+        U = np.array(U, dtype=np.float32)
+        U_dir = np.array(U_dir, dtype=np.float32)
+
+
+        R = compute_rate_of_spread(loc_x, loc_y, loc_z,
+            new_loc_x, new_loc_y, new_loc_z, w_0, delta, M_x,
+            sigma, h, S_T, S_e, p_p, M_f, U, U_dir)
+
+        y_coords = new_loc_y.astype(np.int)
+        x_coords = new_loc_x.astype(np.int)
+        self.burn_amounts[y_coords, x_coords] += R
+
+
+        y_coords, x_coords = np.unique(np.vstack((y_coords, x_coords)), axis=1)
+        for (x_new, y_new) in zip(x_coords, y_coords):
+            if self.burn_amounts[y_new, x_new] > self.pixel_scale:
+                new_sprite = Fire((x_new, y_new), self.fire_size)
+                self.sprites.append(new_sprite)
+                self.fire_map[y_new, x_new] = BurnStatus.BURNING
 
 
 class ConstantSpreadFireManager(FireManager):

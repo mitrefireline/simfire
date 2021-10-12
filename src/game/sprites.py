@@ -112,7 +112,7 @@ class Terrain(pygame.sprite.Sprite):
 
                 updated_texture = self._update_texture_dryness(self.tiles[j][i])
                 image[y:y + h, x:x + w] = updated_texture
-                fuel_arrs[y:y + h, x:x + w] = self.tiles[j][i]
+                fuel_arrs[y:y + h, x:x + w] = self.tiles[i][j]
 
         out_surf = pygame.surfarray.make_surface(image)
 

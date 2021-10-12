@@ -14,13 +14,13 @@ except ValueError:
 
 # Game/Screen parameters
 # Screen size in pixels
-screen_size: int = 625
+screen_size: int = 225
 # Number of terrain tiles in each row/column
-terrain_size: int = 25
+terrain_size: int = 15
 # Fire/flame szie in pixels
 fire_size: int = 2
 # The amount of feet 1 pixel represents (ft)
-pixel_scale = 30
+pixel_scale = 150
 # Copmute the size of each terrain tile in feet
 terrain_scale = terrain_size * pixel_scale
 
@@ -33,9 +33,9 @@ terrain_map: Tuple[Tuple[FuelArray]] = ((chaparral_row, ) * (terrain_size // 2) 
 
 # Fire Manager Parameters
 # (x, y) starting coordinates
-fire_init_pos: Tuple[int, int] = (110, 110)
-# Fires burn for 7 frames
-max_fire_duration: int = 10
+fire_init_pos: Tuple[int, int] = (103, 50)
+# Fires burn for a limited number of frames
+max_fire_duration: int = 5
 
 # Environment Parameters:
 # Moisture Content

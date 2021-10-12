@@ -1,10 +1,8 @@
 from dataclasses import astuple
-from typing import List, Sequence, Tuple
+from typing import List, Tuple
 
 import numpy as np
 import pygame
-
-from src.config import U_dir
 
 from .sprites import Fire, Terrain
 from ..enums import BurnStatus
@@ -196,39 +194,41 @@ class RothermelFireManager(FireManager):
             x, y, _, _ = sprite.rect
             fuel_arr = self.terrain.fuel_arrs[y, x]
             z = fuel_arr.tile.z
+
             new_locs = self._get_new_locs(x, y)
             num_locs = len(new_locs)
             if num_locs == 0:
                 continue
-                
 
             new_locs_uzip = tuple(zip(*new_locs))
             new_loc_x.extend(new_locs_uzip[0])
             new_loc_y.extend(new_locs_uzip[1])
-            new_loc_z.extend([arr.tile.z for arr in \
-                self.terrain.fuel_arrs[new_locs_uzip[::-1]]])
-            loc_x.extend([x]*num_locs)
-            loc_y.extend([y]*num_locs)
-            loc_z.extend([z]*num_locs)
+            new_loc_z.extend([arr.tile.z for arr in
+                              self.terrain.fuel_arrs[new_locs_uzip[::-1]]])
+            loc_x.extend([x] * num_locs)
+            loc_y.extend([y] * num_locs)
+            loc_z.extend([z] * num_locs)
 
-            n_w_0, n_delta, n_M_x, n_sigma = list(zip(*[astuple(arr.fuel) \
-                for arr in self.terrain.fuel_arrs[new_locs_uzip[::-1]]]))
+            n_w_0, n_delta, n_M_x, n_sigma = list(zip(*[astuple(arr.fuel)
+                                                  for arr in
+                                                  self.terrain.fuel_arrs[
+                                                      new_locs_uzip[::-1]]]))
             w_0.extend(n_w_0)
             delta.extend(n_delta)
             M_x.extend(n_M_x)
             sigma.extend(n_sigma)
 
             # Set the FuelParticle parameters into arrays
-            h.extend([self.fuel_particle.h]*num_locs)
-            S_T.extend([self.fuel_particle.S_T]*num_locs)
-            S_e.extend([self.fuel_particle.S_e]*num_locs)
-            p_p.extend([self.fuel_particle.p_p]*num_locs)
+            h.extend([self.fuel_particle.h] * num_locs)
+            S_T.extend([self.fuel_particle.S_T] * num_locs)
+            S_e.extend([self.fuel_particle.S_e] * num_locs)
+            p_p.extend([self.fuel_particle.p_p] * num_locs)
 
             # Set the Environment parameters into arrays
-            M_f.extend([self.environment.M_f]*num_locs)
-            U.extend([self.environment.U]*num_locs)
-            U_dir.extend([self.environment.U_dir]*num_locs)
-        
+            M_f.extend([self.environment.M_f] * num_locs)
+            U.extend([self.environment.U] * num_locs)
+            U_dir.extend([self.environment.U_dir] * num_locs)
+
         loc_x = np.array(loc_x, dtype=np.float32)
         loc_y = np.array(loc_y, dtype=np.float32)
         loc_z = np.array(loc_z, dtype=np.float32)
@@ -247,15 +247,13 @@ class RothermelFireManager(FireManager):
         U = np.array(U, dtype=np.float32)
         U_dir = np.array(U_dir, dtype=np.float32)
 
-
         R = compute_rate_of_spread(loc_x, loc_y, loc_z,
-            new_loc_x, new_loc_y, new_loc_z, w_0, delta, M_x,
-            sigma, h, S_T, S_e, p_p, M_f, U, U_dir)
+                                   new_loc_x, new_loc_y, new_loc_z, w_0, delta, M_x,
+                                   sigma, h, S_T, S_e, p_p, M_f, U, U_dir)
 
         y_coords = new_loc_y.astype(np.int)
         x_coords = new_loc_x.astype(np.int)
         self.burn_amounts[y_coords, x_coords] += R
-
 
         y_coords, x_coords = np.unique(np.vstack((y_coords, x_coords)), axis=1)
         for (x_new, y_new) in zip(x_coords, y_coords):

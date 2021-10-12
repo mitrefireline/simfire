@@ -158,7 +158,7 @@ class Fire(pygame.sprite.Sprite):
     def __init__(self, pos: Tuple[int, int], size: int) -> None:
         '''
         Initialize the class by recording the position and size of the sprite
-        and loading/resizing its texture 
+        and loading/resizing its texture.
 
         Arguments:
             pos: The (x, y) pixel position of the sprite

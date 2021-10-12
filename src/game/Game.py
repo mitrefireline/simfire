@@ -32,7 +32,7 @@ class Game():
         self.background.fill((0, 0, 0))
 
     def update(self,
-               terrain: Terrain, 
+               terrain: Terrain,
                fire_sprites: Sequence[Fire],
                fire_map: np.ndarray) -> bool:
         '''

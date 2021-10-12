@@ -1,7 +1,6 @@
 from typing import Tuple
 
 import GPUtil
-import numpy as np
 
 from .world.parameters import FuelArray
 from .world.presets import Chaparral, ShortGrass
@@ -10,9 +9,9 @@ from .world.presets import Chaparral, ShortGrass
 try:
     if len(GPUtil.getAvailable()) > 0:
         device = 'cuda'
-except:
+except ValueError:
     device = 'cpu'
-    
+
 # Game/Screen parameters
 # Screen size in pixels
 screen_size: int = 625
@@ -43,6 +42,6 @@ max_fire_duration: int = 10
 M_f: float = 0.03
 # Wind Speed (ft/min)
 # ft/min = 88*mi/hour
-U: float = 88 * 2
+U: float = 88 * 1
 # Wind Direction (degrees clockwise from north)
 U_dir: float = 45

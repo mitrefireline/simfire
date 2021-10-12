@@ -202,16 +202,17 @@ class RothermelFireManager(FireManager):
             new_locs_uzip = tuple(zip(*new_locs))
             new_loc_x.extend(new_locs_uzip[0])
             new_loc_y.extend(new_locs_uzip[1])
-            new_loc_z.extend([arr.tile.z for arr in
-                              self.terrain.fuel_arrs[new_locs_uzip[::-1]]])
+            new_loc_z.extend(
+                [arr.tile.z for arr in self.terrain.fuel_arrs[new_locs_uzip[::-1]]])
             loc_x.extend([x] * num_locs)
             loc_y.extend([y] * num_locs)
             loc_z.extend([z] * num_locs)
 
-            n_w_0, n_delta, n_M_x, n_sigma = list(zip(*[astuple(arr.fuel)
-                                                  for arr in
-                                                  self.terrain.fuel_arrs[
-                                                      new_locs_uzip[::-1]]]))
+            n_w_0, n_delta, n_M_x, n_sigma = list(
+                zip(*[
+                    astuple(arr.fuel)
+                    for arr in self.terrain.fuel_arrs[new_locs_uzip[::-1]]
+                ]))
             w_0.extend(n_w_0)
             delta.extend(n_delta)
             M_x.extend(n_M_x)
@@ -246,9 +247,9 @@ class RothermelFireManager(FireManager):
         U = np.array(U, dtype=np.float32)
         U_dir = np.array(U_dir, dtype=np.float32)
 
-        R = compute_rate_of_spread(loc_x, loc_y, loc_z,
-                                   new_loc_x, new_loc_y, new_loc_z, w_0, delta, M_x,
-                                   sigma, h, S_T, S_e, p_p, M_f, U, U_dir)
+        R = compute_rate_of_spread(loc_x, loc_y, loc_z, new_loc_x, new_loc_y, new_loc_z,
+                                   w_0, delta, M_x, sigma, h, S_T, S_e, p_p, M_f, U,
+                                   U_dir)
 
         y_coords = new_loc_y.astype(np.int)
         x_coords = new_loc_x.astype(np.int)

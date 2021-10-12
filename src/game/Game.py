@@ -31,9 +31,7 @@ class Game():
         self.background = self.background.convert()
         self.background.fill((0, 0, 0))
 
-    def update(self,
-               terrain: Terrain,
-               fire_sprites: Sequence[Fire],
+    def update(self, terrain: Terrain, fire_sprites: Sequence[Fire],
                fire_map: np.ndarray) -> bool:
         '''
         Update the game display using the provided terrain, sprites, and

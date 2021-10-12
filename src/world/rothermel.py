@@ -5,12 +5,12 @@ from ..config import device
 
 @vectorize([('float32(float32,float32,float32,float32,float32,float32,'
              'float32,float32,float32,float32,float32,float32,'
-             'float32,float32,float32,float32,float32)')], target=device)
-def compute_rate_of_spread(loc_x: float, loc_y: float, loc_z: float,
-                           new_loc_x: float, new_loc_y: float, new_loc_z: float,
-                           w_0: float, delta: float, M_x: float, sigma: float,
-                           h: float, S_T: float, S_e: float, p_p: float,
-                           M_f: float, U: float, U_dir: float) -> float:
+             'float32,float32,float32,float32,float32)')],
+           target=device)
+def compute_rate_of_spread(loc_x: float, loc_y: float, loc_z: float, new_loc_x: float,
+                           new_loc_y: float, new_loc_z: float, w_0: float, delta: float,
+                           M_x: float, sigma: float, h: float, S_T: float, S_e: float,
+                           p_p: float, M_f: float, U: float, U_dir: float) -> float:
     # Mineral Damping Coefficient
     eta_S = min(0.174 * S_e**-0.19, 1)
     # Moisture Damping Coefficient

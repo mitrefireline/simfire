@@ -194,7 +194,6 @@ class RothermelFireManager(FireManager):
             x, y, _, _ = sprite.rect
             fuel_arr = self.terrain.fuel_arrs[y, x]
             z = fuel_arr.tile.z
-
             new_locs = self._get_new_locs(x, y)
             num_locs = len(new_locs)
             if num_locs == 0:

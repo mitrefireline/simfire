@@ -1,5 +1,6 @@
 from math import atan2, cos, exp, radians
 from numba import vectorize
+
 from ..config import device
 
 

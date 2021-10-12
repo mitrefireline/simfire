@@ -56,10 +56,11 @@ class Terrain(pygame.sprite.Sprite):
 
         Returns: None
         '''
-        burned_idxs = (fire_map == BurnStatus.BURNED)
+        fire_map = fire_map.copy()
+        burned_idxs = np.where(fire_map == BurnStatus.BURNED)
         # This method will update self.image in-place with arr
         arr = pygame.surfarray.pixels3d(self.image)
-        arr[burned_idxs] = (139, 69, 19)
+        arr[burned_idxs[::-1]] = (139, 69, 19)
 
     def _load_texture(self) -> np.ndarray:
         '''
@@ -111,7 +112,7 @@ class Terrain(pygame.sprite.Sprite):
 
                 updated_texture = self._update_texture_dryness(self.tiles[j][i])
                 image[y:y + h, x:x + w] = updated_texture
-                fuel_arrs[y:y + h, x:x + w] = self.tiles[j][i]
+                fuel_arrs[y:y + h, x:x + w] = self.tiles[i][j]
 
         out_surf = pygame.surfarray.make_surface(image)
 
@@ -157,7 +158,11 @@ class Fire(pygame.sprite.Sprite):
     def __init__(self, pos: Tuple[int, int], size: int) -> None:
         '''
         Initialize the class by recording the position and size of the sprite
-        and loading/resizing its texture
+        and loading/resizing its texture.
+
+        Arguments:
+            pos: The (x, y) pixel position of the sprite
+            size: The pixel size of the sprite
         '''
         super().__init__()
 
@@ -168,7 +173,7 @@ class Fire(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(self.image, (self.size, self.size))
 
         self.rect = self.image.get_rect()
-        self.rect = self.rect.move(self.pos[1], self.pos[0])
+        self.rect = self.rect.move(self.pos[0], self.pos[1])
 
         # Layer 2 so that it appears on top of the terrain
         self.layer: int = SpriteLayer.FIRE

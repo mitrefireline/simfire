@@ -4,7 +4,7 @@ import numpy as np
 import pygame
 
 from .image import load_image
-from .sprites import Fire
+from .sprites import Fire, Terrain
 
 
 class Game():
@@ -31,7 +31,8 @@ class Game():
         self.background = self.background.convert()
         self.background.fill((0, 0, 0))
 
-    def update(self, terrain, fire_sprites: Sequence[Fire], fire_map: np.ndarray) -> bool:
+    def update(self, terrain: Terrain, fire_sprites: Sequence[Fire],
+               fire_map: np.ndarray) -> bool:
         '''
         Update the game display using the provided terrain, sprites, and
         environment data. Most of the logic for the game is handled within

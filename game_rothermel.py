@@ -27,7 +27,7 @@ def main():
     running = True
     while running:
         fire_sprites = fire_manager.sprites
-        fire_map = fire_manager.fire_map
+        fire_map = fire_manager.fire_map.copy()
         running = game.update(terrain, fire_sprites, fire_map)
         fire_manager.update()
 

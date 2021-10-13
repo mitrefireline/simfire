@@ -9,6 +9,8 @@ from .world.presets import Chaparral, ShortGrass
 try:
     if len(GPUtil.getAvailable()) > 0:
         device = 'cuda'
+    else:
+        device = 'cpu'
 except ValueError:
     device = 'cpu'
 

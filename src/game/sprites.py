@@ -7,7 +7,7 @@ import pygame
 from .image import load_image
 from .. import config as cfg
 from ..enums import BurnStatus, DRY_TERRAIN_BROWN_IMG, \
-    FIRE_TEXTURE_PATH, SpriteLayer, TERRAIN_TEXTURE_PATH
+    FIRE_TEXTURE_PATH, SpriteLayer, TERRAIN_TEXTURE_PATH, BURNED_RGB_COLOR
 from ..world.parameters import FuelArray
 
 
@@ -60,7 +60,7 @@ class Terrain(pygame.sprite.Sprite):
         burned_idxs = np.where(fire_map == BurnStatus.BURNED)
         # This method will update self.image in-place with arr
         arr = pygame.surfarray.pixels3d(self.image)
-        arr[burned_idxs[::-1]] = (139, 69, 19)
+        arr[burned_idxs[::-1]] = BURNED_RGB_COLOR
 
     def _load_texture(self) -> np.ndarray:
         '''

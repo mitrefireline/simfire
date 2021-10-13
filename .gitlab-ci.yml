@@ -6,6 +6,7 @@ before_script:
 
 stages:
   - Static Analysis
+  - Unit Tests
 
 flake8:
   stage: Static Analysis
@@ -22,5 +23,14 @@ yapf:
     - docker
   script:
     - if [ `yapf -r ./ -d | wc -l` -gt 0 ] ; then false ; else true ;fi
+  only:
+    - merge_requests
+
+unittests:
+  stage: Unit Tests
+  tags:
+    - docker
+  script:
+    - SDL_VIDEODRIVER="dummy" python -m unittest discover -s src -t .. -p "test_*.py"
   only:
     - merge_requests

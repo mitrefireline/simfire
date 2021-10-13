@@ -1,6 +1,7 @@
 import pygame
 
 import src.config as cfg
+from src.enums import GameStatus
 from src.game.Game import Game
 from src.game.managers import RothermelFireManager
 from src.game.sprites import Terrain
@@ -24,8 +25,8 @@ def main():
                                         cfg.max_fire_duration, cfg.pixel_scale,
                                         fuel_particle, terrain, environment)
 
-    running = True
-    while running:
+    running = GameStatus.RUNNING
+    while running == GameStatus.RUNNING:
         fire_sprites = fire_manager.sprites
         fire_map = fire_manager.fire_map.copy()
         running = game.update(terrain, fire_sprites, fire_map)

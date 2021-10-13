@@ -5,6 +5,7 @@ import pygame
 
 from .image import load_image
 from .sprites import Fire, Terrain
+from ..enums import GameStatus
 
 
 class Game():
@@ -32,7 +33,7 @@ class Game():
         self.background.fill((0, 0, 0))
 
     def update(self, terrain: Terrain, fire_sprites: Sequence[Fire],
-               fire_map: np.ndarray) -> bool:
+               fire_map: np.ndarray) -> GameStatus:
         '''
         Update the game display using the provided terrain, sprites, and
         environment data. Most of the logic for the game is handled within
@@ -43,12 +44,15 @@ class Game():
             fire_sprites: A list of all Fire sprites that are actively burning.
             fire_map: The screen_size x screen_size array that monitors each
                       pixel's burn status.
+
+        Returns:
+            status: The GameStatus of the game specified by the GameStatus enum
         '''
-        running = True
+        status = GameStatus.RUNNING
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
+                status = GameStatus.QUIT
 
         # Create a layered group so that the fire appears on top
         fire_sprites_group = pygame.sprite.LayeredUpdates(fire_sprites)
@@ -63,4 +67,4 @@ class Game():
         all_sprites.draw(self.screen)
         pygame.display.flip()
 
-        return running
+        return status

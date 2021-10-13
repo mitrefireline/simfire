@@ -92,21 +92,27 @@ class FireManager():
         '''
         new_locs = ((x + 1, y), (x + 1, y + 1), (x, y + 1), (x - 1, y + 1), (x - 1, y),
                     (x - 1, y - 1), (x, y - 1), (x + 1, y - 1))
-        # Make sure each new location/pixel is:
-        #   Within the game screen boundaries
-        #   UNBURNED
-        new_locs = tuple(filter(self._filter_function, new_locs))
+        new_locs = tuple(filter(self._filter_fire_location, new_locs))
+
         return new_locs
 
-    def _filter_function(self, loc: Tuple[int, int]) -> bool:
-        '''Used in `self.get_new_locs` as the filter function for the new locations
-        Make sure each new location/pixel is:
-          - Within the game screen boundaries
-          - UNBURNED
+    def _filter_fire_location(self, loc: Tuple[int, int]) -> bool:
+        '''
+        Used by self._get_new_locs to make sure each new location/pixel is:
+                - Within the game screen boundaries
+                - UNBURNED
+
+            Arguments:
+                loc: The Fire sprite (x, y) location on the screen
+
+            Returns:
+                in_boundaries: A boolean for whether the location is within
+                               the game boundaries and UNBURNED
         '''
         in_boundaries = loc[0] < self.fire_map.shape[1] and loc[0] >= 0 \
                         and loc[1] < self.fire_map.shape[0] and loc[1] >= 0 \
                         and self.fire_map[loc[1], loc[0]] == BurnStatus.UNBURNED
+
         return in_boundaries
 
 
@@ -251,8 +257,8 @@ class RothermelFireManager(FireManager):
                                    w_0, delta, M_x, sigma, h, S_T, S_e, p_p, M_f, U,
                                    U_dir)
 
-        y_coords = new_loc_y.astype(np.int)
-        x_coords = new_loc_x.astype(np.int)
+        y_coords = new_loc_y.astype(int)
+        x_coords = new_loc_x.astype(int)
         self.burn_amounts[y_coords, x_coords] += R
 
         y_coords, x_coords = np.unique(np.vstack((y_coords, x_coords)), axis=1)

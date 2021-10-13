@@ -25,3 +25,13 @@ repos:
     rev: 3.8.3
     hooks:
     -   id: flake8
+  - repo: local
+    hooks:
+      - id: unittest
+        name: unittest
+        entry: env SDL_VIDEODRIVER=dummy python -m unittest discover -s=src -t=.. -p="test_*.py"
+        language: conda
+        types: [python]
+        args: []
+        pass_filenames: false
+        verbose: true

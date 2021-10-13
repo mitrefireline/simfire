@@ -12,6 +12,34 @@ def compute_rate_of_spread(loc_x: float, loc_y: float, loc_z: float, new_loc_x: 
                            new_loc_y: float, new_loc_z: float, w_0: float, delta: float,
                            M_x: float, sigma: float, h: float, S_T: float, S_e: float,
                            p_p: float, M_f: float, U: float, U_dir: float) -> float:
+    '''
+    Compute the basic Rothermel rate of spread. All measurements are assumed to be in
+    feet, minutes, and pounds, and BTU. This function is vecotrized and compiled by numba
+    for GPU support. The target device (CPU or GPU) is determined in the config based on
+    whether or not a GPU is available.
+
+    Arguments:
+        loc_x: The current x location
+        loc_y: The current y location
+        loc_z: The current z elevation
+        loc_x: The new x location
+        loc_y: The new y location
+        loc_z: The new z elevation
+        w_0: The oven-dry fuel load of the fuel at the new location
+        delta: The fuel bed depth of the fuel at the new location
+        M_x: The dead fuel moisture of extinction of the fuel at the new location
+        sigma: The Surface-area-to-volume ratio of the fuel at the new location
+        h: The fuel particle low heat content
+        S_T: The fuel particle total mineral content
+        S_e: The fuel particle effective mineral content
+        p_p: The fuel particle oven-dry particle density
+        M_f: The envrionment fuel moisture
+        U: The envrionment wind speed
+        U_dir: The envrionment wind direction (degrees clockwise from North)
+
+    Returns:
+        R: The computed rate of spread in ft/min
+    '''
     # Mineral Damping Coefficient
     eta_S = min(0.174 * S_e**-0.19, 1)
     # Moisture Damping Coefficient

@@ -1,7 +1,9 @@
 from typing import Sequence, Tuple
 
+from math import exp
+import matplotlib.pyplot as plt
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageDraw
 import pygame
 
 from .image import load_image
@@ -9,6 +11,18 @@ from .. import config as cfg
 from ..enums import BurnStatus, DRY_TERRAIN_BROWN_IMG, \
     FIRE_TEXTURE_PATH, SpriteLayer, TERRAIN_TEXTURE_PATH, BURNED_RGB_COLOR
 from ..world.parameters import FuelArray
+
+
+def altitude_map(x: float, y: float) -> float:
+    A = 1000
+    sigma_x = 50
+    sigma_y = 50
+    x0 = 50
+    y0 = 50
+    A = 1000
+    exp_term = ((x - x0)**2 / (4 * sigma_x**2)) + ((y - y0)**2 / (4 * sigma_y**2))
+    z = A * exp(-exp_term)
+    return z
 
 
 class Terrain(pygame.sprite.Sprite):
@@ -114,9 +128,27 @@ class Terrain(pygame.sprite.Sprite):
                 image[y:y + h, x:x + w] = updated_texture
                 fuel_arrs[y:y + h, x:x + w] = self.tiles[i][j]
 
-        out_surf = pygame.surfarray.make_surface(image)
+        contour_image = self._make_contour_image(image, fuel_arrs)
+
+        out_surf = pygame.surfarray.make_surface(contour_image)
 
         return out_surf, fuel_arrs
+
+    def _make_contour_image(self, image: np.ndarray, fuel_arrs: np.ndarray) -> np.ndarray:
+        coords = [[[j, i, altitude_map(j, i)] for j in range(fuel_arrs.shape[1])]
+                  for i in range(fuel_arrs.shape[0])]
+        x, y, z = np.array(coords).transpose(2, 0, 1)
+
+        img = Image.fromarray(image.astype(np.uint8))
+        draw = ImageDraw.Draw(img)
+        cont = plt.contour(x, y, z)
+        for segs in cont.allsegs:
+            if segs == []:
+                continue
+            seg = segs[0]
+            draw.line(tuple(map(tuple, seg)), fill=(0, 0, 0), width=2)
+        out_image = np.array(img).astype(np.float32)
+        return out_image
 
     def _update_texture_dryness(self, fuel_arr: FuelArray) -> np.ndarray:
         '''

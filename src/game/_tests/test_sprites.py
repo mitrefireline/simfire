@@ -31,6 +31,12 @@ class TestTerrain(unittest.TestCase):
                                    f'({w}, {h}), but should be '
                                    f'({cfg.screen_size}, {cfg.screen_size})'))
 
+    def test_image_creation(self) -> None:
+        '''
+        Test that the contour map is created successfully.
+        '''
+        self.terrain._make_terrain_image()
+
     def test_update(self) -> None:
         '''
         Test that the terrain updates the correct pixels/tiles to burned.

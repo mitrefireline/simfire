@@ -2,9 +2,11 @@ from typing import Sequence, Tuple
 
 import matplotlib.contour as mcontour
 import matplotlib.pyplot as plt
+import matplotlib.cm as cm
 import numpy as np
 from PIL import Image, ImageDraw
 import pygame
+import matplotlib
 
 from .image import load_image
 from .. import config as cfg
@@ -158,17 +160,24 @@ class Terrain(pygame.sprite.Sprite):
         fn = np.vectorize(self.elevation_fn)
         z = fn(X, Y)
 
+
         # Convert the image to a PIL.Image.Image and draw on it
         img = Image.fromarray(image.astype(np.uint8))
         draw = ImageDraw.Draw(img)
-        cont = mcontour.QuadContourSet(plt.gca(), X, Y, z)
+        levels = np.arange(np.min(z),np.max(z),5)
+        cont = mcontour.QuadContourSet(plt.gca(), X, Y, z, levels=levels)
+        scales = cont.zmax - cont.zmin
+        cmap = cm.get_cmap('plasma')
         for segs in cont.allsegs:
             if segs == []:
                 continue
             seg = segs[0]
+            zp = z[int(seg[0][0]), int(seg[0][1])]
+            r = ((zp - cont.zmin)/scales)
             # The segs are returned in a numpy array of shape (num_points, 2)
             # Map them to tuples for compatibility with ImageDraw
-            draw.line(tuple(map(tuple, seg)), fill=(0, 0, 0), width=1)
+            icmap = cmap(r)[:3]
+            draw.line(tuple(map(tuple, seg)), fill=(int(icmap[0]*255),int(icmap[1]*255),int(icmap[2]*255)), width=1)
 
         # Convert to the desired output format
         out_image = np.array(img).astype(np.float32)

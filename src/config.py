@@ -1,9 +1,10 @@
 from typing import Tuple
 
 import GPUtil
+import numpy as np
 
-from .world.elevation_functions import gaussian
-from .world.parameters import FuelArray
+from .world.elevation_functions import gaussian, perlin_noise_2d
+from .world.parameters import Fuel, FuelArray
 from .world.presets import Chaparral
 
 # Use GPU if available, else CPU
@@ -23,22 +24,31 @@ terrain_size: int = 15
 # Fire/flame szie in pixels
 fire_size: int = 2
 # The amount of feet 1 pixel represents (ft)
-pixel_scale: float = 500
+pixel_scale: float = 50
 # Copmute the size of each terrain tile in feet
 terrain_scale = terrain_size * pixel_scale
 
 # Create function that returns elevation values at (x, y) points
-A = 100
+A = 500
 mu_x = 50
 mu_y = 50
 sigma_x = 50
 sigma_y = 50
-elevation_fn = gaussian(A, mu_x, mu_y, sigma_x, sigma_y)
+pnoise = perlin_noise_2d(A, [225,225],[1,1])
+pnoise.precompute()
+
+elevation_fn = pnoise.fn
+#elevation_fn = gaussian(A, mu_x, mu_y, sigma_x, sigma_y)
 # elevation_fn = flat()
 
+def Chaparral_r():
+    return Fuel(w_0=np.random.uniform(.3,.5), delta=6.000, M_x=0.2000, sigma=1739)
 # Create FuelArray tiles to make the terrain/map
-chaparral_row = (Chaparral, ) * terrain_size
-short_grass_row = (Chaparral, ) * terrain_size
+#derp = (Chaparral, ) * terrain_size
+chaparral_row = tuple((Chaparral_r() for i in range(terrain_size)))
+#chaparral_row = (fuel.w_0 = np.random.randn() for fuel in chaparral_row)
+short_grass_row = tuple((Chaparral_r() for i in range(terrain_size)))
+#short_grass_row = (Fuel.w_0 = np.random.randn() for Fuel in short_grass_row)
 terrain_map: Tuple[Tuple[FuelArray]] = ((chaparral_row, ) * (terrain_size // 2) +
                                         (short_grass_row, ) * (terrain_size // 2) +
                                         (short_grass_row, ) * (terrain_size % 2))

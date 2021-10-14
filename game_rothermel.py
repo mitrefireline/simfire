@@ -15,22 +15,23 @@ def main():
     fuel_particle = FuelParticle()
 
     fuel_arrs = [[
-        FuelArray(Tile(j, i, 0, cfg.terrain_scale, cfg.terrain_scale),
-                  cfg.terrain_map[i][j]) for j in range(cfg.terrain_size)
+        FuelArray(Tile(j, i, cfg.terrain_scale, cfg.terrain_scale), cfg.terrain_map[i][j])
+        for j in range(cfg.terrain_size)
     ] for i in range(cfg.terrain_size)]
-    terrain = Terrain(fuel_arrs)
+    terrain = Terrain(fuel_arrs, cfg.elevation_fn)
     environment = Environment(cfg.M_f, cfg.U, cfg.U_dir)
 
     fire_manager = RothermelFireManager(cfg.fire_init_pos, cfg.fire_size,
                                         cfg.max_fire_duration, cfg.pixel_scale,
                                         fuel_particle, terrain, environment)
 
-    running = GameStatus.RUNNING
-    while running == GameStatus.RUNNING:
+    game_status = GameStatus.RUNNING
+    fire_status = GameStatus.RUNNING
+    while game_status == GameStatus.RUNNING and fire_status == GameStatus.RUNNING:
         fire_sprites = fire_manager.sprites
         fire_map = fire_manager.fire_map.copy()
-        running = game.update(terrain, fire_sprites, fire_map)
-        fire_manager.update()
+        game_status = game.update(terrain, fire_sprites, fire_map)
+        fire_status = fire_manager.update()
 
     pygame.quit()
 

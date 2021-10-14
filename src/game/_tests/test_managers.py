@@ -6,6 +6,7 @@ from ..managers import ConstantSpreadFireManager, FireManager, RothermelFireMana
 from ..sprites import Fire, Terrain
 from ... import config as cfg
 from ...enums import BurnStatus
+from ...world.elevation_functions import flat
 from ...world.parameters import Environment, FuelArray, FuelParticle, Tile
 
 
@@ -82,10 +83,10 @@ class TestRothermelFireManager(unittest.TestCase):
         self.fuel_particle = FuelParticle()
 
         self.tiles = [[
-            FuelArray(Tile(j, i, 0, cfg.terrain_scale, cfg.terrain_scale),
+            FuelArray(Tile(j, i, cfg.terrain_scale, cfg.terrain_scale),
                       cfg.terrain_map[i][j]) for j in range(cfg.terrain_size)
         ] for i in range(cfg.terrain_size)]
-        self.terrain = Terrain(self.tiles)
+        self.terrain = Terrain(self.tiles, flat())
 
         self.environment = Environment(cfg.M_f, cfg.U, cfg.U_dir)
 

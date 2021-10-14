@@ -12,11 +12,11 @@ from ...world.parameters import FuelArray, Tile
 class TestTerrain(unittest.TestCase):
     def setUp(self) -> None:
         self.tiles = [[
-            FuelArray(Tile(j, i, 0, cfg.terrain_scale, cfg.terrain_scale),
+            FuelArray(Tile(j, i, cfg.terrain_scale, cfg.terrain_scale),
                       cfg.terrain_map[i][j]) for j in range(cfg.terrain_size)
         ] for i in range(cfg.terrain_size)]
 
-        self.terrain = Terrain(self.tiles)
+        self.terrain = Terrain(self.tiles, cfg.elevation_fn)
 
     def test_image_loc_and_size(self) -> None:
         '''
@@ -33,9 +33,25 @@ class TestTerrain(unittest.TestCase):
 
     def test_image_creation(self) -> None:
         '''
-        Test that the contour map is created successfully.
+        Test that the image with contour map, FuelArray array, and elevation array are
+        created successfully.
         '''
         self.terrain._make_terrain_image()
+        true_shape = (cfg.screen_size, cfg.screen_size)
+        self.assertIsInstance(self.terrain.image,
+                              pygame.Surface,
+                              msg=('The terrain image should have type pygame.Surface, '
+                                   f'but has type {type(self.terrain.image)}'))
+        self.assertCountEqual(self.terrain.fuel_arrs.shape,
+                              true_shape,
+                              msg=('The FuelArray image has shape '
+                                   f'{self.terrain.fuel_arrs.shape}, but should have '
+                                   f'shape {true_shape}'))
+        self.assertCountEqual(self.terrain.elevations.shape,
+                              true_shape,
+                              msg=('The terrain elevations have shape '
+                                   f'{self.terrain.elevations.shape}, but should have '
+                                   f'shape {true_shape}'))
 
     def test_update(self) -> None:
         '''

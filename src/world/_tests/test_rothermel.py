@@ -5,11 +5,11 @@ import numpy as np
 from ..parameters import FuelParticle
 from ..presets import Chaparral, TallGrass
 from ..rothermel import compute_rate_of_spread
-from ... import config as cfg
+from ...world.elevation_functions import flat
 
 KNOWN_ROTHERMEL_OUTPUT = [
-    1089.4022216796875, 1087.545654296875, 1084.4381103515625, 1079.7835693359375,
-    390.9071960449219, 391.6054382324219, 391.9288635253906, 394.1664123535156
+    1087.6328125, 1087.6328125, 1087.6328125, 1087.6328125, 391.637451171875,
+    391.637451171875, 391.637451171875, 391.637451171875
 ]
 
 
@@ -35,14 +35,14 @@ class TestRothermel(unittest.TestCase):
         S_e = [particle.S_e] * 8
         p_p = [particle.p_p] * 8
 
-        M_f = [cfg.M_f] * 8
-        U = [cfg.U] * 8
-        U_dir = [cfg.U_dir] * 8
+        M_f = [0.03] * 8
+        U = [88 * 13] * 8
+        U_dir = [135] * 8
 
         x = np.arange(8, dtype=np.float32)
         y = np.arange(8, dtype=np.float32)
         X, Y = np.meshgrid(x, y)
-        el_fn = np.vectorize(cfg.elevation_fn)
+        el_fn = np.vectorize(flat())
         elevations = el_fn(X, Y).astype(np.float32)
 
         grad_x, grad_y = np.gradient(elevations)

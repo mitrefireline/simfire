@@ -26,10 +26,10 @@ class TestGame(unittest.TestCase):
         fuel_particle = FuelParticle()
 
         tiles = [[
-            FuelArray(Tile(j, i, 0, cfg.terrain_scale, cfg.terrain_scale),
+            FuelArray(Tile(j, i, cfg.terrain_scale, cfg.terrain_scale),
                       cfg.terrain_map[i][j]) for j in range(cfg.terrain_size)
         ] for i in range(cfg.terrain_size)]
-        terrain = Terrain(tiles)
+        terrain = Terrain(tiles, cfg.elevation_fn)
 
         environment = Environment(cfg.M_f, cfg.U, cfg.U_dir)
 

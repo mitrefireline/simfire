@@ -2,10 +2,10 @@ from dataclasses import astuple
 from typing import List, Tuple
 
 import numpy as np
-import pygame
 
 from .sprites import Fire, Terrain
-from ..enums import BurnStatus
+from .. import config as cfg
+from ..enums import BurnStatus, GameStatus
 from ..world.parameters import Environment, FuelParticle
 from ..world.rothermel import compute_rate_of_spread
 
@@ -48,8 +48,7 @@ class FireManager():
         self.sprites: List[Fire] = [init_fire]
 
         # Map to track which pixels are on fire or have burned
-        self.fire_map = np.full(pygame.display.get_surface().get_size(),
-                                BurnStatus.UNBURNED)
+        self.fire_map = np.full((cfg.screen_size, cfg.screen_size), BurnStatus.UNBURNED)
         self.fire_map[init_pos[1], init_pos[0]] = BurnStatus.BURNING
 
     def update(self) -> None:
@@ -161,8 +160,27 @@ class RothermelFireManager(FireManager):
         # This is needed since each pixel represents a specific number of feet
         # and it might take more than one update to burn
         self.burn_amounts = np.zeros_like(self.fire_map, dtype=np.float32)
+        self.slope_mag, self.slope_dir = self._compute_slopes()
 
-    def update(self) -> None:
+    def _compute_slopes(self) -> Tuple[np.ndarray, np.ndarray]:
+        '''
+        Compute the gradient/slope magnitude and direction for every point for use
+        with the Rothermel calculation. This is easier than computing on the fly for
+        every new location in the update() call.
+
+        Arguments:
+            None
+
+        Returns:
+            grad_mag: The gradient/slope magnitude for every pixel
+            grad_dir: The gradient direction/angle for every pixel
+        '''
+        grad_y, grad_x = np.gradient(self.terrain.elevations)
+        grad_mag = np.sqrt(grad_x**2 + grad_y**2)
+        grad_dir = np.tan(grad_y / (grad_x + 0.000001))
+        return grad_mag, grad_dir
+
+    def update(self) -> GameStatus:
         '''
         Update the spreading of the fires. This function will remove
         any fires that have exceded their duration and will spread fires
@@ -178,12 +196,12 @@ class RothermelFireManager(FireManager):
         # Remove all fires that are past the max duration
         self._prune_sprites()
         num_sprites = len(self.sprites)
+        if num_sprites == 0:
+            return GameStatus.QUIT
         loc_x = []
         loc_y = []
-        loc_z = []
         new_loc_x = []
         new_loc_y = []
-        new_loc_z = []
         w_0 = []
         delta = []
         M_x = []
@@ -195,11 +213,11 @@ class RothermelFireManager(FireManager):
         M_f = []
         U = []
         U_dir = []
+        slope_mag = []
+        slope_dir = []
         for sprite_idx in range(num_sprites):
             sprite = self.sprites[sprite_idx]
             x, y, _, _ = sprite.rect
-            fuel_arr = self.terrain.fuel_arrs[y, x]
-            z = fuel_arr.tile.z
             new_locs = self._get_new_locs(x, y)
             num_locs = len(new_locs)
             if num_locs == 0:
@@ -208,11 +226,8 @@ class RothermelFireManager(FireManager):
             new_locs_uzip = tuple(zip(*new_locs))
             new_loc_x.extend(new_locs_uzip[0])
             new_loc_y.extend(new_locs_uzip[1])
-            new_loc_z.extend(
-                [arr.tile.z for arr in self.terrain.fuel_arrs[new_locs_uzip[::-1]]])
             loc_x.extend([x] * num_locs)
             loc_y.extend([y] * num_locs)
-            loc_z.extend([z] * num_locs)
 
             n_w_0, n_delta, n_M_x, n_sigma = list(
                 zip(*[
@@ -235,12 +250,14 @@ class RothermelFireManager(FireManager):
             U.extend([self.environment.U] * num_locs)
             U_dir.extend([self.environment.U_dir] * num_locs)
 
+            # Set the slope parameters into arrays
+            slope_mag.extend(self.slope_mag[new_locs_uzip[::-1]].tolist())
+            slope_dir.extend(self.slope_dir[new_locs_uzip[::-1]].tolist())
+
         loc_x = np.array(loc_x, dtype=np.float32)
         loc_y = np.array(loc_y, dtype=np.float32)
-        loc_z = np.array(loc_z, dtype=np.float32)
         new_loc_x = np.array(new_loc_x, dtype=np.float32)
         new_loc_y = np.array(new_loc_y, dtype=np.float32)
-        new_loc_z = np.array(new_loc_z, dtype=np.float32)
         w_0 = np.array(w_0, dtype=np.float32)
         delta = np.array(delta, dtype=np.float32)
         M_x = np.array(M_x, dtype=np.float32)
@@ -252,10 +269,12 @@ class RothermelFireManager(FireManager):
         M_f = np.array(M_f, dtype=np.float32)
         U = np.array(U, dtype=np.float32)
         U_dir = np.array(U_dir, dtype=np.float32)
+        slope_mag = np.array(slope_mag, dtype=np.float32)
+        slope_dir = np.array(slope_dir, dtype=np.float32)
 
-        R = compute_rate_of_spread(loc_x, loc_y, loc_z, new_loc_x, new_loc_y, new_loc_z,
-                                   w_0, delta, M_x, sigma, h, S_T, S_e, p_p, M_f, U,
-                                   U_dir)
+        R = compute_rate_of_spread(loc_x, loc_y, new_loc_x, new_loc_y, w_0, delta, M_x,
+                                   sigma, h, S_T, S_e, p_p, M_f, U, U_dir, slope_mag,
+                                   slope_dir)
 
         y_coords = new_loc_y.astype(int)
         x_coords = new_loc_x.astype(int)
@@ -267,6 +286,8 @@ class RothermelFireManager(FireManager):
                 new_sprite = Fire((x_new, y_new), self.fire_size)
                 self.sprites.append(new_sprite)
                 self.fire_map[y_new, x_new] = BurnStatus.BURNING
+
+        return GameStatus.RUNNING
 
 
 class ConstantSpreadFireManager(FireManager):

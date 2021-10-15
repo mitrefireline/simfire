@@ -26,8 +26,6 @@ class Tile:
     x: float
     # y coordinate of the top-left corner of the tile in the array
     y: float
-    # Tile elevation (ft)
-    z: float
     # Tile width in the x direction (ft)
     w: float
     # Tile height in the y direction (ft)

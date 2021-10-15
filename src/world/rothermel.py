@@ -8,10 +8,10 @@ from ..config import device
              'float32,float32,float32,float32,float32,float32,'
              'float32,float32,float32,float32,float32)')],
            target=device)
-def compute_rate_of_spread(loc_x: float, loc_y: float, loc_z: float, new_loc_x: float,
-                           new_loc_y: float, new_loc_z: float, w_0: float, delta: float,
-                           M_x: float, sigma: float, h: float, S_T: float, S_e: float,
-                           p_p: float, M_f: float, U: float, U_dir: float) -> float:
+def compute_rate_of_spread(loc_x: float, loc_y: float, new_loc_x: float, new_loc_y: float,
+                           w_0: float, delta: float, M_x: float, sigma: float, h: float,
+                           S_T: float, S_e: float, p_p: float, M_f: float, U: float,
+                           U_dir: float, slope_mag: float, slope_dir: float) -> float:
     '''
     Compute the basic Rothermel rate of spread. All measurements are assumed to be in
     feet, minutes, and pounds, and BTU. This function is vecotrized and compiled by numba
@@ -36,6 +36,7 @@ def compute_rate_of_spread(loc_x: float, loc_y: float, loc_z: float, new_loc_x: 
         M_f: The envrionment fuel moisture
         U: The envrionment wind speed
         U_dir: The envrionment wind direction (degrees clockwise from North)
+        slope_dir: The angle of the steepest ascent at the location
 
     Returns:
         R: The computed rate of spread in ft/min
@@ -84,10 +85,12 @@ def compute_rate_of_spread(loc_x: float, loc_y: float, loc_z: float, new_loc_x: 
 
     # Slope Factor
     # Phi is the slope between the two locations (i.e. the change in elevation).
-    # We can approximate this using the z coordinates for each point
-    # This equation normally has tan(phi)**2, but we can substitute
-    # tan(phi) = (new_loc.z-old_loc.z)
-    phi_s = 5.275 * B**-0.3 * (new_loc_z - loc_z)**2
+    # The model calls for the tangent of the slope angle between the two points,
+    # but we can approximate this by projecting the slope along the direction
+    # of travel
+    slope_along_angle_of_travel = -slope_mag * cos(slope_dir + angle_of_travel)
+    sign = -1 + 2 * (slope_along_angle_of_travel > 0)
+    phi_s = 5.275 * B**-0.3 * sign * slope_along_angle_of_travel**2
 
     # Effective Heating Number
     epsilon = exp(-138 / sigma)
@@ -95,7 +98,7 @@ def compute_rate_of_spread(loc_x: float, loc_y: float, loc_z: float, new_loc_x: 
     Q_ig = 250 + 1116 * M_f
 
     # Rate of Spread (ft/min)
-    R = (I_R * xi * (1 + phi_w + phi_s)) / (p_b * epsilon * Q_ig)
+    R = ((I_R * xi) * (1 + phi_w + phi_s)) / (p_b * epsilon * Q_ig)
 
     # Take the minimum with 0 because a fire cannot put itself out
     R = max(R, 0)

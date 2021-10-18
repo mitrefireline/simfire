@@ -5,7 +5,8 @@ import pygame
 
 from .image import load_image
 from ..enums import BurnStatus
-from .sprites import Fire, FireLine
+from .sprites import Fire, FireLine, Terrain
+from ..enums import GameStatus
 
 
 class Game():
@@ -35,7 +36,7 @@ class Game():
         self.fire_map = np.full(pygame.display.get_surface().get_size(),
                                 BurnStatus.UNBURNED)
 
-    def update(self, terrain, fire_sprites: Sequence[Fire],
+    def update(self, terrain: Terrain, fire_sprites: Sequence[Fire],
                fireline_sprites: Sequence[FireLine]) -> bool:
         '''
         Update the game display using the provided terrain, sprites, and
@@ -47,11 +48,11 @@ class Game():
             fire_sprites: A list of all Fire sprites that are actively burning.
             fireline_sprites: A list of all FireLine sprites that are dug.
         '''
-        running = True
+        status = GameStatus.RUNNING
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
+                status = GameStatus.QUIT
 
         # Create a layered group so that the fire appears on top
         fire_sprites_group = pygame.sprite.LayeredUpdates(fire_sprites, fireline_sprites)
@@ -66,4 +67,4 @@ class Game():
         all_sprites.draw(self.screen)
         pygame.display.flip()
 
-        return running
+        return status

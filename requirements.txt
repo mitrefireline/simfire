@@ -23,6 +23,7 @@ pygame==2.0.2
 pyparsing==2.4.7
 python-dateutil==2.8.2
 PyYAML==5.4.1
+scikit-image==0.18.3
 six==1.16.0
 toml==0.10.2
 virtualenv==20.8.1

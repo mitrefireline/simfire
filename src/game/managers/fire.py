@@ -92,8 +92,10 @@ class FireManager():
             - Within the game screen boundaries
             - UNBURNED
             '''
-            in_boundaries = loc[0] < fire_map.shape[1] and loc[0] >= 0 \
-                            and loc[1] < fire_map.shape[0] and loc[1] >= 0 \
+            in_boundaries = loc[0] < fire_map.shape[1] \
+                            and loc[0] >= 0 \
+                            and loc[1] < fire_map.shape[0] \
+                            and loc[1] >= 0 \
                             and fire_map[loc[1], loc[0]] == BurnStatus.UNBURNED
             return in_boundaries
 

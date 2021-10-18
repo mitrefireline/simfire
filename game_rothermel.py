@@ -49,7 +49,7 @@ def main():
         game_status = game.update(terrain, fire_sprites, fireline_sprites)
         fire_map = game.fire_map
         fire_map = fireline_manager.update(fire_map)
-        fire_map = fire_manager.update(fire_map)
+        fire_map, fire_status = fire_manager.update(fire_map)
         game.fire_map = fire_map
 
     pygame.quit()

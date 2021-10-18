@@ -45,7 +45,7 @@ class Game():
         Arguments:
             terrain: The Terrain class that comprises the burnable area.
             fire_sprites: A list of all Fire sprites that are actively burning.
-            fireline_sprites: A list of all FireLine sprites that are actively burning.
+            fireline_sprites: A list of all FireLine sprites that are dug.
         '''
         running = True
 

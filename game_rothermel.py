@@ -22,7 +22,7 @@ def main():
     terrain = Terrain(fuel_arrs)
     environment = Environment(cfg.M_f, cfg.U, cfg.U_dir)
 
-    points = line(100, 0, 100, 224)
+    points = line(100, 15, 100, 200)
     y = points[0].tolist()
     x = points[1].tolist()
     points = list(zip(x, y))

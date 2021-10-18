@@ -6,8 +6,8 @@ import pygame
 
 from .image import load_image
 from .. import config as cfg
-from ..enums import BurnStatus, DRY_TERRAIN_BROWN_IMG, \
-    FIRE_TEXTURE_PATH, SpriteLayer, TERRAIN_TEXTURE_PATH
+from ..enums import BurnStatus, DRY_TERRAIN_BROWN_IMG, FIRE_TEXTURE_PATH, SpriteLayer,\
+    TERRAIN_TEXTURE_PATH, FIRELINE_TEXTURE_PATH
 from ..world.parameters import FuelArray
 
 
@@ -170,7 +170,7 @@ class Fire(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect = self.rect.move(self.pos[1], self.pos[0])
 
-        # Layer 2 so that it appears on top of the terrain
+        # Layer 3 so that it appears on top of the terrain and line (if applicable)
         self.layer: int = SpriteLayer.FIRE
 
         # Record how many frames this sprite has been alive
@@ -189,3 +189,44 @@ class Fire(pygame.sprite.Sprite):
         '''
         # Increment the duration
         self.duration += 1
+
+
+class FireLine(pygame.sprite.Sprite):
+    '''
+    This sprite represents a fire burning on one pixel of the terrain. Its
+    image is generally kept very small to make rendering easier. All fire
+    spreading is handled by the FireManager it is attached to.
+    '''
+    def __init__(self, pos: Tuple[int, int], size: int) -> None:
+        '''
+        Initialize the class by recording the position and size of the sprite
+        and loading/resizing its texture
+        '''
+        super().__init__()
+
+        self.pos = pos
+        self.size = size
+
+        self.image = load_image(FIRELINE_TEXTURE_PATH)
+        self.image = pygame.transform.scale(self.image, (self.size, self.size))
+
+        self.rect = self.image.get_rect()
+        self.rect = self.rect.move(self.pos[0], self.pos[1])
+
+        # Layer 2 so that it appears on top of the terrain
+        self.layer: int = SpriteLayer.LINE
+
+        # Record how many frames this sprite has been alive
+
+    def update(self) -> None:
+        '''
+        Check which squares the fire is on and adjacent to and update its
+        spread.
+
+        Arguments:
+            None
+
+        Returns:
+            None
+        '''
+        pass

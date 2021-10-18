@@ -1,7 +1,6 @@
 from typing import List, Tuple
 
 import numpy as np
-import pygame
 
 from ..sprites import Fire, Terrain
 from ...enums import BurnStatus
@@ -46,18 +45,13 @@ class FireManager():
         init_fire = Fire(self.init_pos, self.fire_size)
         self.sprites: List[Fire] = [init_fire]
 
-        # Map to track which pixels are on fire or have burned
-        self.fire_map = np.full(pygame.display.get_surface().get_size(),
-                                BurnStatus.UNBURNED)
-        self.fire_map[init_pos[1], init_pos[0]] = BurnStatus.BURNING
-
     def update(self) -> None:
         '''
         Method that describes how the fires in self.sprites should spread.
         '''
         pass
 
-    def _prune_sprites(self) -> None:
+    def _prune_sprites(self, fire_map: np.ndarray) -> np.ndarray:
         '''
         Internal method to remove any Fire sprites whose durations have
         exceded the maximum allowed duration and mark self.fire_map as
@@ -68,13 +62,15 @@ class FireManager():
             filter(lambda x: x.duration >= self.max_fire_duration, self.sprites))
         for sprite in expired_sprites:
             x, y, _, _ = sprite.rect
-            self.fire_map[y, x] = BurnStatus.BURNED
+            fire_map[y, x] = BurnStatus.BURNED
 
         # Remove the expired sprites
         self.sprites = list(
             filter(lambda x: x.duration < self.max_fire_duration, self.sprites))
 
-    def _get_new_locs(self, x: int, y: int) -> NewLocsType:
+        return fire_map
+
+    def _get_new_locs(self, x: int, y: int, fire_map: np.ndarray) -> NewLocsType:
         '''
         Get the 8-connected locations of the input (x,y) coordinate. This
         function will filter the points that are beyond the boundaries of
@@ -89,25 +85,26 @@ class FireManager():
                         pixel locations that are UNBURNED and within the
                         scope of the game screen
         '''
+        def _filter_function(loc: Tuple[int, int]) -> bool:
+            '''Used in `self.get_new_locs` as the filter function for the new locations
+
+            Make sure each new location/pixel is:
+            - Within the game screen boundaries
+            - UNBURNED
+            '''
+            in_boundaries = loc[0] < fire_map.shape[1] and loc[0] >= 0 \
+                            and loc[1] < fire_map.shape[0] and loc[1] >= 0 \
+                            and fire_map[loc[1], loc[0]] == BurnStatus.UNBURNED
+            return in_boundaries
+
         new_locs = ((x + 1, y), (x + 1, y + 1), (x, y + 1), (x - 1, y + 1), (x - 1, y),
                     (x - 1, y - 1), (x, y - 1), (x + 1, y - 1))
         # Make sure each new location/pixel is:
         #   Within the game screen boundaries
         #   UNBURNED
-        new_locs = tuple(filter(self._filter_function, new_locs))
+        new_locs = tuple(filter(_filter_function, new_locs))
+
         return new_locs
-
-    def _filter_function(self, loc: Tuple[int, int]) -> bool:
-        '''Used in `self.get_new_locs` as the filter function for the new locations
-
-        Make sure each new location/pixel is:
-          - Within the game screen boundaries
-          - UNBURNED
-        '''
-        in_boundaries = loc[0] < self.fire_map.shape[1] and loc[0] >= 0 \
-                        and loc[1] < self.fire_map.shape[0] and loc[1] >= 0 \
-                        and self.fire_map[loc[1], loc[0]] == BurnStatus.UNBURNED
-        return in_boundaries
 
 
 class RothermelFireManager(FireManager):
@@ -154,9 +151,9 @@ class RothermelFireManager(FireManager):
         # Keep track of how much each pixel has burned.
         # This is needed since each pixel represents a specific number of feet
         # and it might take more than one update to burn
-        self.burn_amounts = np.zeros_like(self.fire_map)
+        self.burn_amounts = np.zeros_like(self.terrain.fuel_arrs)
 
-    def update(self) -> None:
+    def update(self, fire_map: np.ndarray) -> np.ndarray:
         '''
         Update the spreading of the fires. This function will remove
         any fires that have exceded their duration and will spread fires
@@ -170,13 +167,13 @@ class RothermelFireManager(FireManager):
             None
         '''
         # Remove all fires that are past the max duration
-        self._prune_sprites()
+        self._prune_sprites(fire_map)
         num_sprites = len(self.sprites)
         for sprite_idx in range(num_sprites):
             sprite = self.sprites[sprite_idx]
             x, y, _, _ = sprite.rect
             fuel_arr = self.terrain.fuel_arrs[y, x]
-            new_locs = self._get_new_locs(x, y)
+            new_locs = self._get_new_locs(x, y, fire_map)
 
             for x_new, y_new in new_locs:
                 loc = (x, y, fuel_arr.tile.z)
@@ -189,7 +186,9 @@ class RothermelFireManager(FireManager):
                 if self.burn_amounts[y, x] > self.pixel_scale:
                     new_sprite = Fire((x_new, y_new), self.fire_size)
                     self.sprites.append(new_sprite)
-                    self.fire_map[y_new, x_new] = BurnStatus.BURNING
+                    fire_map[y_new, x_new] = BurnStatus.BURNING
+
+        return fire_map
 
 
 class ConstantSpreadFireManager(FireManager):

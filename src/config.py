@@ -5,11 +5,13 @@ from .world.presets import Chaparral, ShortGrass
 
 # Game/Screen parameters
 # Screen size in pixels
-screen_size: int = 225
+screen_size: int = 1000
 # Number of terrain tiles in each row/column
 terrain_size: int = 15
 # Fire/flame szie in pixels
 fire_size: int = 2
+# Fireline size in pixels
+control_line_size: int = 10
 # The amount of feet 1 pixel represents (ft)
 pixel_scale = 500
 # Copmute the size of each terrain tile in feet

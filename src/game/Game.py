@@ -4,7 +4,8 @@ import numpy as np
 import pygame
 
 from .image import load_image
-from .sprites import Fire
+from ..enums import BurnStatus
+from .sprites import Fire, FireLine
 
 
 class Game():
@@ -30,8 +31,12 @@ class Game():
         self.background = pygame.Surface(self.screen.get_size())
         self.background = self.background.convert()
         self.background.fill((0, 0, 0))
+        # Map to track which pixels are on fire or have burned
+        self.fire_map = np.full(pygame.display.get_surface().get_size(),
+                                BurnStatus.UNBURNED)
 
-    def update(self, terrain, fire_sprites: Sequence[Fire], fire_map: np.ndarray) -> bool:
+    def update(self, terrain, fire_sprites: Sequence[Fire],
+               fireline_sprites: Sequence[FireLine]) -> bool:
         '''
         Update the game display using the provided terrain, sprites, and
         environment data. Most of the logic for the game is handled within
@@ -40,8 +45,7 @@ class Game():
         Arguments:
             terrain: The Terrain class that comprises the burnable area.
             fire_sprites: A list of all Fire sprites that are actively burning.
-            fire_map: The screen_size x screen_size array that monitors each
-                      pixel's burn status.
+            fireline_sprites: A list of all FireLine sprites that are actively burning.
         '''
         running = True
 
@@ -50,7 +54,7 @@ class Game():
                 running = False
 
         # Create a layered group so that the fire appears on top
-        fire_sprites_group = pygame.sprite.LayeredUpdates(fire_sprites)
+        fire_sprites_group = pygame.sprite.LayeredUpdates(fire_sprites, fireline_sprites)
         all_sprites = pygame.sprite.LayeredUpdates(fire_sprites_group, terrain)
 
         # Update and draw the sprites
@@ -58,7 +62,7 @@ class Game():
             self.screen.blit(self.background, sprite.rect, sprite.rect)
 
         fire_sprites_group.update()
-        terrain.update(fire_map)
+        terrain.update(self.fire_map)
         all_sprites.draw(self.screen)
         pygame.display.flip()
 

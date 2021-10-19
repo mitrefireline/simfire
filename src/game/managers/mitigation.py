@@ -1,10 +1,9 @@
 from typing import Tuple
 
 import numpy as np
-from skimage.draw import line
 
-from ..sprites import FireLine, Terrain
 from ...enums import BurnStatus
+from ..sprites import FireLine, ScratchLine, WetLine, Terrain
 
 PointType = Tuple[int, int]
 PointsType = Tuple[PointType, ...]
@@ -13,23 +12,18 @@ PointsType = Tuple[PointType, ...]
 class ControlLineManager():
     '''
     Base class to create and manage control lines and allow for the creation of more
-    control lines while the game is running. Child classes will
-    '''
-    def __init__(self,
-                 size: int,
-                 pixel_scale: int,
-                 terrain: Terrain,
-                 points: PointsType = []) -> None:
-        '''
-        Initialize the class by recording all initial control line locations by
-        designating each of their two endpoints.
+    control lines while the game is running. Child classes will change the `line_type`,
+    `sprite_type`, and add the initial points with `
 
-        Create the sprites for all control lines and mark the location of the initial
-        control lines.
+    Call `update()` to add points.
+    '''
+    def __init__(self, size: int, pixel_scale: int, terrain: Terrain) -> None:
+        '''
+        Initialize the class with the display size of each `ControlLine` sprite,
+        the `pixel_scale`, and the `Terrain` that the `ControlLine`s will be placed.
 
         Arguments:
-            points: The list of all ((x1, y1), (x2, y2)) pairs of pairs that designate
-                    between which two points control lines will be drawn.
+            size: The display size of each `ControlLine` point.
             pixel_scale: The amount of ft each pixel represents. This is needed
                          to track how much a fire has burned at a certain
                          location since it may take more than one update for
@@ -43,47 +37,9 @@ class ControlLineManager():
         self.size = size
         self.pixel_scale = pixel_scale
         self.terrain = terrain
-        if len(points) == 0:
-            self.points = []
-        elif isinstance(points[0], int):
-            self.points = (points, )
-        else:
-            self.points = points
         self.line_type = None
         self.sprite_type = None
-
-    def _add_initial_points(self, points: PointsType) -> None:
-        '''
-        Uses `self._draw_line` to draw all initial lines passed in to `self.__init__`
-
-        Arguments:
-            None
-
-        Returns:
-            None
-        '''
-        sprites = []
-        for point in points:
-            sprites.append(self.sprite_type(point, size=self.size))
-
-        return sprites
-
-    def _draw_line(self, point_1: PointType, point_2: PointType) -> None:
-        '''
-        Updates `self.fire_map` with a control line of type `self.line_type` between the
-        provided points: `point_1`, and `point_2`.
-
-        Arguments:
-            point_1: A tuple of indices for the first point that will create the control
-                     line.
-            point_2: A tuple of indices for the second point that will create the control
-                     line.
-
-        Returns:
-            None
-        '''
-        rows, columns = line(point_1[1], point_1[0], point_2[1], point_2[0])
-        self.fire_map[rows, columns] = self.line_type
+        self.sprites = []
 
     def _add_point(self, point: PointType) -> None:
         '''
@@ -93,13 +49,13 @@ class ControlLineManager():
 
     def update(self, fire_map: np.ndarray, points: PointsType = []) -> np.ndarray:
         '''
-
+        Updates the passed in `fire_map` with new `ControlLine` `points`.
 
         Arguments:
-            None
+            fire_map: The `fire_map` to update with new points
 
         Returns:
-            fire_map: The upadated fire map with the control lines added
+            fire_map: The upadated fire map with the control lines added.
         '''
         for point in points:
             x, y = point
@@ -111,50 +67,96 @@ class ControlLineManager():
 
 class FireLineManager(ControlLineManager):
     '''
+    Manages the placement of `FireLines` and `FireLine` sprites. Should have varying
+    physical characteristics from `ScratchLines` and `WetLines`.
+
+    Call `update()` to add points.
     '''
-    def __init__(self,
-                 size: int,
-                 pixel_scale: int,
-                 terrain: Terrain,
-                 points: Tuple[Tuple[int, int], ...] = None) -> None:
+    def __init__(self, size: int, pixel_scale: int, terrain: Terrain) -> None:
         '''
+        Initialize the class with the display size of each `FireLine` sprite,
+        the `pixel_scale`, and the `Terrain` that the `FireLine`s will be placed.
+
+        Sets the `line_type` to `BurnStatus.FIRELINE`.
+
+        Arguments:
+            size: The display size of each `FireLine` point.
+            pixel_scale: The amount of ft each pixel represents. This is needed
+                         to track how much a fire has burned at a certain
+                         location since it may take more than one update for
+                         a pixel/location to catch on fire depending on the
+                         rate of spread.
+            terrain: The Terrain that describes the simulation/game
+
+        Returns:
+            None
         '''
-        super().__init__(size=size,
-                         points=points,
-                         pixel_scale=pixel_scale,
-                         terrain=terrain)
+        super().__init__(size=size, pixel_scale=pixel_scale, terrain=terrain)
         self.line_type = BurnStatus.FIRELINE
         self.sprite_type = FireLine
-        self.sprites = self._add_initial_points(self.points)
 
 
 class ScratchLineManager(ControlLineManager):
     '''
+    Manages the placement of `FireLines` and `ScratchLine` sprites. Should have varying
+    physical characteristics from `FireLines` and `WetLines`.
+
+    Call `update()` to add points.
     '''
-    def __init__(self,
-                 pixel_scale: int,
-                 terrain: Terrain,
-                 points: Tuple[Tuple[int, int], ...] = None) -> None:
+    def __init__(self, size: int, pixel_scale: int, terrain: Terrain) -> None:
         '''
+        Initialize the class with the display size of each `ScratchLine` sprite,
+        the `pixel_scale`, and the `Terrain` that the `ScratchLine`s will be placed.
+
+        Sets the `line_type` to `BurnStatus.SCRATCHLINE`.
+
+        Arguments:
+            size: The display size of each `ScratchLine` point.
+            pixel_scale: The amount of ft each pixel represents. This is needed
+                         to track how much a fire has burned at a certain
+                         location since it may take more than one update for
+                         a pixel/location to catch on fire depending on the
+                         rate of spread.
+            terrain: The Terrain that describes the simulation/game
+            points: The list of all ((x1, y1), (x2, y2)) pairs of pairs that designate
+                    between which two points control lines will be drawn.
+
+        Returns:
+            None
         '''
+        super().__init__(size=size, pixel_scale=pixel_scale, terrain=terrain)
         self.line_type = BurnStatus.SCRATCHLINE
-        super().__init__(points=points,
-                         pixel_scale=pixel_scale,
-                         terrain=terrain,
-                         line_type=self.line_type)
+        self.sprite_type = ScratchLine
 
 
 class WetLineManager(ControlLineManager):
     '''
+    Manages the placement of `WetLines` and `WetLine` sprites. Should have varying
+    physical characteristics from `ScratchLines` and `FireLines`.
+
+    Call `update()` to add points.
     '''
-    def __init__(self,
-                 pixel_scale: int,
-                 terrain: Terrain,
-                 points: Tuple[Tuple[int, int], ...] = None) -> None:
+    def __init__(self, size: int, pixel_scale: int, terrain: Terrain) -> None:
         '''
+        Initialize the class with the display size of each `WetLine` sprite,
+        the `pixel_scale`, and the `Terrain` that the `WetLine`s will be placed.
+
+        Sets the `line_type` to `BurnStatus.WETLINE`.
+
+        Arguments:
+            size: The display size of each `WetLine` point.
+            pixel_scale: The amount of ft each pixel represents. This is needed
+                         to track how much a fire has burned at a certain
+                         location since it may take more than one update for
+                         a pixel/location to catch on fire depending on the
+                         rate of spread.
+            terrain: The Terrain that describes the simulation/game
+            points: The list of all ((x1, y1), (x2, y2)) pairs of pairs that designate
+                    between which two points control lines will be drawn.
+
+        Returns:
+            None
         '''
+        super().__init__(size=size, pixel_scale=pixel_scale, terrain=terrain)
         self.line_type = BurnStatus.WETLINE
-        super().__init__(points=points,
-                         pixel_scale=pixel_scale,
-                         terrain=terrain,
-                         line_type=self.line_type)
+        self.sprite_type = WetLine

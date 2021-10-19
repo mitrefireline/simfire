@@ -2,7 +2,7 @@ import unittest
 
 import numpy as np
 
-from ... import config as cfg
+from .... import config as cfg
 from ....enums import BurnStatus, GameStatus
 from ...sprites import Fire, Terrain
 from ....world.elevation_functions import flat

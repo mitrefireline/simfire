@@ -1,5 +1,5 @@
-from skimage.draw import line
 import pygame
+from skimage.draw import line
 
 import src.config as cfg
 from src.enums import GameStatus
@@ -28,8 +28,7 @@ def main():
     x = points[1].tolist()
     points = list(zip(x, y))
 
-    fireline_manager = FireLineManager(points=[],
-                                       size=cfg.control_line_size,
+    fireline_manager = FireLineManager(size=cfg.control_line_size,
                                        pixel_scale=cfg.pixel_scale,
                                        terrain=terrain)
 

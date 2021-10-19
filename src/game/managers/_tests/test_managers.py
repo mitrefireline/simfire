@@ -3,11 +3,11 @@ import unittest
 import numpy as np
 
 from ... import config as cfg
-from ...enums import BurnStatus, GameStatus
-from ..sprites import Fire, Terrain
-from ...world.elevation_functions import flat
-from ...world.parameters import Environment, FuelArray, FuelParticle, Tile
-from ..managers.fire import ConstantSpreadFireManager, FireManager, RothermelFireManager
+from ....enums import BurnStatus, GameStatus
+from ...sprites import Fire, Terrain
+from ....world.elevation_functions import flat
+from ....world.parameters import Environment, FuelArray, FuelParticle, Tile
+from ..fire import ConstantSpreadFireManager, FireManager, RothermelFireManager
 
 
 class TestFireManager(unittest.TestCase):

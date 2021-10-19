@@ -38,8 +38,7 @@ class TestGame(unittest.TestCase):
                                             pixel_scale, fuel_particle, terrain,
                                             environment)
 
-        fireline_manager = FireLineManager(points=[],
-                                           size=cfg.control_line_size,
+        fireline_manager = FireLineManager(size=cfg.control_line_size,
                                            pixel_scale=cfg.pixel_scale,
                                            terrain=terrain)
         fireline_sprites = fireline_manager.sprites

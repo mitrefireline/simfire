@@ -1,9 +1,11 @@
 import pygame
+from skimage.draw import line
 
 import src.config as cfg
 from src.enums import GameStatus
 from src.game.Game import Game
-from src.game.managers import RothermelFireManager
+from src.game.managers.fire import RothermelFireManager
+from src.game.managers.mitigation import FireLineManager
 from src.game.sprites import Terrain
 from src.world.parameters import Environment, FuelArray, FuelParticle, Tile
 
@@ -21,6 +23,19 @@ def main():
     terrain = Terrain(fuel_arrs, cfg.elevation_fn)
     environment = Environment(cfg.M_f, cfg.U, cfg.U_dir)
 
+    points = line(100, 15, 100, 200)
+    y = points[0].tolist()
+    x = points[1].tolist()
+    points = list(zip(x, y))
+
+    fireline_manager = FireLineManager(size=cfg.control_line_size,
+                                       pixel_scale=cfg.pixel_scale,
+                                       terrain=terrain)
+
+    fire_map = game.fire_map
+    fire_map = fireline_manager.update(fire_map, points)
+    game.fire_map = fire_map
+
     fire_manager = RothermelFireManager(cfg.fire_init_pos, cfg.fire_size,
                                         cfg.max_fire_duration, cfg.pixel_scale,
                                         fuel_particle, terrain, environment)
@@ -29,9 +44,12 @@ def main():
     fire_status = GameStatus.RUNNING
     while game_status == GameStatus.RUNNING and fire_status == GameStatus.RUNNING:
         fire_sprites = fire_manager.sprites
-        fire_map = fire_manager.fire_map.copy()
-        game_status = game.update(terrain, fire_sprites, fire_map)
-        fire_status = fire_manager.update()
+        fireline_sprites = fireline_manager.sprites
+        game_status = game.update(terrain, fire_sprites, fireline_sprites)
+        fire_map = game.fire_map
+        fire_map = fireline_manager.update(fire_map)
+        fire_map, fire_status = fire_manager.update(fire_map)
+        game.fire_map = fire_map
 
     pygame.quit()
 

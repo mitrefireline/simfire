@@ -1,10 +1,11 @@
 import unittest
 
 from ..Game import Game
-from ..managers import RothermelFireManager
 from ..sprites import Terrain
 from ... import config as cfg
 from ...enums import GameStatus
+from ..managers.fire import RothermelFireManager
+from ..managers.mitigation import FireLineManager
 from ...world.parameters import Environment, FuelArray, FuelParticle, Tile
 
 
@@ -37,7 +38,11 @@ class TestGame(unittest.TestCase):
                                             pixel_scale, fuel_particle, terrain,
                                             environment)
 
-        status = self.game.update(terrain, fire_manager.sprites, fire_manager.fire_map)
+        fireline_manager = FireLineManager(size=cfg.control_line_size,
+                                           pixel_scale=cfg.pixel_scale,
+                                           terrain=terrain)
+        fireline_sprites = fireline_manager.sprites
+        status = self.game.update(terrain, fire_manager.sprites, fireline_sprites)
 
         self.assertEqual(status,
                          GameStatus.RUNNING,

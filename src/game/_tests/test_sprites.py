@@ -3,8 +3,8 @@ import unittest
 import numpy as np
 import pygame
 
-from ..sprites import Fire, Terrain
 from ... import config as cfg
+from ..sprites import Fire, Terrain
 from ...enums import BURNED_RGB_COLOR, BurnStatus, SpriteLayer
 from ...world.parameters import FuelArray, Tile
 

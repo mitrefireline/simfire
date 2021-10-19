@@ -2,12 +2,12 @@ import unittest
 
 import numpy as np
 
-from ..managers import ConstantSpreadFireManager, FireManager, RothermelFireManager
-from ..sprites import Fire, Terrain
-from ... import config as cfg
-from ...enums import BurnStatus
-from ...world.elevation_functions import flat
-from ...world.parameters import Environment, FuelArray, FuelParticle, Tile
+from .... import config as cfg
+from ....enums import BurnStatus, GameStatus
+from ...sprites import Fire, Terrain
+from ....world.elevation_functions import flat
+from ....world.parameters import Environment, FuelArray, FuelParticle, Tile
+from ..fire import ConstantSpreadFireManager, FireManager, RothermelFireManager
 
 
 class TestFireManager(unittest.TestCase):
@@ -23,13 +23,14 @@ class TestFireManager(unittest.TestCase):
         '''
         Test that the sprites are pruned correctly.
         '''
+        fire_map = np.full((cfg.screen_size, cfg.screen_size), BurnStatus.UNBURNED)
         # Create a sprite that is past the duration
         new_sprite = Fire(self.init_pos, self.fire_size)
         new_sprite.duration = cfg.max_fire_duration + 1
         sprites = [new_sprite]
 
         self.fire_manager.sprites = sprites
-        self.fire_manager._prune_sprites()
+        self.fire_manager._prune_sprites(fire_map)
 
         self.assertEqual(len(self.fire_manager.sprites),
                          0,
@@ -40,9 +41,10 @@ class TestFireManager(unittest.TestCase):
         '''
         Test that new locations can be retrieved correctly.
         '''
+        fire_map = np.full((cfg.screen_size, cfg.screen_size), BurnStatus.UNBURNED)
         # Use a location that is too large and out-of-bounds
         x, y = (cfg.screen_size, cfg.screen_size)
-        new_locs = self.fire_manager._get_new_locs(x, y)
+        new_locs = self.fire_manager._get_new_locs(x, y, fire_map)
         valid_locs = ((x - 1, y - 1), )
         self.assertTupleEqual(new_locs,
                               valid_locs,
@@ -52,7 +54,7 @@ class TestFireManager(unittest.TestCase):
 
         # Use a location that is too small and out-of-bounds
         x, y = (0, 0)
-        new_locs = self.fire_manager._get_new_locs(x, y)
+        new_locs = self.fire_manager._get_new_locs(x, y, fire_map)
         valid_locs = ((x + 1, y), (x + 1, y + 1), (x, y + 1))
         self.assertTupleEqual(new_locs,
                               valid_locs,
@@ -62,8 +64,8 @@ class TestFireManager(unittest.TestCase):
 
         # Use a location that is BURNED
         x, y = (cfg.screen_size // 2, cfg.screen_size // 2)
-        self.fire_manager.fire_map[y, x + 1] = BurnStatus.BURNED
-        new_locs = self.fire_manager._get_new_locs(x, y)
+        fire_map[y, x + 1] = BurnStatus.BURNED
+        new_locs = self.fire_manager._get_new_locs(x, y, fire_map)
         # All 8-connected points except (x+1, y)
         valid_locs = ((x + 1, y + 1), (x, y + 1), (x - 1, y + 1), (x - 1, y),
                       (x - 1, y - 1), (x, y - 1), (x + 1, y - 1))
@@ -82,11 +84,11 @@ class TestRothermelFireManager(unittest.TestCase):
         self.pixel_scale = cfg.pixel_scale
         self.fuel_particle = FuelParticle()
 
-        self.tiles = [[
+        fuel_arrs = [[
             FuelArray(Tile(j, i, cfg.terrain_scale, cfg.terrain_scale),
                       cfg.terrain_map[i][j]) for j in range(cfg.terrain_size)
         ] for i in range(cfg.terrain_size)]
-        self.terrain = Terrain(self.tiles, flat())
+        self.terrain = Terrain(fuel_arrs, flat())
 
         self.environment = Environment(cfg.M_f, cfg.U, cfg.U_dir)
 
@@ -102,19 +104,25 @@ class TestRothermelFireManager(unittest.TestCase):
         Instead, check that the fire will spread correctly once enough time has passed.
         '''
         # Create simulation parameters that will guarantee fire spread
+        fire_map = np.full_like(self.terrain.fuel_arrs, BurnStatus.UNBURNED)
         self.fire_manager.pixel_scale = 0
-        new_locs = self.fire_manager._get_new_locs(self.init_pos[0], self.init_pos[1])
+        new_locs = self.fire_manager._get_new_locs(self.init_pos[0], self.init_pos[1],
+                                                   fire_map)
         new_locs_uzip = tuple(zip(*new_locs))
         self.fire_manager.burn_amounts[new_locs_uzip] = -1
 
         # Update the manager and get the locations that are now burning
         # These should match new_locs since those locations are guaranteed
         # to burn with a pixel_scale of -1
-        self.fire_manager.update()
+        fire_map, status = self.fire_manager.update(fire_map)
         burning_locs = np.where(
             self.fire_manager.burn_amounts > self.fire_manager.pixel_scale)
         burning_locs = tuple(map(tuple, burning_locs[::-1]))
         burning_locs = tuple(zip(*burning_locs))
+
+        self.assertEqual(status,
+                         GameStatus.RUNNING,
+                         msg=('The game status should be "RUNNING"'))
 
         self.assertCountEqual(burning_locs,
                               new_locs,
@@ -161,12 +169,14 @@ class TestConstantSpreadFireManager(unittest.TestCase):
         make sure that no fires are spread before max_fire_duration updates, and that the
         correct number of new fires are created at the correct locations.
         '''
+        fire_map = np.zeros((cfg.screen_size, cfg.screen_size))
         # Get the locations where Fires should be created
-        new_locs = self.fire_manager._get_new_locs(self.init_pos[0], self.init_pos[1])
+        new_locs = self.fire_manager._get_new_locs(self.init_pos[0], self.init_pos[1],
+                                                   fire_map)
 
         # Update the simulation until 1 update before any spreading
         for i in range(self.rate_of_spread):
-            self.fire_manager.update()
+            fire_map = self.fire_manager.update(fire_map)
             # Call the fire sprite update here since it's normally handled by PyGame
             # This is needeed to increment the duration
             self.fire_manager.sprites[0].update()
@@ -175,7 +185,7 @@ class TestConstantSpreadFireManager(unittest.TestCase):
                 self.assertEqual(len(self.fire_manager.sprites), 1)
 
         # Update to make the ConstantSpreadFireManager create new Fire sprites
-        self.fire_manager.update()
+        self.fire_manager.update(fire_map)
 
         # The 0th entry is the initial fire, so don't include it
         new_sprites = self.fire_manager.sprites[1:]

@@ -5,6 +5,7 @@ import pygame
 import config
 from skimage.draw import line
 from gym import spaces
+from gym.utils import seeding
 from ..game.sprites import Terrain
 from src.enums import GameStatus
 from src.game.Game import Game
@@ -30,14 +31,15 @@ class FireLineEnv():
 
         Observation:
         ------------
-        a = [[[0,0,0] for _ in range(255)] for _ in range (255)]
-        b = [[[1,5,1] for _ in range(255)] for _ in range(255)]
+        a = [[[0,0,0,0] for _ in range(255)] for _ in range (255)]
+        b = [[[1,5,1,3] for _ in range(255)] for _ in range(255)]
 
         Type: Box(low=a, high=b, shape=(255,255,3))
         Num    Observation              min     max
         0      Agent Position           0       1
         1      Fuel (type)              0       5
         2      Burned/Unburned          0       1
+        3      Line Type                0       3
 
         TODO: shape will need to fit Box(low=x, high=x, shape=x, dtype=x) where low/high are min/max values. Linear transformation?
         https://github.com/openai/gym/blob/3eb699228024f600e1e5e98218b15381f065abff/gym/spaces/box.py#L7
@@ -107,19 +109,34 @@ class FireLineEnv():
             self.observation = config.fire_init_pos
 
         self.action_space = spaces.Discrete(4)
-        self.low = [[[0,0,0] for _ in range(255)] for _ in range(255)]
-        self.high = [[[1,5,1] for _ in range(255)] for _ in range(255)]
+        self.low = [[[0,0,0,0] for _ in range(255)] for _ in range(255)]
+        self.high = [[[1,5,1,3] for _ in range(255)] for _ in range(255)]
         self.observation_space = spaces.Box(self.low,
                                             self.high,
                                             shape=(config.screen_size,
                                                    config.screen_size,
-                                                   3),
+                                                   4),
                                             dtype=np.float32)
 
         # defines the agent location in the state at each step
-        self.state_space = np.zeros(config.screen_size, config.screen_size)
+        #self.state_space = np.zeros(config.screen_size, config.screen_size)
         # at start, agent is in top left corner
         self.current_agent_loc = (0, 0)
+
+    def seed(self, seed=None):
+        '''
+        Set the seed for numpy random methods.
+
+        Input:
+        -------
+        seed: Random seeding value
+
+        Return:
+        -------
+        seed: Random seeding value
+        '''
+        self.np_random, seed = seeding.np_random(seed)
+        return [seed]
 
     def init_render(self):
         pygame.init()
@@ -127,7 +144,7 @@ class FireLineEnv():
 
     def step(self, action):
         '''
-        This function will apply the action.
+        This function will apply the action to the agent in the current state.
 
         Calculate new agent/state_space position by reseting old position to zero,
             call the _update_current_agent_loc method and set new
@@ -139,25 +156,34 @@ class FireLineEnv():
 
         Input:
         -------
-        action: action[0]: no trench, action[1]: trench
-                points: ((x1, y1), (x2, y2))
+        action: action[0]: no trench, action[1]: trench, action[2]: scratchline, action[3]: wetline
 
         Return:
         -------
-        observation: [screen_size, screen_size, 4]: terrain, agent pos, fuel,
+        observation: [screen_size, screen_size, 3]: agent position, fuel type, burned/unburned
         reward: -1 if trench, 0 if None
         done: end simulation, calculate state differences
         info: extra meta-data
         '''
 
-        self.state_space[self.current_agent_loc] = 0
+        # Make the action on the env at agent's current location
+        self.state[self.current_agent_loc[0], self.current_agent_loc[1], 3] = action
+
+        old_loc = self.current_agent_loc.copy()
+
+        # Move the agent to next location
         self._update_current_agent_loc()
-        self.state_space[self.current_agent_loc] = 1
 
-        done = bool(self.current_agent_loc[0] == (config.screen_size - 1)
-                    and self.current_agent_loc[1] == (config.screen_size - 1))
+        # If the agent is at the last location (cannot move forward)
+        done = old_loc == self.current_agent_loc
 
-        return done
+        if done:
+            # TODO reward is difference between fireline and fire runs
+            reward = None
+        else:
+            reward = 0 if action == 0 else -1
+
+        return self.state, reward, done, {}
 
     def _update_current_agent_loc(self):
         '''
@@ -171,14 +197,16 @@ class FireLineEnv():
             less than/equal to screen size --> y-axis = None, x-axis += 1
 
         '''
-        y = self.current_agent_loc[0]
-        x = self.current_agent_loc[1]
+        x = self.current_agent_loc[0]
+        y = self.current_agent_loc[1]
 
-        if x > (config.screen_size - 1) and y < (config.screen_size - 1):
-            self.current_agent_loc[0] += 1
-            self.current_agent_loc[1] = 0
+        # If moving forward one would bring us out of bounds and we can move to new row
+        if x + 1 > (config.screen_size - 1) and y + 1 <= (config.screen_size - 1):
+            self.current_agent_loc[0] = 0
+            self.current_agent_loc[1] += 1
 
-        elif x < (config.screen_size - 1) and y <= (config.screen_size - 1):
+        # If moving forward keeps us in bounds
+        elif x + 1 <= (config.screen_size - 1):
             self.current_agent_loc[1] += 1
 
     def render(self):
@@ -199,10 +227,23 @@ class FireLineEnv():
 
     def reset(self):
         '''
-        reset environment to initial state
+        Reset environment to initial state.
+        NOTE: reset() must be called before you can call step()
+
+        Terrain is received from the sim.
+        Agent position matrix is assumed to be all 0's when received from sim. Updated to have
+        agent at (0,0) on reset.
 
         '''
-        self.observation
+        # TODO this should be a new terrain from the sim - dummy for now.
+        # ASSUMPTION: [:,:,0] (agent position matrix) are all 0s when received from sim
+        self.state = np.zeros((255,255,4))
+
+        # Place agent at location (0,0)
+        self.state[0,0,0] = 1
+        self.current_agent_loc = (0,0)
+
+        return np.array(self.state, dtype=np.float32)
 
     def compare_spaces(self, fireline_space, fire_space):
         '''

@@ -41,6 +41,12 @@ class FireLineEnv(gym.Env):
         3      Line Type                0       3
         4      Burn Stats               0       6
 
+        TODO: shape will need to fit Box(low=x, high=x, shape=x, dtype=x)
+                where low/high are min/max values. Linear transformation?
+        https://github.com/openai/gym/blob/3eb699228024f600e1e5e98218b15381
+                    f065abff/gym/spaces/box.py#L7
+        Line 19 - Independent bound for each dimension
+
         Actions:
         --------
         Type: Discrete(4) -- real-valued (on / off)
@@ -48,13 +54,20 @@ class FireLineEnv(gym.Env):
         0      None
         1      Fireline
         2      ScratchLine
-        3      Wetline
+        3      WetLine
 
 
         Reward:
         -------
-        Reward of [+ difference]
-        Reward of [-1 + difference]
+        Reward of 0 when 'None' action is taken and agent position is not
+                            the last tile.
+        Reward of -1 when 'Trench, ScratchLine, WetLine' action is taken and agent
+                            position is not the last tile.
+        Reward of (fire_burned - fireline_burned) when done.
+
+        TODO: Will probably want to normalize (difference) to be [0,1] or
+                    something similar.
+                reward values between [0,1] result in better training.
 
         Starting State:
         ---------------
@@ -169,7 +182,7 @@ class FireLineEnv(gym.Env):
 
     def step(self, action):
         '''
-        This function will apply the action.
+        This function will apply the action to the agent in the current state.
 
         Calculate new agent/state_space position by reseting old position to zero,
             call the _update_current_agent_loc method and set new
@@ -186,7 +199,8 @@ class FireLineEnv(gym.Env):
 
         Return:
         -------
-        observation: [screen_size, screen_size, 4]: terrain, agent pos, fuel,
+        observation: [screen_size, screen_size, 3]: agent position,
+                            fuel type, burned/unburned
         reward: -1 if trench, 0 if None
         done: end simulation, calculate state differences
         info: extra meta-data
@@ -210,7 +224,6 @@ class FireLineEnv(gym.Env):
         # If the agent is at the last location (cannot move forward)
         done = old_loc == self.current_agent_loc
 
-        # reward is calculated after final step(): done == True
         if done:
             # compare the state spaces
             difference, reward_agent = self.compare_spaces()
@@ -292,8 +305,7 @@ class FireLineEnv(gym.Env):
 
         '''
         # TODO this should be a new terrain from the sim - dummy for now.
-        # ASSUMPTION: [:,:,0] (agent position matrix) are all 0s when
-        #       received from sim
+        # ASSUMPTION: [:,:,0] (agent position matrix) are all 0s when received from sim
         self.state = np.zeros((255, 255, 5))
 
         # Place agent at location (0,0)
@@ -304,8 +316,8 @@ class FireLineEnv(gym.Env):
 
     def compare_spaces(self):
         '''
-        At the end of stepping through both state spaces, compare fianl agent action space
-            and final observation space of burned terrain
+        At the end of stepping through both state spaces, compare fianl agent
+            action space and final observation space of burned terrain
 
         '''
         difference = np.diff(self.observation_space['burn status'], self.action_space)

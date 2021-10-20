@@ -30,7 +30,10 @@ class FireLineEnv():
 
         Observation:
         ------------
-        Type: Box(4)
+        a = [[[0,0,0] for _ in range(255)] for _ in range (255)]
+        b = [[[1,5,1] for _ in range(255)] for _ in range(255)]
+
+        Type: Box(low=a, high=b, shape=(255,255,3))
         Num    Observation              min     max
         0      Agent Position           0       1
         1      Fuel (type)              0       5
@@ -104,15 +107,16 @@ class FireLineEnv():
             self.observation = config.fire_init_pos
 
         self.action_space = spaces.Discrete(4)
-        self.low = np.array([0, 0, 0])
-        self.high = np.array([1, 5, 1])
+        self.low = [[[0,0,0] for _ in range(255)] for _ in range(255)]
+        self.high = [[[1,5,1] for _ in range(255)] for _ in range(255)]
         self.observation_space = spaces.Box(self.low,
                                             self.high,
                                             shape=(config.screen_size,
-                                                   config.screen_size),
+                                                   config.screen_size,
+                                                   3),
                                             dtype=np.float32)
 
-        # defines the agen location in teh state at each step
+        # defines the agent location in the state at each step
         self.state_space = np.zeros(config.screen_size, config.screen_size)
         # at start, agent is in top left corner
         self.current_agent_loc = (0, 0)
@@ -235,20 +239,22 @@ def get_action():
 
 if __name__ == '__main__':
 
-    # initilize the rl_env()
-    rl_environment = FireLineEnv()
-    rl_environment.init_render()
+    print(spaces.Box(2,3,[2,2]))
 
-    # fire_map = game.fire_map
-    # fire_map = fireline_manager.update(fire_map, points)
-    # game.fire_map = fire_map
+    # # initilize the rl_env()
+    # rl_environment = FireLineEnv()
+    # rl_environment.init_render()
 
-    observation = rl_environment.reset()
-    game_status = GameStatus.RUNNING
-    fire_status = GameStatus.RUNNING
-    while game_status == GameStatus.RUNNING and fire_status == GameStatus.RUNNING:
-        action = get_action()
-        rl_environment.render()
-        rl_environment.step(action)
+    # # fire_map = game.fire_map
+    # # fire_map = fireline_manager.update(fire_map, points)
+    # # game.fire_map = fire_map
 
-    pygame.quit()
+    # observation = rl_environment.reset()
+    # game_status = GameStatus.RUNNING
+    # fire_status = GameStatus.RUNNING
+    # while game_status == GameStatus.RUNNING and fire_status == GameStatus.RUNNING:
+    #     action = get_action()
+    #     rl_environment.render()
+    #     rl_environment.step(action)
+
+    # pygame.quit()

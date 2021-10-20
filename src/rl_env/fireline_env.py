@@ -3,8 +3,9 @@
 import numpy as np
 import pygame
 import config
-from skimage.draw import line
+import gym
 from gym import spaces
+from skimage.draw import line
 from ..game.sprites import Terrain
 from src.enums import GameStatus
 from src.game.Game import Game
@@ -13,7 +14,7 @@ from ..game.managers.fire import RothermelFireManager
 from ..game.managers.mitigation import FireLineManager
 
 
-class FireLineEnv():
+class FireLineEnv(gym.Env):
     '''
         This Environment Catcher will record all environments/actions
             for the RL return states.
@@ -91,10 +92,13 @@ class FireLineEnv():
                                                  rl_environment.fuel_particle,
                                                  self.terrain, self.environment)
 
-        if mode == 'static terrain':
-            self.observation = self.terrain
+        if mode == 'static':
+            # static terrain and static fire start loc
+            self.observation = (self.terrain, config.fire_init_pos)
         elif mode == 'dynamic terrain':
             self.observation = config.fire_init_pos
+        else:
+            self.observation = self.terrain
 
         self.action_space = spaces.Discrete(4)
         self.low = np.array([0, 0, 0])
@@ -138,15 +142,30 @@ class FireLineEnv():
         done: end simulation, calculate state differences
         info: extra meta-data
         '''
-
+        # at current position, check for the action action space value
+        # to determine points to lay down fireline mitigation
+        if self.action_space > 0:
+            # agent will put down some fire mitigation
+            self.points = self.current_agent_loc
+        else:
+            self.points = []
+        # at current position, reset to 0 for next step
         self.state_space[self.current_agent_loc] = 0
+        # update position
         self._update_current_agent_loc()
         self.state_space[self.current_agent_loc] = 1
 
+        # at new updated position, determine if we are done "stepping" through game
         done = bool(self.current_agent_loc[0] == (config.screen_size - 1)
                     and self.current_agent_loc[1] == (config.screen_size - 1))
 
-        return done
+        # reward is calculated after final step(): done == True
+        if done:
+            # compare the state spaces
+            reward = 0
+            return reward, done
+        else:
+            return done
 
     def _update_current_agent_loc(self):
         '''
@@ -180,7 +199,10 @@ class FireLineEnv():
         fireline_sprites = self.fireline_manager.sprites
         game_status = self.game.update(self.terrain, fire_sprites, fireline_sprites)
         fire_map = self.game.fire_map
-        fire_map = self.fireline_manager.update(fire_map, self.points)
+        if len(self.points) == 0:
+            fire_map = self.fireline_manager.update(fire_map)
+        else:
+            fire_map = self.fireline_manager.update(fire_map, self.points)
         fire_map = self.fire_manager.update(fire_map)
         self.game.fire_map = fire_map
 

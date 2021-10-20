@@ -8,6 +8,7 @@ from src.game.managers.fire import RothermelFireManager
 from src.game.managers.mitigation import FireLineManager
 from src.game.sprites import Terrain
 from src.world.parameters import Environment, FuelArray, FuelParticle, Tile
+from src.rl_env.fireline_env import FireLineEnv
 
 
 def main():
@@ -51,8 +52,34 @@ def main():
         fire_map, fire_status = fire_manager.update(fire_map)
         game.fire_map = fire_map
 
+
+def some_action_func(state):
+    '''
+    A dummy function to show how the rl side ingests the state
+        and returns a dict() of the fire mitigation stategy
+    '''
+
+    return {0: 0, 1: 1}
+
+
+def rl_main():
+    # initilize the rl_env()
+    import os
+    os.environ['SDL_VIDEODRIVER'] = 'dummy'
+
+    rl_environment = FireLineEnv()
+
+    state = rl_environment.reset()
+    game_status = GameStatus.RUNNING
+    fire_status = GameStatus.RUNNING
+    while game_status == GameStatus.RUNNING and fire_status == GameStatus.RUNNING:
+        action = some_action_func(state)
+        game_status = rl_environment.render()
+        rl_environment.step(action)
+
     pygame.quit()
 
 
 if __name__ == '__main__':
-    main()
+    # main()
+    rl_main()

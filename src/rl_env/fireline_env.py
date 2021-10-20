@@ -33,13 +33,12 @@ class FireLineEnv():
         Type: Box(4)
         Num    Observation              min     max
         0      Agent Position           0       1
-        1      Fuel
-        2      Terrain
-        3      Burned/Unburned          0       1
+        1      Fuel (type)              0       5
+        2      Burned/Unburned          0       1
 
         Actions:
         --------
-        Type: Discrete(4)
+        Type: Discrete(4) -- real-valued (on / off)
         Num    Action
         0      None
         1      Trench
@@ -48,8 +47,8 @@ class FireLineEnv():
 
         Reward:
         -------
-        Reward of 0 is awarded if the agent
-        Reward of -1 is awarded if .
+        Reward of [+ difference]
+        Reward of [-1 + difference]
 
         Starting State:
         ---------------
@@ -98,12 +97,17 @@ class FireLineEnv():
             self.observation = config.fire_init_pos
 
         self.action_space = spaces.Discrete(4)
-        self.observation_space = spaces.Box(low=0.0,
-                                            high=np.array(config.screen_size *
-                                                          config.screen_size),
+        self.low = np.array([0, 0, 0])
+        self.high = np.array([1, 5, 1])
+        self.observation_space = spaces.Box(self.low,
+                                            self.high,
+                                            shape=(config.screen_size,
+                                                   config.screen_size),
                                             dtype=np.float32)
 
+        # defines the agen location in teh state at each step
         self.state_space = np.zeros(config.screen_size, config.screen_size)
+        # at start, agent is in top left corner
         self.current_agent_loc = (0, 0)
 
     def init_render(self):

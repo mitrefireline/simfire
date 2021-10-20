@@ -4,7 +4,6 @@ import numpy as np
 import pygame
 import config
 import gym
-from gym import spaces
 from skimage.draw import line
 from ..game.sprites import Terrain
 from src.enums import GameStatus
@@ -35,8 +34,7 @@ class FireLineEnv(gym.Env):
         Num    Observation              min     max
         0      Agent Position           0       1
         1      Fuel (type)              0       5
-        2      Burned/Unburned          0       1
-
+        2      burn stats               0       6
         Actions:
         --------
         Type: Discrete(4) -- real-valued (on / off)
@@ -100,14 +98,17 @@ class FireLineEnv(gym.Env):
         else:
             self.observation = self.terrain
 
-        self.action_space = spaces.Discrete(4)
-        self.low = np.array([0, 0, 0])
-        self.high = np.array([1, 5, 1])
-        self.observation_space = spaces.Box(self.low,
-                                            self.high,
-                                            shape=(config.screen_size,
-                                                   config.screen_size),
-                                            dtype=np.float32)
+        self.action_space = gym.spaces.Discrete(4)
+
+        observ_spaces = {
+            'agent position':
+            gym.spaces.Box(low=0, high=1, shape=(config.screen_size, config.screen_size)),
+            'fuel':
+            gym.spaces.Box(low=0, high=4, shape=(config.screen_size, config.screen_size)),
+            'burn status':
+            gym.spaces.Box(low=0, high=5, shape=(config.screen_size, config.screen_size))
+        }
+        self.observation_space = gym.spaces.Dict(observ_spaces)
 
         # defines the agen location in teh state at each step
         self.state_space = np.zeros(config.screen_size, config.screen_size)

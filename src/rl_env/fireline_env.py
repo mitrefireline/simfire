@@ -36,6 +36,10 @@ class FireLineEnv():
         1      Fuel (type)              0       5
         2      Burned/Unburned          0       1
 
+        TODO: shape will need to fit Box(low=x, high=x, shape=x, dtype=x) where low/high are min/max values. Linear transformation?
+        https://github.com/openai/gym/blob/3eb699228024f600e1e5e98218b15381f065abff/gym/spaces/box.py#L7
+        Line 19 - Independent bound for each dimension
+
         Actions:
         --------
         Type: Discrete(4) -- real-valued (on / off)
@@ -43,12 +47,15 @@ class FireLineEnv():
         0      None
         1      Trench
         2      ScratchLine
-        3      Wetline
+        3      WetLine
 
         Reward:
         -------
-        Reward of [+ difference]
-        Reward of [-1 + difference]
+        Reward of 0 when 'None' action is taken and agent position is not the last tile.
+        Reward of -1 when 'Trench, ScratchLine, WetLine' action is taken and agent position is not the last tile.
+        Reward of (fire_burned - fireline_burned) when done.
+
+        TODO: Will probably want to normalize (difference) to be [0,1] or something similar. reward values between [0,1] result in better training.
 
         Starting State:
         ---------------

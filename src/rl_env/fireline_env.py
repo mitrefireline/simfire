@@ -3,6 +3,7 @@
 import numpy as np
 import pygame
 import config
+import gym
 from skimage.draw import line
 from gym import spaces
 from gym.utils import seeding
@@ -14,7 +15,7 @@ from ..game.managers.fire import RothermelFireManager
 from ..game.managers.mitigation import FireLineManager
 
 
-class FireLineEnv():
+class FireLineEnv(gym.Env):
     '''
         This Environment Catcher will record all environments/actions
             for the RL return states.
@@ -31,8 +32,8 @@ class FireLineEnv():
 
         Observation:
         ------------
-        a = [[[0,0,0,0] for _ in range(255)] for _ in range (255)]
-        b = [[[1,5,1,3] for _ in range(255)] for _ in range(255)]
+        a = [[[0,0,0,0,0] for _ in range(255)] for _ in range (255)]
+        b = [[[1,5,1,3,6] for _ in range(255)] for _ in range(255)]
 
         Type: Box(low=a, high=b, shape=(255,255,3))
         Num    Observation              min     max
@@ -40,6 +41,7 @@ class FireLineEnv():
         1      Fuel (type)              0       5
         2      Burned/Unburned          0       1
         3      Line Type                0       3
+        4      Burn Stats               0       6
 
         TODO: shape will need to fit Box(low=x, high=x, shape=x, dtype=x) where low/high are min/max values. Linear transformation?
         https://github.com/openai/gym/blob/3eb699228024f600e1e5e98218b15381f065abff/gym/spaces/box.py#L7
@@ -103,10 +105,13 @@ class FireLineEnv():
                                                  rl_environment.fuel_particle,
                                                  self.terrain, self.environment)
 
-        if mode == 'static terrain':
-            self.observation = self.terrain
+        if mode == 'static':
+            # static terrain and static fire start loc
+            self.observation = (self.terrain, config.fire_init_pos)
         elif mode == 'dynamic terrain':
             self.observation = config.fire_init_pos
+        else:
+            self.observation = self.terrain
 
         self.action_space = spaces.Discrete(4)
         self.low = [[[0,0,0,0] for _ in range(255)] for _ in range(255)]
@@ -117,6 +122,18 @@ class FireLineEnv():
                                                    config.screen_size,
                                                    4),
                                             dtype=np.float32)
+
+        # TODO check if we can use dict (dont think stable-baselines3 supports it)
+        # observ_spaces = {
+        #     'agent position':
+        #     gym.spaces.Box(low=0, high=1, shape=(config.screen_size, config.screen_size)),
+        #     'fuel':
+        #     gym.spaces.Box(low=0, high=4, shape=(config.screen_size, config.screen_size)),
+        #     'burn status':
+        #     gym.spaces.Box(low=0, high=5, shape=(config.screen_size, config.screen_size))
+        # }
+        # self.observation_space = gym.spaces.Dict(observ_spaces)
+
 
         # defines the agent location in the state at each step
         #self.state_space = np.zeros(config.screen_size, config.screen_size)
@@ -219,7 +236,10 @@ class FireLineEnv():
         fireline_sprites = self.fireline_manager.sprites
         game_status = self.game.update(self.terrain, fire_sprites, fireline_sprites)
         fire_map = self.game.fire_map
-        fire_map = self.fireline_manager.update(fire_map, self.points)
+        if len(self.points) == 0:
+            fire_map = self.fireline_manager.update(fire_map)
+        else:
+            fire_map = self.fireline_manager.update(fire_map, self.points)
         fire_map = self.fire_manager.update(fire_map)
         self.game.fire_map = fire_map
 
@@ -237,7 +257,7 @@ class FireLineEnv():
         '''
         # TODO this should be a new terrain from the sim - dummy for now.
         # ASSUMPTION: [:,:,0] (agent position matrix) are all 0s when received from sim
-        self.state = np.zeros((255,255,4))
+        self.state = np.zeros((255,255,5))
 
         # Place agent at location (0,0)
         self.state[0,0,0] = 1

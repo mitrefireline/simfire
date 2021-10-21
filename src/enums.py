@@ -18,7 +18,7 @@ BURNED_RGB_COLOR = (139, 69, 19)
 
 
 class BurnStatus(IntEnum):
-    UNBURNED = auto()
+    UNBURNED = 0
     BURNING = auto()
     BURNED = auto()
     FIRELINE = auto()

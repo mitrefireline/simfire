@@ -2,7 +2,6 @@
 import numpy as np
 import pygame
 import gym
-from typing import List
 from gym.utils import seeding
 from src import config
 from ..game.sprites import Terrain
@@ -33,6 +32,8 @@ class FireLineEnv(gym.Env):
         a = [[[0,0,0,0,0] for _ in range(255)] for _ in range (255)]
         b = [[[1,5,1,3,6] for _ in range(255)] for _ in range(255)]
 
+        IN FUTURE:
+        ----------
         Type: Box(low=a, high=b, shape=(255,255,3))
         Num    Observation              min     max
         0      Agent Position           0       1
@@ -40,6 +41,13 @@ class FireLineEnv(gym.Env):
         2      Burned/Unburned          0       1
         3      Line Type                0       3
         4      Burn Stats               0       6
+
+        Type: Box(low=a, high=b, shape=(255,255,3))
+        Num    Observation              min     max
+        0      Agent Position           0       1
+        1      Fuel (type)              0       4 [w_0, sigma, delta, M_x]
+        2      Line Type                0       1
+
 
         TODO: shape will need to fit Box(low=x, high=x, shape=x, dtype=x)
                 where low/high are min/max values. Linear transformation?
@@ -53,6 +61,9 @@ class FireLineEnv(gym.Env):
         Num    Action
         0      None
         1      Fireline
+
+        Future:
+        -------
         2      ScratchLine
         3      WetLine
 
@@ -114,12 +125,6 @@ class FireLineEnv(gym.Env):
                                               pixel_scale=config.pixel_scale,
                                               terrain=self.terrain)
 
-        self.mitigation = {
-            0: 'None',
-            1: self.fireline_manager,
-            2: self.scratchline_manager,
-            3: self.wetline_manager
-        }
         # initialize fire strategy
         self.fire_manager = RothermelFireManager(config.fire_init_pos, config.fire_size,
                                                  config.max_fire_duration,
@@ -140,26 +145,31 @@ class FireLineEnv(gym.Env):
 
         self.action_space = gym.spaces.Discrete(2)
 
-        self.low = [[[0, 0, 0, 0] for _ in range(255)] for _ in range(255)]
-        self.high = [[[1, 5, 1, 3] for _ in range(255)] for _ in range(255)]
-        self.observation_space = gym.spaces.Box(self.low,
-                                                self.high,
-                                                shape=(config.screen_size,
-                                                       config.screen_size, 4),
-                                                dtype=np.float32)
+        # low = [[0, 0, 0] for _ in range(config.screen_size)
+        #        for _ in range(config.screen_size)]
 
-        # TODO check if we can use dict (dont think stable-baselines3 supports it)
-        # observ_spaces = {
-        #     'agent position': self.state_space,
-        #     # gym.spaces.Discrete(1, shape=(config.screen_size, config.screen_size)),
-        #     'fuel': self.terrain.fuel_arrs,
-        #     # gym.spaces.Discrete(low=0, high=4, shape=(config.screen_size,
-        #                           config.screen_size)),
-        #     'burn status': self.fire_map
-        #     # gym.spaces.Discrete(low=0, high=5, shape=(config.screen_size,
-        #                               config.screen_size))
-        # }
-        # self.observation_space = observ_spaces
+        # high = [[1, 4, 1] for _ in range(config.screen_size)
+        #         for _ in range(config.screen_size)]
+        # self.low = np.reshape(low, (config.screen_size, config.screen_size, 3))
+        # self.high = np.reshape(high, (config.screen_size, config.screen_size, 3))
+        # self.observation_space = gym.spaces.Box(self.low,
+        #                                         self.high,
+        #                                         shape=(config.screen_size,
+        #                                                config.screen_size, 3),
+        #                                         dtype=np.float32)
+
+        #
+        observ_spaces = {
+            'agent position':
+            gym.spaces.Box(low=0, high=1, shape=(config.screen_size, config.screen_size)),
+            'fuel type':
+            gym.spaces.Box(low=0,
+                           high=4,
+                           shape=(config.screen_size, config.screen_size, 4)),
+            'line type':
+            gym.spaces.Box(low=0, high=1, shape=(config.screen_size, config.screen_size))
+        }
+        self.observation_space = gym.spaces.Dict(observ_spaces)
 
         # always keep the same if terrain and fire position are static
         self.seed(1234)
@@ -207,14 +217,7 @@ class FireLineEnv(gym.Env):
         '''
 
         # Make the action on the env at agent's current location
-        self.state[self.current_agent_loc[0], self.current_agent_loc[1], 4] = action
-
-        # get the fire mitigation type (there could be more than 1)
-        sprites_num = [k for k, v in action.items() if v >= 1]
-
-        if len(sprites_num) > 0:
-            # agent will put down some fire mitigation
-            self._update_sprites(sprites_num)
+        self.state[self.current_agent_loc[0], self.current_agent_loc[1], 2] = action
 
         old_loc = self.current_agent_loc.copy()
 
@@ -226,31 +229,10 @@ class FireLineEnv(gym.Env):
 
         if done:
             # compare the state spaces
-            difference, reward_agent = self.compare_spaces()
-            if reward_agent:
-                reward = -1 + difference
-            else:
-                reward = difference
+            difference = self.compare_spaces()
 
-        else:
-            reward = 0 if action == 0 else -1
-
+            reward = difference
         return self.state, reward, done, {}
-
-    def _update_sprites(self, sprites_num: List):
-
-        # update the location to pass to the sprite
-        self.points = self.current_agent_loc
-        sprites = [self.mitigatoin[num] for num in sprites_num]
-        for sprite in sprites:
-            if sprite == self.fireline_manager:
-                self.fireline_sprites = self.fireline_manager._add_point(
-                    point=self.points)
-            elif sprite == self.scratchline_manager:
-                self.scratchine_sprites = self.scratchline_manager._add_point(
-                    point=self.points)
-            elif sprite == self.wetline_manager:
-                self.wetline_sprites = self.wetline_manager._add_point(point=self.points)
 
     def _update_current_agent_loc(self):
         '''
@@ -281,6 +263,9 @@ class FireLineEnv(gym.Env):
         This will take the pygame update command and perform the display updates
 
         '''
+        # get the fire mitigation type (there could be more than 1)
+        # from the self.state object (last index)
+        self._update_sprites()
 
         game_status = self.game.update(self.terrain, self.fire_sprites,
                                        self.fireline_sprites)
@@ -294,6 +279,21 @@ class FireLineEnv(gym.Env):
 
         return game_status
 
+    def _update_sprites(self):
+        '''
+        Update sprite list based on fire mitigation.
+
+        0: no mitigation
+        1: fireline
+
+        '''
+
+        # update the location to pass to the sprite
+        for sprite in self.state[-1]:
+            if sprite == 1:
+                self.fireline_sprites = self.fireline_manager._add_point(
+                    point=self.current_agent_loc)
+
     def reset(self):
         '''
         Reset environment to initial state.
@@ -304,24 +304,68 @@ class FireLineEnv(gym.Env):
             Updated to have agent at (0,0) on reset.
 
         '''
-        # TODO this should be a new terrain from the sim - dummy for now.
-        # ASSUMPTION: [:,:,0] (agent position matrix) are all 0s when received from sim
-        self.state = np.zeros((255, 255, 5))
+
+        self._convert_data_to_gym()
 
         # Place agent at location (0,0)
-        self.state[0, 0, 0] = 1
         self.current_agent_loc = (0, 0)
+        self.state['agent position'][self.current_agent_loc] = 1
 
-        return np.array(self.state, dtype=np.float32)
+        return self.state
+
+    def _convert_data_to_gym(self):
+        '''
+        This function will convert the initialized terrain/fuel type
+            to the gym.spaces.Box format.
+
+        self.current_agent_loc --> [:,:,0]
+        self.terrain.fuel_arrs.w_0 --> [:,:,1[0]]
+        self.terrain.fuel_arrs.sigma --> [:,:,1[1]]
+        self.terrain.fuel_arrs.delta --> [:,:,1[2]]
+        self.terrain.fuel_arrs.M_x --> [:,:,1[3]]
+        self.line_type --> [:,:,2]
+
+
+        '''
+        reset_agent_position = np.zeros([config.screen_size, config.screen_size])
+
+        w_0_array = np.array([
+            self.terrain.fuel_arrs[i][j].fuel.w_0 for j in range(config.screen_size)
+            for i in range(config.screen_size)
+        ]).reshape(config.screen_size, config.screen_size)
+        sigma_array = np.array([
+            self.terrain.fuel_arrs[i][j].fuel.sigma for j in range(config.screen_size)
+            for i in range(config.screen_size)
+        ]).reshape(config.screen_size, config.screen_size)
+        delta_array = np.array([
+            self.terrain.fuel_arrs[i][j].fuel.delta for j in range(config.screen_size)
+            for i in range(config.screen_size)
+        ]).reshape(config.screen_size, config.screen_size)
+        M_x_array = np.array([
+            self.terrain.fuel_arrs[i][j].fuel.M_x for j in range(config.screen_size)
+            for i in range(config.screen_size)
+        ]).reshape(config.screen_size, config.screen_size)
+        reset_line_type = np.zeros([config.screen_size, config.screen_size])
+
+        fuel_arrays = np.stack((w_0_array, sigma_array, delta_array, M_x_array), axis=-1)
+
+        self.state = {
+            'agent position': reset_agent_position,
+            'fuel arrays': fuel_arrays,
+            'line type': reset_line_type
+        }
 
     def compare_spaces(self):
         '''
         At the end of stepping through both state spaces, compare fianl agent
             action space and final observation space of burned terrain
 
+        run simulation a second time with no agent
+
+
         '''
         difference = np.diff(self.observation_space['burn status'], self.action_space)
         # need logic for whether or not to reward the agent based on some difference
         # criteria
-        reward_agent = False
-        return difference, reward_agent
+
+        return difference

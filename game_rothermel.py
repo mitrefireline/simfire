@@ -59,7 +59,7 @@ def some_action_func(state):
         and returns a dict() of the fire mitigation stategy
     '''
 
-    return {0: 0, 1: 1}
+    return 1
 
 
 def rl_main():

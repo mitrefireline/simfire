@@ -2,6 +2,7 @@
 import numpy as np
 import pygame
 import gym
+from copy import deepcopy
 from gym.utils import seeding
 from src import config
 from ..game.sprites import Terrain
@@ -125,20 +126,15 @@ class FireLineEnv(gym.Env):
                                               pixel_scale=config.pixel_scale,
                                               terrain=self.terrain)
 
-        # initialize fire strategy
+        self.fireline_sprites = self.fireline_manager.sprites
+        self.fireline_sprites_copy = self.fireline_sprites.copy()
+        self.scratchline_sprites = self.scratchline_manager.sprites
+        self.wetline_sprites = self.wetline_manager.sprites
+
         self.fire_manager = RothermelFireManager(config.fire_init_pos, config.fire_size,
                                                  config.max_fire_duration,
                                                  config.pixel_scale, self.fuel_particle,
                                                  self.terrain, self.environment)
-
-        self.fireline_sprites = self.fireline_manager.sprites
-        self.scratchline_sprites = self.scratchline_manager.sprites
-        self.wetline_sprites = self.wetline_manager.sprites
-
-        self.fire_sprites = self.fire_manager.sprites
-        self.fire_map = self.game.fire_map
-
-        self.points = []
 
         # at start, agent is not in screen
         self.current_agent_loc = (0, 0)
@@ -217,12 +213,16 @@ class FireLineEnv(gym.Env):
         '''
 
         # Make the action on the env at agent's current location
-        self.state[self.current_agent_loc[0], self.current_agent_loc[1], 2] = action
+        self.state['line type'][self.current_agent_loc] = action
 
-        old_loc = self.current_agent_loc.copy()
+        # make a copy
+        old_loc = deepcopy(self.current_agent_loc)
+        # set the old position back to 0
+        self.state['agent position'][self.current_agent_loc] = 0
 
         # update position
         self._update_current_agent_loc()
+        self.state['agent position'][self.current_agent_loc] = 1
 
         # If the agent is at the last location (cannot move forward)
         done = old_loc == self.current_agent_loc
@@ -232,6 +232,8 @@ class FireLineEnv(gym.Env):
             difference = self.compare_spaces()
 
             reward = difference
+        else:
+            reward = 0
         return self.state, reward, done, {}
 
     def _update_current_agent_loc(self):
@@ -251,30 +253,35 @@ class FireLineEnv(gym.Env):
 
         # If moving forward one would bring us out of bounds and we can move to new row
         if x + 1 > (config.screen_size - 1) and y + 1 <= (config.screen_size - 1):
-            self.current_agent_loc[0] = 0
-            self.current_agent_loc[1] += 1
+            x = 0
+            y += 1
 
         # If moving forward keeps us in bounds
         elif x + 1 <= (config.screen_size - 1):
-            self.current_agent_loc[1] += 1
+            x += 1
+
+        self.current_agent_loc = (x, y)
 
     def render(self):
         '''
         This will take the pygame update command and perform the display updates
+            for a pro-active fire mitigation (no fire)
 
         '''
         # get the fire mitigation type (there could be more than 1)
         # from the self.state object (last index)
         self._update_sprites()
-
+        self.fire_sprites = self.fire_manager.sprites
+        self.fire_map = self.game.fire_map
+        self.game.fire_map = self.fire_map
         game_status = self.game.update(self.terrain, self.fire_sprites,
                                        self.fireline_sprites)
         self.fire_map = self.game.fire_map
-        if len(self.points) == 0:
+        if self.state['line type'][self.current_agent_loc] == 0:
             self.fire_map = self.fireline_manager.update(self.fire_map)
         else:
-            self.fire_map = self.fireline_manager.update(self.fire_map, self.points)
-        self.fire_map = self.fire_manager.update(self.fire_map)
+            self.fire_map = self.fireline_manager.update(self.fire_map,
+                                                         self.current_agent_loc)
         self.game.fire_map = self.fire_map
 
         return game_status
@@ -289,10 +296,9 @@ class FireLineEnv(gym.Env):
         '''
 
         # update the location to pass to the sprite
-        for sprite in self.state[-1]:
-            if sprite == 1:
-                self.fireline_sprites = self.fireline_manager._add_point(
-                    point=self.current_agent_loc)
+        if self.state['line type'][self.current_agent_loc] == 1:
+            self.fireline_sprites = self.fireline_manager._add_point(
+                point=self.current_agent_loc)
 
     def reset(self):
         '''
@@ -362,10 +368,55 @@ class FireLineEnv(gym.Env):
 
         run simulation a second time with no agent
 
+        compare:
+                self.state['line type']
+                self.fire_map --> [0: unburned, 2: burned]
+
+        logic:
+            line:       fire type:        reward:
+            -----       ----------        -------
+            [1]             [0]             0
+            [1]             [2]             -1
+            [0]             [2]             0
+            [0]             [0]             -1
 
         '''
-        difference = np.diff(self.observation_space['burn status'], self.action_space)
-        # need logic for whether or not to reward the agent based on some difference
-        # criteria
+        self.fire_map = self._run_sim_no_agent()
+        difference = np.diff(self.state['line type'], self.fire_map)
 
         return difference
+
+    def _run_sim_no_agent(self):
+        '''
+        TODO: Need Game() class in order to update the fire sprites.
+            FIX: [sprite.update() for sprite in self.fire_manager.sprites]
+
+        Re-Use self.terrain since in the pro-active case, no fire burns
+            while the agent traverses the terrain to decide mitigation
+            points.
+
+        Update the self.fire_map, w/o fireline management to estimate total
+            pixels burned/unburned
+
+
+
+        '''
+
+        from src.enums import GameStatus
+        # initialize fire strategy
+        self.fire_manager = RothermelFireManager(config.fire_init_pos, config.fire_size,
+                                                 config.max_fire_duration,
+                                                 config.pixel_scale, self.fuel_particle,
+                                                 self.terrain, self.environment)
+
+        fire_status = GameStatus.RUNNING
+        game_status = GameStatus.RUNNING
+        while game_status == GameStatus.RUNNING and fire_status == GameStatus.RUNNING:
+            self.fire_sprites = self.fire_manager.sprites
+            game_status = self.game.update(self.terrain, self.fire_sprites,
+                                           self.fireline_sprites_copy)
+            self.fire_map = self.game.fire_map
+            self.fire_map, fire_status = self.fire_manager.update(self.fire_map)
+            self.game.fire_map = self.fire_map
+        if fire_status == GameStatus.QUIT:
+            return self.fire_map

@@ -1,6 +1,6 @@
 import pygame
 from skimage.draw import line
-
+import random
 import src.config as cfg
 from src.enums import GameStatus
 from src.game.Game import Game
@@ -58,8 +58,8 @@ def some_action_func(state):
     A dummy function to show how the rl side ingests the state
         and returns a dict() of the fire mitigation stategy
     '''
-
-    return 1
+    fire_mitigation = random.randint(0, 1)
+    return fire_mitigation
 
 
 def rl_main():
@@ -71,11 +71,10 @@ def rl_main():
 
     state = rl_environment.reset()
     game_status = GameStatus.RUNNING
-    fire_status = GameStatus.RUNNING
-    while game_status == GameStatus.RUNNING and fire_status == GameStatus.RUNNING:
+    while game_status == GameStatus.RUNNING:
         action = some_action_func(state)
+        state, _, _, _ = rl_environment.step(action)
         game_status = rl_environment.render()
-        rl_environment.step(action)
 
     pygame.quit()
 

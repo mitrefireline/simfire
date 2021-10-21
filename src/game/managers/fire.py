@@ -192,7 +192,7 @@ class RothermelFireManager(FireManager):
         self._prune_sprites(fire_map)
         num_sprites = len(self.sprites)
         if num_sprites == 0:
-            return GameStatus.QUIT
+            return fire_map, GameStatus.QUIT
         loc_x = []
         loc_y = []
         new_loc_x = []

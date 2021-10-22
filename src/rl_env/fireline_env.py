@@ -229,11 +229,10 @@ class FireLineEnv(gym.Env):
 
         if done:
             # compare the state spaces
-            difference = self.compare_spaces()
-
-            reward = difference
+            reward = self.compare_spaces()
         else:
-            reward = 0
+            reward = 0 if action == 0 else -1
+
         return self.state, reward, done, {}
 
     def _update_current_agent_loc(self):
@@ -363,7 +362,7 @@ class FireLineEnv(gym.Env):
 
     def compare_spaces(self):
         '''
-        At the end of stepping through both state spaces, compare fianl agent
+        At the end of stepping through both state spaces, compare final agent
             action space and final observation space of burned terrain
 
         run simulation a second time with no agent

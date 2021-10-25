@@ -36,6 +36,21 @@ unittests:
   only:
     - merge_requests
 
+test-pages:
+  stage: Documentation
+  tags:
+    - docker
+  script:
+    - pip install -U sphinx sphinx-autoapi sphinx-rtd-theme
+    - sphinx-build -d docs/build/doctrees docs/source docs/build/html
+    - mv docs/build/html public/
+  artifacts:
+    expose_as: HTML Documentation
+    paths:
+      - public
+  only:
+    - merge_requests
+
 pages:
   stage: Documentation
   tags:
@@ -49,6 +64,4 @@ pages:
     paths:
       - public
   only:
-    - branches
-  except:
     - master

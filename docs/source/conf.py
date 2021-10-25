@@ -17,7 +17,7 @@
 # -- Project information -----------------------------------------------------
 
 project = 'fiReLine Rothermal Model'
-copyright = '2021, Michael Doyle'
+copyright = '2021, fiReLine'
 author = 'Marissa Dotter, Michael Doyle, Chris Kempis, Michael Threet, Tim Welsh'
 
 # The full version, including alpha/beta/rc tags
@@ -28,7 +28,9 @@ release = '0.0.1'
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.napoleon', 'autoapi.extension']
+extensions = [
+    'sphinx.ext.autodoc', 'sphinx.ext.napoleon', 'autoapi.extension', 'myst_parser'
+]
 
 # Autoapi settings
 autoapi_python_class_content = 'both'
@@ -51,7 +53,7 @@ exclude_patterns = ['**/_tests']
 html_theme = 'sphinx_rtd_theme'
 html_logo = '../../assets/icons/fireline_logo.png'
 html_theme_options = {
-    'logo_only': True,
+    'logo_only': False,
     'display_version': False,
 }
 # Add any paths that contain custom static files (such as style sheets) here,

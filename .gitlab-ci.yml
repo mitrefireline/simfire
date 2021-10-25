@@ -41,7 +41,7 @@ test-pages:
   tags:
     - docker
   script:
-    - pip install -U sphinx sphinx-autoapi sphinx-rtd-theme
+    - pip install -U sphinx sphinx-autoapi sphinx-rtd-theme myst-parser
     - sphinx-build -d docs/build/doctrees docs/source docs/build/html
     - mv docs/build/html public/
   artifacts:
@@ -57,7 +57,7 @@ pages:
     - docker
     - pages
   script:
-    - pip install -U sphinx sphinx-autoapi sphinx-rtd-theme
+    - pip install -U sphinx sphinx-autoapi sphinx-rtd-theme myst-parser
     - sphinx-build -d docs/build/doctrees docs/source docs/build/html
     - mv docs/build/html public/
   artifacts:

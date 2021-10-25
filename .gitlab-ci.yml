@@ -45,9 +45,9 @@ test-pages:
     - sphinx-build -d docs/build/doctrees docs/source docs/build/html
     - mv docs/build/html public/
   artifacts:
-    expose_as: HTML Documentation
+    expose_as: 'HTML Documentation'
     paths:
-      - public
+      - public/
   only:
     - merge_requests
 

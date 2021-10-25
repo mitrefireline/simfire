@@ -1,10 +1,12 @@
-# Introduction
+# Rothermel Fire Modeler
+
+## Introduction
 
 The Rothermel Fire Modeler uses [PyGame](https://www.pygame.org/wiki/about) to display and simulate the Rothermel Surface Fire Spread Model described in [this](https://www.fs.fed.us/rm/pubs_series/rmrs/gtr/rmrs_gtr371.pdf) paper.
 
-[GitLab Page](https://gitlab.mitre.org/fireline/rothermel-modeling)
+For more comprehensive documentation, go to our [docs page](https://fireline.pages.mitre.org/rothermel-modeling).
 
-## Running the Simulation
+### Running the Simulation
 
 Clone the repository:
 
@@ -23,3 +25,7 @@ And run the `game_rothermal.py` script:
 ```shell
 python game_rothermel.py
 ```
+
+## Contributing
+
+For contributing, see the [Contribution Page](https://fireline.pages.mitre.org/rothermal-modeling/contributing.html) in our [docs](https://fireline.pages.mitre.org/rothermel-modeling).

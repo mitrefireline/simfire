@@ -51,7 +51,7 @@ exclude_patterns = ['**/_tests']
 # a list of builtin themes.
 #
 html_theme = 'sphinx_rtd_theme'
-html_logo = '../../assets/icons/fireline_logo.png'
+html_logo = '../../assets/icons/rl_logo.png'
 html_theme_options = {
     'logo_only': False,
     'display_version': False,
@@ -60,3 +60,6 @@ html_theme_options = {
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
+
+# favicon location
+html_favicon = '../../assets/icons/favicon.ico'

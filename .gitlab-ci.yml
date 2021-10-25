@@ -40,6 +40,7 @@ pages:
   stage: Documentation
   tags:
     - docker
+    - pages
   script:
     - pip install -U sphinx sphinx-autoapi sphinx-rtd-theme
     - sphinx-build -d docs/build/doctrees docs/source docs/build/html

@@ -42,8 +42,7 @@ pages:
     - docker
   script:
     - pip install -U sphinx sphinx-autoapi sphinx-rtd-theme
-    - cd docs/source
-    - make html
+    - cd docs/source && make html
     - mv docs/build/html public/
   artifacts:
     paths:

@@ -7,6 +7,7 @@ before_script:
 stages:
   - Static Analysis
   - Unit Tests
+  - Documentation
 
 flake8:
   stage: Static Analysis
@@ -34,3 +35,33 @@ unittests:
     - SDL_VIDEODRIVER="dummy" python -m unittest discover -s src -t .. -p "test_*.py"
   only:
     - merge_requests
+
+test-pages:
+  stage: Documentation
+  tags:
+    - docker
+  script:
+    - pip install -U sphinx sphinx-autoapi sphinx-rtd-theme myst-parser
+    - sphinx-build -d docs/build/doctrees docs/source docs/build/html
+    - mv docs/build/html public/
+  artifacts:
+    expose_as: 'HTML Documentation'
+    paths:
+      - public/
+  only:
+    - merge_requests
+
+pages:
+  stage: Documentation
+  tags:
+    - docker
+    - pages
+  script:
+    - pip install -U sphinx sphinx-autoapi sphinx-rtd-theme myst-parser
+    - sphinx-build -d docs/build/doctrees docs/source docs/build/html
+    - mv docs/build/html public/
+  artifacts:
+    paths:
+      - public
+  only:
+    - master

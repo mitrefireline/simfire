@@ -3,7 +3,8 @@ from typing import Tuple
 import GPUtil
 import numpy as np
 
-from .world.elevation_functions import PerlinNoise2D, flat
+from .world.elevation_functions import PerlinNoise2D
+from .world.elevation_functions import flat
 from .world.parameters import Fuel, FuelArray
 
 # Use GPU if available, else CPU
@@ -38,8 +39,10 @@ sigma_y = 50
 pnoise = PerlinNoise2D(A, [screen_size, screen_size], [1, 1])
 pnoise.precompute()
 
-# elevation_fn = pnoise.fn
+# Uncomment this and comment out the other elevations_fn if you'd like a flat terrain map
+# Make sure to uncomment the line that imports the flat terrain at the top as well
 elevation_fn = flat()
+# elevation_fn = pnoise.fn
 
 
 def Chaparral_r():
@@ -55,7 +58,7 @@ terrain_map: Tuple[Tuple[FuelArray]] = ((chaparral_row, ) * (terrain_size // 2) 
 
 # Fire Manager Parameters
 # (x, y) starting coordinates
-fire_init_pos: Tuple[int, int] = (65, 65)
+fire_init_pos: Tuple[int, int] = (70, 70)
 # Fires burn for a limited number of frames
 max_fire_duration: int = 5
 

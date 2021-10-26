@@ -80,5 +80,5 @@ def rl_main():
 
 
 if __name__ == '__main__':
-    # main()
-    rl_main()
+    main()
+    # rl_main()

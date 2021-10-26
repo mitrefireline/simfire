@@ -1,3 +1,10 @@
+'''
+Fire
+====
+
+Defines the different `FireManager`s (`ConstantSpreadFireManager` and
+`RothermelFireManager`) that determine how a fire moves about a `fire_map`.
+'''
 from dataclasses import astuple
 from typing import List, Tuple
 
@@ -48,15 +55,26 @@ class FireManager():
 
     def update(self, fire_map: np.ndarray) -> None:
         '''
-        Method that describes how the fires in self.sprites should spread.
+        Method that describes how the fires in `self.sprites`should spread.
+
+        Should be updated in child classes.
+
+        Arguments:
+            fire_map: All possible fire conditions at each pixel location
         '''
         pass
 
     def _prune_sprites(self, fire_map: np.ndarray) -> np.ndarray:
         '''
         Internal method to remove any Fire sprites whose durations have
-        exceded the maximum allowed duration and mark self.fire_map as
+        exceded the maximum allowed duration and mark `self.fire_map` as
         BURNED.
+
+        Arguments:
+            fire_map: All possible fire conditions at each pixel location
+
+        Returns:
+            An updated `fire_map` with sprites pruned
         '''
         # Use the expired sprites to mark self.fire_map as burned
         expired_sprites = list(
@@ -75,29 +93,40 @@ class FireManager():
         '''
         Get the 8-connected locations of the input (x,y) coordinate. This
         function will filter the points that are beyond the boundaries of
-        the game screen and/or the points that are already BURNED or BURNING.
+        the game screen and/or the points that are already `BURNED` or `BURNING`.
 
         Parameters:
             x: The x coordinate of the location
             y: The y coordinate of the location
 
         Returns:
-            new_coords: A tuple of tuple of ints containing the adjacent
-                        pixel locations that are UNBURNED and within the
-                        scope of the game screen
+            A tuple of tuple of ints containing the adjacent
+            pixel locations that are `UNBURNED` and within the
+            scope of the game screen
         '''
         def _filter_function(loc: Tuple[int, int]) -> bool:
             '''Used in `self.get_new_locs` as the filter function for the new locations
 
             Make sure each new location/pixel is:
-            - Within the game screen boundaries
-            - UNBURNED
+                - Within the game screen boundaries
+                - UNBURNED
+
+            Arguments:
+                loc: The tuple of the x and y location to filter
+
+            Returns:
+                Whether or not the `loc` was inside the boundaries
             '''
+            acceptable_statuses = [
+                BurnStatus.UNBURNED, BurnStatus.FIRELINE, BurnStatus.SCRATCHLINE,
+                BurnStatus.WETLINE
+            ]
+
             in_boundaries = loc[0] < fire_map.shape[1] \
                             and loc[0] >= 0 \
                             and loc[1] < fire_map.shape[0] \
                             and loc[1] >= 0 \
-                            and fire_map[loc[1], loc[0]] == BurnStatus.UNBURNED
+                            and fire_map[loc[1], loc[0]] in acceptable_statuses
             return in_boundaries
 
         new_locs = ((x + 1, y), (x + 1, y + 1), (x, y + 1), (x - 1, y + 1), (x - 1, y),
@@ -143,8 +172,8 @@ class FireManager():
 
 class RothermelFireManager(FireManager):
     '''
-    This FireManager will spread the fire based on the basic Rothermel
-    model (https://www.fs.fed.us/rm/pubs_series/rmrs/gtr/rmrs_gtr371.pdf).
+    This FireManager will spread the fire based on the basic [Rothermel
+    Model](https://www.fs.fed.us/rm/pubs_series/rmrs/gtr/rmrs_gtr371.pdf).
     '''
     def __init__(self, init_pos: Tuple[int, int], fire_size: int, max_fire_duration: int,
                  pixel_scale: int, fuel_particle: FuelParticle, terrain: Terrain,
@@ -198,8 +227,8 @@ class RothermelFireManager(FireManager):
             None
 
         Returns:
-            grad_mag: The gradient/slope magnitude for every pixel
-            grad_dir: The gradient direction/angle for every pixel
+            The gradient/slope magnitude for every pixel ([0]) and the gradient
+            direction/angle for every pixel ([1])
         '''
         grad_y, grad_x = np.gradient(self.terrain.elevations)
         grad_mag = np.sqrt(grad_x**2 + grad_y**2)
@@ -214,10 +243,10 @@ class RothermelFireManager(FireManager):
         time.
 
         Arguments:
-            None
+            fire_map: All possible fire conditions at each pixel location
 
         Returns:
-            None
+            A NumPy array of the updated `fire_map` and the current `GameStatus`
         '''
         # Remove all fires that are past the max duration
         self._prune_sprites(fire_map)
@@ -330,7 +359,7 @@ class ConstantSpreadFireManager(FireManager):
                  rate_of_spread: int) -> None:
         '''
         Initialize the class by recording the initial fire location and size.
-        Create the fire sprite and fire_map and mark the location of the
+        Create the fire sprite and `fire_map` and mark the location of the
         initial fire.
 
         Arguments:
@@ -352,18 +381,18 @@ class ConstantSpreadFireManager(FireManager):
         super().__init__(init_pos, fire_size, max_fire_duration)
         self.rate_of_spread = rate_of_spread
 
-    def update(self, fire_map: np.ndarray) -> None:
+    def update(self, fire_map: np.ndarray) -> np.ndarray:
         '''
         Spread the fire and add new fire sprites to the display. The fire
         will spread at a constant rate in all directions based on
-        self.rate_of_spread. self.fire_map is updated accordingly based on
+        self.rate_of_spread. `self.fire_map` is updated accordingly based on
         which fires have started/spread/stopped.
 
         Arguments:
-            None
+            fire_map: All possible fire conditions at each pixel location
 
         Returns:
-            None
+            An updated NumPy array of the current `fire_map`
         '''
         self._prune_sprites(fire_map)
         for sprite in self.sprites:

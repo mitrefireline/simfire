@@ -4,7 +4,7 @@ from typing import List, Tuple
 import numpy as np
 
 from ..sprites import Fire, Terrain
-from ...enums import BurnStatus, GameStatus
+from ...enums import BurnStatus, RoSAttenuation, GameStatus
 from ...world.parameters import Environment, FuelParticle
 from ...world.rothermel import compute_rate_of_spread
 
@@ -108,6 +108,37 @@ class FireManager():
         new_locs = tuple(filter(_filter_function, new_locs))
 
         return new_locs
+
+    def _update_rate_of_spread(self, rate_of_spread: np.ndarray,
+                               fire_map: np.ndarray) -> np.ndarray:
+        '''Update the burn amounts based on control line status.
+
+        This will attenuate the rate of spread for all control line locations in
+        `rate_of_spread` by the fractions set in `enums.RosAttenuation`.
+
+        e.g. if the `rate_of_spread` (RoS) was 10 for a location where a fireline was
+        located, and `RosAttenuation.FIRELINE` was set to 0.05, it would become 0.5 as a
+        result of this function.
+
+        Arguments:
+            rate_of_spread: The array that keeps track of the rate of spread for
+                          for all pixel locations.
+            fire_map: The array that maintains information about the status of the fire
+                      at each pixel location (`BURNED`, `UNBURNED`, `FIRELINE`, etc.)
+
+        Returns:
+            An updated `rate_of_spread` array, taking into account the control lines
+        '''
+        assert fire_map.shape == rate_of_spread.shape
+
+        factor = np.ones_like(rate_of_spread)
+        factor[np.where(fire_map == BurnStatus.FIRELINE)] = RoSAttenuation.FIRELINE
+        factor[np.where(fire_map == BurnStatus.SCRATCHLINE)] = RoSAttenuation.SCRATCHLINE
+        factor[np.where(fire_map == BurnStatus.WETLINE)] = RoSAttenuation.WETLINE
+
+        rate_of_spread = factor * rate_of_spread
+
+        return rate_of_spread
 
 
 class RothermelFireManager(FireManager):
@@ -273,7 +304,13 @@ class RothermelFireManager(FireManager):
 
         y_coords = new_loc_y.astype(int)
         x_coords = new_loc_x.astype(int)
-        self.burn_amounts[y_coords, x_coords] += R
+
+        rate_of_spread = np.zeros_like(self.burn_amounts)
+        rate_of_spread[y_coords, x_coords] = R
+
+        # Update the burn_amounts dependent on if there are control lines there
+        rate_of_spread = self._update_rate_of_spread(rate_of_spread, fire_map)
+        self.burn_amounts += rate_of_spread
 
         y_coords, x_coords = np.unique(np.vstack((y_coords, x_coords)), axis=1)
         for (x_new, y_new) in zip(x_coords, y_coords):

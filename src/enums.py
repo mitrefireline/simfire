@@ -1,3 +1,12 @@
+'''
+Enums
+=====
+
+Contains many enumeration classes for use throughout `rothermel_model` that depict pixel
+burn status, the ordering of sprite layers, how much to attenuate the rate of spread on
+different types of control lines, and the current game status.
+'''
+from dataclasses import dataclass
 from enum import auto, Enum, IntEnum
 
 import numpy as np
@@ -18,6 +27,16 @@ BURNED_RGB_COLOR = (139, 69, 19)
 
 
 class BurnStatus(IntEnum):
+    '''The status of each pixel in a `fire_map`
+
+    Current statuses are:
+        - UNBURNED
+        - BURNING
+        - BURNED
+        - FIRELINE
+        - SCRATCHLINE
+        - WETLINE
+    '''
     UNBURNED = 0
     BURNING = auto()
     BURNED = auto()
@@ -26,7 +45,32 @@ class BurnStatus(IntEnum):
     WETLINE = auto()
 
 
+@dataclass
+class RoSAttenuation:
+    '''The factor by which to attenuate the rate of spread (RoS), based on control line
+    type
+
+    The only classes that are attenuated are the different control lines:
+        - FIRELINE
+        - SCRATCHLINE
+        - WETLINE
+    '''
+    FIRELINE: float = 0.01
+    SCRATCHLINE: float = 0.02
+    WETLINE: float = 0.03
+
+
 class SpriteLayer(IntEnum):
+    '''The types of layers for sprites
+
+    This determines the order with which sprites are layered and displayed on top of each
+    other. The higher the number, the closer to the top of the layer stack. From bottom
+    to top:
+        - TERRAIN
+        - FIRE
+        - LINE
+        - RESOURCE
+    '''
     TERRAIN = 1
     FIRE = 2
     LINE = 3
@@ -34,5 +78,11 @@ class SpriteLayer(IntEnum):
 
 
 class GameStatus(Enum):
+    '''The different statuses that the game can be in
+
+    Currently it can only be in the following modes:
+        - QUIT
+        - RUNNING
+    '''
     QUIT = auto()
     RUNNING = auto()

@@ -1,13 +1,16 @@
 # from dataclasses import astuple
-import numpy as np
-import pygame
-import gym
 from copy import deepcopy
+from typing import Dict
+
+import gym
+import pygame
+import numpy as np
 from gym.utils import seeding
-from src import config
+
+from .. import config
 from ..game.sprites import Terrain
-from src.game.Game import Game
-from src.world.parameters import Environment, FuelArray, FuelParticle, Tile
+from ..game.Game import Game
+from ..world.parameters import Environment, FuelArray, FuelParticle, Tile
 from ..game.managers.fire import RothermelFireManager
 from ..game.managers.mitigation import (FireLineManager, ScratchLineManager,
                                         WetLineManager)
@@ -15,93 +18,90 @@ from ..game.managers.mitigation import (FireLineManager, ScratchLineManager,
 
 class FireLineEnv(gym.Env):
     '''
-        This Environment Catcher will record all environments/actions
-            for the RL return states.
-        Inlcuding: Observation, Reward (or Penalty), "done", and any meta-data.
+    This Environment Catcher will record all environments/actions for the RL return
+    states. Inlcuding: Observation, Reward (or Penalty), "done", and any meta-data.
 
-        This class will incorporate all gamelogic, input and rendering.
+    This class will incorporate all gamelogic, input and rendering.
 
-        It will also incorporate everything related to pygame into the render()
-            method and separate init() and init_render() methods.
+    It will also incorporate everything related to pygame into the render()
+    method and separate init() and init_render() methods.
 
-        We can then render ML routines using the step() and reset() method
-            w/o loading the pygame package each step - if the environment is loaded,
-            the rendering is not needed for training (saves execution time).
+    We can then render ML routines using the step() and reset() method
+    w/o loading the pygame package each step - if the environment is loaded,
+    the rendering is not needed for training (saves execution time).
 
-        Observation:
-        ------------
-        a = [[[0,0,0,0,0] for _ in range(255)] for _ in range (255)]
-        b = [[[1,5,1,3,6] for _ in range(255)] for _ in range(255)]
+    Observation:
+    ------------
+    a = [[[0,0,0,0,0] for _ in range(255)] for _ in range (255)]
+    b = [[[1,5,1,3,6] for _ in range(255)] for _ in range(255)]
 
-        IN FUTURE:
-        ----------
-        Type: Box(low=a, high=b, shape=(255,255,3))
-        Num    Observation              min     max
-        0      Agent Position           0       1
-        1      Fuel (type)              0       5
-        2      Burned/Unburned          0       1
-        3      Line Type                0       3
-        4      Burn Stats               0       6
+    IN FUTURE:
+    ----------
+    Type: Box(low=a, high=b, shape=(255,255,3))
+    Num    Observation              min     max
+    0      Agent Position           0       1
+    1      Fuel (type)              0       5
+    2      Burned/Unburned          0       1
+    3      Line Type                0       3
+    4      Burn Stats               0       6
 
-        Type: Box(low=a, high=b, shape=(255,255,3))
-        Num    Observation              min     max
-        0      Agent Position           0       1
-        1      Fuel (type)              0       4 [w_0, sigma, delta, M_x]
-        2      Line Type                0       1
-
-
-        TODO: shape will need to fit Box(low=x, high=x, shape=x, dtype=x)
-                where low/high are min/max values. Linear transformation?
-        https://github.com/openai/gym/blob/3eb699228024f600e1e5e98218b15381
-                    f065abff/gym/spaces/box.py#L7
-        Line 19 - Independent bound for each dimension
-
-        Actions:
-        --------
-        Type: Discrete(4) -- real-valued (on / off)
-        Num    Action
-        0      None
-        1      Fireline
-
-        Future:
-        -------
-        2      ScratchLine
-        3      WetLine
+    Type: Box(low=a, high=b, shape=(255,255,3))
+    Num    Observation              min     max
+    0      Agent Position           0       1
+    1      Fuel (type)              0       4 [w_0, sigma, delta, M_x]
+    2      Line Type                0       1
 
 
-        Reward:
-        -------
-        Reward of 0 when 'None' action is taken and agent position is not
-                            the last tile.
-        Reward of -1 when 'Trench, ScratchLine, WetLine' action is taken and agent
-                            position is not the last tile.
-        Reward of (fire_burned - fireline_burned) when done.
+    TODO: shape will need to fit Box(low=x, high=x, shape=x, dtype=x)
+            where low/high are min/max values. Linear transformation?
+    https://github.com/openai/gym/blob/3eb699228024f600e1e5e98218b15381
+                f065abff/gym/spaces/box.py#L7
+    Line 19 - Independent bound for each dimension
 
-        TODO: Will probably want to normalize (difference) to be [0,1] or
-                    something similar.
-                reward values between [0,1] result in better training.
+    Actions:
+    --------
+    Type: Discrete(4) -- real-valued (on / off)
+    Num    Action
+    0      None
+    1      Fireline
 
-        Starting State:
-        ---------------
-        The position of the agent always starts in the top right corner (0,0).
+    Future:
+    -------
+    2      ScratchLine
+    3      WetLine
 
 
-        Episode Termination:
-        ---------------------
-        The agent has traversed all pixels (screen_size, screen_size)
+    Reward:
+    -------
+    Reward of 0 when 'None' action is taken and agent position is not the last tile.
+
+    Reward of -1 when 'Trench, ScratchLine, WetLine' action is taken and agent position
+    is not the last tile.
+
+    Reward of (fire_burned - fireline_burned) when done.
+
+    TODO: Will probably want to normalize (difference) to be [0,1] or something similar.
+          Reward values between [0,1] result in better training.
+
+    Starting State:
+    ---------------
+    The position of the agent always starts in the top right corner (0,0).
+
+    Episode Termination:
+    ---------------------
+    The agent has traversed all pixels (screen_size, screen_size)
 
     TODO: pull out Game functionality or make it a parameter to pass in
-            if we want to train w/o pygame rendering or if we do.
-
+          if we want to train w/o pygame rendering or if we do.
     '''
     def __init__(self):
         '''
-            Initialize the class by recording the state space.
-            We need to make a copy:
-                Need to step through the state space twice:
-                    1. Let the agent step through the space and draw firelines
-                    2. Let the environemnt progress w/o agent
-                Compare the two state spaces.
+        Initialize the class by recording the state space.
+        We need to make a copy:
+            Need to step through the state space twice:
+                1. Let the agent step through the space and draw firelines
+                2. Let the environemnt progress w/o agent
+            Compare the two state spaces.
 
         '''
         pygame.init()
@@ -170,46 +170,40 @@ class FireLineEnv(gym.Env):
         # always keep the same if terrain and fire position are static
         self.seed(1234)
 
-    def seed(self, seed=None):
+    def seed(self, seed: float = None):
         '''
         Set the seed for numpy random methods.
 
-        Input:
-        -------
-        seed: Random seeding value
+        Arguments:
+            seed: Random seeding value
 
-        Return:
-        -------
-        seed: Random seeding value
+        Returns:
+            Random seeding value
         '''
 
         self.np_random, seed = seeding.np_random(seed)
         return [seed]
 
-    def step(self, action):
+    def step(self, action: Dict[int, int]):
         '''
         This function will apply the action to the agent in the current state.
 
         Calculate new agent/state_space position by reseting old position to zero,
-            call the _update_current_agent_loc method and set new
+        call the _update_current_agent_loc method and set new
             agent/state_space location to 1.
 
         Done: Occurs when the agent has traversed the entire game
                 position: [screen_size, screen_size]
 
 
-        Input:
-        -------
-
+        Arguments:
             action: {0: 0, 1: 0, 2: 0, 3: 0}
 
-        Return:
-        -------
-        observation: [screen_size, screen_size, 3]: agent position,
-                            fuel type, burned/unburned
-        reward: -1 if trench, 0 if None
-        done: end simulation, calculate state differences
-        info: extra meta-data
+        Returns:
+            [screen_size, screen_size, 3] of agent position, fuel type, burned/unburned
+            -1 if trench, 0 if None
+            end simulation, calculate state differences
+            extra meta-data
         '''
 
         # Make the action on the env at agent's current location
@@ -237,15 +231,14 @@ class FireLineEnv(gym.Env):
 
     def _update_current_agent_loc(self):
         '''
-        This function will help update the current agent position
-            as it traverses the game.
+        This function will help update the current agent position as it traverses the
+        game.
 
-        Check if the y-axis is less than the screen-size and the
-            x-axis is greater than the screen size --> y-axis += 1, x-axis = 0
+        Check if the y-axis is less than the screen-size and the x-axis is greater than
+        the screen size --> y-axis += 1, x-axis = 0
 
-        Check if the x-axis is less than screen size and the y-axis is
-            less than/equal to screen size --> y-axis = None, x-axis += 1
-
+        Check if the x-axis is less than screen size and the y-axis is less than/equal
+        to screen size --> y-axis = None, x-axis += 1
         '''
         x = self.current_agent_loc[0]
         y = self.current_agent_loc[1]
@@ -263,9 +256,8 @@ class FireLineEnv(gym.Env):
 
     def render(self):
         '''
-        This will take the pygame update command and perform the display updates
-            for a pro-active fire mitigation (no fire)
-
+        This will take the pygame update command and perform the display updates for a
+        pro-active fire mitigation (no fire)
         '''
         # get the fire mitigation type (there could be more than 1)
         # from the self.state object (last index)
@@ -288,12 +280,9 @@ class FireLineEnv(gym.Env):
     def _update_sprites(self):
         '''
         Update sprite list based on fire mitigation.
-
-        0: no mitigation
-        1: fireline
-
+          0: no mitigation
+          1: fireline
         '''
-
         # update the location to pass to the sprite
         if self.state['line type'][self.current_agent_loc] == 1:
             self.fireline_sprites = self.fireline_manager._add_point(
@@ -306,8 +295,7 @@ class FireLineEnv(gym.Env):
 
         Terrain is received from the sim.
         Agent position matrix is assumed to be all 0's when received from sim.
-            Updated to have agent at (0,0) on reset.
-
+        Updated to have agent at (0,0) on reset.
         '''
 
         self._convert_data_to_gym()
@@ -320,8 +308,8 @@ class FireLineEnv(gym.Env):
 
     def _convert_data_to_gym(self):
         '''
-        This function will convert the initialized terrain/fuel type
-            to the gym.spaces.Box format.
+        This function will convert the initialized terrain/fuel type to the
+        `gym.spaces.Box` format.
 
         self.current_agent_loc --> [:,:,0]
         self.terrain.fuel_arrs.w_0 --> [:,:,1[0]]
@@ -329,8 +317,6 @@ class FireLineEnv(gym.Env):
         self.terrain.fuel_arrs.delta --> [:,:,1[2]]
         self.terrain.fuel_arrs.M_x --> [:,:,1[3]]
         self.line_type --> [:,:,2]
-
-
         '''
         reset_agent_position = np.zeros([config.screen_size, config.screen_size])
 
@@ -360,16 +346,16 @@ class FireLineEnv(gym.Env):
             'line type': reset_line_type
         }
 
-    def compare_spaces(self):
+    def compare_spaces(self) -> np.ndarray:
         '''
-        At the end of stepping through both state spaces, compare final agent
-            action space and final observation space of burned terrain
+        At the end of stepping through both state spaces, compare final agent action
+        space and final observation space of burned terrain
 
-        run simulation a second time with no agent
+        Run simulation a second time with no agent
 
         compare:
-                self.state['line type']
-                self.fire_map --> [0: unburned, 2: burned]
+            self.state['line type']
+            self.fire_map --> [0: unburned, 2: burned]
 
         logic:
             line:       fire type:        reward:
@@ -379,26 +365,28 @@ class FireLineEnv(gym.Env):
             [0]             [2]             0
             [0]             [0]             -1
 
+        Returns:
+            A NumPy array that captures the difference between the `fire_map` ran with
+            and without intervention
         '''
         self.fire_map = self._run_sim_no_agent()
         difference = np.diff(self.state['line type'], self.fire_map)
 
         return difference
 
-    def _run_sim_no_agent(self):
+    def _run_sim_no_agent(self) -> np.ndarray:
         '''
         TODO: Need Game() class in order to update the fire sprites.
-            FIX: [sprite.update() for sprite in self.fire_manager.sprites]
+        FIX: [sprite.update() for sprite in self.fire_manager.sprites]
 
-        Re-Use self.terrain since in the pro-active case, no fire burns
-            while the agent traverses the terrain to decide mitigation
-            points.
+        Re-Use self.terrain since in the pro-active case, no fire burns while the agent
+        traverses the terrain to decide mitigation points.
 
-        Update the self.fire_map, w/o fireline management to estimate total
-            pixels burned/unburned
+        Update the self.fire_map, w/o fireline management to estimate total pixels
+        burned/unburned
 
-
-
+        Returns:
+            The updated `fire_map` after being updated by `fire_manager`
         '''
 
         from src.enums import GameStatus

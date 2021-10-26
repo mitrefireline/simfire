@@ -30,31 +30,27 @@ class FireLineEnv(gym.Env):
 
         Observation:
         ------------
-        a = [[[0,0,0,0,0] for _ in range(255)] for _ in range (255)]
-        b = [[[1,5,1,3,6] for _ in range(255)] for _ in range(255)]
+        Type: gym.spaces.Dict(Box(low=min, high=max, shape=(255,255,len(max))))
 
-        IN FUTURE:
-        ----------
-        Type: Box(low=a, high=b, shape=(255,255,3))
+
         Num    Observation              min     max
         0      Agent Position           0       1
-        1      Fuel (type)              0       5
-        2      Burned/Unburned          0       1
-        3      Line Type                0       3
-        4      Burn Stats               0       6
-
-        Type: Box(low=a, high=b, shape=(255,255,3))
-        Num    Observation              min     max
-        0      Agent Position           0       1
-        1      Fuel (type)              0       4 [w_0, sigma, delta, M_x]
-        2      Line Type                0       1
+        1      Fuel (type)              0       5 [type, w_0, sigma, delta, M_x]
+        2      Elevation                0       1 (float)
+        3      Line Type                0       1
 
 
-        TODO: shape will need to fit Box(low=x, high=x, shape=x, dtype=x)
-                where low/high are min/max values. Linear transformation?
-        https://github.com/openai/gym/blob/3eb699228024f600e1e5e98218b15381
-                    f065abff/gym/spaces/box.py#L7
-        Line 19 - Independent bound for each dimension
+
+            In Reactive Case:
+            -----------------
+            Type: gym.spaces.Dict(Box(low=min, high=max, shape=(255,255,len(max))))
+            Num    Observation              min     max
+            0      Agent Position           0       1
+            1      Fuel (type)              0       5
+            2      Burned/Unburned          0       1
+            3      Line Type                0       3
+            4      Burn Stats               0       6
+
 
         Actions:
         --------
@@ -63,7 +59,7 @@ class FireLineEnv(gym.Env):
         0      None
         1      Fireline
 
-        Future:
+        TODO:
         -------
         2      ScratchLine
         3      WetLine
@@ -97,11 +93,15 @@ class FireLineEnv(gym.Env):
     def __init__(self):
         '''
             Initialize the class by recording the state space.
-            We need to make a copy:
+
+            Using a static terrain and fire start position:
                 Need to step through the state space twice:
                     1. Let the agent step through the space and draw firelines
                     2. Let the environemnt progress w/o agent
                 Compare the two state spaces.
+
+            Initialize the observation space and state space as described
+                in the docstrings
 
         '''
         pygame.init()
@@ -191,7 +191,7 @@ class FireLineEnv(gym.Env):
         This function will apply the action to the agent in the current state.
 
         Calculate new agent/state_space position by reseting old position to zero,
-            call the _update_current_agent_loc method and set new
+            call the _update_current_agent_loc() method and set new
             agent/state_space location to 1.
 
         Done: Occurs when the agent has traversed the entire game
@@ -201,12 +201,16 @@ class FireLineEnv(gym.Env):
         Input:
         -------
 
-            action: {0: 0, 1: 0, 2: 0, 3: 0}
+        action: int
 
         Return:
         -------
-        observation: [screen_size, screen_size, 3]: agent position,
-                            fuel type, burned/unburned
+        observation: Dict(
+                        'agent position': (screen_size, screen_size, 1),
+                        'terrain': (screen_size, screen_size, 5)
+                        'line type': (screen_size, screen_size, 1)
+                        )
+
         reward: -1 if trench, 0 if None
         done: end simulation, calculate state differences
         info: extra meta-data
@@ -266,6 +270,7 @@ class FireLineEnv(gym.Env):
         This will take the pygame update command and perform the display updates
             for a pro-active fire mitigation (no fire)
 
+
         '''
         # get the fire mitigation type (there could be more than 1)
         # from the self.state object (last index)
@@ -302,7 +307,7 @@ class FireLineEnv(gym.Env):
     def reset(self):
         '''
         Reset environment to initial state.
-        NOTE: reset() must be called before you can call step()
+        NOTE: reset() must be called before you can call step() for the first time.
 
         Terrain is received from the sim.
         Agent position matrix is assumed to be all 0's when received from sim.
@@ -324,11 +329,13 @@ class FireLineEnv(gym.Env):
             to the gym.spaces.Box format.
 
         self.current_agent_loc --> [:,:,0]
-        self.terrain.fuel_arrs.w_0 --> [:,:,1[0]]
-        self.terrain.fuel_arrs.sigma --> [:,:,1[1]]
-        self.terrain.fuel_arrs.delta --> [:,:,1[2]]
-        self.terrain.fuel_arrs.M_x --> [:,:,1[3]]
-        self.line_type --> [:,:,2]
+        self.terrain.fuel_arrs.type --> [:,:,1[0]]
+        self.terrain.fuel_arrs.w_0 --> [:,:,1[1]]
+        self.terrain.fuel_arrs.sigma --> [:,:,1[2]]
+        self.terrain.fuel_arrs.delta --> [:,:,1[3]]
+        self.terrain.fuel_arrs.M_x --> [:,:,1[4]]
+        self.elevation --> [:,:,2]
+        self.line_type --> [:,:,3]
 
 
         '''
@@ -357,6 +364,7 @@ class FireLineEnv(gym.Env):
         self.state = {
             'agent position': reset_agent_position,
             'fuel arrays': fuel_arrays,
+            'elevation': self.terrain.elevations,
             'line type': reset_line_type
         }
 

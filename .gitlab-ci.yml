@@ -100,11 +100,11 @@ test-release:
   script: >
     apt update -y && apt install jq -y
 
-    curl --header "PRIVATE-TOKEN: ${REGISTRY_DELETE_TOKEN}" "https://gitlab.mitre.org/api/v4/projects/${CI_PROJECT_ID}/packages/"
+    curl --header "gitlab-ci-token: ${CI_JOB_TOKEN}" "https://gitlab.mitre.org/api/v4/projects/${CI_PROJECT_ID}/packages/"
 
-    delete_api_path=$(curl --header "PRIVATE-TOKEN: ${REGISTRY_DELETE_TOKEN}" "https://gitlab.mitre.org/api/v4/projects/${CI_PROJECT_ID}/packages/" | jq -r '.[] | select(.version=="0.0.0") | ._links.delete_api_path')
+    delete_api_path=$(curl --header "gitlab-ci-token: ${CI_JOB_TOKEN}" "https://gitlab.mitre.org/api/v4/projects/${CI_PROJECT_ID}/packages/" | jq -r '.[] | select(.version=="0.0.0") | ._links.delete_api_path')
 
-    curl --request DELETE --header "PRIVATE-TOKEN: ${REGISTRY_DELETE_TOKEN}" "${delete_api_path}"
+    curl --request DELETE --header "gitlab-ci-token: ${CI_JOB_TOKEN}" "${delete_api_path}"
 
 release-dev:
   stage: Release

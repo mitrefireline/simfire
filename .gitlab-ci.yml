@@ -86,7 +86,7 @@ test-release:
   script:
     - pip install wheel
     - python setup.py bdist_wheel
-    - pip install dist/*.whl
+    - pip install -U dist/*.whl
   only:
     - merge_requests
 

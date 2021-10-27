@@ -11,6 +11,7 @@ Welcome to fiReLine Rothermal Fire Modeler documentation!
    :caption: Contents:
 
    intro.md
+   config.md
    contributing.md
    modules
 

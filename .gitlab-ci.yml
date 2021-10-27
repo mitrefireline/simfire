@@ -98,8 +98,7 @@ test-release:
 
 .delete-package:
   variables:
-    PRIVATE_HEADER: >
-      "PRIVATE-TOKEN: ${REGISTRY_DELETE_TOKEN}"
+    PRIVATE_HEADER: '"PRIVATE-TOKEN: ${REGISTRY_DELETE_TOKEN}"'
   script: >
     apt update -y && apt install jq -y
 

@@ -103,7 +103,7 @@ release-dev:
     - docker
   extends: .release
   only:
-    - branches
+    - master
 
 release:
   stage: Release

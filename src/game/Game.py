@@ -36,6 +36,34 @@ class Game():
         self.fire_map = np.full(pygame.display.get_surface().get_size(),
                                 BurnStatus.UNBURNED)
 
+        self.show_wind_magnitude = False
+        self.show_wind_direction = False
+
+    def _toggle_wind_magnitude_display(self):
+        '''
+        Toggle display of wind MAGNITUDE over the main screen
+        Arguments: None
+        '''
+        self.show_wind_magnitude = not self.show_wind_magnitude
+        if(self.show_wind_magnitude == False):
+            print('Wind Magnitude OFF')
+        else:
+            print('Wind Magnitude ON')
+        return
+
+    def _toggle_wind_direction_display(self):
+        '''
+        Toggle display of wind DIRECTION over the main screen
+        Arguments: None
+        '''
+        self.show_wind_direction = not self.show_wind_direction
+        if(self.show_wind_direction == False):
+            print('Wind Direction OFF')
+        else:
+            print('Wind Direction ON')
+        return
+
+
     def update(self, terrain: Terrain, fire_sprites: Sequence[Fire],
                fireline_sprites: Sequence[FireLine]) -> bool:
         '''
@@ -53,6 +81,14 @@ class Game():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 status = GameStatus.QUIT
+
+            if event.type == pygame.KEYUP:
+                keys = pygame.key.get_pressed()
+                if keys[pygame.K_m] == True:
+                    self._toggle_wind_magnitude_display()
+
+                if keys[pygame.K_n] == True:
+                    self._toggle_wind_direction_display()
 
         # Create a layered group so that the fire appears on top
         fire_sprites_group = pygame.sprite.LayeredUpdates(fire_sprites, fireline_sprites)

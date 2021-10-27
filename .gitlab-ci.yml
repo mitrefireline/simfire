@@ -2,13 +2,17 @@ image: "python:3.9"
 
 before_script:
   - python --version
-  - pip install -r requirements.txt
+  - pip install -r dev-requirements.txt
 
 stages:
   - Static Analysis
   - Unit Tests
   - Documentation
+  - Release
 
+###################
+# Static Analysis #
+###################
 flake8:
   stage: Static Analysis
   tags:
@@ -27,6 +31,9 @@ yapf:
   only:
     - merge_requests
 
+##############
+# Unit Tests #
+##############
 unittests:
   stage: Unit Tests
   tags:
@@ -36,14 +43,20 @@ unittests:
   only:
     - merge_requests
 
-test-pages:
-  stage: Documentation
-  tags:
-    - docker
+################
+# GitLab Pages #
+################
+.pages:
   script:
     - pip install -U sphinx sphinx-autoapi sphinx-rtd-theme myst-parser
     - sphinx-build -d docs/build/doctrees docs/source docs/build/html
     - mv docs/build/html public/
+
+test-pages:
+  stage: Documentation
+  tags:
+    - docker
+  extends: .pages
   artifacts:
     expose_as: 'HTML Documentation'
     paths:
@@ -56,12 +69,46 @@ pages:
   tags:
     - docker
     - pages
-  script:
-    - pip install -U sphinx sphinx-autoapi sphinx-rtd-theme myst-parser
-    - sphinx-build -d docs/build/doctrees docs/source docs/build/html
-    - mv docs/build/html public/
+  extends: .pages
   artifacts:
     paths:
       - public
   only:
     - master
+
+###########################
+# Packaging and Releasing #
+###########################
+test-release:
+  stage: Release
+  tags:
+    - docker
+  script:
+    - pip install wheel
+    - python setup.py bdist_wheel
+    - pip install dist/*.whl
+  only:
+    - master
+    - tags
+
+.release:
+  script:
+    - pip install twine wheel
+    - python setup.py bdist_wheel
+    - TWINE_PASSWORD=${CI_JOB_TOKEN} TWINE_USERNAME=gitlab-ci-token python -m twine upload --verbose --repository-url https://gitlab.mitre.org/api/v4/projects/${CI_PROJECT_ID}/packages/pypi dist/*
+
+release-dev:
+  stage: Release
+  tags:
+    - docker
+  extends: .release
+  only:
+    - branches
+
+release:
+  stage: Release
+  tags:
+    - docker
+  extends: .release
+  only:
+    - tags

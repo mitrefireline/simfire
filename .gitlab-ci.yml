@@ -97,14 +97,17 @@ test-release:
     - TWINE_PASSWORD=${CI_JOB_TOKEN} TWINE_USERNAME=gitlab-ci-token python -m twine upload --verbose --repository-url https://gitlab.mitre.org/api/v4/projects/${CI_PROJECT_ID}/packages/pypi dist/*
 
 .delete-package:
+  variables:
+    PRIVATE_HEADER: >
+      "PRIVATE-TOKEN: ${REGISTRY_DELETE_TOKEN}"
   script: >
     apt update -y && apt install jq -y
 
-    curl --header "JOB_TOKEN: ${CI_JOB_TOKEN}" "https://gitlab.mitre.org/api/v4/projects/${CI_PROJECT_ID}/packages/"
+    curl -H ${PRIVATE_HEADER} "https://gitlab.mitre.org/api/v4/projects/${CI_PROJECT_ID}/packages/"
 
-    delete_api_path=$(curl --header "JOB_TOKEN: ${CI_JOB_TOKEN}" "https://gitlab.mitre.org/api/v4/projects/${CI_PROJECT_ID}/packages/" | jq -r '.[] | select(.version=="0.0.0") | ._links.delete_api_path')
+    delete_api_path=$(curl -H ${PRIVATE_HEADER} "https://gitlab.mitre.org/api/v4/projects/${CI_PROJECT_ID}/packages/" | jq -r '.[] | select(.version=="0.0.0") | ._links.delete_api_path')
 
-    curl --request DELETE --header "JOB_TOKEN: ${CI_JOB_TOKEN}" "${delete_api_path}"
+    curl --request DELETE -H ${PRIVATE_HEADER} "${delete_api_path}"
 
 release-dev:
   stage: Release

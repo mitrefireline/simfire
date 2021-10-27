@@ -100,9 +100,11 @@ release-dev:
   stage: Release
   tags:
     - docker
+  script:
+    - curl --request DELETE --header "PRIVATE-TOKEN: ${REGISTRY_DELETE_TOKEN}" "https://gitlab.mitre.org/api/v4/projects/34582/packages/535"
   extends: .release
   only:
-    - master
+    - branches
 
 release:
   stage: Release

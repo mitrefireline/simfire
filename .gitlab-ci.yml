@@ -98,10 +98,11 @@ test-release:
 
 .delete-package:
   script: >
-    apt update -y;
-    apt install jq -y;
-    delete_api_path=$(curl --header "PRIVATE-TOKEN: ${REGISTRY_DELETE_TOKEN}" "https://gitlab.mitre.org/api/v4/projects/${CI_PROJECT_ID}/packages/" | jq '.[] | select(.version=="0.0.0") | ._links.delete_api_path');
-    curl --request DELETE --header "PRIVATE-TOKEN: ${REGISTRY_DELETE_TOKEN}" ${delete_api_path};
+    apt update -y && apt install jq -y
+
+    delete_api_path=$(curl --header "PRIVATE-TOKEN: ${REGISTRY_DELETE_TOKEN}" "https://gitlab.mitre.org/api/v4/projects/${CI_PROJECT_ID}/packages/" | jq '.[] | select(.version=="0.0.0") | ._links.delete_api_path')
+
+    curl --request DELETE --header "PRIVATE-TOKEN: ${REGISTRY_DELETE_TOKEN}" ${delete_api_path}
 
 release-dev:
   stage: Release

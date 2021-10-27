@@ -88,8 +88,7 @@ test-release:
     - python setup.py bdist_wheel
     - pip install dist/*.whl
   only:
-    - master
-    - tags
+    - merge_requests
 
 .release:
   script:

@@ -112,7 +112,7 @@ release-dev:
     - !reference [.delete-package, script]
     - !reference [.release, script]
   only:
-    - branches
+    - master
 
 release:
   stage: Release

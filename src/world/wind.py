@@ -1,4 +1,4 @@
-from typing import Callable, Tuple
+from typing import Callable, Tuple, Sequence
 from noise import pnoise2 ,snoise2
 from math import exp
 import numpy as np
@@ -24,6 +24,8 @@ class WindNoise():
             lacunarity: Controls increase in frequency of octaves per pass.
                         Frequency = lacunarity & (pass number).
                         Higher lacunarity, higher frequency per pass.
+
+            screen_size: Size of screen (both heigh and width) MUST BE SQUARE
         '''
         if(seed == None):
             self.seed = np.random.randint(0,100)
@@ -35,14 +37,25 @@ class WindNoise():
         self.persistence: float = persistence
         self.lacunarity: float = lacunarity
 
-    def set_noise_parameters(self, seed: int, scale: int, octaves: int, persistence: float, lacunarity: float):
+    def set_noise_parameters(self, seed: int, scale: int, octaves: int, persistence: float, lacunarity: float, range_min: float, range_max: float):
         self.seed: int = seed
         self.scale: int = scale
         self.octaves: int = octaves
         self.persistence: float = persistence
         self.lacunarity: float = lacunarity
+        self.range_min: float = range_min
+        self.range_max: float = range_max
 
-    def generate_noise_value(self, x: int, y: int) -> float:
+    def generate_map_array(self, screen_size) -> Sequence[Sequence[float]]:
+        map = []
+        map = [[self._generate_noise_value(x, y) for x in range(screen_size)] for y in range(screen_size)]
+        return map
+
+    def _denormalize_noise_value(self, noise_value):
+        denormalized_value = (((noise_value + 1) * (self.range_max - self.range_min)) /2 ) + self.range_min
+        return denormalized_value
+
+    def _generate_noise_value(self, x: int, y: int) -> float:
         scaledX = x / self.scale
         scaledY = y / self.scale
 
@@ -53,19 +66,62 @@ class WindNoise():
                         lacunarity=self.lacunarity,
                         base=self.seed)
 
-        return value
+        denormalized_value = self._denormalize_noise_value(value)
+
+        return denormalized_value
 
 class WindController():
     '''
     Generates and tracks objects that dictate wind magnitude and wind direction for map given size of the screen
     '''
-    def __init__() -> None:
-        self.map_wind_speeds = WindNoise()
-        self.map_wind_directions = WindNoise()
+    def __init__(self, screen_size: int = 225) -> None:
+        self.speed_layer = WindNoise()
+        self.direction_layer = WindNoise()
+        self.map_wind_speed = []
+        self.map_wind_direction = []
+        self.screen_size = screen_size
 
-    def set_wind_speed_generator(self, seed: int, scale: int, octaves: int, persistence: float, lacunarity: float) -> None:
-        self.map_wind_speeds.set_noise_parameters(seed, scale, octaves, persistence, lacunarity)
+    def init_wind_speed_generator(self, seed: int, scale: int, octaves: int, persistence: float, lacunarity: float, range_min: float, range_max: float ,screen_size: int) -> None:
+        '''
+        Set simplex noise values for wind speeds
+
+        Arguments:
+            seed: The value to seed the noise generator
+            scale: The "altitude" from which to see the noise
+            octaves: number of passes/layers of the algorithm.  Each pass adds more detail
+            persistence: How much each pass affects the overall shape
+                         High values means each pass is less important on shape.
+                         Lower values mean each pass has greater effect on shape.
+                         Best to keep between 0-1
+            lacunarity: Controls increase in frequency of octaves per pass.
+                        Frequency = lacunarity & (pass number).
+                        Higher lacunarity, higher frequency per pass.
+
+            screen_size: Size of screen (both heigh and width) MUST BE SQUARE
+        '''
+        self.speed_layer.set_noise_parameters(seed, scale, octaves, persistence, lacunarity, range_min, range_max)
+
+        self.map_wind_speed = self.speed_layer.generate_map_array(screen_size)
     
-    def set_wind_direction_generator(self, seed: int, scale: int, octaves: int, persistence: float, lacunarity: float) -> None:
-        self.map_wind_directions.set_noise_parameters(seed, scale, octaves, persistence, lacunarity)
+    def init_wind_direction_generator(self, seed: int, scale: int, octaves: int, persistence: float, lacunarity: float, range_min: float, range_max: float ,screen_size: int) -> None:
+        '''
+        Set simplex noise values for wind directions
+        
+        Arguments:
+            seed: The value to seed the noise generator
+            scale: The "altitude" from which to see the noise
+            octaves: number of passes/layers of the algorithm.  Each pass adds more detail
+            persistence: How much each pass affects the overall shape
+                         High values means each pass is less important on shape.
+                         Lower values mean each pass has greater effect on shape.
+                         Best to keep between 0-1
+            lacunarity: Controls increase in frequency of octaves per pass.
+                        Frequency = lacunarity & (pass number).
+                        Higher lacunarity, higher frequency per pass.
+
+            screen_size: Size of screen (both heigh and width) MUST BE SQUARE
+        '''
+        self.direction_layer.set_noise_parameters(seed, scale, octaves, persistence, lacunarity, range_min, range_max)
+
+        self.map_wind_direction = self.direction_layer.generate_map_array(screen_size)
         

@@ -8,6 +8,7 @@ from src.game.managers.fire import RothermelFireManager
 from src.game.managers.mitigation import FireLineManager
 from src.game.sprites import Terrain
 from src.world.parameters import Environment, FuelArray, FuelParticle, Tile
+from src.world.wind import WindController
 
 
 def main():
@@ -31,6 +32,11 @@ def main():
     fireline_manager = FireLineManager(size=cfg.control_line_size,
                                        pixel_scale=cfg.pixel_scale,
                                        terrain=terrain)
+
+    wind_map = WindController()
+    wind_map.init_wind_speed_generator(cfg.mw_seed, cfg.mw_scale, cfg.mw_octaves, cfg.mw_persistence, cfg.mw_lacunarity, cfg.mw_speed_min, cfg.mw_speed_max, cfg.screen_size)
+    wind_map.init_wind_direction_generator(cfg.dw_seed, cfg.dw_scale, cfg.dw_octaves, cfg.dw_persistence, cfg.dw_lacunarity, cfg.dw_deg_min, cfg.dw_deg_max, cfg.screen_size)
+
 
     fire_map = game.fire_map
     fire_map = fireline_manager.update(fire_map, points)

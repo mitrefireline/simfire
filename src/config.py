@@ -67,3 +67,21 @@ M_f: float = 0.03
 U: float = 88 * 13
 # Wind Direction (degrees clockwise from north)
 U_dir: float = 135
+
+
+# Wind Noise Parameters
+mw_seed: int = 2345
+mw_scale: int = 2
+mw_octaves: int = 3
+mw_persistence: float = 0.7
+mw_lacunarity: float = 2.0
+mw_speed_min: float = 616.0 # ft/min
+mw_speed_max: float = 4136.0 # ft/min
+
+dw_seed: int = 1203
+dw_scale: int = 2
+dw_octaves: int = 2
+dw_persistence: float = 0.9
+dw_lacunarity: float = 1.0
+dw_deg_min: float = 0.0 # Degrees, 0/360: North, 90: East, 180: South, 270: West
+dw_deg_max: float  = 360.0 # Degrees, 0/360: North, 90: East, 180: South, 270: West

@@ -22,10 +22,10 @@ First, clone the repository:
 git clone git@gitlab.mitre.org:fireline/rothermel-modeling.git
 ```
 
-Then, install the requirements:
+Then, install the **developer** requirements:
 
 ```shell
-pip install -r requirements.txt
+pip install -r dev-requirements.txt
 ```
 
 ## Using Pre-commit

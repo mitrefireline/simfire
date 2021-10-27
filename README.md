@@ -50,7 +50,7 @@ pip install rothsim --extra-index-url https://__token__:<your_personal_token>@gi
 For information on how to use the package, for now, use [`game_rothermel.py`](https://gitlab.mitre.org/fireline/rothermel-modeling/-/blob/master/game_rothermel.py) as a jumping-off point. And to configure simulation, go to the [Configuring the Simulation](config.md) page.
 
 
-### Modifying `.bashrc` For Easy Install
+### Modifying `.bashrc` for Easy Install
 
 If you'd like, you can modify your `.bashrc` (or `.zshrc`, depending on your terminal) file to more easily install the package without the long URL.
 

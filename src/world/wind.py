@@ -1,14 +1,15 @@
-from typing import Callable, Tuple, Sequence
-from noise import pnoise2 ,snoise2
-from math import exp
+from typing import Sequence
+from noise import snoise2
 import numpy as np
+
 
 class WindNoise():
     '''
     Class for controlling and fine tuning wind noise generation with the Simplex noise
     algorithm
     '''
-    def __init__(self, seed: int = None, scale: int = 100, octaves: int = 2, persistence: float = 0.5, lacunarity: float = 1.0) -> None:
+    def __init__(self, seed: int = None, scale: int = 100, octaves: int = 2,
+                 persistence: float = 0.5, lacunarity: float = 1.0) -> None:
         '''
         Class that handles and creates the wind layer which specifies the magnitude
         and direction of wind a a given location.  Uses python noise library
@@ -27,8 +28,8 @@ class WindNoise():
 
             screen_size: Size of screen (both heigh and width) MUST BE SQUARE
         '''
-        if(seed == None):
-            self.seed = np.random.randint(0,100)
+        if seed is None:
+            self.seed = np.random.randint(0, 100)
         else:
             self.seed = seed
 
@@ -37,7 +38,9 @@ class WindNoise():
         self.persistence: float = persistence
         self.lacunarity: float = lacunarity
 
-    def set_noise_parameters(self, seed: int, scale: int, octaves: int, persistence: float, lacunarity: float, range_min: float, range_max: float):
+    def set_noise_parameters(self, seed: int, scale: int, octaves: int,
+                             persistence: float, lacunarity: float,
+                             range_min: float, range_max: float):
         self.seed: int = seed
         self.scale: int = scale
         self.octaves: int = octaves
@@ -48,19 +51,21 @@ class WindNoise():
 
     def generate_map_array(self, screen_size) -> Sequence[Sequence[float]]:
         map = []
-        map = [[self._generate_noise_value(x, y) for x in range(screen_size)] for y in range(screen_size)]
+        map = [[self._generate_noise_value(x, y) for x in range(screen_size)]
+                for y in range(screen_size)]
         return map
 
     def _denormalize_noise_value(self, noise_value):
-        denormalized_value = (((noise_value + 1) * (self.range_max - self.range_min)) /2 ) + self.range_min
+        denormalized_value = (((noise_value + 1) *
+                               (self.range_max - self.range_min)) / 2) + self.range_min
         return denormalized_value
 
     def _generate_noise_value(self, x: int, y: int) -> float:
         scaledX = x / self.scale
         scaledY = y / self.scale
 
-        value = snoise2(scaledX, 
-                        scaledY, 
+        value = snoise2(scaledX,
+                        scaledY,
                         octaves=self.octaves,
                         persistence=self.persistence,
                         lacunarity=self.lacunarity,
@@ -70,9 +75,11 @@ class WindNoise():
 
         return denormalized_value
 
+
 class WindController():
     '''
-    Generates and tracks objects that dictate wind magnitude and wind direction for map given size of the screen
+    Generates and tracks objects that dictate wind magnitude and wind direction for map
+    given size of the screen
     '''
     def __init__(self, screen_size: int = 225) -> None:
         self.speed_layer = WindNoise()
@@ -81,7 +88,9 @@ class WindController():
         self.map_wind_direction = []
         self.screen_size = screen_size
 
-    def init_wind_speed_generator(self, seed: int, scale: int, octaves: int, persistence: float, lacunarity: float, range_min: float, range_max: float ,screen_size: int) -> None:
+    def init_wind_speed_generator(self, seed: int, scale: int, octaves: int,
+                                  persistence: float, lacunarity: float, range_min: float,
+                                  range_max: float, screen_size: int) -> None:
         '''
         Set simplex noise values for wind speeds
 
@@ -99,14 +108,17 @@ class WindController():
 
             screen_size: Size of screen (both heigh and width) MUST BE SQUARE
         '''
-        self.speed_layer.set_noise_parameters(seed, scale, octaves, persistence, lacunarity, range_min, range_max)
+        self.speed_layer.set_noise_parameters(seed, scale, octaves, persistence,
+                                              lacunarity, range_min, range_max)
 
         self.map_wind_speed = self.speed_layer.generate_map_array(screen_size)
-    
-    def init_wind_direction_generator(self, seed: int, scale: int, octaves: int, persistence: float, lacunarity: float, range_min: float, range_max: float ,screen_size: int) -> None:
+
+    def init_wind_direction_generator(self, seed: int, scale: int,
+                                      octaves: int, persistence: float,
+                                      lacunarity: float, range_min: float,
+                                      range_max: float, screen_size: int) -> None:
         '''
         Set simplex noise values for wind directions
-        
         Arguments:
             seed: The value to seed the noise generator
             scale: The "altitude" from which to see the noise
@@ -121,7 +133,7 @@ class WindController():
 
             screen_size: Size of screen (both heigh and width) MUST BE SQUARE
         '''
-        self.direction_layer.set_noise_parameters(seed, scale, octaves, persistence, lacunarity, range_min, range_max)
+        self.direction_layer.set_noise_parameters(seed, scale, octaves, persistence,
+                                                  lacunarity, range_min, range_max)
 
         self.map_wind_direction = self.direction_layer.generate_map_array(screen_size)
-        

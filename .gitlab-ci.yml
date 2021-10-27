@@ -105,8 +105,8 @@ release-dev:
   tags:
     - docker
   script:
-    - !reference [delete-package, script]
-    - !reference [release, script]
+    - !reference [.delete-package, script]
+    - !reference [.release, script]
   only:
     - branches
 

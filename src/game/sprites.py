@@ -9,7 +9,7 @@ import pygame
 
 from .image import load_image
 from .. import config as cfg
-from ..enums import BurnStatus, DRY_TERRAIN_BROWN_IMG, FIRE_TEXTURE_PATH, SpriteLayer,\
+from ..enums import BurnStatus, DRY_TERRAIN_BROWN_IMG, SpriteLayer,\
     TERRAIN_TEXTURE_PATH, FIRELINE_TEXTURE_PATH, SCRATCHLINE_TEXTURE_PATH,\
     WETLINE_TEXTURE_PATH, BURNED_RGB_COLOR
 from ..world.elevation_functions import ElevationFn
@@ -244,11 +244,15 @@ class Fire(pygame.sprite.Sprite):
         self.pos = pos
         self.size = size
 
-        self.image = load_image(FIRE_TEXTURE_PATH)
-        self.image = pygame.transform.scale(self.image, (self.size, self.size))
+        fire_texture = np.zeros((self.size, self.size, 3))
+        fire_texture[:, :, 0] = 255
+        fire_texture[:, :, 1] = 153
+        fire_texture[:, :, 2] = 51
+        self.image = pygame.surfarray.make_surface(fire_texture)
 
         self.rect = self.image.get_rect()
         self.rect = self.rect.move(self.pos[0], self.pos[1])
+        self.groups = None
 
         # Layer 3 so that it appears on top of the terrain and line (if applicable)
         self.layer: int = SpriteLayer.FIRE

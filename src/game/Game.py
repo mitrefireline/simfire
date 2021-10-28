@@ -45,7 +45,7 @@ class Game():
         Arguments: None
         '''
         self.show_wind_magnitude = not self.show_wind_magnitude
-        if(self.show_wind_magnitude == False):
+        if self.show_wind_magnitude is False:
             print('Wind Magnitude OFF')
         else:
             print('Wind Magnitude ON')
@@ -57,12 +57,11 @@ class Game():
         Arguments: None
         '''
         self.show_wind_direction = not self.show_wind_direction
-        if(self.show_wind_direction == False):
+        if self.show_wind_direction is False:
             print('Wind Direction OFF')
         else:
             print('Wind Direction ON')
         return
-
 
     def update(self, terrain: Terrain, fire_sprites: Sequence[Fire],
                fireline_sprites: Sequence[FireLine]) -> bool:
@@ -84,10 +83,10 @@ class Game():
 
             if event.type == pygame.KEYUP:
                 keys = pygame.key.get_pressed()
-                if keys[pygame.K_m] == True:
+                if keys[pygame.K_m] is True:
                     self._toggle_wind_magnitude_display()
 
-                if keys[pygame.K_n] == True:
+                if keys[pygame.K_n] is True:
                     self._toggle_wind_direction_display()
 
         # Create a layered group so that the fire appears on top

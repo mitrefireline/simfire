@@ -8,8 +8,12 @@ class WindNoise():
     Class for controlling and fine tuning wind noise generation with the Simplex noise
     algorithm
     '''
-    def __init__(self, seed: int = None, scale: int = 100, octaves: int = 2,
-                 persistence: float = 0.5, lacunarity: float = 1.0) -> None:
+    def __init__(self,
+                 seed: int = None,
+                 scale: int = 100,
+                 octaves: int = 2,
+                 persistence: float = 0.5,
+                 lacunarity: float = 1.0) -> None:
         '''
         Class that handles and creates the wind layer which specifies the magnitude
         and direction of wind a a given location.  Uses python noise library
@@ -39,8 +43,8 @@ class WindNoise():
         self.lacunarity: float = lacunarity
 
     def set_noise_parameters(self, seed: int, scale: int, octaves: int,
-                             persistence: float, lacunarity: float,
-                             range_min: float, range_max: float):
+                             persistence: float, lacunarity: float, range_min: float,
+                             range_max: float):
         self.seed: int = seed
         self.scale: int = scale
         self.octaves: int = octaves
@@ -52,7 +56,7 @@ class WindNoise():
     def generate_map_array(self, screen_size) -> Sequence[Sequence[float]]:
         map = []
         map = [[self._generate_noise_value(x, y) for x in range(screen_size)]
-                for y in range(screen_size)]
+               for y in range(screen_size)]
         return map
 
     def _denormalize_noise_value(self, noise_value):
@@ -113,10 +117,10 @@ class WindController():
 
         self.map_wind_speed = self.speed_layer.generate_map_array(screen_size)
 
-    def init_wind_direction_generator(self, seed: int, scale: int,
-                                      octaves: int, persistence: float,
-                                      lacunarity: float, range_min: float,
-                                      range_max: float, screen_size: int) -> None:
+    def init_wind_direction_generator(self, seed: int, scale: int, octaves: int,
+                                      persistence: float, lacunarity: float,
+                                      range_min: float, range_max: float,
+                                      screen_size: int) -> None:
         '''
         Set simplex noise values for wind directions
         Arguments:

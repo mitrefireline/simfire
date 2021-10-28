@@ -191,7 +191,6 @@ U: float = 88 * 13
 # Wind Direction (degrees clockwise from north)
 U_dir: float = 135
 
-
 # Wind Noise Parameters
 mw_seed: int = 2345
 mw_scale: int = 2

@@ -6,20 +6,21 @@ import numpy as np
 ElevationFn = Callable[[float, float], float]
 
 
-def gaussian(A, mu_x, mu_y, sigma_x, sigma_y) -> ElevationFn:
+def gaussian(amplitude: int, mu_x: int, mu_y: int, sigma_x: int,
+             sigma_y: int) -> ElevationFn:
     '''
     Create a callable that returns the value of a Gaussian centered at (mu_x, mu_y) with
     variances given by sigma_x and sigma_y. The input A will modify the final amplitude.
 
     Arguments:
-        A: The Gaussian amplitude
+        amplitude: The Gaussian amplitude
         mu_x: The mean/center in the x direction
         mu_y: The mean/center in the y direction
         sigma_x: The variance in the x direction
         sigma_y: The variance in the y direction
 
     Returns:
-        fn: A callabe that computes z values for (x, y) inputs
+        A callabe that computes z values for (x, y) inputs
     '''
     def fn(x: float, y: float) -> float:
         '''
@@ -34,14 +35,15 @@ def gaussian(A, mu_x, mu_y, sigma_x, sigma_y) -> ElevationFn:
         '''
 
         exp_term = ((x - mu_x)**2 / (4 * sigma_x**2)) + ((y - mu_y)**2 / (4 * sigma_y**2))
-        z = A * exp(-exp_term)
+        z = amplitude * exp(-exp_term)
         return z
 
     return fn
 
 
 class PerlinNoise2D():
-    def __init__(self, A: float, shape: Tuple[int, int], res: Tuple[int, int]) -> None:
+    def __init__(self, amplitude: float, shape: Tuple[int, int], res: Tuple[int,
+                                                                            int]) -> None:
         '''
         Create a class to compute perlin noise for given input parameters.
 
@@ -53,8 +55,7 @@ class PerlinNoise2D():
         Returns:
             None
         '''
-
-        self.amplitude = A
+        self.amplitude = amplitude
         self.shape = shape
         self.res = res
         self.terrain_map = None
@@ -107,7 +108,7 @@ class PerlinNoise2D():
             y: The y coordinate to retrieve
 
         Returns:
-            self.terrain_map[x, y]: The perlin noise value at the (x, y) coordinates
+            The perlin noise value at the (x, y) coordinates
         '''
         if not isinstance(x, int):
             x = int(x)
@@ -124,7 +125,7 @@ def flat() -> ElevationFn:
         None
 
     Returns:
-        fn: A callable that computes z values for (x, y) inputs
+        A callable that computes z values for (x, y) inputs
     '''
     def fn(x: float, y: float) -> float:
         return 0

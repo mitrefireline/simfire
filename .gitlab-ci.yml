@@ -96,11 +96,21 @@ test-release:
     - python setup.py bdist_wheel
     - TWINE_PASSWORD=${CI_JOB_TOKEN} TWINE_USERNAME=gitlab-ci-token python -m twine upload --verbose --repository-url https://gitlab.mitre.org/api/v4/projects/${CI_PROJECT_ID}/packages/pypi dist/*
 
+.delete-package:
+  script: >
+    apt update -y && apt install jq -y
+
+    delete_api_path=$(curl -H "PRIVATE-TOKEN: ${REGISTRY_DELETE_TOKEN}" "https://gitlab.mitre.org/api/v4/projects/${CI_PROJECT_ID}/packages/" | jq -r '.[] | select(.version=="0.0.0") | ._links.delete_api_path')
+
+    curl --request DELETE -H "PRIVATE-TOKEN: ${REGISTRY_DELETE_TOKEN}" "${delete_api_path}"
+
 release-dev:
   stage: Release
   tags:
     - docker
-  extends: .release
+  script:
+    - !reference [.delete-package, script]
+    - !reference [.release, script]
   only:
     - master
 

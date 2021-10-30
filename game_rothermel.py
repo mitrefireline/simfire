@@ -3,7 +3,7 @@ from skimage.draw import line
 
 import src.config as cfg
 from src.enums import GameStatus
-from src.game.game import Game
+from src.game.Game import Game
 from src.game.managers.fire import RothermelFireManager
 from src.game.managers.mitigation import FireLineManager
 from src.game.sprites import Terrain

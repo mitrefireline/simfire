@@ -50,7 +50,6 @@ class Game():
             print('Wind Magnitude OFF')
         else:
             print('Wind Magnitude ON')
-            
         return
 
     def _toggle_wind_direction_display(self, switch: bool):
@@ -121,10 +120,13 @@ class Game():
                     w_mag = x
                     wind_speed_range = (cfg.mw_speed_max - cfg.mw_speed_min)
                     color_gradient = (255 - 0)
-                    color_mag = int((((w_mag - cfg.mw_speed_min) * color_gradient)
-                                    / wind_speed_range) + 0)
-                    wind_mag_surf.set_at((x_idx, y_idx),
-                                         pygame.Color(0, 0, color_mag, a=1))
+                    color_mag = int(((
+                        (w_mag - cfg.mw_speed_min) * color_gradient)
+                        / wind_speed_range) + 0)
+                    wind_mag_surf.set_at((x_idx, y_idx), pygame.Color(0,
+                                                                      0,
+                                                                      color_mag,
+                                                                      a=1))
             self.screen.blit(wind_mag_surf, (0, 0))
         pygame.display.flip()
 

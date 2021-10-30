@@ -149,7 +149,9 @@ class RothermelFireManager(FireManager):
         self.pixel_scale = pixel_scale
         self.fuel_particle = fuel_particle
         self.terrain = terrain
+
         self.environment = environment
+        self.environment.U = np.asarray(environment.U, dtype=np.float32)
 
         # Keep track of how much each pixel has burned.
         # This is needed since each pixel represents a specific number of feet
@@ -240,9 +242,10 @@ class RothermelFireManager(FireManager):
             S_e.extend([self.fuel_particle.S_e] * num_locs)
             p_p.extend([self.fuel_particle.p_p] * num_locs)
 
+            # TODO: Slowly modifying these values to reference wind_map
             # Set the Environment parameters into arrays
             M_f.extend([self.environment.M_f] * num_locs)
-            U.extend([self.environment.U] * num_locs)
+            U.extend(list(self.environment.U[new_locs_uzip[::-1]]))
             U_dir.extend([self.environment.U_dir] * num_locs)
 
             # Set the slope parameters into arrays

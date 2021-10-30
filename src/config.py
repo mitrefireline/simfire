@@ -193,7 +193,7 @@ U_dir: float = 135
 
 # Wind Noise Parameters
 mw_seed: int = 2345
-mw_scale: int = 510  # High values = Lower Resolution, less noisy
+mw_scale: int = 400  # High values = Lower Resolution, less noisy
 mw_octaves: int = 3
 mw_persistence: float = 0.7
 mw_lacunarity: float = 2.0

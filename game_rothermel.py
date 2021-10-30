@@ -22,7 +22,6 @@ def main():
         for j in range(cfg.terrain_size)
     ] for i in range(cfg.terrain_size)]
     terrain = Terrain(fuel_arrs, cfg.elevation_fn)
-    environment = Environment(cfg.M_f, cfg.U, cfg.U_dir)
 
     points = line(100, 15, 100, 200)
     y = points[0].tolist()
@@ -42,6 +41,8 @@ def main():
                                            cfg.dw_persistence, cfg.dw_lacunarity,
                                            cfg.dw_deg_min, cfg.dw_deg_max,
                                            cfg.screen_size)
+
+    environment = Environment(cfg.M_f, wind_map.map_wind_speed, cfg.U_dir)
 
     fire_map = game.fire_map
     fire_map = fireline_manager.update(fire_map, points)

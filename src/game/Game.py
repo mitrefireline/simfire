@@ -2,6 +2,7 @@ from typing import Sequence
 
 import numpy as np
 import pygame
+import src.config as cfg
 
 from .image import load_image
 from ..enums import BurnStatus
@@ -39,24 +40,25 @@ class Game():
         self.show_wind_magnitude = False
         self.show_wind_direction = False
 
-    def _toggle_wind_magnitude_display(self):
+    def _toggle_wind_magnitude_display(self, switch: bool):
         '''
         Toggle display of wind MAGNITUDE over the main screen
         Arguments: None
         '''
-        self.show_wind_magnitude = not self.show_wind_magnitude
+        self.show_wind_magnitude = switch
         if self.show_wind_magnitude is False:
             print('Wind Magnitude OFF')
         else:
             print('Wind Magnitude ON')
+            
         return
 
-    def _toggle_wind_direction_display(self):
+    def _toggle_wind_direction_display(self, switch: bool):
         '''
         Toggle display of wind DIRECTION over the main screen
         Arguments: None
         '''
-        self.show_wind_direction = not self.show_wind_direction
+        self.show_wind_direction = switch
         if self.show_wind_direction is False:
             print('Wind Direction OFF')
         else:
@@ -64,7 +66,8 @@ class Game():
         return
 
     def update(self, terrain: Terrain, fire_sprites: Sequence[Fire],
-               fireline_sprites: Sequence[FireLine]) -> bool:
+               fireline_sprites: Sequence[FireLine],
+               wind_magnitude_map: Sequence[Sequence[float]]) -> bool:
         '''
         Update the game display using the provided terrain, sprites, and
         environment data. Most of the logic for the game is handled within
@@ -81,17 +84,27 @@ class Game():
             if event.type == pygame.QUIT:
                 status = GameStatus.QUIT
 
-            if event.type == pygame.KEYUP:
+            if event.type == pygame.KEYDOWN:
                 keys = pygame.key.get_pressed()
                 if keys[pygame.K_m] is True:
-                    self._toggle_wind_magnitude_display()
+                    self._toggle_wind_magnitude_display(True)
 
                 if keys[pygame.K_n] is True:
-                    self._toggle_wind_direction_display()
+                    self._toggle_wind_direction_display(True)
+
+                if keys[pygame.K_k] is True:
+                    self._toggle_wind_magnitude_display(False)
+
+                if keys[pygame.K_j] is True:
+                    self._toggle_wind_direction_display(False)
 
         # Create a layered group so that the fire appears on top
         fire_sprites_group = pygame.sprite.LayeredUpdates(fire_sprites, fireline_sprites)
         all_sprites = pygame.sprite.LayeredUpdates(fire_sprites_group, terrain)
+
+        # if self.show_wind_magnitude is True:
+
+        # if self.show_wind_direction is true
 
         # Update and draw the sprites
         for sprite in all_sprites.sprites():
@@ -100,6 +113,19 @@ class Game():
         fire_sprites_group.update()
         terrain.update(self.fire_map)
         all_sprites.draw(self.screen)
+
+        if self.show_wind_magnitude is True:
+            wind_mag_surf = pygame.Surface(self.screen.get_size())
+            for y_idx, y in enumerate(wind_magnitude_map):
+                for x_idx, x in enumerate(y):
+                    w_mag = x
+                    wind_speed_range = (cfg.mw_speed_max - cfg.mw_speed_min)
+                    color_gradient = (255 - 0)
+                    color_mag = int((((w_mag - cfg.mw_speed_min) * color_gradient)
+                                    / wind_speed_range) + 0)
+                    wind_mag_surf.set_at((x_idx, y_idx),
+                                         pygame.Color(0, 0, color_mag, a=1))
+            self.screen.blit(wind_mag_surf, (0, 0))
         pygame.display.flip()
 
         return status

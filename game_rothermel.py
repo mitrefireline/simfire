@@ -56,7 +56,8 @@ def main():
     while game_status == GameStatus.RUNNING and fire_status == GameStatus.RUNNING:
         fire_sprites = fire_manager.sprites
         fireline_sprites = fireline_manager.sprites
-        game_status = game.update(terrain, fire_sprites, fireline_sprites)
+        game_status = game.update(terrain, fire_sprites, fireline_sprites,
+                                  wind_map.map_wind_speed)
         fire_map = game.fire_map
         fire_map = fireline_manager.update(fire_map)
         fire_map, fire_status = fire_manager.update(fire_map)

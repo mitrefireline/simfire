@@ -11,6 +11,11 @@ from ...world.rothermel import compute_rate_of_spread
 NewLocsType = Tuple[Tuple[int, int], Tuple[int, int], Tuple[int, int], Tuple[int, int],
                     Tuple[int, int], Tuple[int, int], Tuple[int, int], Tuple[int, int]]
 
+SpriteParamsType = List[List[float], List[float], Tuple[float], Tuple[float],
+                        Tuple[float], Tuple[float], Tuple[float], Tuple[float],
+                        List[float], List[float], List[float], List[float], List[float],
+                        List[float], List[float], List[float], List[float]]
+
 
 class FireManager():
     '''
@@ -181,15 +186,20 @@ class RothermelFireManager(FireManager):
         grad_dir = np.tan(grad_y / (grad_x + 0.000001))
         return grad_mag, grad_dir
 
-    def _accrue_sprites(self, sprite_idx: int, fire_map):
+    def _accrue_sprites(self, sprite_idx: int, fire_map: np.ndarray) -> SpriteParamsType:
         '''
-        Pull all neccessarily information for the update step in a multiprocessable way
+        Pull all neccessary information for the update step in a multiprocessable way.
+        This will return a list of lists containing the Rothermel computation information
+        for a single sprite and all of its possible new locations.
 
-        Arguements:
+        Arguments:
             sprite_idx: position of the sprite
+            fire_map: The numpy array that tracks the fire's burn status for
+                      each pixel in the simulation
 
         Returns:
-            everything
+            The sprite parameters needed for a Rothermel calculation for each sprite for
+            each possible new spreadable fire location
         '''
 
         sprite = self.sprites[sprite_idx]
@@ -226,21 +236,35 @@ class RothermelFireManager(FireManager):
             S_e, p_p, M_f, U, U_dir, slope_mag, slope_dir
         ]
 
-    def _flatten_params(self, all_params):
-        all_params = list(filter(None, all_params))
+    def _flatten_params(self, all_params: SpriteParamsType) -> List[np.ndarray]:
+        '''
+        Flatten the sprite parameters into an array of shape
+        (num_parameters, num_points_to_compute). This will allow for the Rothermel
+        calculation to be done in a multiprocessable way.
 
-        try:  # single burning pixel case (first sim step typically)
+        Arguments:
+            all_params: The sprite parameters needed for a Rothermel calculation for
+                        each sprite for each possible new spreadable fire location. This
+                        will typically be computed by self._accrue_sprites for each
+                        sprite
+
+        Returns:
+            The sprtie parameters with shape (num_parameters, num_points_to_compute).
+            The input is transformed from a list of lists/tuples into a 2D array
+            containing the information in a vectorized/multiprocessing format
+        '''
+        if len(self.sprites) == 1:  # single burning pixel case (first sim step typically)
             arr = np.asarray(all_params, dtype=np.float32)
             arr = np.reshape(arr, (arr.shape[1], arr.shape[0] * arr.shape[2]))
-        except ValueError:  # Multiple burning pixels
-            arr = np.asarray([np.hstack([x[i] for x in all_params]) for i in range(17)],
-                             dtype=np.float32)
+        else:  # Multiple burning pixels
+            num_params_per_example = len(all_params[0])
+            arr = [
+                np.hstack([x[i] for x in all_params])
+                for i in range(num_params_per_example)
+            ]
+            arr = np.asarray(arr, dtype=np.float32)
 
         return [arr[i, :] for i in range(arr.shape[0])]
-
-    def _make_sprite_mp(self, x_coords, y_coords, burn):
-        return self.sprites.append(
-            Fire((x_coords[burn[0]], y_coords[burn[0]]), self.fire_size))
 
     def update(self, fire_map: np.ndarray) -> Tuple[np.ndarray, GameStatus]:
         '''
@@ -250,7 +274,8 @@ class RothermelFireManager(FireManager):
         time.
 
         Arguments:
-            None
+            fire_map: The numpy array that tracks the fire's burn status for
+                      each pixel in the simulation
 
         Returns:
             None
@@ -259,7 +284,7 @@ class RothermelFireManager(FireManager):
         self._prune_sprites(fire_map)
         num_sprites = len(self.sprites)
         if num_sprites == 0:
-            return GameStatus.QUIT
+            return fire_map, GameStatus.QUIT
         loc_x = []
         loc_y = []
         new_loc_x = []
@@ -280,6 +305,7 @@ class RothermelFireManager(FireManager):
         sprite_idxs = list(range(num_sprites))
 
         all_params = [self._accrue_sprites(idx, fire_map) for idx in sprite_idxs]
+        all_params = list(filter(None, all_params))
 
         [
             loc_x, loc_y, new_loc_x, new_loc_y, w_0, delta, M_x, sigma, h, S_T, S_e, p_p,

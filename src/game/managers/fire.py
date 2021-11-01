@@ -1,5 +1,5 @@
 from dataclasses import astuple
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
 import numpy as np
 
@@ -10,6 +10,8 @@ from ...world.rothermel import compute_rate_of_spread
 
 NewLocsType = Tuple[Tuple[int, int], Tuple[int, int], Tuple[int, int], Tuple[int, int],
                     Tuple[int, int], Tuple[int, int], Tuple[int, int], Tuple[int, int]]
+
+SpriteParamsType = List[Union[List[float], Tuple[float]]]
 
 
 class FireManager():
@@ -115,9 +117,15 @@ class RothermelFireManager(FireManager):
     This FireManager will spread the fire based on the basic Rothermel
     model (https://www.fs.fed.us/rm/pubs_series/rmrs/gtr/rmrs_gtr371.pdf).
     '''
-    def __init__(self, init_pos: Tuple[int, int], fire_size: int, max_fire_duration: int,
-                 pixel_scale: int, fuel_particle: FuelParticle, terrain: Terrain,
-                 environment: Environment) -> None:
+    def __init__(self,
+                 init_pos: Tuple[int, int],
+                 fire_size: int,
+                 max_fire_duration: int,
+                 pixel_scale: int,
+                 fuel_particle: FuelParticle,
+                 terrain: Terrain,
+                 environment: Environment,
+                 workers: int = 16) -> None:
         '''
         Initialize the class by recording the initial fire location and size.
         Create the fire sprite and fire_map and mark the location of the
@@ -175,6 +183,86 @@ class RothermelFireManager(FireManager):
         grad_dir = np.tan(grad_y / (grad_x + 0.000001))
         return grad_mag, grad_dir
 
+    def _accrue_sprites(self, sprite_idx: int, fire_map: np.ndarray) -> SpriteParamsType:
+        '''
+        Pull all neccessary information for the update step in a multiprocessable way.
+        This will return a list of lists containing the Rothermel computation information
+        for a single sprite and all of its possible new locations.
+
+        Arguments:
+            sprite_idx: position of the sprite
+            fire_map: The numpy array that tracks the fire's burn status for
+                      each pixel in the simulation
+
+        Returns:
+            The sprite parameters needed for a Rothermel calculation for each sprite for
+            each possible new spreadable fire location
+        '''
+
+        sprite = self.sprites[sprite_idx]
+        x, y, _, _ = sprite.rect
+        new_locs = self._get_new_locs(x, y, fire_map)
+        num_locs = len(new_locs)
+        if num_locs == 0:
+            return
+
+        new_locs_uzip = tuple(zip(*new_locs))
+        new_loc_x = new_locs_uzip[0]
+        new_loc_y = new_locs_uzip[1]
+        loc_x = [x] * num_locs
+        loc_y = [y] * num_locs
+        n_w_0, n_delta, n_M_x, n_sigma = list(
+            zip(*[
+                astuple(arr.fuel) for arr in self.terrain.fuel_arrs[new_locs_uzip[::-1]]
+            ]))
+        # Set the FuelParticle parameters into arrays
+        h = [self.fuel_particle.h] * num_locs
+        S_T = [self.fuel_particle.S_T] * num_locs
+        S_e = [self.fuel_particle.S_e] * num_locs
+        p_p = [self.fuel_particle.p_p] * num_locs
+        # Set the Environment parameters into arrays
+        M_f = [self.environment.M_f] * num_locs
+        U = [self.environment.U] * num_locs
+        U_dir = [self.environment.U_dir] * num_locs
+        # Set the slope parameters into arrays
+        slope_mag = self.slope_mag[new_locs_uzip[::-1]].tolist()
+        slope_dir = self.slope_dir[new_locs_uzip[::-1]].tolist()
+
+        return [
+            loc_x, loc_y, new_loc_x, new_loc_y, n_w_0, n_delta, n_M_x, n_sigma, h, S_T,
+            S_e, p_p, M_f, U, U_dir, slope_mag, slope_dir
+        ]
+
+    def _flatten_params(self, all_params: SpriteParamsType) -> List[np.ndarray]:
+        '''
+        Flatten the sprite parameters into an array of shape
+        (num_parameters, num_points_to_compute). This will allow for the Rothermel
+        calculation to be done in a multiprocessable way.
+
+        Arguments:
+            all_params: The sprite parameters needed for a Rothermel calculation for
+                        each sprite for each possible new spreadable fire location. This
+                        will typically be computed by self._accrue_sprites for each
+                        sprite
+
+        Returns:
+            The sprtie parameters with shape (num_parameters, num_points_to_compute).
+            The input is transformed from a list of lists/tuples into a 2D array
+            containing the information in a vectorized/multiprocessing format
+        '''
+        if len(self.sprites) == 1:  # single burning pixel case (first sim step typically)
+            arr = np.asarray(all_params, dtype=np.float32)
+            arr = np.reshape(arr, (arr.shape[1], arr.shape[0] * arr.shape[2]))
+        else:  # Multiple burning pixels
+            num_params_per_example = len(all_params[0])
+            arr = [
+                np.hstack([x[i] for x in all_params])
+                for i in range(num_params_per_example)
+            ]
+            arr = np.asarray(arr, dtype=np.float32)
+
+        return [arr[i, :] for i in range(arr.shape[0])]
+
     def update(self, fire_map: np.ndarray) -> Tuple[np.ndarray, GameStatus]:
         '''
         Update the spreading of the fires. This function will remove
@@ -183,7 +271,8 @@ class RothermelFireManager(FireManager):
         time.
 
         Arguments:
-            None
+            fire_map: The numpy array that tracks the fire's burn status for
+                      each pixel in the simulation
 
         Returns:
             None
@@ -210,62 +299,15 @@ class RothermelFireManager(FireManager):
         U_dir = []
         slope_mag = []
         slope_dir = []
-        for sprite_idx in range(num_sprites):
-            sprite = self.sprites[sprite_idx]
-            x, y, _, _ = sprite.rect
-            new_locs = self._get_new_locs(x, y, fire_map)
-            num_locs = len(new_locs)
-            if num_locs == 0:
-                continue
+        sprite_idxs = list(range(num_sprites))
 
-            new_locs_uzip = tuple(zip(*new_locs))
-            new_loc_x.extend(new_locs_uzip[0])
-            new_loc_y.extend(new_locs_uzip[1])
-            loc_x.extend([x] * num_locs)
-            loc_y.extend([y] * num_locs)
+        all_params = [self._accrue_sprites(idx, fire_map) for idx in sprite_idxs]
+        all_params = list(filter(None, all_params))
 
-            n_w_0, n_delta, n_M_x, n_sigma = list(
-                zip(*[
-                    astuple(arr.fuel)
-                    for arr in self.terrain.fuel_arrs[new_locs_uzip[::-1]]
-                ]))
-            w_0.extend(n_w_0)
-            delta.extend(n_delta)
-            M_x.extend(n_M_x)
-            sigma.extend(n_sigma)
-
-            # Set the FuelParticle parameters into arrays
-            h.extend([self.fuel_particle.h] * num_locs)
-            S_T.extend([self.fuel_particle.S_T] * num_locs)
-            S_e.extend([self.fuel_particle.S_e] * num_locs)
-            p_p.extend([self.fuel_particle.p_p] * num_locs)
-
-            # Set the Environment parameters into arrays
-            M_f.extend([self.environment.M_f] * num_locs)
-            U.extend([self.environment.U] * num_locs)
-            U_dir.extend([self.environment.U_dir] * num_locs)
-
-            # Set the slope parameters into arrays
-            slope_mag.extend(self.slope_mag[new_locs_uzip[::-1]].tolist())
-            slope_dir.extend(self.slope_dir[new_locs_uzip[::-1]].tolist())
-
-        loc_x = np.array(loc_x, dtype=np.float32)
-        loc_y = np.array(loc_y, dtype=np.float32)
-        new_loc_x = np.array(new_loc_x, dtype=np.float32)
-        new_loc_y = np.array(new_loc_y, dtype=np.float32)
-        w_0 = np.array(w_0, dtype=np.float32)
-        delta = np.array(delta, dtype=np.float32)
-        M_x = np.array(M_x, dtype=np.float32)
-        sigma = np.array(sigma, dtype=np.float32)
-        h = np.array(h, dtype=np.float32)
-        S_T = np.array(S_T, dtype=np.float32)
-        S_e = np.array(S_e, dtype=np.float32)
-        p_p = np.array(p_p, dtype=np.float32)
-        M_f = np.array(M_f, dtype=np.float32)
-        U = np.array(U, dtype=np.float32)
-        U_dir = np.array(U_dir, dtype=np.float32)
-        slope_mag = np.array(slope_mag, dtype=np.float32)
-        slope_dir = np.array(slope_dir, dtype=np.float32)
+        [
+            loc_x, loc_y, new_loc_x, new_loc_y, w_0, delta, M_x, sigma, h, S_T, S_e, p_p,
+            M_f, U, U_dir, slope_mag, slope_dir
+        ] = self._flatten_params(all_params)
 
         R = compute_rate_of_spread(loc_x, loc_y, new_loc_x, new_loc_y, w_0, delta, M_x,
                                    sigma, h, S_T, S_e, p_p, M_f, U, U_dir, slope_mag,
@@ -276,11 +318,13 @@ class RothermelFireManager(FireManager):
         self.burn_amounts[y_coords, x_coords] += R
 
         y_coords, x_coords = np.unique(np.vstack((y_coords, x_coords)), axis=1)
-        for (x_new, y_new) in zip(x_coords, y_coords):
-            if self.burn_amounts[y_new, x_new] > self.pixel_scale:
-                new_sprite = Fire((x_new, y_new), self.fire_size)
-                self.sprites.append(new_sprite)
-                fire_map[y_new, x_new] = BurnStatus.BURNING
+        new_burn = np.argwhere(self.burn_amounts[y_coords, x_coords] > self.pixel_scale)
+        new_sprites = [
+            Fire((x_coords[burn[0]], y_coords[burn[0]]), self.fire_size)
+            for burn in new_burn
+        ]
+        self.sprites = self.sprites + new_sprites
+        fire_map[y_coords[new_burn], x_coords[new_burn]] = BurnStatus.BURNING
 
         return fire_map, GameStatus.RUNNING
 

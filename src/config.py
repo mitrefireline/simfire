@@ -129,20 +129,10 @@
 '''
 from typing import Tuple
 
-import GPUtil
 import numpy as np
 
 from .world.elevation_functions import PerlinNoise2D
 from .world.parameters import Fuel, FuelArray
-
-# Use GPU if available, else CPU
-try:
-    if len(GPUtil.getAvailable()) > 0:
-        device = 'cuda'
-    else:
-        device = 'cpu'
-except ValueError:
-    device = 'cpu'
 
 # Game/Screen parameters
 # Screen size in pixels

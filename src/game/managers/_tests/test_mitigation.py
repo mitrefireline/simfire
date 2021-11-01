@@ -4,7 +4,7 @@ import numpy as np
 from skimage.draw import line
 
 from .... import config as cfg
-from ....game.Game import Game
+from ....game.game import Game
 from ....enums import BurnStatus
 from ....world.elevation_functions import flat
 from ....world.parameters import FuelArray, Tile

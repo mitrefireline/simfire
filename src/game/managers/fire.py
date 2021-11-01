@@ -1,5 +1,5 @@
 from dataclasses import astuple
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
 import numpy as np
 
@@ -11,10 +11,7 @@ from ...world.rothermel import compute_rate_of_spread
 NewLocsType = Tuple[Tuple[int, int], Tuple[int, int], Tuple[int, int], Tuple[int, int],
                     Tuple[int, int], Tuple[int, int], Tuple[int, int], Tuple[int, int]]
 
-SpriteParamsType = List[List[float], List[float], Tuple[float], Tuple[float],
-                        Tuple[float], Tuple[float], Tuple[float], Tuple[float],
-                        List[float], List[float], List[float], List[float], List[float],
-                        List[float], List[float], List[float], List[float]]
+SpriteParamsType = List[Union[List[float], Tuple[float]]]
 
 
 class FireManager():

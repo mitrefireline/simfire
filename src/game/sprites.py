@@ -8,7 +8,6 @@ from PIL import Image, ImageDraw
 import pygame
 
 from .image import load_image
-from .. import config as cfg
 from ..enums import BurnStatus, DRY_TERRAIN_BROWN_IMG, SpriteLayer,\
     TERRAIN_TEXTURE_PATH, FIRELINE_TEXTURE_PATH, SCRATCHLINE_TEXTURE_PATH,\
     WETLINE_TEXTURE_PATH, BURNED_RGB_COLOR
@@ -23,8 +22,8 @@ class Terrain(pygame.sprite.Sprite):
     tiles together initially and then updates their color based on burn
     status.
     '''
-    def __init__(self, tiles: Sequence[Sequence[FuelArray]],
-                 elevation_fn: ElevationFn) -> None:
+    def __init__(self, tiles: Sequence[Sequence[FuelArray]], elevation_fn: ElevationFn,
+                 terrain_size: int, screen_size: int) -> None:
         '''
         Initialize the class by loading the tile textures and stitching
         together the whole terrain image.
@@ -41,10 +40,10 @@ class Terrain(pygame.sprite.Sprite):
         super().__init__()
 
         self.tiles = np.array(tiles)
-        self.terrain_size = cfg.terrain_size
+        self.terrain_size = terrain_size
         self.elevation_fn = elevation_fn
 
-        self.screen_size = (cfg.screen_size, cfg.screen_size)
+        self.screen_size = (screen_size, screen_size)
         self.texture = self._load_texture()
         self.image, self.fuel_arrs, self.elevations = self._make_terrain_image()
         # The rectangle for this sprite is the entire game

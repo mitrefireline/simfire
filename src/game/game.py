@@ -41,29 +41,43 @@ class Game():
         self.show_wind_magnitude = False
         self.show_wind_direction = False
 
-    def _toggle_wind_magnitude_display(self, switch: bool):
+    def _toggle_wind_magnitude_display(self):
         '''
         Toggle display of wind MAGNITUDE over the main screen
         Arguments: None
         '''
-        self.show_wind_magnitude = switch
+        self.show_wind_magnitude = not self.show_wind_magnitude
         if self.show_wind_magnitude is False:
             print('Wind Magnitude OFF')
         else:
             print('Wind Magnitude ON')
         return
 
-    def _toggle_wind_direction_display(self, switch: bool):
+    def _toggle_wind_direction_display(self):
         '''
         Toggle display of wind DIRECTION over the main screen
         Arguments: None
         '''
-        self.show_wind_direction = switch
+        self.show_wind_direction = not self.show_wind_direction
         if self.show_wind_direction is False:
             print('Wind Direction OFF')
         else:
             print('Wind Direction ON')
         return
+
+    def _disable_wind_magnitude_display(self):
+        '''
+        Toggle display of wind DIRECTION over the main screen
+        Arguments: None
+        '''
+        self.show_wind_magnitude = False
+
+    def _disable_wind_direction_display(self):
+        '''
+        Toggle display of wind DIRECTION over the main screen
+        Arguments: None
+        '''
+        self.show_wind_direction = False
 
     def _get_wind_direction_color(self, direction: float, ws_min: float,
                                   ws_max: float) -> (int, int, int):
@@ -190,18 +204,12 @@ class Game():
             if event.type == pygame.KEYDOWN:
                 keys = pygame.key.get_pressed()
                 if keys[pygame.K_m] is True:
-                    self._toggle_wind_direction_display(False)
-                    self._toggle_wind_magnitude_display(True)
+                    self._disable_wind_direction_display()
+                    self._toggle_wind_magnitude_display()
 
                 if keys[pygame.K_n] is True:
-                    self._toggle_wind_magnitude_display(False)
-                    self._toggle_wind_direction_display(True)
-
-                if keys[pygame.K_k] is True:
-                    self._toggle_wind_magnitude_display(False)
-
-                if keys[pygame.K_j] is True:
-                    self._toggle_wind_direction_display(False)
+                    self._disable_wind_magnitude_display()
+                    self._toggle_wind_direction_display()
 
         # Create a layered group so that the fire appears on top
         fire_sprites_group = pygame.sprite.LayeredUpdates(fire_sprites, fireline_sprites)

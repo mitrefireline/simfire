@@ -191,10 +191,10 @@ mw_lacunarity: float = 2.0
 mw_speed_min: float = 616.0  # ft/min
 mw_speed_max: float = 4136.0  # ft/min
 
-dw_seed: int = 1203
-dw_scale: int = 2
+dw_seed: int = 650  # 1203 (North bias)
+dw_scale: int = 1500  # Better to be above 1000 to have less variable wind dir
 dw_octaves: int = 2
 dw_persistence: float = 0.9
 dw_lacunarity: float = 1.0
 dw_deg_min: float = 0.0  # Degrees, 0/360: North, 90: East, 180: South, 270: West
-dw_deg_max: float = 360.0  # Degrees, 0/360: North, 90: East, 180: South, 270: West
+dw_deg_max: float = 360.0  # same as above

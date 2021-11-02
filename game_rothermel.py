@@ -59,7 +59,7 @@ def main():
         fire_sprites = fire_manager.sprites
         fireline_sprites = fireline_manager.sprites
         game_status = game.update(terrain, fire_sprites, fireline_sprites,
-                                  wind_map.map_wind_speed)
+                                  wind_map.map_wind_speed, wind_map.map_wind_direction)
         fire_map = game.fire_map
         fire_map = fireline_manager.update(fire_map)
         fire_map, fire_status = fire_manager.update(fire_map)

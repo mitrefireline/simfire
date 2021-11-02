@@ -88,7 +88,7 @@ class TestRothermelFireManager(unittest.TestCase):
             FuelArray(Tile(j, i, cfg.terrain_scale, cfg.terrain_scale),
                       cfg.terrain_map[i][j]) for j in range(cfg.terrain_size)
         ] for i in range(cfg.terrain_size)]
-        self.terrain = Terrain(fuel_arrs, flat())
+        self.terrain = Terrain(fuel_arrs, flat(), cfg.terrain_size, cfg.screen_size)
 
         self.environment = Environment(cfg.M_f, cfg.U, cfg.U_dir)
 

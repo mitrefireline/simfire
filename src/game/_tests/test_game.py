@@ -1,6 +1,6 @@
 import unittest
 
-from ..Game import Game
+from ..game import Game
 from ..sprites import Terrain
 from ... import config as cfg
 from ...enums import GameStatus
@@ -30,7 +30,7 @@ class TestGame(unittest.TestCase):
             FuelArray(Tile(j, i, cfg.terrain_scale, cfg.terrain_scale),
                       cfg.terrain_map[i][j]) for j in range(cfg.terrain_size)
         ] for i in range(cfg.terrain_size)]
-        terrain = Terrain(tiles, cfg.elevation_fn)
+        terrain = Terrain(tiles, cfg.elevation_fn, cfg.terrain_size, cfg.screen_size)
 
         environment = Environment(cfg.M_f, cfg.U, cfg.U_dir)
 

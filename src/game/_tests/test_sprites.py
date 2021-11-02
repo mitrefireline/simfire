@@ -16,7 +16,8 @@ class TestTerrain(unittest.TestCase):
                       cfg.terrain_map[i][j]) for j in range(cfg.terrain_size)
         ] for i in range(cfg.terrain_size)]
 
-        self.terrain = Terrain(self.tiles, cfg.elevation_fn)
+        self.terrain = Terrain(self.tiles, cfg.elevation_fn, cfg.terrain_size,
+                               cfg.screen_size)
 
     def test_image_loc_and_size(self) -> None:
         '''

@@ -8,8 +8,7 @@ from PIL import Image, ImageDraw
 import pygame
 
 from .image import load_image
-from .. import config as cfg
-from ..enums import BurnStatus, DRY_TERRAIN_BROWN_IMG, FIRE_TEXTURE_PATH, SpriteLayer,\
+from ..enums import BurnStatus, DRY_TERRAIN_BROWN_IMG, SpriteLayer,\
     TERRAIN_TEXTURE_PATH, FIRELINE_TEXTURE_PATH, SCRATCHLINE_TEXTURE_PATH,\
     WETLINE_TEXTURE_PATH, BURNED_RGB_COLOR
 from ..world.elevation_functions import ElevationFn
@@ -23,8 +22,8 @@ class Terrain(pygame.sprite.Sprite):
     tiles together initially and then updates their color based on burn
     status.
     '''
-    def __init__(self, tiles: Sequence[Sequence[FuelArray]],
-                 elevation_fn: ElevationFn) -> None:
+    def __init__(self, tiles: Sequence[Sequence[FuelArray]], elevation_fn: ElevationFn,
+                 terrain_size: int, screen_size: int) -> None:
         '''
         Initialize the class by loading the tile textures and stitching
         together the whole terrain image.
@@ -41,10 +40,10 @@ class Terrain(pygame.sprite.Sprite):
         super().__init__()
 
         self.tiles = np.array(tiles)
-        self.terrain_size = cfg.terrain_size
+        self.terrain_size = terrain_size
         self.elevation_fn = elevation_fn
 
-        self.screen_size = (cfg.screen_size, cfg.screen_size)
+        self.screen_size = (screen_size, screen_size)
         self.texture = self._load_texture()
         self.image, self.fuel_arrs, self.elevations = self._make_terrain_image()
         # The rectangle for this sprite is the entire game
@@ -218,7 +217,8 @@ class Terrain(pygame.sprite.Sprite):
 
         arr = self.texture.copy()
         arr_img = Image.fromarray(arr)
-        texture_img = Image.blend(arr_img, DRY_TERRAIN_BROWN_IMG, color_change_pct / 2)
+        resized_brown = DRY_TERRAIN_BROWN_IMG.resize(arr_img.size)
+        texture_img = Image.blend(arr_img, resized_brown, color_change_pct / 2)
         new_texture = np.array(texture_img)
 
         return new_texture
@@ -244,11 +244,15 @@ class Fire(pygame.sprite.Sprite):
         self.pos = pos
         self.size = size
 
-        self.image = load_image(FIRE_TEXTURE_PATH)
-        self.image = pygame.transform.scale(self.image, (self.size, self.size))
+        fire_texture = np.zeros((self.size, self.size, 3))
+        fire_texture[:, :, 0] = 255
+        fire_texture[:, :, 1] = 153
+        fire_texture[:, :, 2] = 51
+        self.image = pygame.surfarray.make_surface(fire_texture)
 
         self.rect = self.image.get_rect()
         self.rect = self.rect.move(self.pos[0], self.pos[1])
+        self.groups = None
 
         # Layer 3 so that it appears on top of the terrain and line (if applicable)
         self.layer: int = SpriteLayer.FIRE

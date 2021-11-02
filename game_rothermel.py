@@ -22,16 +22,6 @@ def main():
         for j in range(cfg.terrain_size)
     ] for i in range(cfg.terrain_size)]
     terrain = Terrain(fuel_arrs, cfg.elevation_fn, cfg.terrain_size, cfg.screen_size)
-    environment = Environment(cfg.M_f, cfg.U, cfg.U_dir)
-
-    points = line(100, 15, 100, 200)
-    y = points[0].tolist()
-    x = points[1].tolist()
-    points = list(zip(x, y))
-
-    fireline_manager = FireLineManager(size=cfg.control_line_size,
-                                       pixel_scale=cfg.pixel_scale,
-                                       terrain=terrain)
 
     wind_map = WindController()
     wind_map.init_wind_speed_generator(cfg.mw_seed, cfg.mw_scale, cfg.mw_octaves,
@@ -43,7 +33,17 @@ def main():
                                            cfg.dw_deg_min, cfg.dw_deg_max,
                                            cfg.screen_size)
 
-    # environment = Environment(cfg.M_f, wind_map.map_wind_speed, cfg.U_dir)
+    environment = Environment(cfg.M_f, wind_map.map_wind_speed,
+                              wind_map.map_wind_direction)
+
+    points = line(100, 15, 100, 200)
+    y = points[0].tolist()
+    x = points[1].tolist()
+    points = list(zip(x, y))
+
+    fireline_manager = FireLineManager(size=cfg.control_line_size,
+                                       pixel_scale=cfg.pixel_scale,
+                                       terrain=terrain)
 
     fire_map = game.fire_map
     fire_map = fireline_manager.update(fire_map, points)

@@ -43,7 +43,7 @@ def main():
                                            cfg.dw_deg_min, cfg.dw_deg_max,
                                            cfg.screen_size)
 
-    #environment = Environment(cfg.M_f, wind_map.map_wind_speed, cfg.U_dir)
+    # environment = Environment(cfg.M_f, wind_map.map_wind_speed, cfg.U_dir)
 
     fire_map = game.fire_map
     fire_map = fireline_manager.update(fire_map, points)

@@ -304,6 +304,10 @@ class RothermelFireManager(FireManager):
         all_params = [self._accrue_sprites(idx, fire_map) for idx in sprite_idxs]
         all_params = list(filter(None, all_params))
 
+        # Sprites exist, but there are no new locations to spread to
+        if len(all_params) == 0:
+            return fire_map, GameStatus.RUNNING
+
         [
             loc_x, loc_y, new_loc_x, new_loc_y, w_0, delta, M_x, sigma, h, S_T, S_e, p_p,
             M_f, U, U_dir, slope_mag, slope_dir

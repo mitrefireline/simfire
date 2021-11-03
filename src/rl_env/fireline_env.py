@@ -19,7 +19,9 @@ class FireLineEnv():
 
         self.config = config
         self.config.screen_size = 100
+        self.config.fire_init_pos = (self.config.screen_size // 2, ) * 2
         self.config.terrain_size = 10
+        self.config.render_inline = False
         self.config.render_post_agent = True
         self.config.render_post_agent_with_fire = True
 

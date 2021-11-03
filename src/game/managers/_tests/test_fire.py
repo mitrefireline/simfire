@@ -8,6 +8,7 @@ from ...sprites import Fire, Terrain
 from ....world.elevation_functions import flat
 from ....world.parameters import Environment, FuelArray, FuelParticle, Tile
 from ..fire import ConstantSpreadFireManager, FireManager, RothermelFireManager
+from src.world.wind import WindController
 
 
 class TestFireManager(unittest.TestCase):
@@ -90,7 +91,18 @@ class TestRothermelFireManager(unittest.TestCase):
         ] for i in range(cfg.terrain_size)]
         self.terrain = Terrain(fuel_arrs, flat(), cfg.terrain_size, cfg.screen_size)
 
-        self.environment = Environment(cfg.M_f, cfg.U, cfg.U_dir)
+        self.wind_map = WindController()
+        self.wind_map.init_wind_speed_generator(cfg.mw_seed, cfg.mw_scale, cfg.mw_octaves,
+                                                cfg.mw_persistence, cfg.mw_lacunarity,
+                                                cfg.mw_speed_min, cfg.mw_speed_max,
+                                                cfg.screen_size)
+        self.wind_map.init_wind_direction_generator(cfg.dw_seed, cfg.dw_scale,
+                                                    cfg.dw_octaves, cfg.dw_persistence,
+                                                    cfg.dw_lacunarity, cfg.dw_deg_min,
+                                                    cfg.dw_deg_max, cfg.screen_size)
+
+        self.environment = Environment(cfg.M_f, self.wind_map.map_wind_speed,
+                                       self.wind_map.map_wind_direction)
 
         self.fire_manager = RothermelFireManager(self.init_pos, self.fire_size,
                                                  self.max_fire_duration, self.pixel_scale,

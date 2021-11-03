@@ -14,10 +14,9 @@ class TestWindNoise(unittest.TestCase):
         self.range_max: float = 4136.0
         self.screen_size = 150
         self.test_wind = WindNoise()
-        self.test_wind.set_noise_parameters(self.seed, self.scale,
-                                            self.octaves, self.persistence,
-                                            self.lacunarity, self.range_min,
-                                            self.range_max)
+        self.test_wind.set_noise_parameters(self.seed, self.scale, self.octaves,
+                                            self.persistence, self.lacunarity,
+                                            self.range_min, self.range_max)
 
     def test_generate_map_array(self) -> None:
         wind_map = self.test_wind.generate_map_array(self.screen_size)

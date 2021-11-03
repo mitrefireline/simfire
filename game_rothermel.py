@@ -8,11 +8,11 @@ from src.game.managers.fire import RothermelFireManager
 from src.game.managers.mitigation import FireLineManager
 from src.game.sprites import Terrain
 from src.world.parameters import Environment, FuelArray, FuelParticle, Tile
-from src.rl_env.fireline_env import FireLineEnv
+from src.rl_env.fireline_env import FireLineEnv, RLEnv
 
 
 def main():
-    pygame.init()
+
     game = Game(cfg.screen_size)
 
     fuel_particle = FuelParticle()
@@ -58,23 +58,21 @@ def some_action_func(state):
     A dummy function to show how the rl side ingests the state
         and returns a dict() of the fire mitigation stategy
     '''
-    fire_mitigation = random.randint(0, 1)
-    return fire_mitigation
+    fire_mitigation = random.choices([0, 1], weights=[0.8, 0.2])
+    return fire_mitigation[0]
 
 
 def rl_main():
-    # initilize the rl_env()
-    import os
-    os.environ['SDL_VIDEODRIVER'] = 'dummy'
 
-    rl_environment = FireLineEnv()
-
+    env_config = FireLineEnv(cfg)
+    rl_environment = RLEnv(env_config)
     state = rl_environment.reset()
-    game_status = GameStatus.RUNNING
-    while game_status == GameStatus.RUNNING:
+    done = False
+    final_reward = 0
+    while not done:
         action = some_action_func(state)
-        state, _, _, _ = rl_environment.step(action)
-        game_status = rl_environment.render()
+        state, reward, done, _ = rl_environment.step(action)
+        final_reward += reward
 
     pygame.quit()
 

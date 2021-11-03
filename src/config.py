@@ -180,3 +180,7 @@ M_f: float = 0.03
 U: float = 88 * 13
 # Wind Direction (degrees clockwise from north)
 U_dir: float = 135
+
+render_inline: str = False
+render_post_agent: str = False
+render_post_agent_with_fire: str = False

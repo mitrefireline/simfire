@@ -1,7 +1,16 @@
 from math import atan2, cos, exp, radians
+
+import GPUtil
 from numba import vectorize
 
-from ..config import device
+# Use GPU if available, else CPU
+try:
+    if len(GPUtil.getAvailable()) > 0:
+        device = 'cuda'
+    else:
+        device = 'cpu'
+except ValueError:
+    device = 'cpu'
 
 
 @vectorize([('float32(float32,float32,float32,float32,float32,float32,'

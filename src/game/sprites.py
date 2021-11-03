@@ -217,7 +217,8 @@ class Terrain(pygame.sprite.Sprite):
 
         arr = self.texture.copy()
         arr_img = Image.fromarray(arr)
-        texture_img = Image.blend(arr_img, DRY_TERRAIN_BROWN_IMG, color_change_pct / 2)
+        resized_brown = DRY_TERRAIN_BROWN_IMG.resize(arr_img.size)
+        texture_img = Image.blend(arr_img, resized_brown, color_change_pct / 2)
         new_texture = np.array(texture_img)
 
         return new_texture

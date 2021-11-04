@@ -6,12 +6,12 @@ from copy import deepcopy
 from gym.utils import seeding
 from src.enums import GameStatus, BurnStatus
 from src import config
-from ..game.sprites import Terrain
+from src.game.sprites import Terrain
 from src.game.game import Game
 from src.world.parameters import Environment, FuelArray, FuelParticle, Tile
-from ..game.managers.fire import RothermelFireManager
-from ..game.managers.mitigation import (FireLineManager, ScratchLineManager,
-                                        WetLineManager)
+from src.game.managers.fire import RothermelFireManager
+from src.game.managers.mitigation import (FireLineManager, ScratchLineManager,
+                                          WetLineManager)
 
 
 class FireLineEnv():

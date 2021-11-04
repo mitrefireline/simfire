@@ -262,8 +262,7 @@ class Fire(pygame.sprite.Sprite):
 
     def update(self) -> None:
         '''
-        Check which squares the fire is on and adjacent to and update its
-        spread.
+        Currently unused.
 
         Arguments:
             None
@@ -271,8 +270,7 @@ class Fire(pygame.sprite.Sprite):
         Returns:
             None
         '''
-        # Increment the duration
-        self.duration += 1
+        pass
 
 
 class FireLine(pygame.sprite.Sprite):

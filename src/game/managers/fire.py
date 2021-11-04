@@ -47,6 +47,7 @@ class FireManager():
 
         init_fire = Fire(self.init_pos, self.fire_size)
         self.sprites: List[Fire] = [init_fire]
+        self.durations: List[int] = [0]
 
     def update(self, fire_map: np.ndarray) -> None:
         '''
@@ -60,16 +61,25 @@ class FireManager():
         exceded the maximum allowed duration and mark self.fire_map as
         BURNED.
         '''
-        # Use the expired sprites to mark self.fire_map as burned
-        expired_sprites = list(
-            filter(lambda x: x.duration >= self.max_fire_duration, self.sprites))
-        for sprite in expired_sprites:
-            x, y, _, _ = sprite.rect
-            fire_map[y, x] = BurnStatus.BURNED
+        lists_zipped = list(zip(self.sprites, self.durations))
+        # Get the sprites whose duration exceeds the max allowed duration
+        results = list(filter(lambda x: x[1] >= self.max_fire_duration, lists_zipped))
+        results = list(zip(*results))
+        if len(results) > 0:
+            expired_sprites = results[0]
+            # Use the expired sprites to mark self.fire_map as burned
+            for sprite in expired_sprites:
+                x, y, _, _ = sprite.rect
+                fire_map[y, x] = BurnStatus.BURNED
 
         # Remove the expired sprites
-        self.sprites = list(
-            filter(lambda x: x.duration < self.max_fire_duration, self.sprites))
+        results = list(filter(lambda x: x[1] < self.max_fire_duration, lists_zipped))
+
+        if len(results) > 0:
+            self.sprites, self.durations = list(map(list, zip(*results)))
+        else:
+            self.sprites = []
+            self.durations = []
 
         return fire_map
 
@@ -279,6 +289,8 @@ class RothermelFireManager(FireManager):
         '''
         # Remove all fires that are past the max duration
         self._prune_sprites(fire_map)
+        # Increment the durations
+        self.durations = list(map(lambda x: x + 1, self.durations))
         num_sprites = len(self.sprites)
         if num_sprites == 0:
             return fire_map, GameStatus.QUIT
@@ -327,7 +339,10 @@ class RothermelFireManager(FireManager):
             Fire((x_coords[burn[0]], y_coords[burn[0]]), self.fire_size)
             for burn in new_burn
         ]
+        new_durations = [0] * len(new_sprites)
+
         self.sprites = self.sprites + new_sprites
+        self.durations = self.durations + new_durations
         fire_map[y_coords[new_burn], x_coords[new_burn]] = BurnStatus.BURNING
 
         return fire_map, GameStatus.RUNNING

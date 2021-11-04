@@ -392,11 +392,11 @@ class ConstantSpreadFireManager(FireManager):
             None
         '''
         self._prune_sprites(fire_map)
-        for sprite in self.sprites:
+        for sprite, duration in zip(self.sprites, self.durations):
             x, y, _, _ = sprite.rect
             # Create new sprites and mark the area as burning if
             # it has been burning long enough to spread
-            if sprite.duration == self.rate_of_spread:
+            if duration == self.rate_of_spread:
                 # Fire can spread in 8 directions, need to check all of them
                 # and verify they are unburned to start a new fire there
                 new_locs = self._get_new_locs(x, y, fire_map)
@@ -406,5 +406,8 @@ class ConstantSpreadFireManager(FireManager):
                     fire_map[loc[1], loc[0]] = BurnStatus.BURNING
             else:
                 continue
+
+        # Increment the durations
+        self.durations = list(map(lambda x: x + 1, self.durations))
 
         return fire_map

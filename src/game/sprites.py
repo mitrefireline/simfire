@@ -257,9 +257,6 @@ class Fire(pygame.sprite.Sprite):
         # Layer 3 so that it appears on top of the terrain and line (if applicable)
         self.layer: int = SpriteLayer.FIRE
 
-        # Record how many frames this sprite has been alive
-        self.duration: int = 0
-
     def update(self) -> None:
         '''
         Currently unused.

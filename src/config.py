@@ -137,7 +137,7 @@ from .world.parameters import Fuel, FuelArray
 # Game/Screen parameters
 
 # Number of terrain tiles in each row/column
-terrain_size: int = 15
+terrain_size: int = 2
 # Screen size in pixels
 screen_size: int = terrain_size**2
 
@@ -170,7 +170,7 @@ terrain_map: Tuple[Tuple[FuelArray]] = tuple(
 # (x, y) starting coordinates
 fire_init_pos: Tuple[int, int] = (screen_size // 2, screen_size // 2)
 # Fires burn for a limited number of frames
-max_fire_duration: int = 5
+max_fire_duration: int = 4
 
 # Environment Parameters:
 # Moisture Content
@@ -183,4 +183,4 @@ U_dir: float = 135
 
 render_inline: str = False
 render_post_agent: str = False
-render_post_agent_with_fire: str = False
+render_post_agent_with_fire: str = True

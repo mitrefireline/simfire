@@ -18,13 +18,6 @@ class FireLineEnv():
     def __init__(self, config: config):
 
         self.config = config
-        # self.config.screen_size = 100
-        self.config.fire_init_pos = (self.config.screen_size // 2, ) * 2
-        # self.config.terrain_size = 10
-        self.config.render_inline = False
-        self.config.render_post_agent = True
-        self.config.render_post_agent_with_fire = True
-
         self.points = set([])
 
         self.fuel_particle = FuelParticle()
@@ -42,9 +35,9 @@ class FireLineEnv():
                                                 pixel_scale=self.config.pixel_scale,
                                                 terrain=self.terrain)
 
-        self.scratchline_manager = ScratchLineManager(size=self.config.control_line_size,
-                                                      pixel_scale=self.config.pixel_scale,
-                                                      terrain=self.terrain)
+        self.scratchline_manager = ScratchLineManager(self.config.control_line_size,
+                                                      self.config.pixel_scale,
+                                                      self.terrain)
         self.wetline_manager = WetLineManager(size=self.config.control_line_size,
                                               pixel_scale=self.config.pixel_scale,
                                               terrain=self.terrain)
@@ -61,7 +54,6 @@ class FireLineEnv():
                                                  self.fuel_particle, self.terrain,
                                                  self.environment)
         self.fire_sprites = self.fire_manager.sprites
-        self.game = Game(self.config.screen_size)
 
         self.game_status = GameStatus.RUNNING
         self.fire_status = GameStatus.RUNNING
@@ -91,23 +83,45 @@ class FireLineEnv():
                 2. pro-active fire mitigation (full traversal)
                 3. pro-active fire mitigation (full traversal) + fire spread
 
-        Render at any point in the agents' traversal of the game.
-        Inlcuding at every step()
+        Parameters
+        -----------
+        mitigation_state: np.ndarray
+                            Array of either the current agent mitigation
+                                or all mitigations.
 
-        Initialize the Game().
-        Update the agent's actions for mitigation.
+        position_state: np.ndarray
+                        Array of either the current agent position only
+                            used when 'inline' == True
+
+        mitigation_only: bool = True
+                            Boolean value to only show agent mitigation stategy
+
+        mitigation_and_fire_spread: bool = False
+                            Boolean value to show agent mitigation stategy and
+                                fire spread. Only used when agent has traversed
+                                etire game board.
+        inline: bool = False
+                Boolean value to use rendering at each call to step()
+
+        Return
+        -------
+        None
 
         '''
 
+        self.fire_manager = RothermelFireManager(self.config.fire_init_pos,
+                                                 self.config.fire_size,
+                                                 self.config.max_fire_duration,
+                                                 self.config.pixel_scale,
+                                                 self.fuel_particle, self.terrain,
+                                                 self.environment)
+        self.game = Game(self.config.screen_size)
         self.fire_map = self.game.fire_map
-
-        # # look at map before anything happens
-        # self.game_status = self.game.update(self.terrain, self.fire_sprites,
-        #                                     self.fireline_sprites)
 
         if mitigation_only:
             self._update_sprite_points(mitigation_state, position_state, inline)
             if self.game_status == GameStatus.RUNNING:
+
                 self.fire_map = self.fireline_manager.update(self.fire_map, self.points)
                 self.fireline_sprites = self.fireline_manager.sprites
                 self.game.fire_map = self.fire_map
@@ -118,21 +132,23 @@ class FireLineEnv():
                 self.game.fire_map = self.fire_map
 
         if mitigation_and_fire_spread:
+            self.fire_status = GameStatus.RUNNING
+            self.game_status = GameStatus.RUNNING
             self._update_sprite_points(mitigation_state, position_state, inline)
+            self.fireline_sprites = self.fireline_manager.sprites
+            self.fire_map = self.fireline_manager.update(self.fire_map, self.points)
             while self.game_status == GameStatus.RUNNING and \
                     self.fire_status == GameStatus.RUNNING:
                 self.fire_sprites = self.fire_manager.sprites
                 self.game.fire_map = self.fire_map
                 self.game_status = self.game.update(self.terrain, self.fire_sprites,
-                                                    self.fireline_sprites_empty)
+                                                    self.fireline_sprites)
                 self.fire_map, self.fire_status = self.fire_manager.update(self.fire_map)
                 self.fire_map = self.game.fire_map
                 self.game.fire_map = self.fire_map
 
-        # after rendering - reset mitigation sprites and locations
-        # can always recover these through the agent state info and
-        #  _update_sprite_points()
-        # self.fireline_sprites = self.fireline_sprites_empty
+        # after rendering - reset mitigation points can always recover
+        # these through the agent state info and _update_sprite_points()
         self.points = set([])
 
     def _update_sprite_points(self,
@@ -157,9 +173,6 @@ class FireLineEnv():
                 If False, loop through all mitigation_state array to get points
                     to add to fireline sprites group
 
-        0: no mitigation
-        1: fireline
-
         '''
         if inline:
             if mitigation_state == 1:
@@ -170,8 +183,6 @@ class FireLineEnv():
             for i in range(self.config.screen_size):
                 for j in range(self.config.screen_size):
                     if mitigation_state[(i, j)] == 1:
-                        # self.fireline_sprites = \
-                        #     self.fireline_manager.update(point=(i, j))
                         self.points.add((i, j))
 
     def _run(self,
@@ -187,14 +198,22 @@ class FireLineEnv():
 
         Parameters
         ----------
-        mitigation_state: np.ndarary
-
+        mitigation_state: np.ndarray
+                            Array of mitigation value(s).
+                            0: No Control Line, 1: Control Line
         position_state: np.ndarray
+                        Array of current agent position.
+                        Only used when rendering `inline`
 
         mitigation: bool
+                    Boolean value to update agent's mitigation staegy before
+                        fire spread.
 
-
-
+        Return
+        ------
+        fire_map: np.ndarray
+                    Burned/Unburned/ControlLine pixel map.
+                    Values range from [0, 6]
         '''
 
         # reset the fire status to running
@@ -234,6 +253,14 @@ class FireLineEnv():
         self.elevation --> [:,:,2]
         self.mitigation --> [:,:,3]
 
+        Parameters
+        -----------
+        None
+
+        Return
+        -------
+        state: Dict[np.ndarray]
+
 
         '''
         reset_position = np.zeros([self.config.screen_size, self.config.screen_size])
@@ -253,7 +280,8 @@ class FireLineEnv():
         #     for i in range(self.config.screen_size)
         # ]).reshape(self.config.screen_size, self.config.screen_size)
         # M_x_array = np.array([
-        #    self.terrain.fuel_arrs[i][j].fuel.M_x for j in range(self.config.screen_size)
+        #    self.terrain.fuel_arrs[i][j].fuel.M_x for j in
+        #           range(self.config.screen_size)
         #     for i in range(self.config.screen_size)
         # ]).reshape(self.config.screen_size, self.config.screen_size)
         reset_mitigation = np.zeros([self.config.screen_size, self.config.screen_size])
@@ -506,7 +534,7 @@ class RLEnv(gym.Env):
         # if we want to render as we step through the game
         if self.simulation.config.render_inline:
             self.simulation._render(self.state[-1][self.current_agent_loc],
-                                    self.state[0][self.current_agent_loc],
+                                    self.current_agent_loc,
                                     inline=True)
 
         # set the old position back to 0

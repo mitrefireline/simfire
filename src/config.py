@@ -170,7 +170,7 @@ terrain_map: Tuple[Tuple[FuelArray]] = tuple(
 # (x, y) starting coordinates
 fire_init_pos: Tuple[int, int] = (screen_size // 2, screen_size // 2)
 # Fires burn for a limited number of frames
-max_fire_duration: int = 5
+max_fire_duration: int = 4
 
 # Environment Parameters:
 # Moisture Content
@@ -180,3 +180,7 @@ M_f: float = 0.03
 U: float = 88 * 13
 # Wind Direction (degrees clockwise from north)
 U_dir: float = 135
+
+render_inline: str = False
+render_post_agent: str = False
+render_post_agent_with_fire: str = True

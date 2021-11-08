@@ -106,19 +106,6 @@ class TestFire(unittest.TestCase):
                               msg=(f'The fire has (width, height) size of ({w}, {h}), '
                                    f'but should have size of ({self.size}, {self.size})'))
 
-    def test_update(self) -> None:
-        '''
-        Test that the fire updates the duration counter correctly.
-        '''
-        num_updates = 5
-        for _ in range(num_updates):
-            self.fire.update()
-
-        self.assertEqual(self.fire.duration,
-                         num_updates,
-                         msg=(f'The fire duration is {self.fire.duration} frames, '
-                              f'but should be {num_updates} frames'))
-
     def test_layer(self) -> None:
         '''
         Test that the Fire has the correct Sprite/render layer.

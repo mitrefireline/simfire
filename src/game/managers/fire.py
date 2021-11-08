@@ -47,6 +47,7 @@ class FireManager():
 
         init_fire = Fire(self.init_pos, self.fire_size)
         self.sprites: List[Fire] = [init_fire]
+        self.durations: List[int] = [0]
 
     def update(self, fire_map: np.ndarray) -> None:
         '''
@@ -60,16 +61,25 @@ class FireManager():
         exceded the maximum allowed duration and mark self.fire_map as
         BURNED.
         '''
-        # Use the expired sprites to mark self.fire_map as burned
-        expired_sprites = list(
-            filter(lambda x: x.duration >= self.max_fire_duration, self.sprites))
-        for sprite in expired_sprites:
-            x, y, _, _ = sprite.rect
-            fire_map[y, x] = BurnStatus.BURNED
+        lists_zipped = list(zip(self.sprites, self.durations))
+        # Get the sprites whose duration exceeds the max allowed duration
+        results = list(filter(lambda x: x[1] >= self.max_fire_duration, lists_zipped))
+        results = list(zip(*results))
+        if len(results) > 0:
+            expired_sprites = results[0]
+            # Use the expired sprites to mark self.fire_map as burned
+            for sprite in expired_sprites:
+                x, y, _, _ = sprite.rect
+                fire_map[y, x] = BurnStatus.BURNED
 
         # Remove the expired sprites
-        self.sprites = list(
-            filter(lambda x: x.duration < self.max_fire_duration, self.sprites))
+        results = list(filter(lambda x: x[1] < self.max_fire_duration, lists_zipped))
+
+        if len(results) > 0:
+            self.sprites, self.durations = list(map(list, zip(*results)))
+        else:
+            self.sprites = []
+            self.durations = []
 
         return fire_map
 
@@ -279,6 +289,8 @@ class RothermelFireManager(FireManager):
         '''
         # Remove all fires that are past the max duration
         self._prune_sprites(fire_map)
+        # Increment the durations
+        self.durations = list(map(lambda x: x + 1, self.durations))
         num_sprites = len(self.sprites)
         if num_sprites == 0:
             return fire_map, GameStatus.QUIT
@@ -304,6 +316,10 @@ class RothermelFireManager(FireManager):
         all_params = [self._accrue_sprites(idx, fire_map) for idx in sprite_idxs]
         all_params = list(filter(None, all_params))
 
+        # Sprites exist, but there are no new locations to spread to
+        if len(all_params) == 0:
+            return fire_map, GameStatus.RUNNING
+
         [
             loc_x, loc_y, new_loc_x, new_loc_y, w_0, delta, M_x, sigma, h, S_T, S_e, p_p,
             M_f, U, U_dir, slope_mag, slope_dir
@@ -323,7 +339,10 @@ class RothermelFireManager(FireManager):
             Fire((x_coords[burn[0]], y_coords[burn[0]]), self.fire_size)
             for burn in new_burn
         ]
+        new_durations = [0] * len(new_sprites)
+
         self.sprites = self.sprites + new_sprites
+        self.durations = self.durations + new_durations
         fire_map[y_coords[new_burn], x_coords[new_burn]] = BurnStatus.BURNING
 
         return fire_map, GameStatus.RUNNING
@@ -373,11 +392,11 @@ class ConstantSpreadFireManager(FireManager):
             None
         '''
         self._prune_sprites(fire_map)
-        for sprite in self.sprites:
+        for sprite, duration in zip(self.sprites, self.durations):
             x, y, _, _ = sprite.rect
             # Create new sprites and mark the area as burning if
             # it has been burning long enough to spread
-            if sprite.duration == self.rate_of_spread:
+            if duration == self.rate_of_spread:
                 # Fire can spread in 8 directions, need to check all of them
                 # and verify they are unburned to start a new fire there
                 new_locs = self._get_new_locs(x, y, fire_map)
@@ -387,5 +406,8 @@ class ConstantSpreadFireManager(FireManager):
                     fire_map[loc[1], loc[0]] = BurnStatus.BURNING
             else:
                 continue
+
+        # Increment the durations
+        self.durations = list(map(lambda x: x + 1, self.durations))
 
         return fire_map

@@ -137,7 +137,7 @@ from .world.parameters import Fuel, FuelArray
 # Game/Screen parameters
 
 # Number of terrain tiles in each row/column
-terrain_size: int = 2
+terrain_size: int = 15
 # Screen size in pixels
 screen_size: int = terrain_size**2
 

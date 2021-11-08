@@ -18,7 +18,8 @@ class TestControlLineManager(unittest.TestCase):
     using the `FireLineManager` as a proxy.
     '''
     def setUp(self) -> None:
-        points = line(100, 15, 100, 200)
+        points = line(cfg.terrain_size, cfg.terrain_size + 1, cfg.terrain_size,
+                      cfg.terrain_size + 1)
         y = points[0].tolist()
         x = points[1].tolist()
         self.manager = FireLineManager

@@ -18,9 +18,9 @@ class FireLineEnv():
     def __init__(self, config: config):
 
         self.config = config
-        self.config.screen_size = 100
+        # self.config.screen_size = 100
         self.config.fire_init_pos = (self.config.screen_size // 2, ) * 2
-        self.config.terrain_size = 10
+        # self.config.terrain_size = 10
         self.config.render_inline = False
         self.config.render_post_agent = True
         self.config.render_post_agent_with_fire = True
@@ -68,10 +68,14 @@ class FireLineEnv():
 
         self.actions = ['None', 'fireline']
         self.observ_spaces = {
-            'position': [0, 1, (self.config.screen_size, self.config.screen_size)],
-            'terrain': [0, 4, (self.config.screen_size, self.config.screen_size, 4)],
-            'elevation': [0, 1, (self.config.screen_size, self.config.screen_size)],
-            'mitigation': [0, 1, (self.config.screen_size, self.config.screen_size)]
+            'position': (0, 1),
+            'w_0': (0, 1),
+            # 'sigma': (0, 1),
+            # 'delta': (0, 1),
+            # 'm_x': (0, 1),
+            # 'm_f': (0, 1)
+            'elevation': (0, 1),
+            'mitigation': (0, len(self.actions))
         }
 
     def _render(self,
@@ -238,31 +242,27 @@ class FireLineEnv():
             self.terrain.fuel_arrs[i][j].fuel.w_0 for j in range(self.config.screen_size)
             for i in range(self.config.screen_size)
         ]).reshape(self.config.screen_size, self.config.screen_size)
-        sigma_array = np.array([
-            self.terrain.fuel_arrs[i][j].fuel.sigma
-            for j in range(self.config.screen_size)
-            for i in range(self.config.screen_size)
-        ]).reshape(self.config.screen_size, self.config.screen_size)
-        delta_array = np.array([
-            self.terrain.fuel_arrs[i][j].fuel.delta
-            for j in range(self.config.screen_size)
-            for i in range(self.config.screen_size)
-        ]).reshape(self.config.screen_size, self.config.screen_size)
-        M_x_array = np.array([
-            self.terrain.fuel_arrs[i][j].fuel.M_x for j in range(self.config.screen_size)
-            for i in range(self.config.screen_size)
-        ]).reshape(self.config.screen_size, self.config.screen_size)
+        # sigma_array = np.array([
+        #     self.terrain.fuel_arrs[i][j].fuel.sigma
+        #     for j in range(self.config.screen_size)
+        #     for i in range(self.config.screen_size)
+        # ]).reshape(self.config.screen_size, self.config.screen_size)
+        # delta_array = np.array([
+        #     self.terrain.fuel_arrs[i][j].fuel.delta
+        #     for j in range(self.config.screen_size)
+        #     for i in range(self.config.screen_size)
+        # ]).reshape(self.config.screen_size, self.config.screen_size)
+        # M_x_array = np.array([
+        #    self.terrain.fuel_arrs[i][j].fuel.M_x for j in range(self.config.screen_size)
+        #     for i in range(self.config.screen_size)
+        # ]).reshape(self.config.screen_size, self.config.screen_size)
         reset_mitigation = np.zeros([self.config.screen_size, self.config.screen_size])
 
         # (screen_size, screen_size, 4)
-        terrain = np.stack((w_0_array, sigma_array, delta_array, M_x_array), axis=-1)
-
-        state = {
-            'position': reset_position,
-            'terrain': terrain,
-            'elevation': self.terrain.elevations,
-            'mitigation': reset_mitigation
-        }
+        # terrain = np.stack((w_0_array, sigma_array, delta_array, M_x_array), axis=-1)
+        state = np.stack((reset_position, w_0_array,
+                          (self.terrain.elevations + self.config.noise_amplitude) /
+                          (2 * self.config.noise_amplitude), reset_mitigation))
 
         return state
 
@@ -282,11 +282,10 @@ class FireLineEnv():
         4   Scratchline
         5   Wetline
 
-        firemap: [0] firemap_with_agent: [0] -> reward = 0
+        firemap_with_agent: [2] -> reward = -1
+        firemap_with_agent: [3] -> reward = -1
         firemap: [2] firemap_with_agent: [0] -> reward = +1
-        firemap: [2] firemap_with_agent: [2] -> reward = -1
-        firemap: [2] firemap_with_agent: [3] -> reward = +1
-
+        else 0
 
         Input:
         ------
@@ -295,21 +294,40 @@ class FireLineEnv():
 
         Return:
         -------
-        int: score / difference between the firemaps
+        float: score / difference between the firemaps (normalized wrt screen size)
 
         '''
         reward = 0
+        mod = 0
+        unmod = 0
         for x in range(self.config.screen_size):
             for y in range(self.config.screen_size):
-                if fire_map[x][y] == 0 and fire_map_with_agent[x][y] == 0:
-                    reward += 0
-                elif fire_map[x][y] == 2 and fire_map_with_agent[x][y] == 0:
-                    reward += 1
-                elif fire_map[x][y] == 2 and fire_map_with_agent[x][y] == 2:
-                    reward -= 1
-                elif fire_map[x][y] == 2 and fire_map_with_agent[x][y] == 3:
-                    reward += 1
-        return reward
+                modified = fire_map_with_agent[x][y]
+                unmodified = fire_map[x][y]
+
+                # How well did the unmodified map perform at this tile
+                if unmodified == 0:
+                    unmod_reward = 0
+                if unmodified == 2:
+                    unmod_reward = -1
+                else:
+                    unmod_reward = 0
+
+                # How well did the modified map perform at this tile
+                if modified == 0:
+                    mod_reward = 0
+                elif modified == 2:
+                    mod_reward = -1
+                elif modified == 3:
+                    mod_reward = -1
+                else:
+                    mod_reward = 0
+
+                reward += mod_reward - unmod_reward
+                mod += mod_reward
+                unmod += unmod_reward
+
+        return reward / (self.config.screen_size * self.config.screen_size)
 
 
 class RLEnv(gym.Env):
@@ -334,7 +352,7 @@ class RLEnv(gym.Env):
 
         Num    Observation              min     max
         0      position                 0       1
-        1      Fuel (type)              0       5 [type, w_0, sigma, delta, M_x]
+        1      Fuel (w_0)               0       1
         2      Elevation                0       1 (float)
         3      mitigation               0       1
 
@@ -345,7 +363,7 @@ class RLEnv(gym.Env):
             Type: gym.spaces.Dict(Box(low=min, high=max, shape=(255,255,len(max))))
             Num    Observation              min     max
             0      position                 0       1
-            1      Fuel (type)              0       5
+            1      Fuel (w_0)               0       1
             2      Burned/Unburned          0       1
             3      mitigation               0       3
             4      Burn Stats               0       6
@@ -372,24 +390,15 @@ class RLEnv(gym.Env):
                             position is not the last tile.
         Reward of (fire_burned - fireline_burned) when done.
 
-        TODO: Will probably want to normalize (difference) to be [0,1] or
-                    something similar.
-                reward values between [0,1] result in better training.
-
         Starting State:
         ---------------
         The position of the agent always starts in the top right corner (0,0).
 
-
         Episode Termination:
         ---------------------
         The agent has traversed all pixels (screen_size, screen_size)
-
-    TODO: pull out Game functionality or make it a parameter to pass in
-            if we want to train w/o pygame rendering or if we do.
-
     '''
-    def __init__(self, config: FireLineEnv):
+    def __init__(self, simulation: FireLineEnv):
         '''
             Initialize the class by recording the state space.
 
@@ -404,14 +413,39 @@ class RLEnv(gym.Env):
 
         '''
 
-        self.config = config
-        self.action_space = gym.spaces.Discrete(len(self.config.actions))
-        self.observation_space = gym.spaces.Dict({
-            f'{i}': gym.spaces.Box(low=self.config.observ_spaces[i][0],
-                                   high=self.config.observ_spaces[i][1],
-                                   shape=self.config.observ_spaces[i][2])
-            for i in self.config.observ_spaces.keys()
-        })
+        self.simulation = simulation
+        self.action_space = gym.spaces.Discrete(len(self.simulation.actions))
+
+        channel_lows = [
+            self.simulation.observ_spaces[channel][0]
+            for channel in self.simulation.observ_spaces.keys()
+        ]
+        channel_highs = [
+            self.simulation.observ_spaces[channel][1]
+            for channel in self.simulation.observ_spaces.keys()
+        ]
+
+        low = [
+            channel_lows for _ in range(self.simulation.config.screen_size)
+            for _ in range(self.simulation.config.screen_size)
+        ]
+
+        high = [
+            channel_highs for _ in range(self.simulation.config.screen_size)
+            for _ in range(self.simulation.config.screen_size)
+        ]
+
+        self.low = np.reshape(
+            low, (self.simulation.config.screen_size, self.simulation.config.screen_size,
+                  len(self.simulation.observ_spaces.keys())))
+        self.high = np.reshape(
+            high, (self.simulation.config.screen_size, self.simulation.config.screen_size,
+                   len(self.simulation.observ_spaces.keys())))
+        self.observation_space = gym.spaces.Box(
+            np.float32(self.low),
+            np.float32(self.high),
+            shape=(self.simulation.config.screen_size, self.simulation.config.screen_size,
+                   len(self.simulation.observ_spaces.keys())))
 
         # always keep the same if terrain and fire position are static
         self.seed(1234)
@@ -464,46 +498,45 @@ class RLEnv(gym.Env):
         '''
 
         # Make the action on the env at agent's current location
-        self.state['mitigation'][self.current_agent_loc] = action
+        self.state[-1][self.current_agent_loc] = action
 
         # make a copy
         old_loc = deepcopy(self.current_agent_loc)
 
         # if we want to render as we step through the game
-        if self.config.config.render_inline:
-            self.config._render(self.state['mitigation'][self.current_agent_loc],
-                                self.state['position'][self.current_agent_loc],
-                                inline=True)
+        if self.simulation.config.render_inline:
+            self.simulation._render(self.state[-1][self.current_agent_loc],
+                                    self.state[0][self.current_agent_loc],
+                                    inline=True)
 
         # set the old position back to 0
-        self.state['position'][self.current_agent_loc] = 0
+        self.state[0][self.current_agent_loc] = 0
 
         # update position
         self._update_current_agent_loc()
-        self.state['position'][self.current_agent_loc] = 1
+        self.state[0][self.current_agent_loc] = 1
 
-        reward = 0 if action == 0 else -1
+        reward = 0  # if action == 0 else
+        # (-1 / (self.simulation.config.screen_size * self.simulation.config.screen_size))
 
         # If the agent is at the last location (cannot move forward)
         done = old_loc == self.current_agent_loc
         if done:
-
             # compare the state spaces
-            fire_map = self.config._run(self.state['mitigation'], self.state['position'])
+            fire_map = self.simulation._run(self.state[-1], self.state[0])
             # render only agent
-            if self.config.config.render_post_agent:
-                self.config._render(self.state['mitigation'], self.state['position'])
+            if self.simulation.config.render_post_agent:
+                self.simulation._render(self.state[-1], self.state[0])
 
-            fire_map_with_agent = self.config._run(self.state['mitigation'],
-                                                   self.state['position'], True)
+            fire_map_with_agent = self.simulation._run(self.state[-1], self.state[0],
+                                                       True)
             # render fire with agents mitigation in place
-            if self.config.config.render_post_agent_with_fire:
-                self.config._render(self.state['mitigation'],
-                                    self.state['position'],
-                                    mitigation_only=False,
-                                    mitigation_and_fire_spread=True)
-
-            reward += self.config._compare_states(fire_map, fire_map_with_agent)
+            if self.simulation.config.render_post_agent_with_fire:
+                self.simulation._render(self.state[-1],
+                                        self.state[0],
+                                        mitigation_only=False,
+                                        mitigation_and_fire_spread=True)
+            reward = self.simulation._compare_states(fire_map, fire_map_with_agent)
 
         return self.state, reward, done, {}
 
@@ -519,20 +552,20 @@ class RLEnv(gym.Env):
             less than/equal to screen size --> y-axis = None, x-axis += 1
 
         '''
-        x = self.current_agent_loc[0]
-        y = self.current_agent_loc[1]
+        row = self.current_agent_loc[0]
+        column = self.current_agent_loc[1]
 
         # If moving forward one would bring us out of bounds and we can move to new row
-        if x + 1 > (self.config.config.screen_size -
-                    1) and y + 1 <= (self.config.config.screen_size - 1):
-            x = 0
-            y += 1
+        if column + 1 > (self.simulation.config.screen_size -
+                         1) and row + 1 <= (self.simulation.config.screen_size - 1):
+            column = 0
+            row += 1
 
         # If moving forward keeps us in bounds
-        elif x + 1 <= (self.config.config.screen_size - 1):
-            x += 1
+        elif column + 1 <= (self.simulation.config.screen_size - 1):
+            column += 1
 
-        self.current_agent_loc = (x, y)
+        self.current_agent_loc = (row, column)
 
     def reset(self):
         '''
@@ -545,10 +578,10 @@ class RLEnv(gym.Env):
 
         '''
 
-        self.state = self.config._reset_state()
+        self.state = self.simulation._reset_state()
 
         # Place agent at location (0,0)
         self.current_agent_loc = (0, 0)
-        self.state['position'][self.current_agent_loc] = 1
+        self.state[0][self.current_agent_loc] = 1
 
         return self.state

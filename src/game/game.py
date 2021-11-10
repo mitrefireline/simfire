@@ -26,7 +26,7 @@ class Game():
         self.screen = pygame.display.set_mode((screen_size, screen_size))
 
         pygame.display.set_caption('Rothermel 2D Simulator')
-        pygame.display.set_icon(load_image('assets/icons/fireline_logo.png'))
+        pygame.display.set_icon(load_image('./assets/icons/fireline_logo.png'))
 
         # Create the background so it doesn't have to be recreated every update
         self.background = pygame.Surface(self.screen.get_size())

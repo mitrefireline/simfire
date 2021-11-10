@@ -184,4 +184,3 @@ U_dir: float = 135
 render_inline: str = False
 render_post_agent: str = False
 render_post_agent_with_fire: str = True
-

@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 
-from ... import config
+from . import test_config as config
 from ...game.sprites import Terrain
 from ...game.game import Game
 from ...enums import BurnStatus

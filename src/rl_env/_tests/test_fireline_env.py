@@ -204,11 +204,13 @@ class FireLineEnvTest(unittest.TestCase):
                                   mitigation_only=False,
                                   mitigation_and_fire_spread=True)
 
-        self.assertEqual(np.where(self.fireline_env.fire_map == 2),
-                         self.config.fire_init_pos,
-                         msg=(f'The number of sprites updated is '
-                              f'{len(np.where(self.fireline_env.fire_map == 2))} '
-                              f', but it should be {self.config.fire_init_pos}'))
+        all_burning_locs = list(zip(*np.where(self.fireline_env.fire_map == 2)))
+
+        self.assertIn(self.config.fire_init_pos,
+                      all_burning_locs,
+                      msg=(f'The number of sprites updated is '
+                           f'{len(np.where(self.fireline_env.fire_map == 2))} '
+                           f', but it should be {self.config.fire_init_pos}'))
 
     def test_update_sprite_points(self) -> None:
         '''

@@ -107,7 +107,7 @@ class FireManager():
         function will filter the points that are beyond the boundaries of
         the game screen and/or the points that are already `BURNED` or `BURNING`.
 
-        Parameters:
+        Arguments:
             x: The x coordinate of the location
             y: The y coordinate of the location
 

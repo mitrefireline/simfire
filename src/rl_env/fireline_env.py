@@ -1,5 +1,5 @@
 from copy import deepcopy
-from typing import Dict
+from typing import Dict, List, Tuple
 
 import gym
 import numpy as np
@@ -9,14 +9,14 @@ from src import config
 from src.game.game import Game
 from src.game.sprites import Terrain
 from src.enums import GameStatus, BurnStatus
-from src.world.parameters import Environment, FuelArray, FuelParticle, Tile
 from src.game.managers.fire import RothermelFireManager
+from src.world.parameters import Environment, FuelArray, FuelParticle, Tile
 from src.game.managers.mitigation import (FireLineManager, ScratchLineManager,
                                           WetLineManager)
 
 
 class FireLineEnv():
-    def __init__(self, config: config):
+    def __init__(self, config: config) -> None:
 
         self.config = config
         self.points = set([])
@@ -76,7 +76,7 @@ class FireLineEnv():
                 position_state: np.ndarray,
                 mitigation_only: bool = True,
                 mitigation_and_fire_spread: bool = False,
-                inline: bool = False):
+                inline: bool = False) -> None:
         '''
         This will take the pygame update command and perform the display updates
             for the following scenarios:
@@ -84,32 +84,22 @@ class FireLineEnv():
                 2. pro-active fire mitigation (full traversal)
                 3. pro-active fire mitigation (full traversal) + fire spread
 
-        Parameters
-        -----------
-        mitigation_state: np.ndarray
-                            Array of either the current agent mitigation
-                                or all mitigations.
+        Arguments:
+            mitigation_state: Array of either the current agent mitigation or all
+                              mitigations.
+            position_state: Array of either the current agent position only used when
+                            `inline == True`.
 
-        position_state: np.ndarray
-                        Array of either the current agent position only
-                            used when 'inline' == True
+            mitigation_only: Boolean value to only show agent mitigation stategy.
 
-        mitigation_only: bool = True
-                            Boolean value to only show agent mitigation stategy
+            mitigation_and_fire_spread: Boolean value to show agent mitigation stategy and
+                                        fire spread. Only used when agent has traversed
+                                        entire game board.
+            inline: Boolean value to use rendering at each call to step().
 
-        mitigation_and_fire_spread: bool = False
-                            Boolean value to show agent mitigation stategy and
-                                fire spread. Only used when agent has traversed
-                                etire game board.
-        inline: bool = False
-                Boolean value to use rendering at each call to step()
-
-        Return
-        -------
-        None
-
+        Returns:
+            None
         '''
-
         self.fire_manager = RothermelFireManager(self.config.fire_init_pos,
                                                  self.config.fire_size,
                                                  self.config.max_fire_duration,
@@ -155,25 +145,22 @@ class FireLineEnv():
     def _update_sprite_points(self,
                               mitigation_state,
                               position_state,
-                              inline: bool = False):
+                              inline: bool = False) -> None:
         '''
         Update sprite point list based on fire mitigation.
 
-        Parameters
-        -----------
-        mitigation_state: np.ndarray
-                            Array of mitigation value(s).
-                            0: No Control Line, 1: Control Line
-        position_state: np.ndarray
-                        Array of position. Only used when rendering `inline`
-        inline: bool
-                Boolean value of whether or not to render at each step() or after
-                    agent has placed control lines
-                If True, will use mitigation state, position_state to add a new
-                    point to the fireline sprites group
-                If False, loop through all mitigation_state array to get points
-                    to add to fireline sprites group
+        Arguments:
+            mitigation_state: Array of mitigation value(s). 0: No Control Line,
+                              1: Control Line
+            position_state: Array of position. Only used when rendering `inline`
+            inline: Boolean value of whether or not to render at each step() or after
+                    agent has placed control lines. If True, will use mitigation state,
+                    position_state to add a new point to the fireline sprites group.
+                    If False, loop through all mitigation_state array to get points to add
+                    to fireline sprites group.
 
+        Returns:
+            None
         '''
         if inline:
             if mitigation_state == 1:
@@ -191,32 +178,24 @@ class FireLineEnv():
              position_state: np.ndarray,
              mitigation: bool = False):
         '''
+        Runs the simulation with or without mitigation lines
 
         Use self.terrain to either:
-            1. Place agent's mitigation lines and then spread fire
-            2. Only spread fire, with no mitigation line
-                    (to compare for reward calculation)
 
-        Parameters
-        ----------
-        mitigation_state: np.ndarray
-                            Array of mitigation value(s).
-                            0: No Control Line, 1: Control Line
-        position_state: np.ndarray
-                        Array of current agent position.
-                        Only used when rendering `inline`
+          1. Place agent's mitigation lines and then spread fire
+          2. Only spread fire, with no mitigation line (to compare for reward calculation)
 
-        mitigation: bool
-                    Boolean value to update agent's mitigation staegy before
-                        fire spread.
+        Arguments:
+            mitigation_state: Array of mitigation value(s). 0: No Control Line,
+                              1: Control Line
+            position_state: Array of current agent position. Only used when rendering
+                            `inline`.
+            mitigation: Boolean value to update agent's mitigation staegy before fire
+                        spread.
 
-        Return
-        ------
-        fire_map: np.ndarray
-                    Burned/Unburned/ControlLine pixel map.
-                    Values range from [0, 6]
+        Returns:
+            fire_map: Burned/Unburned/ControlLine pixel map. Values range from [0, 6]
         '''
-
         # reset the fire status to running
         self.fire_status = GameStatus.RUNNING
         # initialize fire strategy
@@ -245,6 +224,7 @@ class FireLineEnv():
         This function will convert the initialized terrain
             to the gym.spaces.Box format.
 
+        ```
         self.current_agent_loc --> [:,:,0]
         self.terrain.fuel_arrs.type --> [:,:,1[0]]
         self.terrain.fuel_arrs.w_0 --> [:,:,1[1]]
@@ -253,16 +233,13 @@ class FireLineEnv():
         self.terrain.fuel_arrs.M_x --> [:,:,1[4]]
         self.elevation --> [:,:,2]
         self.mitigation --> [:,:,3]
+        ```
 
-        Parameters
-        -----------
-        None
+        Arguments:
+            None
 
-        Return
-        -------
-        state: Dict[np.ndarray]
-
-
+        Returns:
+            state: The reset state of the simulation.
         '''
         reset_position = np.zeros([self.config.screen_size, self.config.screen_size])
 
@@ -295,35 +272,37 @@ class FireLineEnv():
 
         return state
 
-    def _compare_states(self, fire_map, fire_map_with_agent):
+    def _compare_states(self, fire_map: np.ndarray,
+                        fire_map_with_agent: np.ndarray) -> float:
         '''
         Calculate the reward for the agent's actions.
+
+        Possible `fire_map` values:
+
+        | Burn Status | Value |
+        |-------------|-------|
+        | Unburned    | 0     |
+        | Burning     | 1     |
+        | Burned      | 2     |
+        | Fireline    | 3     |
+        | Scratchline | 4     |
+        | Wetline     | 5     |
+
         Reward is determined by:
+        ```
+            firemap_with_agent: [2] -> reward = -1
+            firemap_with_agent: [3] -> reward = -1
+            firemap: [2] firemap_with_agent: [0] -> reward = +1
+            else 0
+        ```
 
-        TYPE:                   min:     max:
-        ------                  ----    ----
-        Burn Stats               0       6
+        Arguments:
+            fire_map: `np.ndarray` with possible values [0, 2]
+            fire_map_with_agent: `np.ndarray` with possible values [0, 2, 3]
 
-        0   Unburned
-        1   Burning (this should never be used at the very end of a sim)
-        2   Burned
-        3   Fireline
-        4   Scratchline
-        5   Wetline
-
-        firemap_with_agent: [2] -> reward = -1
-        firemap_with_agent: [3] -> reward = -1
-        firemap: [2] firemap_with_agent: [0] -> reward = +1
-        else 0
-
-        Input:
-        ------
-        fire_map [0, 2]
-        fire_map_with_agent [0, 2, 3]
-
-        Return:
-        -------
-        float: score / difference between the firemaps (normalized wrt screen size)
+        Returns:
+            score / difference between the firemaps (normalized with respect to screen
+            size).
 
         '''
         reward = 0
@@ -361,87 +340,89 @@ class FireLineEnv():
 
 class RLEnv(gym.Env):
     '''
-        This Environment Catcher will record all environments/actions
-            for the RL return states.
-        Inlcuding: Observation, Reward (or Penalty), "done", and any meta-data.
+    This Environment Catcher will record all environments/actions for the RL return
+    states.
 
-        This class will incorporate all gamelogic, input and rendering.
+    This includes: Observation, Reward (or Penalty), "done", and any meta-data.
 
-        It will also incorporate everything related to pygame into the render()
-            method and separate init() and init_render() methods.
+    This class will incorporate all gamelogic, input and rendering.
 
-        We can then render ML routines using the step() and reset() method
-            w/o loading the pygame package each step - if the environment is loaded,
-            the rendering is not needed for training (saves execution time).
+    It will also incorporate everything related to pygame into the `render()` method and
+    separate `__init__()` and `init_render()` methods.
 
-        Observation:
-        ------------
-        Type: gym.spaces.Dict(Box(low=min, high=max, shape=(255,255,len(max))))
+    We can then render ML routines using the step() and reset() method w/o loading the
+    pygame package each step - if the environment is loaded, the rendering is not needed
+    for training (saves execution time).
 
+    Observation:
+    ------------
+    Type: gym.spaces.Dict(Box(low=min, high=max, shape=(255,255,len(max))))
 
-        Num    Observation              min     max
-        0      position                 0       1
-        1      Fuel (w_0)               0       1
-        2      Elevation                0       1 (float)
-        3      mitigation               0       1
+    | Number | Observation | min | max |
+    |--------|-------------|-----|-----|
+    | 0      | Position    | 0   | 1   |
+    | 1      | Fuel (w_0)  | 0   | 1   |
+    | 2      | Elevation   | 0   | 1.0 |
+    | 3      | Mitigation  | 0   | 1   |
 
+    In Reactive Case:
+    -----------------
+    Type: gym.spaces.Dict(Box(low=min, high=max, shape=(255,255,len(max))))
 
+    | Number | Observation | min | max |
+    |--------|-------------|-----|-----|
+    | 0      | Position    | 0   | 1   |
+    | 1      | Fuel (w_0)  | 0   | 1   |
+    | 2      | Elevation   | 0   | 1   |
+    | 3      | Mitigation  | 0   | 1   |
 
-            In Reactive Case:
-            -----------------
-            Type: gym.spaces.Dict(Box(low=min, high=max, shape=(255,255,len(max))))
-            Num    Observation              min     max
-            0      position                 0       1
-            1      Fuel (w_0)               0       1
-            2      Burned/Unburned          0       1
-            3      mitigation               0       3
-            4      Burn Stats               0       6
+    Actions:
+    --------
+    Type: Discrete(4) -- real-valued (on / off)
 
-
-        Actions:
-        --------
-        Type: Discrete(4) -- real-valued (on / off)
-        Num    Action
-        0      None
-        1      Fireline
-
-        TODO:
-        -------
-        2      ScratchLine
-        3      WetLine
+    | Num | Action            |
+    |-----|-------------------|
+    | 0   | None              |
+    | 1   | Fireline          |
+    | 2   | Scratchline (TBD) |
+    | 3   | Wetline (TBD)     |
 
 
-        Reward:
-        -------
-        Reward of 0 when 'None' action is taken and position is not
-                            the last tile.
-        Reward of -1 when 'Trench, ScratchLine, WetLine' action is taken and agent
-                            position is not the last tile.
-        Reward of (fire_burned - fireline_burned) when done.
+    Reward:
+    -------
+    - Reward of 0 when 'None' action is taken and position is not the last tile.
+    - Reward of -1 when 'Trench, ScratchLine, WetLine' action is taken and agent
+      position is not the last tile.
+    - Reward of (fire_burned - fireline_burned) when done.
 
-        Starting State:
-        ---------------
-        The position of the agent always starts in the top right corner (0,0).
+    Starting State:
+    ---------------
+    The position of the agent always starts in the top right corner (0,0).
 
-        Episode Termination:
-        ---------------------
-        The agent has traversed all pixels (screen_size, screen_size)
+    Episode Termination:
+    ---------------------
+    The agent has traversed all pixels (screen_size, screen_size)
     '''
-    def __init__(self, simulation: FireLineEnv):
+    def __init__(self, simulation: FireLineEnv) -> None:
         '''
-            Initialize the class by recording the state space.
+        Initialize the class by recording the state space
 
-            Using a self.configurable terrain and fire start position:
-                Need to step through the state space twice:
-                    1. Let the agent step through the space and draw firelines
-                    2. Let the environemnt progress w/o agent
-                Compare the two state spaces.
+        Using a configurable terrain and fire start position, compare the two state
+        spaces.
 
-            Initialize the observation space and state space as described
-                in the docstrings
+        Need to step through the state space twice:
 
+          1. Let the agent step through the space and draw firelines
+          2. Let the environemnt progress w/o agent
+
+        Initialize the observation space and state space as described in the docstrings.
+
+        Arguments:
+            simulation: A `FireLineEnv` environment that will be used by the agent.
+
+        Returns:
+            None
         '''
-
         self.simulation = simulation
         self.action_space = gym.spaces.Discrete(len(self.simulation.actions))
 
@@ -479,51 +460,45 @@ class RLEnv(gym.Env):
         # always keep the same if terrain and fire position are static
         self.seed(1234)
 
-    def seed(self, seed: float = None):
+    def seed(self, seed: float = None) -> List[float]:
         '''
         Set the seed for numpy random methods.
 
         Arguments:
-            seed: Random seeding value
+            seed: Random seeding value.
 
         Returns:
-            Random seeding value
+            Random seeding value.
         '''
-
         self.np_random, seed = seeding.np_random(seed)
         return [seed]
 
-    def step(self, action: Dict[int, int]):
+    def step(self, action: Dict[int, int]) ->\
+            Tuple[Dict[str, Tuple[int, int, int]], float, bool]:
         '''
         This function will apply the action to the agent in the current state.
 
-        Calculate new agent/state_space position by reseting old position to zero,
-            call the _update_current_agent_loc() method and set new
-            agent/state_space location to 1.
+        Calculate new agent/state_space position by reseting old position to zero, call
+        the `_update_current_agent_loc()` method and set new `agent`/`state_space`
+        location to 1.
 
-        Done: Occurs when the agent has traversed the entire game
-                position: [screen_size, screen_size]
+        `done` occurs when the agent has traversed the entire game position:
+        `[screen_size, screen_size]`
 
+        Arguments:
+            action: A dictionary of action location.
 
-        Input:
-        -------
+        Returns:
+            A tuple of the `self.state` dictionary seen below:
 
-        action: int
+            {'position': (screen_size, screen_size, 1),
+             'terrain': (screen_size, screen_size, 5),
+             'elevation': (screen_size, screen_size, 1),
+             'mitigation': (screen_size, screen_size, 1)}
 
-        Return:
-        -------
-        observation: Dict(
-                        'position': (screen_size, screen_size, 1),
-                        'terrain': (screen_size, screen_size, 5),
-                        'elevation': (screen_size, screen_size, 1),
-                        'mitigation': (screen_size, screen_size, 1)
-                        )
-
-        reward: -1 if trench, 0 if None
-        done: end simulation, calculate state differences
-        info: extra meta-data
+            The reward for the step, whether or not the simulation is `done`, and a
+            dictionary containing metadata.
         '''
-
         # Make the action on the env at agent's current location
         self.state[-1][self.current_agent_loc] = action
 
@@ -567,19 +542,24 @@ class RLEnv(gym.Env):
 
         return self.state, reward, done, {}
 
-    def _update_current_agent_loc(self):
+    def _update_current_agent_loc(self) -> None:
         '''
-        This function will help update the current position
-            as it traverses the game.
+        This function will help update the current position as it traverses the game.
 
-        Check if the y-axis is less than the screen-size and the
-            x-axis is greater than the screen size --> y-axis += 1, x-axis = 0
+        Check if the y-axis is less than the screen-size and the x-axis is greater than
+        the screen size --> y-axis += 1, x-axis = 0
 
         Check if the y-axis is less than the screen-size and the x-axis is greater than
         the screen size --> y-axis += 1, x-axis = 0
 
         Check if the x-axis is less than screen size and the y-axis is less than/equal
         to screen size --> y-axis = None, x-axis += 1
+
+        Arguments:
+            None
+
+        Returns:
+            None
         '''
         row = self.current_agent_loc[0]
         column = self.current_agent_loc[1]
@@ -596,17 +576,26 @@ class RLEnv(gym.Env):
 
         self.current_agent_loc = (row, column)
 
-    def reset(self):
+    def reset(self) -> Dict[str, Tuple[int, int, int]]:
         '''
         Reset environment to initial state.
+
         NOTE: reset() must be called before you can call step() for the first time.
 
-        Terrain is received from the sim.
-        position matrix is assumed to be all 0's when received from sim.
-            Updated to have agent at (0,0) on reset.
+        Terrain is received from the sim. Position matrix is assumed to be all 0's when
+        received from sim. Updated to have agent at (0,0) on reset.
 
+        Arguments:
+            None
+
+        Returns:
+            `self.state`, a dictionary with the following structure:
+
+            {'position': (screen_size, screen_size, 1),
+             'terrain': (screen_size, screen_size, 5),
+             'elevation': (screen_size, screen_size, 1),
+             'mitigation': (screen_size, screen_size, 1)}
         '''
-
         self.state = self.simulation._reset_state()
 
         # Place agent at location (0,0)

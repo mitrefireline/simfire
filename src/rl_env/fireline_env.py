@@ -1,16 +1,16 @@
-# from dataclasses import astuple
-
-import numpy as np
-import gym
 from copy import deepcopy
+
+import gym
+import numpy as np
 from gym.utils import seeding
-from src.enums import GameStatus, BurnStatus
-from src import config
-from src.game.sprites import Terrain
-from src.game.game import Game
-from src.world.parameters import Environment, FuelArray, FuelParticle, Tile
-from src.game.managers.fire import RothermelFireManager
-from src.game.managers.mitigation import (FireLineManager, ScratchLineManager,
+
+from ..enums import GameStatus, BurnStatus
+from .. import config
+from ..game.sprites import Terrain
+from ..game.game import Game
+from ..world.parameters import Environment, FuelArray, FuelParticle, Tile
+from ..game.managers.fire import RothermelFireManager
+from ..game.managers.mitigation import (FireLineManager, ScratchLineManager,
                                           WetLineManager)
 
 

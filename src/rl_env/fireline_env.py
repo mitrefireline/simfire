@@ -11,7 +11,7 @@ from ..game.game import Game
 from ..world.parameters import Environment, FuelArray, FuelParticle, Tile
 from ..game.managers.fire import RothermelFireManager
 from ..game.managers.mitigation import (FireLineManager, ScratchLineManager,
-                                          WetLineManager)
+                                        WetLineManager)
 
 
 class FireLineEnv():

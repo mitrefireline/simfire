@@ -4,7 +4,7 @@ import numpy as np
 from skimage.draw import line
 
 from .... import config as cfg
-from ....game.Game import Game
+from ....game.game import Game
 from ....enums import BurnStatus
 from ....world.elevation_functions import flat
 from ....world.parameters import FuelArray, Tile
@@ -18,7 +18,8 @@ class TestControlLineManager(unittest.TestCase):
     using the `FireLineManager` as a proxy.
     '''
     def setUp(self) -> None:
-        points = line(100, 15, 100, 200)
+        points = line(cfg.terrain_size, cfg.terrain_size + 1, cfg.terrain_size,
+                      cfg.terrain_size + 1)
         y = points[0].tolist()
         x = points[1].tolist()
         self.manager = FireLineManager
@@ -30,7 +31,7 @@ class TestControlLineManager(unittest.TestCase):
                       cfg.terrain_map[i][j]) for j in range(cfg.terrain_size)
         ] for i in range(cfg.terrain_size)]
 
-        self.terrain = Terrain(fuel_arrs, flat())
+        self.terrain = Terrain(fuel_arrs, flat(), cfg.terrain_size, cfg.screen_size)
 
     def test_add_point(self) -> None:
         '''
@@ -98,7 +99,7 @@ class TestFireLineManager(unittest.TestCase):
                       cfg.terrain_map[i][j]) for j in range(cfg.terrain_size)
         ] for i in range(cfg.terrain_size)]
 
-        self.terrain = Terrain(fuel_arrs, flat())
+        self.terrain = Terrain(fuel_arrs, flat(), cfg.terrain_size, cfg.screen_size)
 
     def test_init(self) -> None:
         '''
@@ -138,7 +139,7 @@ class TestScratchLineManager(unittest.TestCase):
                       cfg.terrain_map[i][j]) for j in range(cfg.terrain_size)
         ] for i in range(cfg.terrain_size)]
 
-        self.terrain = Terrain(fuel_arrs, flat())
+        self.terrain = Terrain(fuel_arrs, flat(), cfg.terrain_size, cfg.screen_size)
 
     def test_init(self) -> None:
         '''
@@ -178,7 +179,7 @@ class TestWetLineManager(unittest.TestCase):
                       cfg.terrain_map[i][j]) for j in range(cfg.terrain_size)
         ] for i in range(cfg.terrain_size)]
 
-        self.terrain = Terrain(fuel_arrs, flat())
+        self.terrain = Terrain(fuel_arrs, flat(), cfg.terrain_size, cfg.screen_size)
 
     def test_init(self) -> None:
         '''

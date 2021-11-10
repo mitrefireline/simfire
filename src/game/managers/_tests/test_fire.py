@@ -26,10 +26,11 @@ class TestFireManager(unittest.TestCase):
         fire_map = np.full((cfg.screen_size, cfg.screen_size), BurnStatus.UNBURNED)
         # Create a sprite that is past the duration
         new_sprite = Fire(self.init_pos, self.fire_size)
-        new_sprite.duration = cfg.max_fire_duration + 1
         sprites = [new_sprite]
+        durations = [cfg.max_fire_duration + 1]
 
         self.fire_manager.sprites = sprites
+        self.fire_manager.durations = durations
         self.fire_manager._prune_sprites(fire_map)
 
         self.assertEqual(len(self.fire_manager.sprites),
@@ -88,7 +89,7 @@ class TestRothermelFireManager(unittest.TestCase):
             FuelArray(Tile(j, i, cfg.terrain_scale, cfg.terrain_scale),
                       cfg.terrain_map[i][j]) for j in range(cfg.terrain_size)
         ] for i in range(cfg.terrain_size)]
-        self.terrain = Terrain(fuel_arrs, flat())
+        self.terrain = Terrain(fuel_arrs, flat(), cfg.terrain_size, cfg.screen_size)
 
         self.environment = Environment(cfg.M_f, cfg.U, cfg.U_dir)
 

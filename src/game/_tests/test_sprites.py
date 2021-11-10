@@ -16,7 +16,8 @@ class TestTerrain(unittest.TestCase):
                       cfg.terrain_map[i][j]) for j in range(cfg.terrain_size)
         ] for i in range(cfg.terrain_size)]
 
-        self.terrain = Terrain(self.tiles, cfg.elevation_fn)
+        self.terrain = Terrain(self.tiles, cfg.elevation_fn, cfg.terrain_size,
+                               cfg.screen_size)
 
     def test_image_loc_and_size(self) -> None:
         '''
@@ -104,19 +105,6 @@ class TestFire(unittest.TestCase):
         self.assertTupleEqual((w, h), (self.size, self.size),
                               msg=(f'The fire has (width, height) size of ({w}, {h}), '
                                    f'but should have size of ({self.size}, {self.size})'))
-
-    def test_update(self) -> None:
-        '''
-        Test that the fire updates the duration counter correctly.
-        '''
-        num_updates = 5
-        for _ in range(num_updates):
-            self.fire.update()
-
-        self.assertEqual(self.fire.duration,
-                         num_updates,
-                         msg=(f'The fire duration is {self.fire.duration} frames, '
-                              f'but should be {num_updates} frames'))
 
     def test_layer(self) -> None:
         '''

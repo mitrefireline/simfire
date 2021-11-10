@@ -1,18 +1,15 @@
-import pygame
 from skimage.draw import line
-import random
 import src.config as cfg
 from src.enums import GameStatus
-from src.game.Game import Game
+from src.game.game import Game
 from src.game.managers.fire import RothermelFireManager
 from src.game.managers.mitigation import FireLineManager
 from src.game.sprites import Terrain
 from src.world.parameters import Environment, FuelArray, FuelParticle, Tile
-from src.rl_env.fireline_env import FireLineEnv
 
 
 def main():
-    pygame.init()
+
     game = Game(cfg.screen_size)
 
     fuel_particle = FuelParticle()
@@ -21,7 +18,7 @@ def main():
         FuelArray(Tile(j, i, cfg.terrain_scale, cfg.terrain_scale), cfg.terrain_map[i][j])
         for j in range(cfg.terrain_size)
     ] for i in range(cfg.terrain_size)]
-    terrain = Terrain(fuel_arrs, cfg.elevation_fn)
+    terrain = Terrain(fuel_arrs, cfg.elevation_fn, cfg.terrain_size, cfg.screen_size)
     environment = Environment(cfg.M_f, cfg.U, cfg.U_dir)
 
     points = line(100, 15, 100, 200)
@@ -53,32 +50,5 @@ def main():
         game.fire_map = fire_map
 
 
-def some_action_func(state):
-    '''
-    A dummy function to show how the rl side ingests the state
-        and returns a dict() of the fire mitigation stategy
-    '''
-    fire_mitigation = random.randint(0, 1)
-    return fire_mitigation
-
-
-def rl_main():
-    # initilize the rl_env()
-    import os
-    os.environ['SDL_VIDEODRIVER'] = 'dummy'
-
-    rl_environment = FireLineEnv()
-
-    state = rl_environment.reset()
-    game_status = GameStatus.RUNNING
-    while game_status == GameStatus.RUNNING:
-        action = some_action_func(state)
-        state, _, _, _ = rl_environment.step(action)
-        game_status = rl_environment.render()
-
-    pygame.quit()
-
-
 if __name__ == '__main__':
     main()
-    # rl_main()

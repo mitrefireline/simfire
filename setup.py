@@ -15,7 +15,7 @@ with open('README.md', 'r', encoding='utf-8') as fh:
 # Find the packages and correctly label name them for `setup`
 # Make sure to exclude _tests
 packages = setuptools.find_packages(where='src', exclude=['*_tests*'])
-packages = ['rothsim.' + p for p in packages] + ['rothsim']
+packages = ['rothsim.' + p for p in packages] + ['rothsim'] + ['assets']
 
 setuptools.setup(
     name='rothsim',
@@ -29,8 +29,12 @@ setuptools.setup(
         'Documentation': 'https://fireline.pages.mitre.org/rothermel-modeling/'
     },
     classifiers=['Programming Language :: Python :: 3'],
-    package_dir={'rothsim': 'src'},
+    package_dir={
+        'rothsim': 'src',
+        'assets': 'assets'
+    },
     packages=packages,
+    package_data={'assets': ['../assets/**/*']},
     author='The MITRE Corporation',
     author_email='twelsh@mitre.org',
 )

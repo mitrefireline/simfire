@@ -464,16 +464,20 @@ class RLEnv(gym.Env):
         ]
 
         self.low = np.reshape(
-            low, (self.simulation.config.screen_size, self.simulation.config.screen_size,
-                  len(self.simulation.observ_spaces.keys())))
+            low, (len(self.simulation.observ_spaces.keys()),
+                  self.simulation.config.screen_size, self.simulation.config.screen_size))
+
         self.high = np.reshape(
-            high, (self.simulation.config.screen_size, self.simulation.config.screen_size,
-                   len(self.simulation.observ_spaces.keys())))
+            high,
+            (len(self.simulation.observ_spaces.keys()),
+             self.simulation.config.screen_size, self.simulation.config.screen_size))
+
         self.observation_space = gym.spaces.Box(
             np.float32(self.low),
             np.float32(self.high),
-            shape=(self.simulation.config.screen_size, self.simulation.config.screen_size,
-                   len(self.simulation.observ_spaces.keys())))
+            shape=(len(self.simulation.observ_spaces.keys()),
+                   self.simulation.config.screen_size,
+                   self.simulation.config.screen_size))
 
         # always keep the same if terrain and fire position are static
         self.seed(1234)

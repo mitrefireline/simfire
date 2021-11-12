@@ -466,7 +466,8 @@ class RLEnv(gym.Env):
             np.float32(self.high),
             shape=(len(self.simulation.observ_spaces.keys()),
                    self.simulation.config.screen_size,
-                   self.simulation.config.screen_size))
+                   self.simulation.config.screen_size),
+            dtype=np.float64)
 
         # always keep the same if terrain and fire position are static
         self.seed(1234)

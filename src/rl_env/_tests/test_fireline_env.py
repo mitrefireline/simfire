@@ -4,7 +4,7 @@ import numpy as np
 from . import test_config as config
 from ...game.sprites import Terrain
 from ...game.game import Game
-from ...enums import BurnStatus
+from ...enums import BurnStatus, GameStatus
 from ...world.parameters import Environment, FuelArray, FuelParticle, Tile
 from ...game.managers.fire import RothermelFireManager
 from ...game.managers.mitigation import FireLineManager
@@ -165,8 +165,6 @@ class FireLineEnvTest(unittest.TestCase):
 
         Assert the points get updated in the `fireline_sprites` group.
 
-        TODO: FIX - Putting a control_line "down" before spreading fire, the `fire_map`
-        changes from `GameStatus.FIRELINE` -> `GameStatus.BURNED`
         '''
         current_agent_loc = (1, 1)
 
@@ -204,13 +202,11 @@ class FireLineEnvTest(unittest.TestCase):
                                   mitigation_only=False,
                                   mitigation_and_fire_spread=True)
 
-        all_burning_locs = list(zip(*np.where(self.fireline_env.fire_map == 2)))
-
-        self.assertIn(self.config.fire_init_pos,
-                      all_burning_locs,
-                      msg=(f'The number of sprites updated is '
-                           f'{len(np.where(self.fireline_env.fire_map == 2))} '
-                           f', but it should be {self.config.fire_init_pos}'))
+        self.assertEqual(
+            self.fireline_env.fire_status,
+            GameStatus.QUIT,
+            msg=f'The returned state of the Game is {self.fireline_env.game_status} '
+            ' but, should be GameStatus.QUIT.')
 
     def test_update_sprite_points(self) -> None:
         '''

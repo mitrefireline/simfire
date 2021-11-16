@@ -1,4 +1,5 @@
 from typing import Sequence
+from importlib import resources
 
 import numpy as np
 import pygame
@@ -28,7 +29,9 @@ class Game():
         self.screen = pygame.display.set_mode((screen_size, screen_size))
 
         pygame.display.set_caption('Rothermel 2D Simulator')
-        pygame.display.set_icon(load_image('assets/icons/fireline_logo.png'))
+        with resources.path('assets.icons', 'fireline_logo.png') as path:
+            fireline_logo_path = path
+        pygame.display.set_icon(load_image(fireline_logo_path))
 
         # Create the background so it doesn't have to be recreated every update
         self.background = pygame.Surface(self.screen.get_size())

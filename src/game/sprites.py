@@ -7,10 +7,8 @@ import numpy as np
 from PIL import Image, ImageDraw
 import pygame
 
-from .image import load_image
-from ..enums import BurnStatus, DRY_TERRAIN_BROWN_IMG, SpriteLayer,\
-    TERRAIN_TEXTURE_PATH, FIRELINE_TEXTURE_PATH, SCRATCHLINE_TEXTURE_PATH,\
-    WETLINE_TEXTURE_PATH, BURNED_RGB_COLOR
+from ..enums import (BurnStatus, DRY_TERRAIN_BROWN_IMG, SpriteLayer, TERRAIN_TEXTURE_PATH,
+                     BURNED_RGB_COLOR)
 from ..world.elevation_functions import ElevationFn
 from ..world.parameters import FuelArray
 
@@ -79,7 +77,7 @@ class Terrain(pygame.sprite.Sprite):
             None
 
         Returns:
-            None
+            The returned NumPy array of the texture.
         '''
         out_size = (self.terrain_size, self.terrain_size)
         texture = Image.open(TERRAIN_TEXTURE_PATH)
@@ -233,7 +231,7 @@ class Fire(pygame.sprite.Sprite):
     def __init__(self, pos: Tuple[int, int], size: int) -> None:
         '''
         Initialize the class by recording the position and size of the sprite
-        and loading/resizing its texture.
+        and creating a solid color texture.
 
         Arguments:
             pos: The (x, y) pixel position of the sprite
@@ -244,11 +242,11 @@ class Fire(pygame.sprite.Sprite):
         self.pos = pos
         self.size = size
 
-        fire_texture = np.zeros((self.size, self.size, 3))
-        fire_texture[:, :, 0] = 255
-        fire_texture[:, :, 1] = 153
-        fire_texture[:, :, 2] = 51
-        self.image = pygame.surfarray.make_surface(fire_texture)
+        fire_color = np.zeros((self.size, self.size, 3))
+        fire_color[:, :, 0] = 255
+        fire_color[:, :, 1] = 153
+        fire_color[:, :, 2] = 51
+        self.image = pygame.surfarray.make_surface(fire_color)
 
         self.rect = self.image.get_rect()
         self.rect = self.rect.move(self.pos[0], self.pos[1])
@@ -257,13 +255,9 @@ class Fire(pygame.sprite.Sprite):
         # Layer 3 so that it appears on top of the terrain and line (if applicable)
         self.layer: int = SpriteLayer.FIRE
 
-        # Record how many frames this sprite has been alive
-        self.duration: int = 0
-
     def update(self) -> None:
         '''
-        Check which squares the fire is on and adjacent to and update its
-        spread.
+        Currently unused.
 
         Arguments:
             None
@@ -271,8 +265,7 @@ class Fire(pygame.sprite.Sprite):
         Returns:
             None
         '''
-        # Increment the duration
-        self.duration += 1
+        pass
 
 
 class FireLine(pygame.sprite.Sprite):
@@ -284,15 +277,18 @@ class FireLine(pygame.sprite.Sprite):
     def __init__(self, pos: Tuple[int, int], size: int) -> None:
         '''
         Initialize the class by recording the position and size of the sprite
-        and loading/resizing its texture
+        and creating a solid color texture.
         '''
         super().__init__()
 
         self.pos = pos
         self.size = size
 
-        self.image = load_image(FIRELINE_TEXTURE_PATH)
-        self.image = pygame.transform.scale(self.image, (self.size, self.size))
+        fireline_color = np.zeros((self.size, self.size, 3))
+        fireline_color[:, :, 0] = 155  # R
+        fireline_color[:, :, 1] = 118  # G
+        fireline_color[:, :, 2] = 83  # B
+        self.image = pygame.surfarray.make_surface(fireline_color)
 
         self.rect = self.image.get_rect()
         self.rect = self.rect.move(self.pos[0], self.pos[1])
@@ -323,15 +319,18 @@ class ScratchLine(pygame.sprite.Sprite):
     def __init__(self, pos: Tuple[int, int], size: int) -> None:
         '''
         Initialize the class by recording the position and size of the sprite
-        and loading/resizing its texture
+        and creating a solid color texture.
         '''
         super().__init__()
 
         self.pos = pos
         self.size = size
 
-        self.image = load_image(SCRATCHLINE_TEXTURE_PATH)
-        self.image = pygame.transform.scale(self.image, (self.size, self.size))
+        scratchline_color = np.zeros((self.size, self.size, 3))
+        scratchline_color[:, :, 0] = 139  # R
+        scratchline_color[:, :, 1] = 125  # G
+        scratchline_color[:, :, 2] = 58  # B
+        self.image = pygame.surfarray.make_surface(scratchline_color)
 
         self.rect = self.image.get_rect()
         self.rect = self.rect.move(self.pos[0], self.pos[1])
@@ -362,15 +361,18 @@ class WetLine(pygame.sprite.Sprite):
     def __init__(self, pos: Tuple[int, int], size: int) -> None:
         '''
         Initialize the class by recording the position and size of the sprite
-        and loading/resizing its texture
+        and creating a color texture.
         '''
         super().__init__()
 
         self.pos = pos
         self.size = size
 
-        self.image = load_image(WETLINE_TEXTURE_PATH)
-        self.image = pygame.transform.scale(self.image, (self.size, self.size))
+        wetline_color = np.zeros((self.size, self.size, 3))
+        wetline_color[:, :, 0] = 212  # R
+        wetline_color[:, :, 1] = 241  # G
+        wetline_color[:, :, 2] = 249  # B
+        self.image = pygame.surfarray.make_surface(wetline_color)
 
         self.rect = self.image.get_rect()
         self.rect = self.rect.move(self.pos[0], self.pos[1])

@@ -1,6 +1,4 @@
-import pygame
 from skimage.draw import line
-
 import src.config as cfg
 from src.enums import GameStatus
 from src.game.game import Game
@@ -12,7 +10,7 @@ from src.world.wind import WindController
 
 
 def main():
-    pygame.init()
+
     game = Game(cfg.screen_size)
 
     fuel_particle = FuelParticle()
@@ -64,8 +62,6 @@ def main():
         fire_map = fireline_manager.update(fire_map)
         fire_map, fire_status = fire_manager.update(fire_map)
         game.fire_map = fire_map
-
-    pygame.quit()
 
 
 if __name__ == '__main__':

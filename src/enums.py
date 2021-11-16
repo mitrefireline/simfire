@@ -8,16 +8,16 @@ different types of control lines, and the current game status.
 '''
 from typing import Tuple
 from dataclasses import dataclass
+from pathlib import Path
+from importlib import resources
+
 from enum import auto, Enum, IntEnum
 
 import numpy as np
 from PIL import Image
 
-TERRAIN_TEXTURE_PATH: str = 'assets/textures/terrain.jpg'
-FIRE_TEXTURE_PATH: str = 'assets/textures/flames.png'
-FIRELINE_TEXTURE_PATH: str = 'assets/textures/fire_line.jpg'
-SCRATCHLINE_TEXTURE_PATH: str = 'assets/textures/scratch_line.jpg'
-WETLINE_TEXTURE_PATH: str = 'assets/textures/wet_line.jpg'
+with resources.path('assets.textures', 'terrain.jpg') as path:
+    TERRAIN_TEXTURE_PATH: Path = path
 
 DRY_TERRAIN_BROWN_IMG: Image.Image = Image.fromarray(
     np.full((10, 10, 3), (205, 133, 63), dtype=np.uint8))

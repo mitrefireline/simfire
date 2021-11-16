@@ -68,7 +68,7 @@ class FireLineEnv():
             # 'm_x': (0, 1),
             # 'm_f': (0, 1)
             'elevation': (0, 1),
-            'mitigation': (0, len(self.actions))
+            'mitigation': (0, len(self.actions) - 1)
         }
 
     def _render(self,
@@ -426,36 +426,30 @@ class RLEnv(gym.Env):
         self.simulation = simulation
         self.action_space = gym.spaces.Discrete(len(self.simulation.actions))
 
-        channel_lows = [
-            self.simulation.observ_spaces[channel][0]
-            for channel in self.simulation.observ_spaces.keys()
-        ]
-        channel_highs = [
-            self.simulation.observ_spaces[channel][1]
-            for channel in self.simulation.observ_spaces.keys()
-        ]
+        channel_lows = np.array([[[self.simulation.observ_spaces[channel][0]]]
+                                 for channel in self.simulation.observ_spaces.keys()])
+        channel_highs = np.array([[[self.simulation.observ_spaces[channel][1]]]
+                                  for channel in self.simulation.observ_spaces.keys()])
 
-        low = [
-            channel_lows for _ in range(self.simulation.config.screen_size)
-            for _ in range(self.simulation.config.screen_size)
-        ]
+        self.low = np.repeat(np.repeat(channel_lows,
+                                       self.simulation.config.screen_size,
+                                       axis=1),
+                             self.simulation.config.screen_size,
+                             axis=2)
 
-        high = [
-            channel_highs for _ in range(self.simulation.config.screen_size)
-            for _ in range(self.simulation.config.screen_size)
-        ]
+        self.high = np.repeat(np.repeat(channel_highs,
+                                        self.simulation.config.screen_size,
+                                        axis=1),
+                              self.simulation.config.screen_size,
+                              axis=2)
 
-        self.low = np.reshape(
-            low, (self.simulation.config.screen_size, self.simulation.config.screen_size,
-                  len(self.simulation.observ_spaces.keys())))
-        self.high = np.reshape(
-            high, (self.simulation.config.screen_size, self.simulation.config.screen_size,
-                   len(self.simulation.observ_spaces.keys())))
         self.observation_space = gym.spaces.Box(
             np.float32(self.low),
             np.float32(self.high),
-            shape=(self.simulation.config.screen_size, self.simulation.config.screen_size,
-                   len(self.simulation.observ_spaces.keys())))
+            shape=(len(self.simulation.observ_spaces.keys()),
+                   self.simulation.config.screen_size,
+                   self.simulation.config.screen_size),
+            dtype=np.float64)
 
         # always keep the same if terrain and fire position are static
         self.seed(1234)

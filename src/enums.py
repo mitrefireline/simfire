@@ -6,6 +6,7 @@ Contains many enumeration classes for use throughout `rothermel_model` that depi
 burn status, the ordering of sprite layers, how much to attenuate the rate of spread on
 different types of control lines, and the current game status.
 '''
+from typing import Tuple
 from dataclasses import dataclass
 from enum import auto, Enum, IntEnum
 
@@ -21,7 +22,7 @@ WETLINE_TEXTURE_PATH: str = 'assets/textures/wet_line.jpg'
 DRY_TERRAIN_BROWN_IMG: Image.Image = Image.fromarray(
     np.full((10, 10, 3), (205, 133, 63), dtype=np.uint8))
 
-BURNED_RGB_COLOR = (139, 69, 19)
+BURNED_RGB_COLOR: Tuple[int, int, int] = (139, 69, 19)
 
 
 class BurnStatus(IntEnum):
@@ -53,7 +54,7 @@ class RoSAttenuation:
         - SCRATCHLINE
         - WETLINE
     '''
-    FIRELINE: float = 0.01
+    FIRELINE: float = 0.00
     SCRATCHLINE: float = 0.02
     WETLINE: float = 0.03
 

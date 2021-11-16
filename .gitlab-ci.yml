@@ -6,7 +6,7 @@ before_script:
 
 stages:
   - Static Analysis
-  - Unit Tests
+  - Tests
   - Documentation
   - Release
 
@@ -31,15 +31,24 @@ yapf:
   only:
     - merge_requests
 
-##############
-# Unit Tests #
-##############
+#########
+# Tests #
+#########
 unittests:
-  stage: Unit Tests
+  stage: Tests
   tags:
     - docker
   script:
     - SDL_VIDEODRIVER="dummy" python -m unittest discover -s src -t .. -p "test_*.py"
+  only:
+    - merge_requests
+
+game_rothermel.py:
+  stage: Tests
+  tags:
+    - docker
+  script:
+    - SDL_VIDEODRIVER="dummy" python game_rothermel.py
   only:
     - merge_requests
 

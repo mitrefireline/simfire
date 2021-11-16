@@ -15,7 +15,6 @@ from ..game.managers.mitigation import (FireLineManager, ScratchLineManager,
                                         WetLineManager)
 
 
-
 class FireLineEnv():
     def __init__(self, config: config):
 
@@ -31,25 +30,16 @@ class FireLineEnv():
         self.terrain = Terrain(self.fuel_arrs, self.config.elevation_fn,
                                self.config.terrain_size, self.config.screen_size)
         self.wind_map = WindController()
-        self.wind_map.init_wind_speed_generator(self.config.mw_seed,
-                                                self.config.mw_scale,
-                                                self.config.mw_octaves,
-                                                self.config.mw_persistence,
-                                                self.config.mw_lacunarity,
-                                                self.config.mw_speed_min,
-                                                self.config.mw_speed_max,
-                                                self.config.screen_size)
-        self.wind_map.init_wind_direction_generator(self.config.dw_seed,
-                                                    self.config.dw_scale,
-                                                    self.config.dw_octaves,
-                                                    self.config.dw_persistence,
-                                                    self.config.dw_lacunarity,
-                                                    self.config.dw_deg_min,
-                                                    self.config.dw_deg_max,
-                                                    self.config.screen_size)
+        self.wind_map.init_wind_speed_generator(
+            self.config.mw_seed, self.config.mw_scale, self.config.mw_octaves,
+            self.config.mw_persistence, self.config.mw_lacunarity,
+            self.config.mw_speed_min, self.config.mw_speed_max, self.config.screen_size)
+        self.wind_map.init_wind_direction_generator(
+            self.config.dw_seed, self.config.dw_scale, self.config.dw_octaves,
+            self.config.dw_persistence, self.config.dw_lacunarity, self.config.dw_deg_min,
+            self.config.dw_deg_max, self.config.screen_size)
 
-        self.environment = Environment(self.config.M_f,
-                                       self.wind_map.map_wind_speed,
+        self.environment = Environment(self.config.M_f, self.wind_map.map_wind_speed,
                                        self.wind_map.map_wind_direction)
 
         # initialize all mitigation strategies
@@ -147,8 +137,7 @@ class FireLineEnv():
                 self.fire_map = self.fireline_manager.update(self.fire_map, self.points)
                 self.fireline_sprites = self.fireline_manager.sprites
                 self.game.fire_map = self.fire_map
-                self.game_status = self.game.update(self.terrain,
-                                                    self.fire_sprites,
+                self.game_status = self.game.update(self.terrain, self.fire_sprites,
                                                     self.fireline_sprites,
                                                     self.wind_map.map_wind_speed,
                                                     self.wind_map.map_wind_direction)
@@ -166,8 +155,7 @@ class FireLineEnv():
                     self.fire_status == GameStatus.RUNNING:
                 self.fire_sprites = self.fire_manager.sprites
                 self.game.fire_map = self.fire_map
-                self.game_status = self.game.update(self.terrain,
-                                                    self.fire_sprites,
+                self.game_status = self.game.update(self.terrain, self.fire_sprites,
                                                     self.fireline_sprites,
                                                     self.wind_map.map_wind_speed,
                                                     self.wind_map.map_wind_direction)

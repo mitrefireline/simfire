@@ -177,7 +177,7 @@ class FireManager():
         factor[np.where(fire_map == BurnStatus.SCRATCHLINE)] = RoSAttenuation.SCRATCHLINE
         factor[np.where(fire_map == BurnStatus.WETLINE)] = RoSAttenuation.WETLINE
 
-        rate_of_spread = factor * rate_of_spread
+        rate_of_spread = rate_of_spread - factor
 
         return rate_of_spread
 

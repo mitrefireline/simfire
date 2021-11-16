@@ -54,9 +54,9 @@ class RoSAttenuation:
         - SCRATCHLINE
         - WETLINE
     '''
-    FIRELINE: float = 0.00
-    SCRATCHLINE: float = 0.02
-    WETLINE: float = 0.03
+    FIRELINE: float = 980
+    SCRATCHLINE: float = 490
+    WETLINE: float = 245
 
 
 class SpriteLayer(IntEnum):

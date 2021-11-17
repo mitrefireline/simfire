@@ -71,3 +71,34 @@ pip_install_rothsim <version number>
 ```
 
 By default, it will get the most recent version. Right now, whatever is in `master` will always be version `0.0.0`. The other versions can be seen in the [Releases Section of the GitLab](https://gitlab.mitre.org/fireline/rothermel-modeling/-/releases) or on the [Package Registry Page](https://gitlab.mitre.org/fireline/rothermel-modeling/-/packages).
+
+
+## Setting Up xpra for Remote Simulation Visualization
+
+If you'd like, you can modify your `.bashrc` (or `.zshrc`, depending on your terminal) file to easily forward the simulation display from your remote machine.
+
+Before adding to the `.bashrc`, install the following packages on your remote terminal, which will open a persistent tmux session titled `xpra` to forward your remote ports:
+
+```shell
+sudo apt install xpra
+sudo apt install tmux
+```
+
+Add the following to your `.bashrc`, making sure to substitute your own `<DISPLAY>` from the section above:
+
+```shell
+
+# Added for XPRA support
+if ! tmux has-session -t xpra
+then
+    tmux new -s xpra -d
+    tmux send -t xpra.0 'xpra start :<DISPLAY> --systemd-run=no --daemon=no' Enter
+fi
+
+```
+
+Finally, on your local terminal, install the `xpra` package and then run the following command:
+
+```shell
+xpra attach --ssh=ssh ssh://<CONTAINER>@rlord/<DISPLAY>
+```

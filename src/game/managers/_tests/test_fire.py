@@ -84,6 +84,7 @@ class TestRothermelFireManager(unittest.TestCase):
         self.fire_size = cfg.fire_size
         self.max_fire_duration = cfg.max_fire_duration
         self.pixel_scale = cfg.pixel_scale
+        self.update_rate = cfg.update_rate
         self.fuel_particle = FuelParticle()
 
         fuel_arrs = [[
@@ -107,8 +108,8 @@ class TestRothermelFireManager(unittest.TestCase):
 
         self.fire_manager = RothermelFireManager(self.init_pos, self.fire_size,
                                                  self.max_fire_duration, self.pixel_scale,
-                                                 self.fuel_particle, self.terrain,
-                                                 self.environment)
+                                                 self.update_rate, self.fuel_particle,
+                                                 self.terrain, self.environment)
 
     def test_update(self) -> None:
         '''

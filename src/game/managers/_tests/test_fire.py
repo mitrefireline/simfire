@@ -8,7 +8,7 @@ from ...sprites import Fire, Terrain
 from ....world.elevation_functions import flat
 from ....world.parameters import Environment, FuelArray, FuelParticle, Tile
 from ..fire import ConstantSpreadFireManager, FireManager, RothermelFireManager
-from src.world.wind import WindController
+from ....world.wind import WindController
 
 
 class TestFireManager(unittest.TestCase):

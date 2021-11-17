@@ -4,7 +4,7 @@ from importlib import resources
 import numpy as np
 import pygame
 import math
-import src.config as cfg
+from .. import config as cfg
 
 from .image import load_image
 from ..enums import BurnStatus

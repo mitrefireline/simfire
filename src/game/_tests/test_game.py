@@ -7,7 +7,7 @@ from ...enums import GameStatus
 from ..managers.fire import RothermelFireManager
 from ..managers.mitigation import FireLineManager
 from ...world.parameters import Environment, FuelArray, FuelParticle, Tile
-from src.world.wind import WindController
+from ...world.wind import WindController
 
 
 class TestGame(unittest.TestCase):

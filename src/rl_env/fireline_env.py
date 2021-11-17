@@ -59,12 +59,10 @@ class FireLineEnv():
         self.scratchline_sprites = self.scratchline_manager.sprites
         self.wetline_sprites = self.wetline_manager.sprites
 
-        self.fire_manager = RothermelFireManager(self.config.fire_init_pos,
-                                                 self.config.fire_size,
-                                                 self.config.max_fire_duration,
-                                                 self.config.pixel_scale,
-                                                 self.fuel_particle, self.terrain,
-                                                 self.environment)
+        self.fire_manager = RothermelFireManager(
+            self.config.fire_init_pos, self.config.fire_size,
+            self.config.max_fire_duration, self.config.pixel_scale,
+            self.config.update_rate, self.fuel_particle, self.terrain, self.environment)
         self.fire_sprites = self.fire_manager.sprites
 
         self.game_status = GameStatus.RUNNING
@@ -121,12 +119,10 @@ class FireLineEnv():
 
         '''
 
-        self.fire_manager = RothermelFireManager(self.config.fire_init_pos,
-                                                 self.config.fire_size,
-                                                 self.config.max_fire_duration,
-                                                 self.config.pixel_scale,
-                                                 self.fuel_particle, self.terrain,
-                                                 self.environment)
+        self.fire_manager = RothermelFireManager(
+            self.config.fire_init_pos, self.config.fire_size,
+            self.config.max_fire_duration, self.config.pixel_scale,
+            self.config.update_rate, self.fuel_particle, self.terrain, self.environment)
         self.game = Game(self.config.screen_size)
         self.fire_map = self.game.fire_map
 
@@ -235,12 +231,10 @@ class FireLineEnv():
         # reset the fire status to running
         self.fire_status = GameStatus.RUNNING
         # initialize fire strategy
-        self.fire_manager = RothermelFireManager(self.config.fire_init_pos,
-                                                 self.config.fire_size,
-                                                 self.config.max_fire_duration,
-                                                 self.config.pixel_scale,
-                                                 self.fuel_particle, self.terrain,
-                                                 self.environment)
+        self.fire_manager = RothermelFireManager(
+            self.config.fire_init_pos, self.config.fire_size,
+            self.config.max_fire_duration, self.config.pixel_scale,
+            self.config.update_rate, self.fuel_particle, self.terrain, self.environment)
 
         self.fire_map = np.full((self.config.screen_size, self.config.screen_size),
                                 BurnStatus.UNBURNED)

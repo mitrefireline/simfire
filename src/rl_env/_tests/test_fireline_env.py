@@ -146,12 +146,10 @@ class FireLineEnvTest(unittest.TestCase):
                                                 terrain=self.terrain)
         self.fireline_sprites = self.fireline_manager.sprites
         self.fireline_sprites_reset = self.fireline_manager.sprites.copy()
-        self.fire_manager = RothermelFireManager(self.config.fire_init_pos,
-                                                 self.config.fire_size,
-                                                 self.config.max_fire_duration,
-                                                 self.config.pixel_scale,
-                                                 self.fuel_particle, self.terrain,
-                                                 self.environment)
+        self.fire_manager = RothermelFireManager(
+            self.config.fire_init_pos, self.config.fire_size,
+            self.config.max_fire_duration, self.config.pixel_scale,
+            self.config.update_rate, self.fuel_particle, self.terrain, self.environment)
         self.fire_sprites = self.fire_manager.sprites
 
     def test_render(self) -> None:

@@ -127,15 +127,9 @@ class RothermelFireManager(FireManager):
     This FireManager will spread the fire based on the basic Rothermel
     model (https://www.fs.fed.us/rm/pubs_series/rmrs/gtr/rmrs_gtr371.pdf).
     '''
-    def __init__(self,
-                 init_pos: Tuple[int, int],
-                 fire_size: int,
-                 max_fire_duration: int,
-                 pixel_scale: int,
-                 fuel_particle: FuelParticle,
-                 terrain: Terrain,
-                 environment: Environment,
-                 workers: int = 16) -> None:
+    def __init__(self, init_pos: Tuple[int, int], fire_size: int, max_fire_duration: int,
+                 pixel_scale: int, update_rate: float, fuel_particle: FuelParticle,
+                 terrain: Terrain, environment: Environment) -> None:
         '''
         Initialize the class by recording the initial fire location and size.
         Create the fire sprite and fire_map and mark the location of the
@@ -156,6 +150,8 @@ class RothermelFireManager(FireManager):
                          location since it may take more than one update for
                          a pixel/location to catch on fire depending on the
                          rate of spread.
+            update_rate: The amount of time in minutes that passes for each simulation
+                         update step
             fuel_particle: The parameters that describe the fuel particle
             terrain: The Terrain that describes the simulation/game
             environment: The Environment that describes the simulation/game
@@ -165,6 +161,7 @@ class RothermelFireManager(FireManager):
         '''
         super().__init__(init_pos, fire_size, max_fire_duration)
         self.pixel_scale = pixel_scale
+        self.update_rate = update_rate
         self.fuel_particle = fuel_particle
         self.terrain = terrain
 
@@ -333,6 +330,9 @@ class RothermelFireManager(FireManager):
         R = compute_rate_of_spread(loc_x, loc_y, new_loc_x, new_loc_y, w_0, delta, M_x,
                                    sigma, h, S_T, S_e, p_p, M_f, U, U_dir, slope_mag,
                                    slope_dir)
+
+        # Scale the rate of spread by the update rate
+        R *= self.update_rate
 
         y_coords = new_loc_y.astype(int)
         x_coords = new_loc_x.astype(int)

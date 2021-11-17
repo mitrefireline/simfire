@@ -38,6 +38,13 @@ The number of feet across that one pixel represents. i.e. for the default value,
 pixel represents a 50ft x 50ft square of land.
 
 
+### `update_rate`
+(`float`, default = 1)
+
+The number of minutes that each game/frame update represents in simulation time. Note
+that this can be fractional to account for times that are non-integer and/or less than 1.
+
+
 ### Display Parameters
 Used in determining display scaling.
 

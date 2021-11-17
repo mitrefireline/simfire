@@ -96,6 +96,7 @@ test-release:
     - pip install wheel
     - python setup.py bdist_wheel
     - pip install -U dist/*.whl
+    - python tests/package.py
   only:
     - merge_requests
 

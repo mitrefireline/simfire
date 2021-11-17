@@ -150,6 +150,9 @@ pixel_scale: float = 50
 # Copmute the size of each terrain tile in feet
 terrain_scale: int = terrain_size * pixel_scale
 
+# The amount of time that passes in the simulation for each frame update (minutes)
+update_rate: float = 1
+
 # Create function that returns elevation values at (x, y) points
 noise_amplitude: int = 500
 pnoise = PerlinNoise2D(noise_amplitude, [screen_size, screen_size], [1, 1])

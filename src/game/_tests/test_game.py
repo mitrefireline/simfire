@@ -25,6 +25,7 @@ class TestGame(unittest.TestCase):
         fire_size = cfg.fire_size
         max_fire_duration = cfg.max_fire_duration
         pixel_scale = cfg.pixel_scale
+        update_rate = cfg.update_rate
         fuel_particle = FuelParticle()
 
         tiles = [[
@@ -47,8 +48,8 @@ class TestGame(unittest.TestCase):
                                   wind_map.map_wind_direction)
 
         fire_manager = RothermelFireManager(init_pos, fire_size, max_fire_duration,
-                                            pixel_scale, fuel_particle, terrain,
-                                            environment)
+                                            pixel_scale, update_rate, fuel_particle,
+                                            terrain, environment)
 
         fireline_manager = FireLineManager(size=cfg.control_line_size,
                                            pixel_scale=cfg.pixel_scale,

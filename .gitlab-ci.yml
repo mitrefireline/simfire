@@ -73,7 +73,7 @@ test-pages:
     expose_as: 'HTML Documentation'
     paths:
       - public/
-    expires: 1 week
+    expire_in: 1 week
   only:
     - merge_requests
 

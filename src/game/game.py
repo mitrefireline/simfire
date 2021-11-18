@@ -1,15 +1,14 @@
-from typing import Sequence
 from importlib import resources
+from typing import Sequence, Tuple
 
-import numpy as np
-import pygame
 import math
-from .. import config as cfg
+import pygame
+import numpy as np
 
+from .. import config as cfg
 from .image import load_image
-from ..enums import BurnStatus
+from ..enums import BurnStatus, GameStatus
 from .sprites import Fire, FireLine, Terrain
-from ..enums import GameStatus
 
 
 class Game():
@@ -83,7 +82,7 @@ class Game():
         self.show_wind_direction = False
 
     def _get_wind_direction_color(self, direction: float, ws_min: float,
-                                  ws_max: float) -> (int, int, int):
+                                  ws_max: float) -> Tuple[int, int, int]:
         '''
         Get the color and intensity representing direction based
         on wind direction

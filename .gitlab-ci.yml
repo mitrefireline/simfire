@@ -40,6 +40,7 @@ unittests:
     - docker
   script:
     - SDL_VIDEODRIVER="dummy" python -m unittest discover -s src -t .. -p "test_*.py"
+  needs: []
   only:
     - merge_requests
 
@@ -49,6 +50,7 @@ game_rothermel.py:
     - docker
   script:
     - SDL_VIDEODRIVER="dummy" python game_rothermel.py
+  needs: []
   only:
     - merge_requests
 
@@ -66,10 +68,12 @@ test-pages:
   tags:
     - docker
   extends: .pages
+  needs: []
   artifacts:
     expose_as: 'HTML Documentation'
     paths:
       - public/
+    expire_in: 1 week
   only:
     - merge_requests
 
@@ -97,6 +101,7 @@ test-release:
     - python setup.py bdist_wheel
     - pip install -U dist/*.whl
     - python tests/package.py
+  needs: []
   only:
     - merge_requests
 

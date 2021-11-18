@@ -101,6 +101,7 @@ test-release:
     - python setup.py bdist_wheel
     - pip install -U dist/*.whl
     - python tests/package.py
+  needs: []
   only:
     - merge_requests
 
@@ -125,7 +126,6 @@ release-dev:
   script:
     - !reference [.delete-package, script]
     - !reference [.release, script]
-  needs: []
   only:
     - master
 

@@ -69,8 +69,7 @@ class FireLineEnv():
     def _render(self,
                 mitigation_state: np.ndarray,
                 mitigation_only: bool = True,
-                mitigation_and_fire_spread: bool = False,
-                inline: bool = False):
+                mitigation_and_fire_spread: bool = False):
         '''
         This will take the pygame update command and perform the display updates
             for the following scenarios:

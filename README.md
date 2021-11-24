@@ -1,7 +1,7 @@
 # Rothermel Fire Modeler
 
 <p align="center">
-    <img src="assets/icons/rl_logo.png" width=300>
+    <img src="assets/icons/rl_logo_horizontal.png">
 </p>
 
 ## Introduction
@@ -89,4 +89,4 @@ By default, it will get the most recent version. Right now, whatever is in `mast
 
 ## Contributing
 
-For contributing, see the [Contribution Page](https://fireline.pages.mitre.org/rothermal-modeling/contributing.html) in our [docs](https://fireline.pages.mitre.org/rothermel-modeling).
+For contributing, see the [Contribution Page](https://fireline.pages.mitre.org/rothermel-modeling/contributing.html) in our [docs](https://fireline.pages.mitre.org/rothermel-modeling).

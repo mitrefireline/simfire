@@ -7,6 +7,7 @@ from .. import config
 from ..game.sprites import Terrain
 from ..game.game import Game
 from ..world.parameters import Environment, FuelArray, FuelParticle, Tile
+from ..world.wind import WindController
 from ..game.managers.fire import RothermelFireManager
 from ..game.managers.mitigation import (FireLineManager, ScratchLineManager,
                                         WetLineManager)
@@ -26,7 +27,18 @@ class FireLineEnv():
         ] for i in range(self.config.terrain_size)]
         self.terrain = Terrain(self.fuel_arrs, self.config.elevation_fn,
                                self.config.terrain_size, self.config.screen_size)
-        self.environment = Environment(self.config.M_f, self.config.U, self.config.U_dir)
+        self.wind_map = WindController()
+        self.wind_map.init_wind_speed_generator(
+            self.config.mw_seed, self.config.mw_scale, self.config.mw_octaves,
+            self.config.mw_persistence, self.config.mw_lacunarity,
+            self.config.mw_speed_min, self.config.mw_speed_max, self.config.screen_size)
+        self.wind_map.init_wind_direction_generator(
+            self.config.dw_seed, self.config.dw_scale, self.config.dw_octaves,
+            self.config.dw_persistence, self.config.dw_lacunarity, self.config.dw_deg_min,
+            self.config.dw_deg_max, self.config.screen_size)
+
+        self.environment = Environment(self.config.M_f, self.wind_map.map_wind_speed,
+                                       self.wind_map.map_wind_direction)
 
         # initialize all mitigation strategies
         self.fireline_manager = FireLineManager(size=self.config.control_line_size,
@@ -45,12 +57,10 @@ class FireLineEnv():
         self.scratchline_sprites = self.scratchline_manager.sprites
         self.wetline_sprites = self.wetline_manager.sprites
 
-        self.fire_manager = RothermelFireManager(self.config.fire_init_pos,
-                                                 self.config.fire_size,
-                                                 self.config.max_fire_duration,
-                                                 self.config.pixel_scale,
-                                                 self.fuel_particle, self.terrain,
-                                                 self.environment)
+        self.fire_manager = RothermelFireManager(
+            self.config.fire_init_pos, self.config.fire_size,
+            self.config.max_fire_duration, self.config.pixel_scale,
+            self.config.update_rate, self.fuel_particle, self.terrain, self.environment)
         self.fire_sprites = self.fire_manager.sprites
 
         self.game_status = GameStatus.RUNNING
@@ -103,12 +113,10 @@ class FireLineEnv():
 
         '''
 
-        self.fire_manager = RothermelFireManager(self.config.fire_init_pos,
-                                                 self.config.fire_size,
-                                                 self.config.max_fire_duration,
-                                                 self.config.pixel_scale,
-                                                 self.fuel_particle, self.terrain,
-                                                 self.environment)
+        self.fire_manager = RothermelFireManager(
+            self.config.fire_init_pos, self.config.fire_size,
+            self.config.max_fire_duration, self.config.pixel_scale,
+            self.config.update_rate, self.fuel_particle, self.terrain, self.environment)
         self.game = Game(self.config.screen_size)
         self.fire_map = self.game.fire_map
 
@@ -120,7 +128,9 @@ class FireLineEnv():
                 self.fireline_sprites = self.fireline_manager.sprites
                 self.game.fire_map = self.fire_map
                 self.game_status = self.game.update(self.terrain, self.fire_sprites,
-                                                    self.fireline_sprites)
+                                                    self.fireline_sprites,
+                                                    self.wind_map.map_wind_speed,
+                                                    self.wind_map.map_wind_direction)
 
                 self.fire_map = self.game.fire_map
                 self.game.fire_map = self.fire_map
@@ -136,7 +146,9 @@ class FireLineEnv():
                 self.fire_sprites = self.fire_manager.sprites
                 self.game.fire_map = self.fire_map
                 self.game_status = self.game.update(self.terrain, self.fire_sprites,
-                                                    self.fireline_sprites)
+                                                    self.fireline_sprites,
+                                                    self.wind_map.map_wind_speed,
+                                                    self.wind_map.map_wind_direction)
                 self.fire_map, self.fire_status = self.fire_manager.update(self.fire_map)
                 self.fire_map = self.game.fire_map
                 self.game.fire_map = self.fire_map
@@ -198,12 +210,10 @@ class FireLineEnv():
         # reset the fire status to running
         self.fire_status = GameStatus.RUNNING
         # initialize fire strategy
-        self.fire_manager = RothermelFireManager(self.config.fire_init_pos,
-                                                 self.config.fire_size,
-                                                 self.config.max_fire_duration,
-                                                 self.config.pixel_scale,
-                                                 self.fuel_particle, self.terrain,
-                                                 self.environment)
+        self.fire_manager = RothermelFireManager(
+            self.config.fire_init_pos, self.config.fire_size,
+            self.config.max_fire_duration, self.config.pixel_scale,
+            self.config.update_rate, self.fuel_particle, self.terrain, self.environment)
 
         self.fire_map = np.full((self.config.screen_size, self.config.screen_size),
                                 BurnStatus.UNBURNED)

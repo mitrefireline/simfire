@@ -88,7 +88,7 @@
 
 #         self.assertEqual(fireline,
 #                          0,
-#                    msg=(f'The returned state of the fireline is {fireline}, but it '
+#                      msg=(f'The returned state of the fireline is {fireline}, but it '
 #                               f'should be 0'))
 
 #         self.assertTrue(
@@ -136,7 +136,7 @@
 #         ] for i in range(self.config.terrain_size)]
 #         self.terrain = Terrain(self.fuel_arrs, self.config.elevation_fn,
 #                                self.config.terrain_size, self.config.screen_size)
-#      self.environment = Environment(self.config.M_f, self.config.U, self.config.U_dir)
+#       self.environment = Environment(self.config.M_f, self.config.U, self.config.U_dir)
 
 #         # initialize all mitigation strategies
 #         self.fireline_manager = FireLineManager(size=self.config.control_line_size,
@@ -144,12 +144,10 @@
 #                                                 terrain=self.terrain)
 #         self.fireline_sprites = self.fireline_manager.sprites
 #         self.fireline_sprites_reset = self.fireline_manager.sprites.copy()
-#         self.fire_manager = RothermelFireManager(self.config.fire_init_pos,
-#                                                  self.config.fire_size,
-#                                                  self.config.max_fire_duration,
-#                                                  self.config.pixel_scale,
-#                                                  self.fuel_particle, self.terrain,
-#                                                  self.environment)
+#         self.fire_manager = RothermelFireManager(
+#             self.config.fire_init_pos, self.config.fire_size,
+#             self.config.max_fire_duration, self.config.pixel_scale,
+#             self.config.update_rate, self.fuel_particle, self.terrain, self.environment)
 #         self.fire_sprites = self.fire_manager.sprites
 
 #     def test_render(self) -> None:

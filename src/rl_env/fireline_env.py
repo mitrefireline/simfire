@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 import gym
 import numpy as np
 from gym.utils import seeding
@@ -68,18 +70,22 @@ class FireLineEnv():
 
         self.actions = ['None', 'fireline']
         self.observ_spaces = {
+            'position': (0, 1),
             'w_0': (0, 1),
             # 'sigma': (0, 1),
             # 'delta': (0, 1),
             # 'm_x': (0, 1),
             # 'm_f': (0, 1)
-            'elevation': (0, 1)
+            'elevation': (0, 1),
+            'mitigation': (0, len(self.actions) - 1)
         }
 
     def _render(self,
                 mitigation_state: np.ndarray,
+                position_state: np.ndarray,
                 mitigation_only: bool = True,
-                mitigation_and_fire_spread: bool = False):
+                mitigation_and_fire_spread: bool = False,
+                inline: bool = False):
         '''
         This will take the pygame update command and perform the display updates
             for the following scenarios:
@@ -121,7 +127,7 @@ class FireLineEnv():
         self.fire_map = self.game.fire_map
 
         if mitigation_only:
-            self._update_sprite_points(mitigation_state)
+            self._update_sprite_points(mitigation_state, position_state, inline)
             if self.game_status == GameStatus.RUNNING:
 
                 self.fire_map = self.fireline_manager.update(self.fire_map, self.points)
@@ -138,7 +144,7 @@ class FireLineEnv():
         if mitigation_and_fire_spread:
             self.fire_status = GameStatus.RUNNING
             self.game_status = GameStatus.RUNNING
-            self._update_sprite_points(mitigation_state)
+            self._update_sprite_points(mitigation_state, position_state, inline)
             self.fireline_sprites = self.fireline_manager.sprites
             self.fire_map = self.fireline_manager.update(self.fire_map, self.points)
             while self.game_status == GameStatus.RUNNING and \
@@ -157,7 +163,10 @@ class FireLineEnv():
         # these through the agent state info and _update_sprite_points()
         self.points = set([])
 
-    def _update_sprite_points(self, mitigation_state):
+    def _update_sprite_points(self,
+                              mitigation_state,
+                              position_state,
+                              inline: bool = False):
         '''
         Update sprite point list based on fire mitigation.
 
@@ -166,6 +175,8 @@ class FireLineEnv():
         mitigation_state: np.ndarray
                             Array of mitigation value(s).
                             0: No Control Line, 1: Control Line
+        position_state: np.ndarray
+                        Array of position. Only used when rendering `inline`
         inline: bool
                 Boolean value of whether or not to render at each step() or after
                     agent has placed control lines
@@ -175,14 +186,21 @@ class FireLineEnv():
                     to add to fireline sprites group
 
         '''
+        if inline:
+            if mitigation_state == 1:
+                self.points.add(position_state)
 
-        # update the location to pass to the sprite
-        for i in range(self.config.screen_size):
-            for j in range(self.config.screen_size):
-                if mitigation_state[(i, j)] == 1:
-                    self.points.add((i, j))
+        else:
+            # update the location to pass to the sprite
+            for i in range(self.config.screen_size):
+                for j in range(self.config.screen_size):
+                    if mitigation_state[(i, j)] == 1:
+                        self.points.add((i, j))
 
-    def _run(self, mitigation_state: np.ndarray, mitigation: bool = False):
+    def _run(self,
+             mitigation_state: np.ndarray,
+             position_state: np.ndarray,
+             mitigation: bool = False):
         '''
 
         Use self.terrain to either:
@@ -195,6 +213,9 @@ class FireLineEnv():
         mitigation_state: np.ndarray
                             Array of mitigation value(s).
                             0: No Control Line, 1: Control Line
+        position_state: np.ndarray
+                        Array of current agent position.
+                        Only used when rendering `inline`
 
         mitigation: bool
                     Boolean value to update agent's mitigation staegy before
@@ -219,7 +240,7 @@ class FireLineEnv():
                                 BurnStatus.UNBURNED)
         if mitigation:
             # update firemap with agent actions before initializing fire spread
-            self._update_sprite_points(mitigation_state)
+            self._update_sprite_points(mitigation_state, position_state)
             self.fire_map = self.fireline_manager.update(self.fire_map, self.points)
 
         while self.fire_status == GameStatus.RUNNING:
@@ -252,6 +273,7 @@ class FireLineEnv():
 
 
         '''
+        reset_position = np.zeros([self.config.screen_size, self.config.screen_size])
 
         w_0_array = np.array([
             self.terrain.fuel_arrs[i][j].fuel.w_0 for j in range(self.config.screen_size)
@@ -272,13 +294,13 @@ class FireLineEnv():
         #           range(self.config.screen_size)
         #     for i in range(self.config.screen_size)
         # ]).reshape(self.config.screen_size, self.config.screen_size)
+        reset_mitigation = np.zeros([self.config.screen_size, self.config.screen_size])
 
         # (screen_size, screen_size, 4)
         # terrain = np.stack((w_0_array, sigma_array, delta_array, M_x_array), axis=-1)
-        state = np.stack(
-            (w_0_array, (self.terrain.elevations + self.config.noise_amplitude) /
-             (2 * self.config.noise_amplitude)),
-            axis=-1)
+        state = np.stack((reset_position, w_0_array,
+                          (self.terrain.elevations + self.config.noise_amplitude) /
+                          (2 * self.config.noise_amplitude), reset_mitigation))
 
         return state
 
@@ -430,33 +452,31 @@ class RLEnv(gym.Env):
         '''
 
         self.simulation = simulation
-        self.action_space = gym.spaces.Box(0,
-                                           1,
-                                           shape=(self.simulation.config.screen_size,
-                                                  self.simulation.config.screen_size))
+        self.action_space = gym.spaces.Discrete(len(self.simulation.actions))
 
-        channel_lows = np.array([
-            self.simulation.observ_spaces[channel][0]
-            for channel in self.simulation.observ_spaces.keys()
-        ])
-        channel_highs = np.array([
-            self.simulation.observ_spaces[channel][1]
-            for channel in self.simulation.observ_spaces.keys()
-        ])
+        channel_lows = np.array([[[self.simulation.observ_spaces[channel][0]]]
+                                 for channel in self.simulation.observ_spaces.keys()])
+        channel_highs = np.array([[[self.simulation.observ_spaces[channel][1]]]
+                                  for channel in self.simulation.observ_spaces.keys()])
 
-        self.low = np.array(
-            [[channel_lows for _ in range(self.simulation.config.screen_size)]
-             for _ in range(self.simulation.config.screen_size)])
+        self.low = np.repeat(np.repeat(channel_lows,
+                                       self.simulation.config.screen_size,
+                                       axis=1),
+                             self.simulation.config.screen_size,
+                             axis=2)
 
-        self.high = np.array(
-            [[channel_highs for _ in range(self.simulation.config.screen_size)]
-             for _ in range(self.simulation.config.screen_size)])
+        self.high = np.repeat(np.repeat(channel_highs,
+                                        self.simulation.config.screen_size,
+                                        axis=1),
+                              self.simulation.config.screen_size,
+                              axis=2)
 
         self.observation_space = gym.spaces.Box(
             np.float32(self.low),
             np.float32(self.high),
-            shape=(self.simulation.config.screen_size, self.simulation.config.screen_size,
-                   len(self.simulation.observ_spaces.keys())),
+            shape=(len(self.simulation.observ_spaces.keys()),
+                   self.simulation.config.screen_size,
+                   self.simulation.config.screen_size),
             dtype=np.float64)
 
         # always keep the same if terrain and fire position are static
@@ -509,21 +529,75 @@ class RLEnv(gym.Env):
         info: extra meta-data
         '''
 
-        # compare the state spaces
-        fire_map = self.simulation._run(action)
-        # render only agent
-        if self.simulation.config.render_post_agent:
-            self.simulation._render(action)
+        # Make the action on the env at agent's current location
+        self.state[-1][self.current_agent_loc] = action
 
-        fire_map_with_agent = self.simulation._run(action, True)
-        # render fire with agents mitigation in place
-        if self.simulation.config.render_post_agent_with_fire:
-            self.simulation._render(action,
-                                    mitigation_only=False,
-                                    mitigation_and_fire_spread=True)
-        reward = self.simulation._compare_states(fire_map, fire_map_with_agent)
+        # make a copy
+        old_loc = deepcopy(self.current_agent_loc)
 
-        return self.state, reward, True, {}
+        # if we want to render as we step through the game
+        if self.simulation.config.render_inline:
+            self.simulation._render(self.state[-1][self.current_agent_loc],
+                                    self.current_agent_loc,
+                                    inline=True)
+
+        # set the old position back to 0
+        self.state[0][self.current_agent_loc] = 0
+
+        # update position
+        self._update_current_agent_loc()
+        self.state[0][self.current_agent_loc] = 1
+
+        reward = 0  # if action == 0 else
+        # (-1 / (self.simulation.config.screen_size * self.simulation.config.screen_size))
+
+        # If the agent is at the last location (cannot move forward)
+        done = old_loc == self.current_agent_loc
+        if done:
+            # compare the state spaces
+            fire_map = self.simulation._run(self.state[-1], self.state[0])
+            # render only agent
+            if self.simulation.config.render_post_agent:
+                self.simulation._render(self.state[-1], self.state[0])
+
+            fire_map_with_agent = self.simulation._run(self.state[-1], self.state[0],
+                                                       True)
+            # render fire with agents mitigation in place
+            if self.simulation.config.render_post_agent_with_fire:
+                self.simulation._render(self.state[-1],
+                                        self.state[0],
+                                        mitigation_only=False,
+                                        mitigation_and_fire_spread=True)
+            reward = self.simulation._compare_states(fire_map, fire_map_with_agent)
+
+        return self.state, reward, done, {}
+
+    def _update_current_agent_loc(self):
+        '''
+        This function will help update the current position
+            as it traverses the game.
+
+        Check if the y-axis is less than the screen-size and the
+            x-axis is greater than the screen size --> y-axis += 1, x-axis = 0
+
+        Check if the x-axis is less than screen size and the y-axis is
+            less than/equal to screen size --> y-axis = None, x-axis += 1
+
+        '''
+        row = self.current_agent_loc[0]
+        column = self.current_agent_loc[1]
+
+        # If moving forward one would bring us out of bounds and we can move to new row
+        if column + 1 > (self.simulation.config.screen_size -
+                         1) and row + 1 <= (self.simulation.config.screen_size - 1):
+            column = 0
+            row += 1
+
+        # If moving forward keeps us in bounds
+        elif column + 1 <= (self.simulation.config.screen_size - 1):
+            column += 1
+
+        self.current_agent_loc = (row, column)
 
     def reset(self):
         '''
@@ -537,5 +611,9 @@ class RLEnv(gym.Env):
         '''
 
         self.state = self.simulation._reset_state()
+
+        # Place agent at location (0,0)
+        self.current_agent_loc = (0, 0)
+        self.state[0][self.current_agent_loc] = 1
 
         return self.state

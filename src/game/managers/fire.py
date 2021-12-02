@@ -27,8 +27,11 @@ class FireManager():
     pixels have already burned. Child classes should create their own update()
     method to describe how the fire spreads.
     '''
-    def __init__(self, init_pos: Tuple[int, int], fire_size: int,
-                 max_fire_duration: int) -> None:
+    def __init__(self,
+                 init_pos: Tuple[int, int],
+                 fire_size: int,
+                 max_fire_duration: int,
+                 attenuate_line_ros: bool = True) -> None:
         '''
         Initialize the class by recording the initial fire location and size.
         Create the fire sprite and fire_map and mark the location of the
@@ -44,13 +47,18 @@ class FireManager():
                                for before going out. This is moslty useful so
                                that fires that have spread and are now on the
                                interior do not have to keep being rendered.
-
+            attenuate_line_ros: Whether or not to attenuate the rate of spread.
+                                Defaults to `True`. If set to `True`, will subtract
+                                values found in `enums.RoSAttenuation` from the initial
+                                rate of spread calculation. If set to `False`, all
+                                different control lines will completely stop the fire.
         Returns:
             None
         '''
         self.init_pos = init_pos
         self.fire_size = fire_size
         self.max_fire_duration = max_fire_duration
+        self.attenuate_line_ros = attenuate_line_ros
 
         init_fire = Fire(self.init_pos, self.fire_size)
         self.sprites: List[Fire] = [init_fire]
@@ -154,11 +162,11 @@ class FireManager():
                                fire_map: np.ndarray) -> np.ndarray:
         '''Update the burn amounts based on control line status.
 
-        This will attenuate the rate of spread for all control line locations in
-        `rate_of_spread` by the fractions set in `enums.RosAttenuation`.
+        This will subtract the rate of spread for all control line locations in
+        `rate_of_spread` by the numbers set in `enums.RosAttenuation`.
 
         e.g. if the `rate_of_spread` (RoS) was 10 for a location where a fireline was
-        located, and `RosAttenuation.FIRELINE` was set to 0.05, it would become 0.5 as a
+        located, and `RosAttenuation.FIRELINE` was set to 6, it would become 4 as a
         result of this function.
 
         Arguments:
@@ -172,10 +180,16 @@ class FireManager():
         '''
         assert fire_map.shape == rate_of_spread.shape
 
-        factor = np.ones_like(rate_of_spread)
-        factor[np.where(fire_map == BurnStatus.FIRELINE)] = RoSAttenuation.FIRELINE
-        factor[np.where(fire_map == BurnStatus.SCRATCHLINE)] = RoSAttenuation.SCRATCHLINE
-        factor[np.where(fire_map == BurnStatus.WETLINE)] = RoSAttenuation.WETLINE
+        factor = np.zeros_like(rate_of_spread)
+        if self.attenuate_line_ros:
+            factor[np.where(fire_map == BurnStatus.FIRELINE)] = RoSAttenuation.FIRELINE
+            factor[np.where(
+                fire_map == BurnStatus.SCRATCHLINE)] = RoSAttenuation.SCRATCHLINE
+            factor[np.where(fire_map == BurnStatus.WETLINE)] = RoSAttenuation.WETLINE
+        else:
+            factor[np.where(fire_map == BurnStatus.FIRELINE)] = 0
+            factor[np.where(fire_map == BurnStatus.SCRATCHLINE)] = 0
+            factor[np.where(fire_map == BurnStatus.WETLINE)] = 0
 
         rate_of_spread = rate_of_spread - factor
 
@@ -187,9 +201,16 @@ class RothermelFireManager(FireManager):
     This FireManager will spread the fire based on the basic [Rothermel
     Model](https://www.fs.fed.us/rm/pubs_series/rmrs/gtr/rmrs_gtr371.pdf).
     '''
-    def __init__(self, init_pos: Tuple[int, int], fire_size: int, max_fire_duration: int,
-                 pixel_scale: int, update_rate: float, fuel_particle: FuelParticle,
-                 terrain: Terrain, environment: Environment) -> None:
+    def __init__(self,
+                 init_pos: Tuple[int, int],
+                 fire_size: int,
+                 max_fire_duration: int,
+                 pixel_scale: int,
+                 update_rate: float,
+                 fuel_particle: FuelParticle,
+                 terrain: Terrain,
+                 environment: Environment,
+                 attenuate_line_ros: bool = True) -> None:
         '''
         Initialize the class by recording the initial fire location and size.
         Create the fire sprite and fire_map and mark the location of the
@@ -215,11 +236,16 @@ class RothermelFireManager(FireManager):
             fuel_particle: The parameters that describe the fuel particle
             terrain: The Terrain that describes the simulation/game
             environment: The Environment that describes the simulation/game
+            attenuate_line_ros: Whether or not to attenuate the rate of spread.
+                                Defaults to `True`. If set to `True`, will subtract
+                                values found in `enums.RoSAttenuation` from the initial
+                                rate of spread calculation. If set to `False`, all
+                                different control lines will completely stop the fire.
 
         Returns:
             None
         '''
-        super().__init__(init_pos, fire_size, max_fire_duration)
+        super().__init__(init_pos, fire_size, max_fire_duration, attenuate_line_ros)
         self.pixel_scale = pixel_scale
         self.update_rate = update_rate
         self.fuel_particle = fuel_particle
@@ -401,6 +427,7 @@ class RothermelFireManager(FireManager):
         rate_of_spread[y_coords, x_coords] = R
 
         # Update the burn_amounts dependent on if there are control lines there
+        # And only update if specified in the class
         rate_of_spread = self._update_rate_of_spread(rate_of_spread, fire_map)
         self.burn_amounts += rate_of_spread
 

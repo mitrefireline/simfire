@@ -2,8 +2,6 @@ from copy import deepcopy
 
 import gym
 import numpy as np
-from gym.utils import seeding
-
 from ..enums import GameStatus, BurnStatus
 from .. import config
 from ..game.sprites import Terrain
@@ -13,13 +11,27 @@ from ..world.wind import WindController
 from ..game.managers.fire import RothermelFireManager
 from ..game.managers.mitigation import (FireLineManager, ScratchLineManager,
                                         WetLineManager)
+from ..utils.terrain import Chaparral, RandomSeedList
 
 
 class FireLineEnv():
-    def __init__(self, config: config):
+    def __init__(self, config: config, seed: int = None):
 
         self.config = config
         self.points = set([])
+
+        if seed:
+            np.random.seed(seed)
+            seed_tuple = RandomSeedList(self.config.terrain_size, seed)
+            self.config.terrain_map = tuple(
+                tuple(
+                    Chaparral(seed=seed_tuple[outer][inner])
+                    for inner in range(self.config.terrain_size))
+                for outer in range(self.config.terrain_size))
+        else:
+            self.config.terrain_map = tuple(
+                tuple(Chaparral() for _ in range(self.config.terrain_size))
+                for _ in range(self.config.terrain_size))
 
         self.fuel_particle = FuelParticle()
         self.fuel_arrs = [[
@@ -279,25 +291,9 @@ class FireLineEnv():
             self.terrain.fuel_arrs[i][j].fuel.w_0 for j in range(self.config.screen_size)
             for i in range(self.config.screen_size)
         ]).reshape(self.config.screen_size, self.config.screen_size)
-        # sigma_array = np.array([
-        #     self.terrain.fuel_arrs[i][j].fuel.sigma
-        #     for j in range(self.config.screen_size)
-        #     for i in range(self.config.screen_size)
-        # ]).reshape(self.config.screen_size, self.config.screen_size)
-        # delta_array = np.array([
-        #     self.terrain.fuel_arrs[i][j].fuel.delta
-        #     for j in range(self.config.screen_size)
-        #     for i in range(self.config.screen_size)
-        # ]).reshape(self.config.screen_size, self.config.screen_size)
-        # M_x_array = np.array([
-        #    self.terrain.fuel_arrs[i][j].fuel.M_x for j in
-        #           range(self.config.screen_size)
-        #     for i in range(self.config.screen_size)
-        # ]).reshape(self.config.screen_size, self.config.screen_size)
+
         reset_mitigation = np.zeros([self.config.screen_size, self.config.screen_size])
 
-        # (screen_size, screen_size, 4)
-        # terrain = np.stack((w_0_array, sigma_array, delta_array, M_x_array), axis=-1)
         state = np.stack((reset_position, w_0_array,
                           (self.terrain.elevations + self.config.noise_amplitude) /
                           (2 * self.config.noise_amplitude), reset_mitigation))
@@ -478,25 +474,6 @@ class RLEnv(gym.Env):
                    self.simulation.config.screen_size,
                    self.simulation.config.screen_size),
             dtype=np.float64)
-
-        # always keep the same if terrain and fire position are static
-        self.seed(1234)
-
-    def seed(self, seed=None):
-        '''
-        Set the seed for numpy random methods.
-
-        Input:
-        -------
-        seed: Random seeding value
-
-        Return:
-        -------
-        seed: Random seeding value
-        '''
-
-        self.np_random, seed = seeding.np_random(seed)
-        return [seed]
 
     def step(self, action):
         '''

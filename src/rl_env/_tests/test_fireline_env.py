@@ -21,6 +21,34 @@ class RLEnvTest(unittest.TestCase):
         self.action = 1
         self.current_agent_loc = (1, 1)
 
+    def test_init(self) -> None:
+        '''
+        Test setting the seed for the terrain map.
+
+        '''
+        seed = 1212
+        fireline_env_seed = FireLineEnv(config, seed)
+        fireline_env_seed = fireline_env_seed.config.terrain_map
+        fireline_env_no_seed = FireLineEnv(config)
+        fireline_env_no_seed = fireline_env_no_seed.config.terrain_map
+
+        # assert these envs are different
+        for i, j in zip(fireline_env_seed, fireline_env_no_seed):
+            for fuel_i, fuel_j in zip(i, j):
+                self.assertNotEqual(
+                    fuel_i.w_0,
+                    fuel_j.w_0,
+                    msg='Different seeds should produce different terrain '
+                    'maps.')
+
+        # assert equal Fuel Maps
+        fireline_env_same_seed = FireLineEnv(config, seed)
+        fireline_env_same_seed = fireline_env_same_seed.config.terrain_map
+        self.assertEqual(fireline_env_seed,
+                         fireline_env_same_seed,
+                         msg='Same seeds should produce the same terrain '
+                         'maps.')
+
     def test_step(self) -> None:
         '''
         Test that the call to `step()` runs through properly.
@@ -148,12 +176,10 @@ class FireLineEnvTest(unittest.TestCase):
                                                 terrain=self.terrain)
         self.fireline_sprites = self.fireline_manager.sprites
         self.fireline_sprites_reset = self.fireline_manager.sprites.copy()
-        self.fire_manager = RothermelFireManager(self.config.fire_init_pos,
-                                                 self.config.fire_size,
-                                                 self.config.max_fire_duration,
-                                                 self.config.pixel_scale,
-                                                 self.fuel_particle, self.terrain,
-                                                 self.environment)
+        self.fire_manager = RothermelFireManager(
+            self.config.fire_init_pos, self.config.fire_size,
+            self.config.max_fire_duration, self.config.pixel_scale,
+            self.config.update_rate, self.fuel_particle, self.terrain, self.environment)
         self.fire_sprites = self.fire_manager.sprites
 
     def test_render(self) -> None:

@@ -129,10 +129,9 @@
 '''
 from typing import Tuple
 
-import numpy as np
-
 from .world.elevation_functions import PerlinNoise2D
-from .world.parameters import Fuel, FuelArray
+from .world.parameters import FuelArray
+from .utils.terrain import Chaparral
 
 # Game/Screen parameters
 
@@ -147,8 +146,11 @@ fire_size: int = 2
 control_line_size: int = 2
 # The amount of feet 1 pixel represents (ft)
 pixel_scale: float = 50
-# Copmute the size of each terrain tile in feet
+# Compute the size of each terrain tile in feet
 terrain_scale: int = terrain_size * pixel_scale
+
+# The amount of time that passes in the simulation for each frame update (minutes)
+update_rate: float = 1
 
 # Create function that returns elevation values at (x, y) points
 noise_amplitude: int = 500
@@ -157,14 +159,9 @@ pnoise.precompute()
 
 elevation_fn = pnoise.fn
 
-
-def Chaparral_r():
-    return Fuel(w_0=np.random.uniform(.2, .6), delta=6.000, M_x=0.2000, sigma=1739)
-
-
 # Create FuelArray tiles to make the terrain/map
 terrain_map: Tuple[Tuple[FuelArray]] = tuple(
-    tuple(Chaparral_r() for _ in range(terrain_size)) for _ in range(terrain_size))
+    tuple(Chaparral() for _ in range(terrain_size)) for _ in range(terrain_size))
 
 # Fire Manager Parameters
 # (x, y) starting coordinates
@@ -181,6 +178,26 @@ U: float = 88 * 13
 # Wind Direction (degrees clockwise from north)
 U_dir: float = 135
 
+# Wind Noise Parameters
+mw_seed: int = 2345
+mw_scale: int = 400  # High values = Lower Resolution, less noisy
+mw_octaves: int = 3
+mw_persistence: float = 0.7
+mw_lacunarity: float = 2.0
+mw_speed_min: float = 616.0  # ft/min
+mw_speed_max: float = 4136.0  # ft/min
+
+dw_seed: int = 650  # 1203 (North bias)
+dw_scale: int = 1500  # Better to be above 1000 to have less variable wind dir
+dw_octaves: int = 2
+dw_persistence: float = 0.9
+dw_lacunarity: float = 1.0
+dw_deg_min: float = 0.0  # Degrees, 0/360: North, 90: East, 180: South, 270: West
+dw_deg_max: float = 360.0  # same as above
+
 render_inline: str = False
 render_post_agent: str = False
 render_post_agent_with_fire: str = True
+
+# random seed for producing same terrain map
+seed = 1111  # None

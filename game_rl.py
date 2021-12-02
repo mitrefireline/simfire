@@ -5,7 +5,11 @@ from src.rl_env.fireline_env import FireLineEnv, RLEnv
 
 
 def main():
-    env_config = FireLineEnv(cfg)
+    seed = None
+    if seed is not None:
+        env_config = FireLineEnv(cfg, seed)
+    else:
+        env_config = FireLineEnv(cfg)
     rl_environment = RLEnv(env_config)
     state = rl_environment.reset()
     done = False

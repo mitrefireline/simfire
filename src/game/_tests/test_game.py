@@ -7,6 +7,7 @@ from ...enums import GameStatus
 from ..managers.fire import RothermelFireManager
 from ..managers.mitigation import FireLineManager
 from ...world.parameters import Environment, FuelArray, FuelParticle, Tile
+from ...world.wind import WindController
 
 
 class TestGame(unittest.TestCase):
@@ -24,6 +25,7 @@ class TestGame(unittest.TestCase):
         fire_size = cfg.fire_size
         max_fire_duration = cfg.max_fire_duration
         pixel_scale = cfg.pixel_scale
+        update_rate = cfg.update_rate
         fuel_particle = FuelParticle()
 
         tiles = [[
@@ -32,17 +34,29 @@ class TestGame(unittest.TestCase):
         ] for i in range(cfg.terrain_size)]
         terrain = Terrain(tiles, cfg.elevation_fn, cfg.terrain_size, cfg.screen_size)
 
-        environment = Environment(cfg.M_f, cfg.U, cfg.U_dir)
+        wind_map = WindController()
+        wind_map.init_wind_speed_generator(cfg.mw_seed, cfg.mw_scale, cfg.mw_octaves,
+                                           cfg.mw_persistence, cfg.mw_lacunarity,
+                                           cfg.mw_speed_min, cfg.mw_speed_max,
+                                           cfg.screen_size)
+        wind_map.init_wind_direction_generator(cfg.dw_seed, cfg.dw_scale, cfg.dw_octaves,
+                                               cfg.dw_persistence, cfg.dw_lacunarity,
+                                               cfg.dw_deg_min, cfg.dw_deg_max,
+                                               cfg.screen_size)
+
+        environment = Environment(cfg.M_f, wind_map.map_wind_speed,
+                                  wind_map.map_wind_direction)
 
         fire_manager = RothermelFireManager(init_pos, fire_size, max_fire_duration,
-                                            pixel_scale, fuel_particle, terrain,
-                                            environment)
+                                            pixel_scale, update_rate, fuel_particle,
+                                            terrain, environment)
 
         fireline_manager = FireLineManager(size=cfg.control_line_size,
                                            pixel_scale=cfg.pixel_scale,
                                            terrain=terrain)
         fireline_sprites = fireline_manager.sprites
-        status = self.game.update(terrain, fire_manager.sprites, fireline_sprites)
+        status = self.game.update(terrain, fire_manager.sprites, fireline_sprites,
+                                  wind_map.map_wind_speed, wind_map.map_wind_direction)
 
         self.assertEqual(status,
                          GameStatus.RUNNING,

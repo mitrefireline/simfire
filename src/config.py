@@ -198,3 +198,6 @@ dw_deg_max: float = 360.0  # same as above
 render_inline: str = False
 render_post_agent: str = False
 render_post_agent_with_fire: str = True
+
+# random seed for producing same terrain map
+seed = 1111  # None

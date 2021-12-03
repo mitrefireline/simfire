@@ -171,7 +171,7 @@ class FireManager():
 
         Arguments:
             rate_of_spread: The array that keeps track of the rate of spread for
-                          for all pixel locations.
+                            all pixel locations.
             fire_map: The array that maintains information about the status of the fire
                       at each pixel location (`BURNED`, `UNBURNED`, `FIRELINE`, etc.)
 
@@ -186,12 +186,11 @@ class FireManager():
             factor[np.where(
                 fire_map == BurnStatus.SCRATCHLINE)] = RoSAttenuation.SCRATCHLINE
             factor[np.where(fire_map == BurnStatus.WETLINE)] = RoSAttenuation.WETLINE
+            rate_of_spread = rate_of_spread - factor
         else:
-            factor[np.where(fire_map == BurnStatus.FIRELINE)] = 0
-            factor[np.where(fire_map == BurnStatus.SCRATCHLINE)] = 0
-            factor[np.where(fire_map == BurnStatus.WETLINE)] = 0
-
-        rate_of_spread = rate_of_spread - factor
+            rate_of_spread[np.where(fire_map == BurnStatus.FIRELINE)] = 0
+            rate_of_spread[np.where(fire_map == BurnStatus.SCRATCHLINE)] = 0
+            rate_of_spread[np.where(fire_map == BurnStatus.WETLINE)] = 0
 
         return rate_of_spread
 

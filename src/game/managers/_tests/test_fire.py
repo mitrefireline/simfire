@@ -77,6 +77,41 @@ class TestFireManager(unittest.TestCase):
                                    f'the valid locations: {valid_locs} when a '
                                    'new location is BURNED'))
 
+    def test_update_rate_of_spread(self) -> None:
+        '''
+        Test updating the rate of spread based on locations of control lines
+        '''
+        fire_map = np.full((cfg.screen_size, cfg.screen_size), BurnStatus.UNBURNED)
+        rate_of_spread = np.zeros_like(fire_map)
+
+        fireline_y_coords = [100, 100]
+        fireline_x_coords = [100, 101]
+        scratchline_y_coords = [100, 100]
+        scratchline_x_coords = [102, 103]
+        wetline_y_coords = [100, 100]
+        wetline_x_coords = [104, 105]
+
+        y_coords = [100, 100, 100, 100, 100, 100]
+        x_coords = [100, 101, 102, 103, 104, 105]
+
+        fire_map[fireline_y_coords, fireline_x_coords] = BurnStatus.FIRELINE
+        fire_map[scratchline_y_coords, scratchline_x_coords] = BurnStatus.SCRATCHLINE
+        fire_map[wetline_y_coords, wetline_x_coords] = BurnStatus.WETLINE
+        rate_of_spread[y_coords, x_coords] = 1
+
+        # First, test the True case
+        self.fire_manager.attenuate_line_ros = True
+        rate_of_spread_true = self.fire_manager._update_rate_of_spread(
+            rate_of_spread, fire_map)
+        # Check to make sure that the rate of spread was changed to a smaller value
+        self.assertLess(np.sum(rate_of_spread_true), 5)
+
+        # Then, test the False case
+        self.fire_manager.attenuate_line_ros = False
+        rate_of_spread_false = self.fire_manager._update_rate_of_spread(
+            rate_of_spread, fire_map)
+        self.assertEqual(np.sum(rate_of_spread_false), 0)
+
 
 class TestRothermelFireManager(unittest.TestCase):
     def setUp(self) -> None:

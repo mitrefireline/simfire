@@ -1,22 +1,51 @@
-.. Rothermal Modeler documentation master file, created by
-   sphinx-quickstart on Mon Oct 25 11:10:18 2021.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+fiReLine Rothermal Fire Modeler
+===============================
 
-Welcome to fiReLine Rothermal Fire Modeler documentation!
-===========================================================
+Running The Simulation
+----------------------
+:doc:`intro`
+   Introduction to installing and running the simulation.
+
+:doc:`config`
+   The different configuration parameters to set for the simulation and their defaults.
+
+Development
+-----------
+
+:doc:`contributing`
+   How to contribute changes to the codebase or to documentation.
+
+API
+---
+
+:doc:`autoapi/index`
+
+.. Hidden TOCs
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Running the Simulation
+   :hidden:
+
+   intro
+   config
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Development
+   :hidden:
+
+   contributing
 
 .. toctree::
    :maxdepth: 1
-   :caption: Contents:
+   :caption: API Reference
+   :hidden:
 
-   intro.md
-   config.md
-   contributing.md
-   modules
+   autoapi/index
 
 Indices and tables
-==================
+------------------
 
 * :ref:`genindex`
 * :ref:`modindex`

@@ -4,7 +4,7 @@ import numpy as np
 from . import test_config as config
 from ...game.sprites import Terrain
 from ...game.game import Game
-from ...enums import BurnStatus
+from ...enums import BurnStatus, GameStatus
 from ...world.parameters import Environment, FuelArray, FuelParticle, Tile
 from ...game.managers.fire import RothermelFireManager
 from ...game.managers.mitigation import FireLineManager
@@ -15,7 +15,6 @@ class RLEnvTest(unittest.TestCase):
     def setUp(self) -> None:
         '''
         Initialize the FireLineEnv class and instantiate a fireline action.
-
         '''
         self.fireline_env = FireLineEnv(config)
         self.rl_env = RLEnv(self.fireline_env)
@@ -52,8 +51,9 @@ class RLEnvTest(unittest.TestCase):
 
     def test_step(self) -> None:
         '''
-        Test that the call to step() runs through properly.
-        Step() calls a handful of sub-functions, which also get tested.
+        Test that the call to `step()` runs through properly.
+
+        `step()` calls a handful of sub-functions, which also get tested.
 
         TODO: This will change with updates to the state format
         '''
@@ -80,8 +80,10 @@ class RLEnvTest(unittest.TestCase):
 
     def test_reset(self) -> None:
         '''
-        Test that the call to reset() runs through properly.
-        reset() calls a handful of sub-functions, which also get tested.
+        Test that the call to `reset()` runs through properly.
+
+        `reset()` calls a handful of sub-functions, which also get tested.
+
         Assert agent position is returned to upper left corner (1,0) of game.
 
         state_space:
@@ -129,8 +131,9 @@ class RLEnvTest(unittest.TestCase):
 
     def test_update_current_agent_loc(self) -> None:
         '''
-        Test that the call to _update_current_agent_loc() runs through properly.
-        The agent position should only be at a single location per step().
+        Test that the call to `_update_current_agent_loc()` runs through properly.
+
+        The agent position should only be at a single location per `step()`.
         '''
 
         self.rl_env.reset()
@@ -150,8 +153,7 @@ class RLEnvTest(unittest.TestCase):
 class FireLineEnvTest(unittest.TestCase):
     def setUp(self) -> None:
         '''
-        Initialize the FireLineEnv class and instantiate a fireline action.
-
+        Initialize the `FireLineEnv` class and instantiate a fireline action.
         '''
         self.config = config
         self.fireline_env = FireLineEnv(self.config)
@@ -182,13 +184,13 @@ class FireLineEnvTest(unittest.TestCase):
 
     def test_render(self) -> None:
         '''
-        Test that the call to _render() runs through properly.
-        This should be pass as long as the calls to fireline_manager.update()
-        and fire_map.update() pass tests, respectively.
-        Assert the points get updated in the fireline_sprites group.
+        Test that the call to `_render()` runs through properly.
 
-        TODO: FIX - Putting a control_line "down" before spreading fire, the fire_map
-                changes from GameStatus.FIRELINE -> GameStatus.BURNED
+        This should be pass as long as the calls to `fireline_manager.update()` and
+        `fire_map.update()` pass tests.
+
+        Assert the points get updated in the `fireline_sprites` group.
+
         '''
         current_agent_loc = (1, 1)
 
@@ -226,19 +228,18 @@ class FireLineEnvTest(unittest.TestCase):
                                   mitigation_only=False,
                                   mitigation_and_fire_spread=True)
 
-        all_burning_locs = list(zip(*np.where(self.fireline_env.fire_map == 2)))
-
-        self.assertIn(self.config.fire_init_pos,
-                      all_burning_locs,
-                      msg=(f'The number of sprites updated is '
-                           f'{len(np.where(self.fireline_env.fire_map == 2))} '
-                           f', but it should be {self.config.fire_init_pos}'))
+        self.assertEqual(
+            self.fireline_env.fire_status,
+            GameStatus.QUIT,
+            msg=f'The returned state of the Game is {self.fireline_env.game_status} '
+            ' but, should be GameStatus.QUIT.')
 
     def test_update_sprite_points(self) -> None:
         '''
-        Test that the call to _update_sprites() runs through properly.
-        Since self.action is instantiated as 1, we need to verify that
-            a fireline sprite is created and added to the fireline_manager.
+        Test that the call to `_update_sprites()` runs through properly.
+
+        Since self.action is instantiated as `1`, we need to verify that a fireline sprite
+        is created and added to the `fireline_manager`.
         '''
 
         # assert points get updated 'inline' as agent traverses
@@ -250,8 +251,8 @@ class FireLineEnvTest(unittest.TestCase):
                                                 inline=True)
         self.assertEqual(self.fireline_env.points,
                          points,
-                         msg=f'The sprite was updated at {self.fireline_env.points} '
-                         f', but it should have been at {current_agent_loc}')
+                         msg=f'The sprite was updated at {self.fireline_env.points}, '
+                         f'but it should have been at {current_agent_loc}')
 
         # assert points get updated after agent traverses entire game
         current_agent_loc = (self.config.screen_size, self.config.screen_size)
@@ -270,23 +271,25 @@ class FireLineEnvTest(unittest.TestCase):
 
     def test_reset_state(self) -> None:
         '''
-        Test that the call to _convert_data_to_gym runs through properly.
+        Test that the call to `_convert_data_to_gym()` runs through properly.
+
         This function returns the state as an array.
 
         TODO: Waiting for update to the state space
-
         '''
+        pass
 
     def test_run(self) -> None:
         '''
-        Test that the call to _run runs the simulation properly.
+        Test that the call to `_run` runs the simulation properly.
+
         This function returns the burned firemap with or w/o mitigation.
 
-        This function will reset the fire_map to all UNBURNED pixels
-            at each call to the method.
+        This function will reset the `fire_map` to all `UNBURNED` pixels at each call to
+        the method.
 
-        This should pass as long as the calls to fireline_manager.update()
-        and fire_map.update() pass tests, respectively.
+        This should pass as long as the calls to `fireline_manager.update()`
+        and `fire_map.update()` pass tests.
         '''
         mitigation = np.zeros((self.config.screen_size, self.config.screen_size))
         mitigation[1, 0] = 1
@@ -315,8 +318,9 @@ class FireLineEnvTest(unittest.TestCase):
 
     def test_compare_states(self) -> None:
         '''
-        Test that the call to _compare_states runs the comparison of
-            state spaces properly.
+        Test that the call to `_compare_states` runs the comparison of state spaces
+        properly.
+
         This function returns the overall reward.
         '''
         screen_size = self.fireline_env.config.screen_size

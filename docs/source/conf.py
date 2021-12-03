@@ -21,7 +21,7 @@ copyright = '2021, fiReLine'
 author = 'Marissa Dotter, Michael Doyle, Chris Kempis, Michael Threet, Tim Welsh'
 
 # The full version, including alpha/beta/rc tags
-release = '0.0.1'
+release = '0.0.0'
 
 # -- General configuration ---------------------------------------------------
 

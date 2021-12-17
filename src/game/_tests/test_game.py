@@ -101,13 +101,20 @@ class TestGame(unittest.TestCase):
         environment = Environment(cfg.M_f, wind_map.map_wind_speed,
                                   wind_map.map_wind_direction)
 
-        fire_manager = RothermelFireManager(init_pos, fire_size, max_fire_duration,
-                                            pixel_scale, update_rate, fuel_particle,
-                                            terrain, environment)
+        fire_manager = RothermelFireManager(init_pos,
+                                            fire_size,
+                                            max_fire_duration,
+                                            pixel_scale,
+                                            update_rate,
+                                            fuel_particle,
+                                            terrain,
+                                            environment,
+                                            headless=True)
 
         fireline_manager = FireLineManager(size=cfg.control_line_size,
                                            pixel_scale=cfg.pixel_scale,
-                                           terrain=terrain)
+                                           terrain=terrain,
+                                           headless=True)
         fireline_sprites = fireline_manager.sprites
         status = game.update(terrain, fire_manager.sprites, fireline_sprites,
                              wind_map.map_wind_speed, wind_map.map_wind_direction)

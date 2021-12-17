@@ -1,4 +1,6 @@
+import os
 import unittest
+from unittest import mock
 
 import numpy as np
 from skimage.draw import line
@@ -12,6 +14,7 @@ from ...sprites import FireLine, ScratchLine, WetLine, Terrain
 from ..mitigation import FireLineManager, ScratchLineManager, WetLineManager
 
 
+@mock.patch.dict(os.environ, {'SDL_VIDEODRIVER': 'dummy'})
 class TestControlLineManager(unittest.TestCase):
     '''
     Tests the parent `ControlLineManager` class's `add_point` and `update` functions
@@ -24,7 +27,6 @@ class TestControlLineManager(unittest.TestCase):
         x = points[1].tolist()
         self.manager = FireLineManager
         self.points = list(zip(x, y))
-        self.game = Game(cfg.screen_size)
 
         fuel_arrs = [[
             FuelArray(Tile(j, i, cfg.terrain_scale, cfg.terrain_scale),
@@ -33,6 +35,7 @@ class TestControlLineManager(unittest.TestCase):
 
         self.terrain = Terrain(fuel_arrs, flat(), cfg.terrain_size, cfg.screen_size)
 
+    @mock.patch.dict(os.environ, {'SDL_VIDEODRIVER': 'dummy'})
     def test_add_point(self) -> None:
         '''
         Test that a point is added to the self.sprites list correctly.
@@ -58,12 +61,13 @@ class TestControlLineManager(unittest.TestCase):
         Test that all points supplied to `manager.update()` are the same points in the
         resulting `fire_map`
         '''
+        game = Game(cfg.screen_size)
         fire_map = np.full((cfg.screen_size, cfg.screen_size), BurnStatus.UNBURNED)
 
         manager = self.manager(size=cfg.control_line_size,
                                pixel_scale=cfg.pixel_scale,
                                terrain=self.terrain)
-        fire_map = self.game.fire_map
+        fire_map = game.fire_map
         fire_map = manager.update(fire_map, self.points)
 
         fireline_points = np.argwhere(fire_map == BurnStatus.FIRELINE)
@@ -81,6 +85,7 @@ class TestControlLineManager(unittest.TestCase):
                                   f'{fireline_points}'))
 
 
+@mock.patch.dict(os.environ, {'SDL_VIDEODRIVER': 'dummy'})
 class TestFireLineManager(unittest.TestCase):
     '''
     Meant to test the `FireLineManager` class. Will eventually test the different physics
@@ -92,7 +97,6 @@ class TestFireLineManager(unittest.TestCase):
         x = points[1].tolist()
         self.manager = FireLineManager
         self.points = list(zip(x, y))
-        self.game = Game(cfg.screen_size)
 
         fuel_arrs = [[
             FuelArray(Tile(j, i, cfg.terrain_scale, cfg.terrain_scale),
@@ -121,6 +125,7 @@ class TestFireLineManager(unittest.TestCase):
                          msg=('FireLine.sprite_type is not a FireLine sprite'))
 
 
+@mock.patch.dict(os.environ, {'SDL_VIDEODRIVER': 'dummy'})
 class TestScratchLineManager(unittest.TestCase):
     '''
     Meant to test the `ScratchLineManager` class. Will eventually test the different
@@ -132,7 +137,6 @@ class TestScratchLineManager(unittest.TestCase):
         x = points[1].tolist()
         self.manager = ScratchLineManager
         self.points = list(zip(x, y))
-        self.game = Game(cfg.screen_size)
 
         fuel_arrs = [[
             FuelArray(Tile(j, i, cfg.terrain_scale, cfg.terrain_scale),
@@ -161,6 +165,7 @@ class TestScratchLineManager(unittest.TestCase):
                          msg=('FireLine.sprite_type is not a FireLine sprite'))
 
 
+@mock.patch.dict(os.environ, {'SDL_VIDEODRIVER': 'dummy'})
 class TestWetLineManager(unittest.TestCase):
     '''
     Meant to test the `WetLineManager` class. Will eventually test the different physics
@@ -172,7 +177,6 @@ class TestWetLineManager(unittest.TestCase):
         x = points[1].tolist()
         self.manager = WetLineManager
         self.points = list(zip(x, y))
-        self.game = Game(cfg.screen_size)
 
         fuel_arrs = [[
             FuelArray(Tile(j, i, cfg.terrain_scale, cfg.terrain_scale),

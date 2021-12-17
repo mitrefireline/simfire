@@ -19,6 +19,15 @@
     Variables
     ---------
 
+    ### Game Parameters
+    Used to modifgy game behavior
+
+    #### `headless`
+    (`bool`, default = False):
+    Whether to run the game in a headless state. When set to false, the game will render
+    like normal. When set to True, the game will not render/draw any sprites to the
+    display.
+
     ### Area Parameters
     Used to determine scale of area in square feet.
 
@@ -134,6 +143,7 @@ from .world.parameters import FuelArray
 from .utils.terrain import Chaparral
 
 # Game/Screen parameters
+headless: bool = False
 
 # Number of terrain tiles in each row/column
 terrain_size: int = 15

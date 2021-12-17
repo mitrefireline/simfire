@@ -20,8 +20,12 @@ class Terrain(pygame.sprite.Sprite):
     tiles together initially and then updates their color based on burn
     status.
     '''
-    def __init__(self, tiles: Sequence[Sequence[FuelArray]], elevation_fn: ElevationFn,
-                 terrain_size: int, screen_size: int) -> None:
+    def __init__(self,
+                 tiles: Sequence[Sequence[FuelArray]],
+                 elevation_fn: ElevationFn,
+                 terrain_size: int,
+                 screen_size: int,
+                 headless: bool = False) -> None:
         '''
         Initialize the class by loading the tile textures and stitching
         together the whole terrain image.
@@ -31,6 +35,10 @@ class Terrain(pygame.sprite.Sprite):
                    terrain.
             elevation_fn: A callable function that converts (x, y) coordintates to
                           elevations
+            terrain_size: The size of each terrain block in pixels
+            screen_size: The game's screen size in pixels
+            headless: Flag to run in a headless state. This will allow PyGame objects to
+                      not be initialized.
 
         Returns:
             None
@@ -43,9 +51,15 @@ class Terrain(pygame.sprite.Sprite):
 
         self.screen_size = (screen_size, screen_size)
         self.texture = self._load_texture()
+        self.headless = headless
+
         self.image, self.fuel_arrs, self.elevations = self._make_terrain_image()
-        # The rectangle for this sprite is the entire game
-        self.rect = pygame.Rect(0, 0, *self.screen_size)
+        if self.headless:
+            self.image = None
+            self.rect = None
+        else:
+            # The rectangle for this sprite is the entire game
+            self.rect = pygame.Rect(0, 0, *self.screen_size)
 
         # This sprite should always have layer 1 since it will always
         # be behind every other sprite
@@ -64,9 +78,10 @@ class Terrain(pygame.sprite.Sprite):
         '''
         fire_map = fire_map.copy()
         burned_idxs = np.where(fire_map == BurnStatus.BURNED)
-        # This method will update self.image in-place with arr
-        arr = pygame.surfarray.pixels3d(self.image)
-        arr[burned_idxs[::-1]] = BURNED_RGB_COLOR
+        if not self.headless:
+            # This method will update self.image in-place with arr
+            arr = pygame.surfarray.pixels3d(self.image)
+            arr[burned_idxs[::-1]] = BURNED_RGB_COLOR
 
     def _load_texture(self) -> np.ndarray:
         '''
@@ -228,7 +243,7 @@ class Fire(pygame.sprite.Sprite):
     image is generally kept very small to make rendering easier. All fire
     spreading is handled by the FireManager it is attached to.
     '''
-    def __init__(self, pos: Tuple[int, int], size: int) -> None:
+    def __init__(self, pos: Tuple[int, int], size: int, headless: bool = False) -> None:
         '''
         Initialize the class by recording the position and size of the sprite
         and creating a solid color texture.
@@ -236,20 +251,29 @@ class Fire(pygame.sprite.Sprite):
         Arguments:
             pos: The (x, y) pixel position of the sprite
             size: The pixel size of the sprite
+            headless: Flag to run in a headless state. This will allow PyGame objects to
+                      not be initialized.
         '''
         super().__init__()
 
         self.pos = pos
         self.size = size
+        self.headless = headless
 
-        fire_color = np.zeros((self.size, self.size, 3))
-        fire_color[:, :, 0] = 255
-        fire_color[:, :, 1] = 153
-        fire_color[:, :, 2] = 51
-        self.image = pygame.surfarray.make_surface(fire_color)
+        if self.headless:
+            self.image = None
+            self.rect = None
+        else:
+            fire_color = np.zeros((self.size, self.size, 3))
+            fire_color[:, :, 0] = 255
+            fire_color[:, :, 1] = 153
+            fire_color[:, :, 2] = 51
+            self.image = pygame.surfarray.make_surface(fire_color)
 
-        self.rect = self.image.get_rect()
-        self.rect = self.rect.move(self.pos[0], self.pos[1])
+            self.rect = self.image.get_rect()
+            self.rect = self.rect.move(self.pos[0], self.pos[1])
+
+        # Initialize groups to None to start with a "clean" sprite
         self.groups = None
 
         # Layer 3 so that it appears on top of the terrain and line (if applicable)
@@ -274,24 +298,38 @@ class FireLine(pygame.sprite.Sprite):
     kept very small to make rendering easier. All fireline placement spreading is handled
     by the FireLineManager it is attached to.
     '''
-    def __init__(self, pos: Tuple[int, int], size: int) -> None:
+    def __init__(self, pos: Tuple[int, int], size: int, headless: bool = False) -> None:
         '''
         Initialize the class by recording the position and size of the sprite
         and creating a solid color texture.
+
+        Arguments:
+            pos: The (x, y) pixel position of the sprite
+            size: The pixel size of the sprite
+            headless: Flag to run in a headless state. This will allow PyGame objects to
+                      not be initialized.
+
+        Returns:
+            None
         '''
         super().__init__()
 
         self.pos = pos
         self.size = size
+        self.headless = headless
 
-        fireline_color = np.zeros((self.size, self.size, 3))
-        fireline_color[:, :, 0] = 155  # R
-        fireline_color[:, :, 1] = 118  # G
-        fireline_color[:, :, 2] = 83  # B
-        self.image = pygame.surfarray.make_surface(fireline_color)
+        if self.headless:
+            self.image = None
+            self.rect = None
+        else:
+            fire_color = np.zeros((self.size, self.size, 3))
+            fire_color[:, :, 0] = 255
+            fire_color[:, :, 1] = 153
+            fire_color[:, :, 2] = 51
+            self.image = pygame.surfarray.make_surface(fire_color)
 
-        self.rect = self.image.get_rect()
-        self.rect = self.rect.move(self.pos[0], self.pos[1])
+            self.rect = self.image.get_rect()
+            self.rect = self.rect.move(self.pos[0], self.pos[1])
 
         # Layer LINE so that it appears on top of the terrain
         self.layer: int = SpriteLayer.LINE
@@ -316,7 +354,7 @@ class ScratchLine(pygame.sprite.Sprite):
     generally kept very small to make rendering easier. All scratch line placement
     spreading is handled by the ScratchLineManager it is attached to.
     '''
-    def __init__(self, pos: Tuple[int, int], size: int) -> None:
+    def __init__(self, pos: Tuple[int, int], size: int, headless: bool = False) -> None:
         '''
         Initialize the class by recording the position and size of the sprite
         and creating a solid color texture.
@@ -325,15 +363,20 @@ class ScratchLine(pygame.sprite.Sprite):
 
         self.pos = pos
         self.size = size
+        self.headless = headless
 
-        scratchline_color = np.zeros((self.size, self.size, 3))
-        scratchline_color[:, :, 0] = 139  # R
-        scratchline_color[:, :, 1] = 125  # G
-        scratchline_color[:, :, 2] = 58  # B
-        self.image = pygame.surfarray.make_surface(scratchline_color)
+        if self.headless:
+            self.image = None
+            self.rect = None
+        else:
+            scratchline_color = np.zeros((self.size, self.size, 3))
+            scratchline_color[:, :, 0] = 139  # R
+            scratchline_color[:, :, 1] = 125  # G
+            scratchline_color[:, :, 2] = 58  # B
+            self.image = pygame.surfarray.make_surface(scratchline_color)
 
-        self.rect = self.image.get_rect()
-        self.rect = self.rect.move(self.pos[0], self.pos[1])
+            self.rect = self.image.get_rect()
+            self.rect = self.rect.move(self.pos[0], self.pos[1])
 
         # Layer LINE so that it appears on top of the terrain
         self.layer: int = SpriteLayer.LINE
@@ -358,7 +401,7 @@ class WetLine(pygame.sprite.Sprite):
     generally kept very small to make rendering easier. All wet line placement
     spreading is handled by the WaterLineManager it is attached to.
     '''
-    def __init__(self, pos: Tuple[int, int], size: int) -> None:
+    def __init__(self, pos: Tuple[int, int], size: int, headless: bool = False) -> None:
         '''
         Initialize the class by recording the position and size of the sprite
         and creating a color texture.
@@ -367,15 +410,20 @@ class WetLine(pygame.sprite.Sprite):
 
         self.pos = pos
         self.size = size
+        self.headless = headless
 
-        wetline_color = np.zeros((self.size, self.size, 3))
-        wetline_color[:, :, 0] = 212  # R
-        wetline_color[:, :, 1] = 241  # G
-        wetline_color[:, :, 2] = 249  # B
-        self.image = pygame.surfarray.make_surface(wetline_color)
+        if self.headless:
+            self.image = None
+            self.rect = None
+        else:
+            wetline_color = np.zeros((self.size, self.size, 3))
+            wetline_color[:, :, 0] = 212  # R
+            wetline_color[:, :, 1] = 241  # G
+            wetline_color[:, :, 2] = 249  # B
+            self.image = pygame.surfarray.make_surface(wetline_color)
 
-        self.rect = self.image.get_rect()
-        self.rect = self.rect.move(self.pos[0], self.pos[1])
+            self.rect = self.image.get_rect()
+            self.rect = self.rect.move(self.pos[0], self.pos[1])
 
         # Layer LINE so that it appears on top of the terrain
         self.layer: int = SpriteLayer.LINE

@@ -11,7 +11,7 @@ from src.world.wind import WindController
 
 def main():
 
-    game = Game(cfg.screen_size)
+    game = Game(cfg.screen_size, headless=cfg.headless)
 
     fuel_particle = FuelParticle()
 
@@ -41,16 +41,22 @@ def main():
 
     fireline_manager = FireLineManager(size=cfg.control_line_size,
                                        pixel_scale=cfg.pixel_scale,
-                                       terrain=terrain)
+                                       terrain=terrain,
+                                       headless=cfg.headless)
 
     fire_map = game.fire_map
     fire_map = fireline_manager.update(fire_map, points)
     game.fire_map = fire_map
 
-    fire_manager = RothermelFireManager(cfg.fire_init_pos, cfg.fire_size,
-                                        cfg.max_fire_duration, cfg.pixel_scale,
-                                        cfg.update_rate, fuel_particle, terrain,
-                                        environment)
+    fire_manager = RothermelFireManager(cfg.fire_init_pos,
+                                        cfg.fire_size,
+                                        cfg.max_fire_duration,
+                                        cfg.pixel_scale,
+                                        cfg.update_rate,
+                                        fuel_particle,
+                                        terrain,
+                                        environment,
+                                        headless=cfg.headless)
 
     game_status = GameStatus.RUNNING
     fire_status = GameStatus.RUNNING

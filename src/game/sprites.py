@@ -262,7 +262,9 @@ class Fire(pygame.sprite.Sprite):
 
         if self.headless:
             self.image = None
-            self.rect = None
+            # Need to use self.rect to track the location of the sprite
+            # When running headless, we need this to be a tuple instead of a PyGame Rect
+            self.rect = pos + (size, size)
         else:
             fire_color = np.zeros((self.size, self.size, 3))
             fire_color[:, :, 0] = 255
@@ -320,7 +322,9 @@ class FireLine(pygame.sprite.Sprite):
 
         if self.headless:
             self.image = None
-            self.rect = None
+            # Need to use self.rect to track the location of the sprite
+            # When running headless, we need this to be a tuple instead of a PyGame Rect
+            self.rect = pos + (size, size)
         else:
             fire_color = np.zeros((self.size, self.size, 3))
             fire_color[:, :, 0] = 255
@@ -367,7 +371,9 @@ class ScratchLine(pygame.sprite.Sprite):
 
         if self.headless:
             self.image = None
-            self.rect = None
+            # Need to use self.rect to track the location of the sprite
+            # When running headless, we need this to be a tuple instead of a PyGame Rect
+            self.rect = pos + (size, size)
         else:
             scratchline_color = np.zeros((self.size, self.size, 3))
             scratchline_color[:, :, 0] = 139  # R
@@ -414,7 +420,9 @@ class WetLine(pygame.sprite.Sprite):
 
         if self.headless:
             self.image = None
-            self.rect = None
+            # Need to use self.rect to track the location of the sprite
+            # When running headless, we need this to be a tuple instead of a PyGame Rect
+            self.rect = pos + (size, size)
         else:
             wetline_color = np.zeros((self.size, self.size, 3))
             wetline_color[:, :, 0] = 212  # R

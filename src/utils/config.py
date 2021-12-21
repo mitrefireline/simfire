@@ -1,10 +1,10 @@
-import sys
 import yaml
-from typing import Any
 from pathlib import Path
+from typing import Any
 from yaml.scanner import ScannerError
 
 from .log import create_logger
+from ..world.elevation_functions import PerlinNoise2D, flat, gaussian
 
 log = create_logger(__name__)
 
@@ -20,7 +20,7 @@ class ConfigType:
         All `kwargs` passed in will be nested into attributes if the `kwargs` consist of
         nested dictionaries.
         '''
-        self.kwargs = kwargs
+        self.__dict__ = kwargs
         for key, value in kwargs.items():
             if isinstance(value, dict):
                 value = ConfigType(**value)
@@ -32,9 +32,8 @@ class ConfigType:
         '''
         if isinstance(obj, str):
             if '(' in obj:
-                return tuple(map(int, obj[1:-1].split(', ')))
-        else:
-            return obj
+                obj = tuple(map(int, obj[1:-1].split(', ')))
+        return obj
 
 
 class Config:
@@ -52,8 +51,11 @@ class Config:
             None
         '''
         self.path = path
+        self._possible_elevations = ('perlin', 'gaussian', 'flat')
         self._load()
         self._set_attributes()
+        self._set_terrain_scale()
+        self._set_elevation_function()
 
     def _load(self) -> None:
         '''
@@ -65,10 +67,10 @@ class Config:
                     self.data = yaml.safe_load(f)
                 except ScannerError as e:
                     log.error(f'Error parsing YAML file at {self.path}:\n' f'{e.error}')
-                    sys.exit(1)
+                    raise ScannerError
         except FileNotFoundError:
             log.error(f'Error opening YAML file at {self.path}. Does it exist?')
-            sys.exit(1)
+            raise FileNotFoundError
 
     def _set_attributes(self) -> None:
         '''
@@ -78,6 +80,40 @@ class Config:
             if isinstance(value, dict):
                 value = ConfigType(**value)
             setattr(self, key, value)
+
+    def _set_terrain_scale(self) -> None:
+        '''
+        Set the attribute `self.area.terrain_scale` defined as
+        `self.area.pixel_scale * self.area.terrain_size`
+        '''
+        setattr(self.area, 'terrain_scale',
+                self.area.pixel_scale * self.area.terrain_size)
+
+    def _set_elevation_function(self) -> None:
+        '''
+        Reset the attribute `self.terrain.elevation_function`
+
+        Before, as read in from the YAML, the elevation function was just a string. After
+        calling this, it becomes an actual function with all of the precompute values
+        from the config passed in.
+        '''
+        if self.terrain.elevation_function.lower() == 'perlin':
+            args = self.terrain.perlin
+            noise = PerlinNoise2D(args.amplitude, args.shape, args.resolution)
+            noise.precompute()
+            setattr(self.terrain, 'elevation_function', noise.fn)
+        elif self.terrain.elevation_function.lower() == 'gaussian':
+            args = self.terrain.gaussian
+            noise = gaussian(args.amplitude, args.mu_x, args.mu_y, args.sigma_x,
+                             args.sigma_y)
+            setattr(self.terrain, 'elevation_function', noise.fn)
+        elif self.terrain.elevation_function.lower() == 'flat':
+            setattr(self.terrain, 'elevation_function', flat)
+        else:
+            log.error('The user-defined elevation function is set to '
+                      f'{self.terrain.elevation_function} when it can only be one of '
+                      f'these values: {self._possible_elevations}')
+            raise ValueError
 
     def save(self, path: Path) -> None:
         '''

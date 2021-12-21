@@ -11,7 +11,7 @@ display:
 
 terrain:
   seed: 1111
-  elevation_function: 'perlin'
+  elevation_function: perlin
   perlin:
     amplitude: 500
     shape: (225, 225)

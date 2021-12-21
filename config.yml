@@ -1,0 +1,54 @@
+# For a description of config parameters, go to
+# https://fireline.pages.mitre.org/rothermel-modeling/config.html
+area:
+  screen_size: 225
+  terrain_size: 15
+  pixel_scale: 50
+
+display:
+  fire_size: 2
+  control_line_size: 2
+
+terrain:
+  seed: 1111
+  elevation_function: 'perlin'
+  perlin:
+    amplitude: 500
+    shape: (225, 225)
+    resolution: (1, 1)
+  gaussian:
+    amplitude: 500
+    mu_x: 50
+    mu_y: 50
+    sigma_x: 50
+    sigma_y: 50
+
+simulation:
+  fire_initial_position: (65, 65)
+
+environment:
+  moisture: 0.03
+  wind_speed: 13
+  wind_direction: 135
+
+wind:
+  speed:
+    seed: 2345
+    scale: 400
+    octaves: 3
+    persistence: 0.7
+    lacunarity: 2.0
+    min: 616.0
+    max: 4136.0
+  direction:
+    seed: 650
+    scale: 1500
+    octaves: 2
+    persistence: 0.9
+    lacunarity: 1.0
+    min: 0.0
+    max: 360.0
+  render:
+    inline: false
+    post_agent: false
+    post_agent_with_fire: true

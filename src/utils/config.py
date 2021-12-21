@@ -4,6 +4,10 @@ from typing import Any
 from pathlib import Path
 from yaml.scanner import ScannerError
 
+from .log import create_logger
+
+log = create_logger(__name__)
+
 
 class ConfigType:
     '''
@@ -60,10 +64,10 @@ class Config:
                 try:
                     self.data = yaml.safe_load(f)
                 except ScannerError as e:
-                    print(f'Error parsing YAML file at {self.path}:\n' f'{e.error}')
+                    log.error(f'Error parsing YAML file at {self.path}:\n' f'{e.error}')
                     sys.exit(1)
         except FileNotFoundError:
-            print(f'Error opening YAML file at {self.path}. Does it exist?')
+            log.error(f'Error opening YAML file at {self.path}. Does it exist?')
             sys.exit(1)
 
     def _set_attributes(self) -> None:

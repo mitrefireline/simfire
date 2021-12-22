@@ -13,7 +13,7 @@ from ..game.managers.fire import RothermelFireManager
 from ..world.parameters import Environment, FuelArray, FuelParticle, Tile
 from ..game.managers.mitigation import (FireLineManager, ScratchLineManager,
                                         WetLineManager)
-from ..utils.terrain import Chaparral, RandomSeedList
+from ..utils.terrain import chaparral, random_seed_list
 
 
 class FireLineEnv():
@@ -24,15 +24,15 @@ class FireLineEnv():
 
         if seed:
             np.random.seed(seed)
-            seed_tuple = RandomSeedList(self.config.terrain_size, seed)
+            seed_tuple = random_seed_list(self.config.terrain_size, seed)
             self.config.terrain_map = tuple(
                 tuple(
-                    Chaparral(seed=seed_tuple[outer][inner])
+                    chaparral(seed=seed_tuple[outer][inner])
                     for inner in range(self.config.terrain_size))
                 for outer in range(self.config.terrain_size))
         else:
             self.config.terrain_map = tuple(
-                tuple(Chaparral() for _ in range(self.config.terrain_size))
+                tuple(chaparral() for _ in range(self.config.terrain_size))
                 for _ in range(self.config.terrain_size))
 
         self.fuel_particle = FuelParticle()

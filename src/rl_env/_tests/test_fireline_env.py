@@ -1,14 +1,14 @@
 import unittest
 import numpy as np
 
-from . import test_config as config
-from ...game.sprites import Terrain
-from ...game.game import Game
 from ...enums import BurnStatus, GameStatus
-from ...world.parameters import Environment, FuelArray, FuelParticle, Tile
+from ...game.game import Game
 from ...game.managers.fire import RothermelFireManager
 from ...game.managers.mitigation import FireLineManager
+from ...game.sprites import Terrain
 from ...rl_env.fireline_env import FireLineEnv, RLEnv
+from ...utils.config import Config
+from ...world.parameters import Environment, FuelParticle
 
 
 class RLEnvTest(unittest.TestCase):
@@ -16,7 +16,8 @@ class RLEnvTest(unittest.TestCase):
         '''
         Initialize the FireLineEnv class and instantiate a fireline action.
         '''
-        self.fireline_env = FireLineEnv(config)
+        self.config = Config('./src/rl_env/_tests/test_config.yml')
+        self.fireline_env = FireLineEnv(self.config)
         self.rl_env = RLEnv(self.fireline_env)
         self.action = 1
         self.current_agent_loc = (1, 1)
@@ -27,9 +28,9 @@ class RLEnvTest(unittest.TestCase):
 
         '''
         seed = 1212
-        fireline_env_seed = FireLineEnv(config, seed)
+        fireline_env_seed = FireLineEnv(self.config, seed)
         fireline_env_seed = fireline_env_seed.config.terrain_map
-        fireline_env_no_seed = FireLineEnv(config)
+        fireline_env_no_seed = FireLineEnv(self.config)
         fireline_env_no_seed = fireline_env_no_seed.config.terrain_map
 
         # assert these envs are different
@@ -42,7 +43,7 @@ class RLEnvTest(unittest.TestCase):
                     'maps.')
 
         # assert equal Fuel Maps
-        fireline_env_same_seed = FireLineEnv(config, seed)
+        fireline_env_same_seed = FireLineEnv(self.config, seed)
         fireline_env_same_seed = fireline_env_same_seed.config.terrain_map
         self.assertEqual(fireline_env_seed,
                          fireline_env_same_seed,
@@ -102,10 +103,10 @@ class RLEnvTest(unittest.TestCase):
 
         w_0_array = np.array([
             self.fireline_env.terrain.fuel_arrs[i][j].fuel.w_0
-            for j in range(self.fireline_env.config.screen_size)
-            for i in range(self.fireline_env.config.screen_size)
-        ]).reshape(self.fireline_env.config.screen_size,
-                   self.fireline_env.config.screen_size)
+            for j in range(self.fireline_env.config.area.screen_size)
+            for i in range(self.fireline_env.config.area.screen_size)
+        ]).reshape(self.fireline_env.config.area.screen_size,
+                   self.fireline_env.config.area.screen_size)
 
         self.assertEqual(
             agent_pos, (0, 0),
@@ -121,11 +122,11 @@ class RLEnvTest(unittest.TestCase):
                          0,
                          msg=(f'The returned state of the fireline is {fireline}, but it '
                               f'should be 0'))
-
+        elevation_zero_min = self.fireline_env.terrain.elevations - \
+                             self.fireline_env.terrain.elevations.min()
+        valid_elevation = elevation_zero_min / (elevation_zero_min.max() + 1e-6)
         self.assertTrue(
-            (elevation == (self.fireline_env.terrain.elevations +
-                           self.fireline_env.config.noise_amplitude) /
-             (2 * self.fireline_env.config.noise_amplitude)).all(),
+            (elevation == valid_elevation).all(),
             msg=('The returned state of the terrain elevation map is not the same '
                  'as the initialized terrain elevation map'))
 
@@ -155,31 +156,36 @@ class FireLineEnvTest(unittest.TestCase):
         '''
         Initialize the `FireLineEnv` class and instantiate a fireline action.
         '''
-        self.config = config
+        self.config = Config('./src/rl_env/_tests/test_config.yml')
         self.fireline_env = FireLineEnv(self.config)
         self.mitigation = True
         self.fire_spread = False
 
-        self.game = Game(self.config.screen_size)
+        self.game = Game(self.config.area.screen_size)
         self.fuel_particle = FuelParticle()
         self.fuel_arrs = [[
-            FuelArray(Tile(j, i, config.terrain_scale, config.terrain_scale),
-                      config.terrain_map[i][j]) for j in range(self.config.terrain_size)
-        ] for i in range(self.config.terrain_size)]
-        self.terrain = Terrain(self.fuel_arrs, self.config.elevation_fn,
-                               self.config.terrain_size, self.config.screen_size)
-        self.environment = Environment(self.config.M_f, self.config.U, self.config.U_dir)
+            self.config.terrain.fuel_array_function(x, y)
+            for x in range(self.config.area.terrain_size)
+        ] for y in range(self.config.area.terrain_size)]
+        self.terrain = Terrain(self.fuel_arrs, self.config.terrain.elevation_function,
+                               self.config.area.terrain_size,
+                               self.config.area.screen_size)
+        self.environment = Environment(self.config.environment.moisture,
+                                       self.config.environment.wind_speed,
+                                       self.config.environment.wind_direction)
 
         # initialize all mitigation strategies
-        self.fireline_manager = FireLineManager(size=self.config.control_line_size,
-                                                pixel_scale=self.config.pixel_scale,
-                                                terrain=self.terrain)
+        self.fireline_manager = FireLineManager(
+            size=self.config.display.control_line_size,
+            pixel_scale=self.config.area.pixel_scale,
+            terrain=self.terrain)
         self.fireline_sprites = self.fireline_manager.sprites
         self.fireline_sprites_reset = self.fireline_manager.sprites.copy()
         self.fire_manager = RothermelFireManager(
-            self.config.fire_init_pos, self.config.fire_size,
-            self.config.max_fire_duration, self.config.pixel_scale,
-            self.config.update_rate, self.fuel_particle, self.terrain, self.environment)
+            self.config.fire.fire_initial_position, self.config.display.fire_size,
+            self.config.fire.max_fire_duration, self.config.area.pixel_scale,
+            self.config.simulation.update_rate, self.fuel_particle, self.terrain,
+            self.environment)
         self.fire_sprites = self.fire_manager.sprites
 
     def test_render(self) -> None:
@@ -205,28 +211,30 @@ class FireLineEnvTest(unittest.TestCase):
 
         # Test Full Mitigation (after agent traversal)
         self.fireline_sprites = self.fireline_sprites_reset
-        mitigation = np.full((self.config.screen_size, self.config.screen_size), 1)
-        self.fireline_env._render(mitigation,
-                                  (self.config.screen_size, self.config.screen_size))
+        mitigation = np.full((self.config.area.screen_size, self.config.area.screen_size),
+                             1)
+        self.fireline_env._render(
+            mitigation, (self.config.area.screen_size, self.config.area.screen_size))
         # assert the points are placed
         self.assertEqual(len(self.fireline_env.fireline_manager.sprites),
-                         self.config.screen_size**2 + 1,
+                         self.config.area.screen_size**2 + 1,
                          msg=(f'The number of sprites updated is '
                               f'{len(self.fireline_env.fireline_manager.sprites)} '
-                              f', but it should be {self.config.screen_size**2+1}'))
+                              f', but it should be {self.config.area.screen_size**2+1}'))
 
         # Test Full Mitigation (after agent traversal) and fire spread
 
         # assert the points are placed and fire can spread
         self.fireline_sprites = self.fireline_sprites_reset
 
-        mitigation = np.zeros((self.config.screen_size, self.config.screen_size))
+        mitigation = np.zeros(
+            (self.config.area.screen_size, self.config.area.screen_size))
         # start the fire where we have a control line
-        mitigation[self.config.fire_init_pos[0] - 1:] = 1
-        self.fireline_env._render(mitigation,
-                                  (self.config.screen_size, self.config.screen_size),
-                                  mitigation_only=False,
-                                  mitigation_and_fire_spread=True)
+        mitigation[self.config.fire.fire_initial_position[0] - 1:] = 1
+        self.fireline_env._render(
+            mitigation, (self.config.area.screen_size, self.config.area.screen_size),
+            mitigation_only=False,
+            mitigation_and_fire_spread=True)
 
         self.assertEqual(
             self.fireline_env.fire_status,
@@ -255,10 +263,11 @@ class FireLineEnvTest(unittest.TestCase):
                          f'but it should have been at {current_agent_loc}')
 
         # assert points get updated after agent traverses entire game
-        current_agent_loc = (self.config.screen_size, self.config.screen_size)
-        self.mitigation = np.full((self.config.screen_size, self.config.screen_size), 1)
-        points = [(i, j) for j in range(self.config.screen_size)
-                  for i in range(self.config.screen_size)]
+        current_agent_loc = (self.config.area.screen_size, self.config.area.screen_size)
+        self.mitigation = np.full(
+            (self.config.area.screen_size, self.config.area.screen_size), 1)
+        points = [(i, j) for j in range(self.config.area.screen_size)
+                  for i in range(self.config.area.screen_size)]
         points = set(points)
         self.fireline_env._update_sprite_points(self.mitigation,
                                                 current_agent_loc,
@@ -291,12 +300,13 @@ class FireLineEnvTest(unittest.TestCase):
         This should pass as long as the calls to `fireline_manager.update()`
         and `fire_map.update()` pass tests.
         '''
-        mitigation = np.zeros((self.config.screen_size, self.config.screen_size))
+        mitigation = np.zeros(
+            (self.config.area.screen_size, self.config.area.screen_size))
         mitigation[1, 0] = 1
-        position = np.zeros((self.config.screen_size, self.config.screen_size))
-        position[self.config.screen_size - 1, self.config.screen_size - 1] = 1
+        position = np.zeros((self.config.area.screen_size, self.config.area.screen_size))
+        position[self.config.area.screen_size - 1, self.config.area.screen_size - 1] = 1
 
-        fire_map = np.full((self.config.screen_size, self.config.screen_size),
+        fire_map = np.full((self.config.area.screen_size, self.config.area.screen_size),
                            BurnStatus.BURNED)
 
         self.fire_map = self.fireline_env._run(mitigation, position, False)
@@ -323,7 +333,7 @@ class FireLineEnvTest(unittest.TestCase):
 
         This function returns the overall reward.
         '''
-        screen_size = self.fireline_env.config.screen_size
+        screen_size = self.fireline_env.config.area.screen_size
         # create array of BURNED pixels
         fire_map = np.full((screen_size, screen_size), 2)
         # create array of agent mitigation + fire spread (BURNED pixels)

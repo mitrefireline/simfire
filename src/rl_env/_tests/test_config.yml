@@ -1,8 +1,8 @@
 # For a description of config parameters, go to
 # https://fireline.pages.mitre.org/rothermel-modeling/config.html
 area:
-  screen_size: 225
-  terrain_size: 15
+  screen_size: 9
+  terrain_size: 3
   pixel_scale: &pixel_scale 50
 
 display:
@@ -32,7 +32,7 @@ terrain:
     seed: 1111
 
 fire:
-  fire_initial_position: (65, 65)
+  fire_initial_position: (5, 3)
   max_fire_duration: 4
 
 environment:

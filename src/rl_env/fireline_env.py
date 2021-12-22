@@ -4,68 +4,73 @@ from typing import Dict, Tuple
 import gym
 import numpy as np
 
-from .. import config
 from ..enums import GameStatus, BurnStatus
 from ..game.game import Game
 from ..game.sprites import Terrain
 from ..world.wind import WindController
 from ..game.managers.fire import RothermelFireManager
-from ..world.parameters import Environment, FuelArray, FuelParticle, Tile
+from ..world.parameters import Environment, FuelParticle
 from ..game.managers.mitigation import (FireLineManager, ScratchLineManager,
                                         WetLineManager)
+from ..utils.config import Config
 from ..utils.terrain import chaparral, random_seed_list
 
 
 class FireLineEnv():
-    def __init__(self, config: config, seed: int = None):
+    def __init__(self, config: Config, seed: int = None):
 
         self.config = config
         self.points = set([])
 
         if seed:
             np.random.seed(seed)
-            seed_tuple = random_seed_list(self.config.terrain_size, seed)
+            seed_tuple = random_seed_list(self.config.area.terrain_size, seed)
             self.config.terrain_map = tuple(
                 tuple(
                     chaparral(seed=seed_tuple[outer][inner])
-                    for inner in range(self.config.terrain_size))
-                for outer in range(self.config.terrain_size))
+                    for inner in range(self.config.area.terrain_size))
+                for outer in range(self.config.area.terrain_size))
         else:
             self.config.terrain_map = tuple(
-                tuple(chaparral() for _ in range(self.config.terrain_size))
-                for _ in range(self.config.terrain_size))
+                tuple(chaparral() for _ in range(self.config.area.terrain_size))
+                for _ in range(self.config.area.terrain_size))
 
         self.fuel_particle = FuelParticle()
         self.fuel_arrs = [[
-            FuelArray(Tile(j, i, self.config.terrain_scale, self.config.terrain_scale),
-                      self.config.terrain_map[i][j])
-            for j in range(self.config.terrain_size)
-        ] for i in range(self.config.terrain_size)]
-        self.terrain = Terrain(self.fuel_arrs, self.config.elevation_fn,
-                               self.config.terrain_size, self.config.screen_size)
+            self.config.terrain.fuel_array_function(x, y)
+            for x in range(self.config.area.terrain_size)
+        ] for y in range(self.config.area.terrain_size)]
+        self.terrain = Terrain(self.fuel_arrs, self.config.terrain.elevation_function,
+                               self.config.area.terrain_size,
+                               self.config.area.screen_size)
+
         self.wind_map = WindController()
         self.wind_map.init_wind_speed_generator(
-            self.config.mw_seed, self.config.mw_scale, self.config.mw_octaves,
-            self.config.mw_persistence, self.config.mw_lacunarity,
-            self.config.mw_speed_min, self.config.mw_speed_max, self.config.screen_size)
+            self.config.wind.speed.seed, self.config.wind.speed.scale,
+            self.config.wind.speed.octaves, self.config.wind.speed.persistence,
+            self.config.wind.speed.lacunarity, self.config.wind.speed.min,
+            self.config.wind.speed.max, self.config.area.screen_size)
         self.wind_map.init_wind_direction_generator(
-            self.config.dw_seed, self.config.dw_scale, self.config.dw_octaves,
-            self.config.dw_persistence, self.config.dw_lacunarity, self.config.dw_deg_min,
-            self.config.dw_deg_max, self.config.screen_size)
+            self.config.wind.direction.seed, self.config.wind.direction.scale,
+            self.config.wind.direction.octaves, self.config.wind.direction.persistence,
+            self.config.wind.direction.lacunarity, self.config.wind.direction.min,
+            self.config.wind.direction.max, self.config.area.screen_size)
 
-        self.environment = Environment(self.config.M_f, self.wind_map.map_wind_speed,
+        self.environment = Environment(self.config.environment.moisture,
+                                       self.wind_map.map_wind_speed,
                                        self.wind_map.map_wind_direction)
 
         # initialize all mitigation strategies
-        self.fireline_manager = FireLineManager(size=self.config.control_line_size,
-                                                pixel_scale=self.config.pixel_scale,
-                                                terrain=self.terrain)
+        self.fireline_manager = FireLineManager(
+            size=self.config.display.control_line_size,
+            pixel_scale=self.config.area.pixel_scale,
+            terrain=self.terrain)
 
-        self.scratchline_manager = ScratchLineManager(self.config.control_line_size,
-                                                      self.config.pixel_scale,
-                                                      self.terrain)
-        self.wetline_manager = WetLineManager(size=self.config.control_line_size,
-                                              pixel_scale=self.config.pixel_scale,
+        self.scratchline_manager = ScratchLineManager(
+            self.config.display.control_line_size, self.config.area.pixel_scale,
+            self.terrain)
+        self.wetline_manager = WetLineManager(size=self.config.display.control_line_size,
+                                              pixel_scale=self.config.area.pixel_scale,
                                               terrain=self.terrain)
 
         self.fireline_sprites = self.fireline_manager.sprites
@@ -74,9 +79,10 @@ class FireLineEnv():
         self.wetline_sprites = self.wetline_manager.sprites
 
         self.fire_manager = RothermelFireManager(
-            self.config.fire_init_pos, self.config.fire_size,
-            self.config.max_fire_duration, self.config.pixel_scale,
-            self.config.update_rate, self.fuel_particle, self.terrain, self.environment)
+            self.config.fire.fire_initial_position, self.config.display.fire_size,
+            self.config.fire.max_fire_duration, self.config.area.pixel_scale,
+            self.config.simulation.update_rate, self.fuel_particle, self.terrain,
+            self.environment)
         self.fire_sprites = self.fire_manager.sprites
 
         self.game_status = GameStatus.RUNNING
@@ -125,10 +131,11 @@ class FireLineEnv():
         '''
 
         self.fire_manager = RothermelFireManager(
-            self.config.fire_init_pos, self.config.fire_size,
-            self.config.max_fire_duration, self.config.pixel_scale,
-            self.config.update_rate, self.fuel_particle, self.terrain, self.environment)
-        self.game = Game(self.config.screen_size)
+            self.config.fire.fire_initial_position, self.config.display.fire_size,
+            self.config.fire.max_fire_duration, self.config.area.pixel_scale,
+            self.config.simulation.update_rate, self.fuel_particle, self.terrain,
+            self.environment)
+        self.game = Game(self.config.area.screen_size)
         self.fire_map = self.game.fire_map
 
         if mitigation_only:
@@ -194,8 +201,8 @@ class FireLineEnv():
 
         else:
             # update the location to pass to the sprite
-            for i in range(self.config.screen_size):
-                for j in range(self.config.screen_size):
+            for i in range(self.config.area.screen_size):
+                for j in range(self.config.area.screen_size):
                     if mitigation_state[(i, j)] == 1:
                         self.points.add((i, j))
 
@@ -226,12 +233,14 @@ class FireLineEnv():
         self.fire_status = GameStatus.RUNNING
         # initialize fire strategy
         self.fire_manager = RothermelFireManager(
-            self.config.fire_init_pos, self.config.fire_size,
-            self.config.max_fire_duration, self.config.pixel_scale,
-            self.config.update_rate, self.fuel_particle, self.terrain, self.environment)
+            self.config.fire.fire_initial_position, self.config.display.fire_size,
+            self.config.fire.max_fire_duration, self.config.area.pixel_scale,
+            self.config.simulation.update_rate, self.fuel_particle, self.terrain,
+            self.environment)
 
-        self.fire_map = np.full((self.config.screen_size, self.config.screen_size),
-                                BurnStatus.UNBURNED)
+        self.fire_map = np.full(
+            (self.config.area.screen_size, self.config.area.screen_size),
+            BurnStatus.UNBURNED)
         if mitigation:
             # update firemap with agent actions before initializing fire spread
             self._update_sprite_points(mitigation_state, position_state)
@@ -265,18 +274,22 @@ class FireLineEnv():
         Returns:
             state: The reset state of the simulation.
         '''
-        reset_position = np.zeros([self.config.screen_size, self.config.screen_size])
+        reset_position = np.zeros(
+            [self.config.area.screen_size, self.config.area.screen_size])
 
         w_0_array = np.array([
-            self.terrain.fuel_arrs[i][j].fuel.w_0 for j in range(self.config.screen_size)
-            for i in range(self.config.screen_size)
-        ]).reshape(self.config.screen_size, self.config.screen_size)
+            self.terrain.fuel_arrs[i][j].fuel.w_0
+            for j in range(self.config.area.screen_size)
+            for i in range(self.config.area.screen_size)
+        ]).reshape(self.config.area.screen_size, self.config.area.screen_size)
 
-        reset_mitigation = np.zeros([self.config.screen_size, self.config.screen_size])
+        reset_mitigation = np.zeros(
+            [self.config.area.screen_size, self.config.area.screen_size])
 
-        state = np.stack((reset_position, w_0_array,
-                          (self.terrain.elevations + self.config.noise_amplitude) /
-                          (2 * self.config.noise_amplitude), reset_mitigation))
+        elevations_zero_min = self.terrain.elevations - self.terrain.elevations.min()
+        elevations_norm = elevations_zero_min / (elevations_zero_min.max() + 1e-6)
+
+        state = np.stack((reset_position, w_0_array, elevations_norm, reset_mitigation))
 
         return state
 
@@ -316,8 +329,8 @@ class FireLineEnv():
         reward = 0
         mod = 0
         unmod = 0
-        for x in range(self.config.screen_size):
-            for y in range(self.config.screen_size):
+        for x in range(self.config.area.screen_size):
+            for y in range(self.config.area.screen_size):
                 modified = fire_map_with_agent[x][y]
                 unmodified = fire_map[x][y]
 
@@ -343,7 +356,7 @@ class FireLineEnv():
                 mod += mod_reward
                 unmod += unmod_reward
 
-        return reward / (self.config.screen_size * self.config.screen_size)
+        return reward / (self.config.area.screen_size * self.config.area.screen_size)
 
 
 class RLEnv(gym.Env):
@@ -440,23 +453,23 @@ class RLEnv(gym.Env):
                                   for channel in self.simulation.observ_spaces.keys()])
 
         self.low = np.repeat(np.repeat(channel_lows,
-                                       self.simulation.config.screen_size,
+                                       self.simulation.config.area.screen_size,
                                        axis=1),
-                             self.simulation.config.screen_size,
+                             self.simulation.config.area.screen_size,
                              axis=2)
 
         self.high = np.repeat(np.repeat(channel_highs,
-                                        self.simulation.config.screen_size,
+                                        self.simulation.config.area.screen_size,
                                         axis=1),
-                              self.simulation.config.screen_size,
+                              self.simulation.config.area.screen_size,
                               axis=2)
 
         self.observation_space = gym.spaces.Box(
             np.float32(self.low),
             np.float32(self.high),
             shape=(len(self.simulation.observ_spaces.keys()),
-                   self.simulation.config.screen_size,
-                   self.simulation.config.screen_size),
+                   self.simulation.config.area.screen_size,
+                   self.simulation.config.area.screen_size),
             dtype=np.float64)
 
     def step(self, action):
@@ -491,7 +504,7 @@ class RLEnv(gym.Env):
         old_loc = deepcopy(self.current_agent_loc)
 
         # if we want to render as we step through the game
-        if self.simulation.config.render_inline:
+        if self.simulation.config.render.inline:
             self.simulation._render(self.state[-1][self.current_agent_loc],
                                     self.current_agent_loc,
                                     inline=True)
@@ -504,7 +517,8 @@ class RLEnv(gym.Env):
         self.state[0][self.current_agent_loc] = 1
 
         reward = 0  # if action == 0 else
-        # (-1 / (self.simulation.config.screen_size * self.simulation.config.screen_size))
+        # (-1 / (self.simulation.config.area.screen_size *
+        # self.simulation.config.area.screen_size))
 
         # If the agent is at the last location (cannot move forward)
         done = old_loc == self.current_agent_loc
@@ -550,13 +564,13 @@ class RLEnv(gym.Env):
         column = self.current_agent_loc[1]
 
         # If moving forward one would bring us out of bounds and we can move to new row
-        if column + 1 > (self.simulation.config.screen_size -
-                         1) and row + 1 <= (self.simulation.config.screen_size - 1):
+        if column + 1 > (self.simulation.config.area.screen_size -
+                         1) and row + 1 <= (self.simulation.config.area.screen_size - 1):
             column = 0
             row += 1
 
         # If moving forward keeps us in bounds
-        elif column + 1 <= (self.simulation.config.screen_size - 1):
+        elif column + 1 <= (self.simulation.config.area.screen_size - 1):
             column += 1
 
         self.current_agent_loc = (row, column)

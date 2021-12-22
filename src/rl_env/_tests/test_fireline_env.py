@@ -1,9 +1,11 @@
+import os
 import unittest
+from unittest import mock
+
 import numpy as np
 
 from . import test_config as config
 from ...game.sprites import Terrain
-from ...game.game import Game
 from ...enums import BurnStatus, GameStatus
 from ...world.parameters import Environment, FuelArray, FuelParticle, Tile
 from ...game.managers.fire import RothermelFireManager
@@ -150,6 +152,7 @@ class RLEnvTest(unittest.TestCase):
             f'should be {new_agent_loc}.')
 
 
+@mock.patch.dict(os.environ, {'SDL_VIDEODRIVER': 'dummy'})
 class FireLineEnvTest(unittest.TestCase):
     def setUp(self) -> None:
         '''
@@ -160,7 +163,6 @@ class FireLineEnvTest(unittest.TestCase):
         self.mitigation = True
         self.fire_spread = False
 
-        self.game = Game(self.config.screen_size)
         self.fuel_particle = FuelParticle()
         self.fuel_arrs = [[
             FuelArray(Tile(j, i, config.terrain_scale, config.terrain_scale),

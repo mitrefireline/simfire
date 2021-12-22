@@ -1,19 +1,14 @@
 import unittest
 import numpy as np
 
-from src import config
-from src.utils.terrain import chaparral, random_seed_list
+from ..config import Config
+from ..terrain import chaparral, random_seed_list
 from ...world.parameters import Fuel
 
 
 class ChaparralTest(unittest.TestCase):
     def setUp(self) -> None:
-        '''
-
-
-        '''
-        self.config = config
-        self.config.terrain_size = 5
+        self.config = Config('./config.yml')
 
     def test_chaparral(self) -> None:
         '''

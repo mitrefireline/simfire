@@ -5,6 +5,7 @@ from yaml.scanner import ScannerError
 
 from .log import create_logger
 from ..world.elevation_functions import PerlinNoise2D, flat, gaussian
+from ..world.fuel_array_functions import chaparral_fn
 
 log = create_logger(__name__)
 
@@ -52,10 +53,12 @@ class Config:
         '''
         self.path = path
         self._possible_elevations = ('perlin', 'gaussian', 'flat')
+        self._possible_fuel_arrays = ('chaparral')
         self._load()
         self._set_attributes()
         self._set_terrain_scale()
         self._set_elevation_function()
+        self._set_fuel_array_function()
 
     def _load(self) -> None:
         '''
@@ -114,6 +117,23 @@ class Config:
                       f'{self.terrain.elevation_function} when it can only be one of '
                       f'these values: {self._possible_elevations}')
             raise ValueError
+
+    def _set_fuel_array_function(self) -> None:
+        '''
+        Reset the attribute `self.terrain.fuel_array_fn`
+
+        Before, as read in from the YAML, the fuel array function was just a string. After
+        calling this, it becomes an actual function with all of the precompute values
+        from the config passed in.
+        '''
+        if self.terrain.fuel_array_function.lower() == 'chaparral':
+            args = self.terrain.chaparral
+            fn = chaparral_fn(args.scale_x, args.scale_y, args.seed)
+            setattr(self.terrain, 'fuel_array_function', fn)
+        else:
+            log.error('The user-defined fuel array function is set to '
+                      f'{self.terrain.fuel_array_function}, when it can only be one of '
+                      f'these values: {self._possible_fuel_arrays}')
 
     def save(self, path: Path) -> None:
         '''

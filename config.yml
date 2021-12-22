@@ -22,7 +22,7 @@ terrain:
     mu_y: 50
     sigma_x: 50
     sigma_y: 50
-  fuel_array_fn: chaparral
+  fuel_array_function: chaparral
   chaparral:
     scale_x: *pixel_scale
     scale_y: *pixel_scale

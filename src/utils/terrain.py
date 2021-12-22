@@ -33,6 +33,7 @@ def w_0_seed(seed: int) -> float:
         The oven-dry fuel load value of the fuel.
     '''
     np.random.seed(seed)
+    # Update the test for this function if this range is changed in the future
     w_0 = np.random.uniform(.2, .6)
     return w_0
 

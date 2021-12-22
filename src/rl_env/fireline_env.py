@@ -4,20 +4,20 @@ from typing import Dict, Tuple
 import gym
 import numpy as np
 
-from ..enums import GameStatus, BurnStatus
 from ..game.game import Game
+from ..utils.config import Config
 from ..game.sprites import Terrain
 from ..world.wind import WindController
+from ..enums import GameStatus, BurnStatus
 from ..game.managers.fire import RothermelFireManager
+from ..utils.terrain import chaparral, random_seed_list
 from ..world.parameters import Environment, FuelParticle
 from ..game.managers.mitigation import (FireLineManager, ScratchLineManager,
                                         WetLineManager)
-from ..utils.config import Config
-from ..utils.terrain import chaparral, random_seed_list
 
 
 class FireLineEnv():
-    def __init__(self, config: Config, seed: int = None):
+    def __init__(self, config: Config, seed: int = None) -> None:
 
         self.config = config
         self.points = set([])
@@ -129,7 +129,6 @@ class FireLineEnv():
         Returns:
             None
         '''
-
         self.fire_manager = RothermelFireManager(
             self.config.fire.fire_initial_position, self.config.display.fire_size,
             self.config.fire.max_fire_duration, self.config.area.pixel_scale,
@@ -176,8 +175,8 @@ class FireLineEnv():
         self.points = set([])
 
     def _update_sprite_points(self,
-                              mitigation_state,
-                              position_state,
+                              mitigation_state: int,
+                              position_state: int,
                               inline: bool = False) -> None:
         '''
         Update sprite point list based on fire mitigation.
@@ -207,9 +206,9 @@ class FireLineEnv():
                         self.points.add((i, j))
 
     def _run(self,
-             mitigation_state: np.ndarray,
-             position_state: np.ndarray,
-             mitigation: bool = False):
+             mitigation_state: int,
+             position_state: int,
+             mitigation: bool = False) -> np.ndarray:
         '''
         Runs the simulation with or without mitigation lines
 
@@ -252,7 +251,7 @@ class FireLineEnv():
             if self.fire_status == GameStatus.QUIT:
                 return self.fire_map
 
-    def _reset_state(self):
+    def _reset_state(self) -> np.ndarray:
         '''
         This function will convert the initialized terrain
             to the gym.spaces.Box format.
@@ -324,7 +323,6 @@ class FireLineEnv():
         Returns:
             score / difference between the firemaps (normalized with respect to screen
             size).
-
         '''
         reward = 0
         mod = 0

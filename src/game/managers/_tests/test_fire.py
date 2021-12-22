@@ -17,7 +17,7 @@ class TestFireManager(unittest.TestCase):
         self.config = Config('./config.yml')
         self.init_pos = (self.config.area.screen_size // 2,
                          self.config.area.screen_size // 2)
-        self.fire_size = self.config.fire.fire_size
+        self.fire_size = self.config.display.fire_size
         self.max_fire_duration = self.config.fire.max_fire_duration
 
         self.fire_manager = FireManager(self.init_pos, self.fire_size,

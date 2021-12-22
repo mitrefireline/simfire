@@ -3,7 +3,7 @@
 area:
   screen_size: 225
   terrain_size: 15
-  pixel_scale: 50
+  pixel_scale: &pixel_scale 50
 
 display:
   fire_size: 2
@@ -22,6 +22,11 @@ terrain:
     mu_y: 50
     sigma_x: 50
     sigma_y: 50
+  fuel_array_fn: chaparral
+  chaparral:
+    scale_x: *pixel_scale
+    scale_y: *pixel_scale
+    seed: 1111
 
 simulation:
   fire_initial_position: (65, 65)

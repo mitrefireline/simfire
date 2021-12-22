@@ -50,10 +50,10 @@ def main():
     fire_map = fireline_manager.update(fire_map, points)
     game.fire_map = fire_map
 
-    fire_manager = RothermelFireManager(cfg.fire_init_pos, cfg.fire_size,
-                                        cfg.max_fire_duration, cfg.pixel_scale,
-                                        cfg.update_rate, fuel_particle, terrain,
-                                        environment)
+    fire_manager = RothermelFireManager(cfg.simulation.fire_init_pos,
+                                        cfg.display.fire_size, cfg.max_fire_duration,
+                                        cfg.pixel_scale, cfg.update_rate, fuel_particle,
+                                        terrain, environment)
 
     game_status = GameStatus.RUNNING
     fire_status = GameStatus.RUNNING

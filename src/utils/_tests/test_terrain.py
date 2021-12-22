@@ -2,18 +2,18 @@ import unittest
 import numpy as np
 
 from ..config import Config
-from ..terrain import chaparral, random_seed_list
+from ..terrain import chaparral, random_seed_list, w_0_seed
 from ...world.parameters import Fuel
 
 
-class ChaparralTest(unittest.TestCase):
+class TerrainTest(unittest.TestCase):
     def setUp(self) -> None:
         self.config = Config('./config.yml')
+        self.length = 3
 
     def test_chaparral(self) -> None:
         '''
         Test that the seeding runs propoerly when creating a terrain map.
-
         '''
         # assert the same seed
         seed = 1111
@@ -36,12 +36,21 @@ class ChaparralTest(unittest.TestCase):
                             msg='The seed value should produce a '
                             'different Fuel map.')
 
-
-class RandomSeedListTest(unittest.TestCase):
-    def setUp(self) -> None:
-        self.length = 3
+    def test_w_0_seed(self) -> None:
+        '''
+        Test creating a random float value for w_0 (moisture content)
+        '''
+        seed = 1111
+        w_0 = w_0_seed(seed)
+        self.assertIsInstance(w_0, float)
+        # If this range changes in the function itself, update this test
+        self.assertGreaterEqual(w_0, 0.2)
+        self.assertLessEqual(w_0, 0.6)
 
     def test_random_seed_list(self) -> None:
+        '''
+        Test that random seed lists are created correctly
+        '''
         seed = 1111
         np.random.seed(seed)
         terrain_random_seed_tuple = tuple(

@@ -131,7 +131,7 @@ from typing import Tuple
 
 from .world.elevation_functions import PerlinNoise2D
 from .world.parameters import FuelArray
-from .utils.terrain import Chaparral
+from .utils.terrain import chaparral
 
 # Game/Screen parameters
 
@@ -161,7 +161,7 @@ elevation_fn = pnoise.fn
 
 # Create FuelArray tiles to make the terrain/map
 terrain_map: Tuple[Tuple[FuelArray]] = tuple(
-    tuple(Chaparral() for _ in range(terrain_size)) for _ in range(terrain_size))
+    tuple(chaparral() for _ in range(terrain_size)) for _ in range(terrain_size))
 
 # Fire Manager Parameters
 # (x, y) starting coordinates

@@ -9,6 +9,9 @@ display:
   fire_size: 2
   control_line_size: 2
 
+simulation:
+  update_rate: 1
+
 terrain:
   seed: 1111
   elevation_function: perlin
@@ -28,8 +31,9 @@ terrain:
     scale_y: *pixel_scale
     seed: 1111
 
-simulation:
+fire:
   fire_initial_position: (65, 65)
+  max_fire_duration: 4
 
 environment:
   moisture: 0.03

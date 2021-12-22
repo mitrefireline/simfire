@@ -1,20 +1,24 @@
+from pathlib import Path
+
 from skimage.draw import line
-from src.enums import GameStatus
+
 from src.game.game import Game
+from src.enums import GameStatus
+from src.utils.config import Config
+from src.game.sprites import Terrain
+from src.world.wind import WindController
 from src.game.managers.fire import RothermelFireManager
 from src.game.managers.mitigation import FireLineManager
-from src.game.sprites import Terrain
-from src.utils.config import Config
 from src.world.parameters import Environment, FuelArray, FuelParticle, Tile
-from src.world.wind import WindController
 
 
 def main():
 
-    cfg_path = 'config.yml'
-    cfg = Config(cfg_path)
+    config_path = Path('./config.yml')
 
-    game = Game(cfg.screen_size)
+    cfg = Config(config_path)
+
+    game = Game(cfg.area.screen_size)
 
     fuel_particle = FuelParticle()
 

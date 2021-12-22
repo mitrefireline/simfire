@@ -2,20 +2,23 @@ import unittest
 
 import numpy as np
 
-from .... import config as cfg
-from ....enums import BurnStatus, GameStatus
+from ....utils.config import Config
 from ...sprites import Fire, Terrain
+from ....world.presets import Chaparral
+from ....world.wind import WindController
+from ....enums import BurnStatus, GameStatus
 from ....world.elevation_functions import flat
 from ....world.parameters import Environment, FuelArray, FuelParticle, Tile
 from ..fire import ConstantSpreadFireManager, FireManager, RothermelFireManager
-from ....world.wind import WindController
 
 
 class TestFireManager(unittest.TestCase):
     def setUp(self) -> None:
-        self.init_pos = (cfg.screen_size // 2, cfg.screen_size // 2)
-        self.fire_size = cfg.fire_size
-        self.max_fire_duration = cfg.max_fire_duration
+        self.config = Config('./config.yml')
+        self.init_pos = (self.config.area.screen_size // 2,
+                         self.config.area.screen_size // 2)
+        self.fire_size = self.config.fire.fire_size
+        self.max_fire_duration = self.config.fire.max_fire_duration
 
         self.fire_manager = FireManager(self.init_pos, self.fire_size,
                                         self.max_fire_duration)
@@ -24,11 +27,12 @@ class TestFireManager(unittest.TestCase):
         '''
         Test that the sprites are pruned correctly.
         '''
-        fire_map = np.full((cfg.screen_size, cfg.screen_size), BurnStatus.UNBURNED)
+        fire_map = np.full((self.config.area.screen_size, self.config.area.screen_size),
+                           BurnStatus.UNBURNED)
         # Create a sprite that is past the duration
         new_sprite = Fire(self.init_pos, self.fire_size)
         sprites = [new_sprite]
-        durations = [cfg.max_fire_duration + 1]
+        durations = [self.max_fire_duration + 1]
 
         self.fire_manager.sprites = sprites
         self.fire_manager.durations = durations
@@ -43,9 +47,10 @@ class TestFireManager(unittest.TestCase):
         '''
         Test that new locations can be retrieved correctly.
         '''
-        fire_map = np.full((cfg.screen_size, cfg.screen_size), BurnStatus.UNBURNED)
+        fire_map = np.full((self.config.area.screen_size, self.config.area.screen_size),
+                           BurnStatus.UNBURNED)
         # Use a location that is too large and out-of-bounds
-        x, y = (cfg.screen_size, cfg.screen_size)
+        x, y = (self.config.area.screen_size, self.config.area.screen_size)
         new_locs = self.fire_manager._get_new_locs(x, y, fire_map)
         valid_locs = ((x - 1, y - 1), )
         self.assertTupleEqual(new_locs,
@@ -65,7 +70,7 @@ class TestFireManager(unittest.TestCase):
                                    'location is too small'))
 
         # Use a location that is BURNED
-        x, y = (cfg.screen_size // 2, cfg.screen_size // 2)
+        x, y = (self.config.area.screen_size // 2, self.config.area.screen_size // 2)
         fire_map[y, x + 1] = BurnStatus.BURNED
         new_locs = self.fire_manager._get_new_locs(x, y, fire_map)
         # All 8-connected points except (x+1, y)
@@ -81,7 +86,8 @@ class TestFireManager(unittest.TestCase):
         '''
         Test updating the rate of spread based on locations of control lines
         '''
-        fire_map = np.full((cfg.screen_size, cfg.screen_size), BurnStatus.UNBURNED)
+        fire_map = np.full((self.config.area.screen_size, self.config.area.screen_size),
+                           BurnStatus.UNBURNED)
         rate_of_spread = np.zeros_like(fire_map)
 
         fireline_y_coords = [100, 100]
@@ -115,30 +121,41 @@ class TestFireManager(unittest.TestCase):
 
 class TestRothermelFireManager(unittest.TestCase):
     def setUp(self) -> None:
-        self.init_pos = (cfg.screen_size // 3, cfg.screen_size // 4)
-        self.fire_size = cfg.fire_size
-        self.max_fire_duration = cfg.max_fire_duration
-        self.pixel_scale = cfg.pixel_scale
-        self.update_rate = cfg.update_rate
+        self.config = Config('./config.yml')
+        self.init_pos = (self.config.area.screen_size // 3,
+                         self.config.area.screen_size // 4)
+        self.fire_size = self.config.display.fire_size
+        self.max_fire_duration = self.config.fire.max_fire_duration
+        self.pixel_scale = self.config.area.pixel_scale
+        self.update_rate = self.config.simulation.update_rate
         self.fuel_particle = FuelParticle()
 
+        terrain_map = tuple(
+            tuple(Chaparral for _ in range(self.config.area.terrain_size))
+            for _ in range(self.config.area.terrain_size))
         fuel_arrs = [[
-            FuelArray(Tile(j, i, cfg.terrain_scale, cfg.terrain_scale),
-                      cfg.terrain_map[i][j]) for j in range(cfg.terrain_size)
-        ] for i in range(cfg.terrain_size)]
-        self.terrain = Terrain(fuel_arrs, flat(), cfg.terrain_size, cfg.screen_size)
+            FuelArray(
+                Tile(j, i, self.config.area.terrain_scale,
+                     self.config.area.terrain_scale), terrain_map[i][j])
+            for j in range(self.config.area.terrain_size)
+        ] for i in range(self.config.area.terrain_size)]
+        self.terrain = Terrain(fuel_arrs, flat(), self.config.area.terrain_size,
+                               self.config.area.screen_size)
 
         self.wind_map = WindController()
-        self.wind_map.init_wind_speed_generator(cfg.mw_seed, cfg.mw_scale, cfg.mw_octaves,
-                                                cfg.mw_persistence, cfg.mw_lacunarity,
-                                                cfg.mw_speed_min, cfg.mw_speed_max,
-                                                cfg.screen_size)
-        self.wind_map.init_wind_direction_generator(cfg.dw_seed, cfg.dw_scale,
-                                                    cfg.dw_octaves, cfg.dw_persistence,
-                                                    cfg.dw_lacunarity, cfg.dw_deg_min,
-                                                    cfg.dw_deg_max, cfg.screen_size)
+        self.wind_map.init_wind_speed_generator(
+            self.config.wind.speed.seed, self.config.wind.speed.scale,
+            self.config.wind.speed.octaves, self.config.wind.speed.persistence,
+            self.config.wind.speed.lacunarity, self.config.wind.speed.min,
+            self.config.wind.speed.max, self.config.area.screen_size)
+        self.wind_map.init_wind_direction_generator(
+            self.config.wind.direction.seed, self.config.wind.direction.scale,
+            self.config.wind.direction.octaves, self.config.wind.direction.persistence,
+            self.config.wind.direction.lacunarity, self.config.wind.direction.min,
+            self.config.wind.direction.max, self.config.area.screen_size)
 
-        self.environment = Environment(cfg.M_f, self.wind_map.map_wind_speed,
+        self.environment = Environment(self.config.environment.moisture,
+                                       self.wind_map.map_wind_speed,
                                        self.wind_map.map_wind_direction)
 
         self.fire_manager = RothermelFireManager(self.init_pos, self.fire_size,
@@ -203,9 +220,11 @@ class TestRothermelFireManager(unittest.TestCase):
 
 class TestConstantSpreadFireManager(unittest.TestCase):
     def setUp(self) -> None:
-        self.init_pos = (cfg.screen_size // 5, cfg.screen_size // 7)
-        self.fire_size = cfg.fire_size
-        self.max_fire_duration = cfg.max_fire_duration
+        self.config = Config('./config.yml')
+        self.init_pos = (self.config.area.screen_size // 5,
+                         self.config.area.screen_size // 7)
+        self.fire_size = self.config.display.fire_size
+        self.max_fire_duration = self.config.fire.max_fire_duration
         self.rate_of_spread = self.max_fire_duration - 1
 
         self.fire_manager = ConstantSpreadFireManager(self.init_pos, self.fire_size,
@@ -218,7 +237,7 @@ class TestConstantSpreadFireManager(unittest.TestCase):
         make sure that no fires are spread before max_fire_duration updates, and that the
         correct number of new fires are created at the correct locations.
         '''
-        fire_map = np.zeros((cfg.screen_size, cfg.screen_size))
+        fire_map = np.zeros((self.config.area.screen_size, self.config.area.screen_size))
         # Get the locations where Fires should be created
         new_locs = self.fire_manager._get_new_locs(self.init_pos[0], self.init_pos[1],
                                                    fire_map)

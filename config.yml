@@ -11,6 +11,7 @@ display:
 
 simulation:
   update_rate: 1
+  headless: true
 
 terrain:
   elevation_function: perlin

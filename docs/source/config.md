@@ -43,6 +43,10 @@ change how much space the control line takes up in the simulation.
 The number of minutes that each game/frame update represents in simulation time. Note
 that this can be fractional to account for times that are non-integer and/or less than 1.
 
+### headless
+(`bool`)
+Whether or not to run the simulation in a headless state.
+
 
 ### Terrain Parameters
 
@@ -212,14 +216,15 @@ display:
 
 simulation:
   update_rate: 1
+  headless: true
 
 terrain:
-  seed: 1111
   elevation_function: perlin
   perlin:
     amplitude: 500
     shape: (225, 225)
     resolution: (1, 1)
+    seed: 1111
   gaussian:
     amplitude: 500
     mu_x: 50

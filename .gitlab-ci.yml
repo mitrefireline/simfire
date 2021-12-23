@@ -60,7 +60,7 @@ coverage:
   - docker
   script:
     - pip install pytest pytest-cov
-    - coverage run -m pytest
+    - SDL_VIDEODRIVER="dummy" coverage run -m pytest
     - coverage report
     - coverage xml
   artifacts:

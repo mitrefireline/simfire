@@ -1,6 +1,6 @@
+from math import exp
 from typing import Callable, Tuple
 
-from math import exp
 import numpy as np
 
 ElevationFn = Callable[[float, float], float]
@@ -42,8 +42,11 @@ def gaussian(amplitude: int, mu_x: int, mu_y: int, sigma_x: int,
 
 
 class PerlinNoise2D():
-    def __init__(self, amplitude: float, shape: Tuple[int, int], res: Tuple[int,
-                                                                            int]) -> None:
+    def __init__(self,
+                 amplitude: float,
+                 shape: Tuple[int, int],
+                 res: Tuple[int, int],
+                 seed: int = None) -> None:
         '''
         Create a class to compute perlin noise for given input parameters.
 
@@ -58,6 +61,7 @@ class PerlinNoise2D():
         self.amplitude = amplitude
         self.shape = shape
         self.res = res
+        self.seed = seed
         self.terrain_map = None
 
     def precompute(self) -> None:
@@ -80,6 +84,8 @@ class PerlinNoise2D():
         d = (shape[0] // res[0], shape[1] // res[1])
         grid = np.mgrid[0:res[0]:delta[0], 0:res[1]:delta[1]].transpose(1, 2, 0) % 1
         # Gradients
+        if isinstance(self.seed, int):
+            np.random.seed(self.seed)
         angles = 2 * np.pi * np.random.rand(res[0] + 1, res[1] + 1)
         gradients = np.dstack((np.cos(angles), np.sin(angles)))
         g00 = gradients[0:-1, 0:-1].repeat(d[0], 0).repeat(d[1], 1)

@@ -21,7 +21,7 @@ copyright = '2021, fiReLine'
 author = 'Marissa Dotter, Michael Doyle, Chris Kempis, Michael Threet, Tim Welsh'
 
 # The full version, including alpha/beta/rc tags
-release = '0.0.1'
+release = '0.0.0'
 
 # -- General configuration ---------------------------------------------------
 
@@ -31,6 +31,9 @@ release = '0.0.1'
 extensions = [
     'sphinx.ext.autodoc', 'sphinx.ext.napoleon', 'autoapi.extension', 'myst_parser'
 ]
+
+# Autodoc settings
+autodoc_typehints = 'description'
 
 # Autoapi settings
 autoapi_python_class_content = 'both'

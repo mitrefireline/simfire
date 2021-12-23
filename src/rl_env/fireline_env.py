@@ -524,13 +524,13 @@ class RLEnv(gym.Env):
             # compare the state spaces
             fire_map = self.simulation._run(self.state[-1], self.state[0])
             # render only agent
-            if self.simulation.config.render_post_agent:
+            if self.simulation.config.render.post_agent:
                 self.simulation._render(self.state[-1], self.state[0])
 
             fire_map_with_agent = self.simulation._run(self.state[-1], self.state[0],
                                                        True)
             # render fire with agents mitigation in place
-            if self.simulation.config.render_post_agent_with_fire:
+            if self.simulation.config.render.post_agent_with_fire:
                 self.simulation._render(self.state[-1],
                                         self.state[0],
                                         mitigation_only=False,

@@ -420,12 +420,12 @@ class RLGridEnv(gym.Env):
         # compare the state spaces
         fire_map = self.simulation._run(action)
         # render only agent
-        if self.simulation.config.render_post_agent:
+        if self.simulation.config.render.post_agent:
             self.simulation._render(action)
 
         fire_map_with_agent = self.simulation._run(action, True)
         # render fire with agents mitigation in place
-        if self.simulation.config.render_post_agent_with_fire:
+        if self.simulation.config.render.post_agent_with_fire:
             self.simulation._render(action,
                                     mitigation_only=False,
                                     mitigation_and_fire_spread=True)

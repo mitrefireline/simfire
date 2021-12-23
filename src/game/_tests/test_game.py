@@ -89,8 +89,11 @@ class TestGame(unittest.TestCase):
             self.config.terrain.fuel_array_function(x, y)
             for x in range(self.config.area.terrain_size)
         ] for y in range(self.config.area.terrain_size)]
-        terrain = Terrain(tiles, self.config.terrain.elevation_function,
-                          self.config.area.terrain_size, self.config.area.screen_size)
+        terrain = Terrain(tiles,
+                          self.config.terrain.elevation_function,
+                          self.config.area.terrain_size,
+                          self.config.area.screen_size,
+                          headless=True)
 
         wind_map = WindController()
         wind_map.init_wind_speed_generator(
@@ -149,8 +152,11 @@ class TestGame(unittest.TestCase):
             self.config.terrain.fuel_array_function(x, y)
             for x in range(self.config.area.terrain_size)
         ] for y in range(self.config.area.terrain_size)]
-        terrain = Terrain(tiles, self.config.terrain.elevation_function,
-                          self.config.area.terrain_size, self.config.area.screen_size)
+        terrain = Terrain(tiles,
+                          self.config.terrain.elevation_function,
+                          self.config.area.terrain_size,
+                          self.config.area.screen_size,
+                          headless=True)
 
         wind_map = WindController()
         wind_map.init_wind_speed_generator(

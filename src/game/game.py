@@ -40,7 +40,6 @@ class Game():
         self.dw_speed_min = dw_deg_min
         self.dw_speed_max = dw_deg_max
 
-        self.screen = pygame.display.set_mode((screen_size, screen_size))
         self.headless = headless
 
         if not self.headless:
@@ -305,6 +304,7 @@ class Game():
             wind_dir_surf = self._get_wind_dir_surf(wind_direction_map)
             self.screen.blit(wind_dir_surf, (0, 0))
 
-        pygame.display.flip()
+        if not self.headless:
+            pygame.display.flip()
 
         return status

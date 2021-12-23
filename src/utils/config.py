@@ -102,7 +102,7 @@ class Config:
         '''
         if self.terrain.elevation_function.lower() == 'perlin':
             args = self.terrain.perlin
-            noise = PerlinNoise2D(args.amplitude, args.shape, args.resolution)
+            noise = PerlinNoise2D(args.amplitude, args.shape, args.resolution, args.seed)
             noise.precompute()
             setattr(self.terrain, 'elevation_function', noise.fn)
         elif self.terrain.elevation_function.lower() == 'gaussian':
@@ -134,6 +134,7 @@ class Config:
             log.error('The user-defined fuel array function is set to '
                       f'{self.terrain.fuel_array_function}, when it can only be one of '
                       f'these values: {self._possible_fuel_arrays}')
+            raise ValueError
 
     def save(self, path: Path) -> None:
         '''

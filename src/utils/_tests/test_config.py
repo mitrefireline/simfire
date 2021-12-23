@@ -79,7 +79,7 @@ class ConfigTest(unittest.TestCase):
         '''
         Test assigning elevation Python function based on a config string
         '''
-        pnoise = PerlinNoise2D(500, (225, 225), (1, 1))
+        pnoise = PerlinNoise2D(500, (225, 225), (1, 1), 1111)
         pnoise.precompute()
         # This is the only way I could really come up with to make the correct function
         # was assigned - mdoyle

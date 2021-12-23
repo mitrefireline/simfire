@@ -54,6 +54,23 @@ game_rothermel.py:
   only:
     - merge_requests
 
+coverage:
+  stage: Tests
+  tags:
+  - docker
+  script:
+    - pip install pytest pytest-cov
+    - coverage run -m pytest
+    - coverage report
+    - coverage xml
+  artifacts:
+    reports:
+      cobertura: coverage.xml
+  needs: []
+  only:
+    - merge_requests
+    - master
+
 ################
 # GitLab Pages #
 ################

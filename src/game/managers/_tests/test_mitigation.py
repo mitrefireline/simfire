@@ -5,11 +5,10 @@ from unittest import mock
 import numpy as np
 from skimage.draw import line
 
-from .... import config as cfg
-from ....game.game import Game
 from ....enums import BurnStatus
+from ....game.game import Game
+from ....utils.config import Config
 from ....world.elevation_functions import flat
-from ....world.parameters import FuelArray, Tile
 from ...sprites import FireLine, ScratchLine, WetLine, Terrain
 from ..mitigation import FireLineManager, ScratchLineManager, WetLineManager
 
@@ -21,27 +20,30 @@ class TestControlLineManager(unittest.TestCase):
     using the `FireLineManager` as a proxy.
     '''
     def setUp(self) -> None:
-        points = line(cfg.terrain_size, cfg.terrain_size + 1, cfg.terrain_size,
-                      cfg.terrain_size + 1)
+        self.config = Config('./config.yml')
+        points = line(self.config.area.terrain_size, self.config.area.terrain_size + 1,
+                      self.config.area.terrain_size, self.config.area.terrain_size + 1)
         y = points[0].tolist()
         x = points[1].tolist()
         self.manager = FireLineManager
         self.points = list(zip(x, y))
+        self.game = Game(self.config.area.screen_size)
 
         fuel_arrs = [[
-            FuelArray(Tile(j, i, cfg.terrain_scale, cfg.terrain_scale),
-                      cfg.terrain_map[i][j]) for j in range(cfg.terrain_size)
-        ] for i in range(cfg.terrain_size)]
+            self.config.terrain.fuel_array_function(x, y)
+            for x in range(self.config.area.terrain_size)
+        ] for y in range(self.config.area.terrain_size)]
 
-        self.terrain = Terrain(fuel_arrs, flat(), cfg.terrain_size, cfg.screen_size)
+        self.terrain = Terrain(fuel_arrs, flat(), self.config.area.terrain_size,
+                               self.config.area.screen_size)
 
     @mock.patch.dict(os.environ, {'SDL_VIDEODRIVER': 'dummy'})
     def test_add_point(self) -> None:
         '''
         Test that a point is added to the self.sprites list correctly.
         '''
-        manager = self.manager(size=cfg.control_line_size,
-                               pixel_scale=cfg.pixel_scale,
+        manager = self.manager(size=self.config.display.control_line_size,
+                               pixel_scale=self.config.area.pixel_scale,
                                terrain=self.terrain)
 
         manager._add_point(self.points[0])
@@ -61,13 +63,13 @@ class TestControlLineManager(unittest.TestCase):
         Test that all points supplied to `manager.update()` are the same points in the
         resulting `fire_map`
         '''
-        game = Game(cfg.screen_size)
-        fire_map = np.full((cfg.screen_size, cfg.screen_size), BurnStatus.UNBURNED)
+        fire_map = np.full((self.config.area.screen_size, self.config.area.screen_size),
+                           BurnStatus.UNBURNED)
 
-        manager = self.manager(size=cfg.control_line_size,
-                               pixel_scale=cfg.pixel_scale,
+        manager = self.manager(size=self.config.display.control_line_size,
+                               pixel_scale=self.config.area.pixel_scale,
                                terrain=self.terrain)
-        fire_map = game.fire_map
+        fire_map = self.game.fire_map
         fire_map = manager.update(fire_map, self.points)
 
         fireline_points = np.argwhere(fire_map == BurnStatus.FIRELINE)
@@ -92,25 +94,28 @@ class TestFireLineManager(unittest.TestCase):
     present in FireLines, but right now assumes that they stop the fire in its tracks.
     '''
     def setUp(self) -> None:
+        self.config = Config('./config.yml')
         points = line(100, 15, 100, 200)
         y = points[0].tolist()
         x = points[1].tolist()
         self.manager = FireLineManager
         self.points = list(zip(x, y))
+        self.game = Game(self.config.area.screen_size)
 
         fuel_arrs = [[
-            FuelArray(Tile(j, i, cfg.terrain_scale, cfg.terrain_scale),
-                      cfg.terrain_map[i][j]) for j in range(cfg.terrain_size)
-        ] for i in range(cfg.terrain_size)]
+            self.config.terrain.fuel_array_function(x, y)
+            for x in range(self.config.area.terrain_size)
+        ] for y in range(self.config.area.terrain_size)]
 
-        self.terrain = Terrain(fuel_arrs, flat(), cfg.terrain_size, cfg.screen_size)
+        self.terrain = Terrain(fuel_arrs, flat(), self.config.area.terrain_size,
+                               self.config.area.screen_size)
 
     def test_init(self) -> None:
         '''
         Test to make sure that `self.sprite_type` and `self.line_type` are set correctly
         '''
-        manager = self.manager(size=cfg.control_line_size,
-                               pixel_scale=cfg.pixel_scale,
+        manager = self.manager(size=self.config.display.control_line_size,
+                               pixel_scale=self.config.area.pixel_scale,
                                terrain=self.terrain)
 
         # Make sure line_type is the same
@@ -132,25 +137,28 @@ class TestScratchLineManager(unittest.TestCase):
     physics present in ScratchLines.
     '''
     def setUp(self) -> None:
+        self.config = Config('./config.yml')
         points = line(100, 15, 100, 200)
         y = points[0].tolist()
         x = points[1].tolist()
         self.manager = ScratchLineManager
         self.points = list(zip(x, y))
+        self.game = Game(self.config.area.screen_size)
 
         fuel_arrs = [[
-            FuelArray(Tile(j, i, cfg.terrain_scale, cfg.terrain_scale),
-                      cfg.terrain_map[i][j]) for j in range(cfg.terrain_size)
-        ] for i in range(cfg.terrain_size)]
+            self.config.terrain.fuel_array_function(x, y)
+            for x in range(self.config.area.terrain_size)
+        ] for y in range(self.config.area.terrain_size)]
 
-        self.terrain = Terrain(fuel_arrs, flat(), cfg.terrain_size, cfg.screen_size)
+        self.terrain = Terrain(fuel_arrs, flat(), self.config.area.terrain_size,
+                               self.config.area.screen_size)
 
     def test_init(self) -> None:
         '''
         Test to make sure that `self.sprite_type` and `self.line_type` are set correctly
         '''
-        manager = self.manager(size=cfg.control_line_size,
-                               pixel_scale=cfg.pixel_scale,
+        manager = self.manager(size=self.config.display.control_line_size,
+                               pixel_scale=self.config.area.pixel_scale,
                                terrain=self.terrain)
 
         # Make sure line_type is the same
@@ -172,25 +180,28 @@ class TestWetLineManager(unittest.TestCase):
     present in WetLines.
     '''
     def setUp(self) -> None:
+        self.config = Config('./config.yml')
         points = line(100, 15, 100, 200)
         y = points[0].tolist()
         x = points[1].tolist()
         self.manager = WetLineManager
         self.points = list(zip(x, y))
+        self.game = Game(self.config.area.screen_size)
 
         fuel_arrs = [[
-            FuelArray(Tile(j, i, cfg.terrain_scale, cfg.terrain_scale),
-                      cfg.terrain_map[i][j]) for j in range(cfg.terrain_size)
-        ] for i in range(cfg.terrain_size)]
+            self.config.terrain.fuel_array_function(x, y)
+            for x in range(self.config.area.terrain_size)
+        ] for y in range(self.config.area.terrain_size)]
 
-        self.terrain = Terrain(fuel_arrs, flat(), cfg.terrain_size, cfg.screen_size)
+        self.terrain = Terrain(fuel_arrs, flat(), self.config.area.terrain_size,
+                               self.config.area.screen_size)
 
     def test_init(self) -> None:
         '''
         Test to make sure that `self.sprite_type` and `self.line_type` are set correctly
         '''
-        manager = self.manager(size=cfg.control_line_size,
-                               pixel_scale=cfg.pixel_scale,
+        manager = self.manager(size=self.config.display.control_line_size,
+                               pixel_scale=self.config.area.pixel_scale,
                                terrain=self.terrain)
 
         # Make sure line_type is the same

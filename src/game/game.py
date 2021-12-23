@@ -5,7 +5,6 @@ import math
 import pygame
 import numpy as np
 
-from .. import config as cfg
 from .image import load_image
 from ..enums import BurnStatus, GameStatus
 from .sprites import Fire, FireLine, Terrain
@@ -17,7 +16,15 @@ class Game():
     and allow for terrain, fire, and other sprites to be rendered and
     interact.
     '''
-    def __init__(self, screen_size: int, headless: bool = False) -> None:
+    def __init__(self,
+                 screen_size: int,
+                 headless: bool = False,
+                 show_wind_magnitude: bool = False,
+                 show_wind_direction: bool = False,
+                 mw_speed_min: float = None,
+                 mw_speed_max: float = None,
+                 dw_deg_min: float = None,
+                 dw_deg_max: float = None) -> None:
         '''
         Initalize the class by creating the game display and background.
 
@@ -26,6 +33,13 @@ class Game():
             headless: Flag to run in a headless state
         '''
         self.screen_size = screen_size
+        self.show_wind_magnitude = show_wind_magnitude
+        self.show_wind_direction = show_wind_direction
+        self.mw_speed_min = mw_speed_min
+        self.mw_speed_max = mw_speed_max
+        self.dw_speed_min = dw_deg_min
+        self.dw_speed_max = dw_deg_max
+
         self.headless = headless
 
         if not self.headless:
@@ -46,9 +60,6 @@ class Game():
 
         # Map to track which pixels are on fire or have burned
         self.fire_map = np.full((screen_size, screen_size), BurnStatus.UNBURNED)
-
-        self.show_wind_magnitude = False
-        self.show_wind_direction = False
 
     def _toggle_wind_magnitude_display(self):
         '''
@@ -190,6 +201,52 @@ class Game():
         )
         return floorColorRGB
 
+    def _get_wind_mag_surf(self, wind_magnitude_map: Sequence[Sequence[float]]) -> \
+            pygame.Surface:
+        '''
+        Compute the wind magnitude surface for display.
+
+        Arguments:
+            wind_magnitude_map: The map/array containing wind magnitudes at each pixel
+                                location
+
+        Returns:
+            The PyGame Surface for the wind magnitude
+        '''
+        wind_mag_surf = pygame.Surface(self.screen.get_size())
+        for y_idx, y in enumerate(wind_magnitude_map):
+            for x_idx, x in enumerate(y):
+                w_mag = x
+                wind_speed_range = (self.mw_speed_max - self.mw_speed_min)
+                color_grad = (255 - 0)
+                color_mag = int(((
+                    (w_mag - self.mw_speed_min) * color_grad) / wind_speed_range) + 0)
+                wind_mag_surf.set_at((x_idx, y_idx), pygame.Color(0, 0, color_mag, a=1))
+        return wind_mag_surf
+
+    def _get_wind_dir_surf(self, wind_direction_map: Sequence[Sequence[float]]) -> \
+            pygame.Surface:
+        '''
+        Compute the wind direction surface for display.
+
+        Arguments:
+            wind_direction_map: The map/array containing wind directions at each pixel
+                                location
+
+        Returns:
+            The PyGame Surface for the wind direction
+        '''
+        wind_dir_surf = pygame.Surface(self.screen.get_size())
+        for y_idx, y in enumerate(wind_direction_map):
+            for x_idx, x in enumerate(y):
+                w_dir = x
+                color = self._get_wind_direction_color(w_dir, self.dw_deg_min,
+                                                       self.dw_deg_max)
+                pyColor = pygame.Color(color[0], color[1], color[2], a=0.75)
+                wind_dir_surf.set_at((x_idx, y_idx), pyColor)
+
+        return wind_dir_surf
+
     def update(self, terrain: Terrain, fire_sprites: Sequence[Fire],
                fireline_sprites: Sequence[FireLine],
                wind_magnitude_map: Sequence[Sequence[float]],
@@ -203,6 +260,10 @@ class Game():
             terrain: The Terrain class that comprises the burnable area.
             fire_sprites: A list of all Fire sprites that are actively burning.
             fireline_sprites: A list of all FireLine sprites that are dug.
+            wind_magnitude_map: The map/array containing wind magnitudes at each pixel
+                                location
+            wind_direction_map: The map/array containing wind directions at each pixel
+                                location
         '''
         status = GameStatus.RUNNING
 
@@ -225,10 +286,6 @@ class Game():
         fire_sprites_group = pygame.sprite.LayeredUpdates(fire_sprites, fireline_sprites)
         all_sprites = pygame.sprite.LayeredUpdates(fire_sprites_group, terrain)
 
-        # if self.show_wind_magnitude is True:
-
-        # if self.show_wind_direction is true
-
         # Update and draw the sprites
         if not self.headless:
             for sprite in all_sprites.sprites():
@@ -240,32 +297,13 @@ class Game():
             all_sprites.draw(self.screen)
 
         if self.show_wind_magnitude is True:
-            wind_mag_surf = pygame.Surface(self.screen.get_size())
-            for y_idx, y in enumerate(wind_magnitude_map):
-                for x_idx, x in enumerate(y):
-                    w_mag = x
-                    wind_speed_range = (cfg.mw_speed_max - cfg.mw_speed_min)
-                    color_grad = (255 - 0)
-                    color_mag = int(((
-                        (w_mag - cfg.mw_speed_min) * color_grad) / wind_speed_range) + 0)
-                    wind_mag_surf.set_at((x_idx, y_idx), pygame.Color(0,
-                                                                      0,
-                                                                      color_mag,
-                                                                      a=1))
-            if not self.headless:
-                self.screen.blit(wind_mag_surf, (0, 0))
+            wind_mag_surf = self._get_wind_mag_surf(wind_magnitude_map)
+            self.screen.blit(wind_mag_surf, (0, 0))
 
         if self.show_wind_direction is True:
-            wind_dir_surf = pygame.Surface(self.screen.get_size())
-            for y_idx, y in enumerate(wind_direction_map):
-                for x_idx, x in enumerate(y):
-                    w_dir = x
-                    color = self._get_wind_direction_color(w_dir, cfg.dw_deg_min,
-                                                           cfg.dw_deg_max)
-                    pyColor = pygame.Color(color[0], color[1], color[2], a=0.75)
-                    wind_dir_surf.set_at((x_idx, y_idx), pyColor)
-            if not self.headless:
-                self.screen.blit(wind_dir_surf, (0, 0))
+            wind_dir_surf = self._get_wind_dir_surf(wind_direction_map)
+            self.screen.blit(wind_dir_surf, (0, 0))
+
         if not self.headless:
             pygame.display.flip()
 

@@ -32,6 +32,9 @@ extensions = [
     'sphinx.ext.autodoc', 'sphinx.ext.napoleon', 'autoapi.extension', 'myst_parser'
 ]
 
+# Autodoc settings
+autodoc_typehints = 'description'
+
 # Autoapi settings
 autoapi_python_class_content = 'both'
 autoapi_type = 'python'

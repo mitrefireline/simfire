@@ -1,4 +1,6 @@
+import os
 import unittest
+from unittest import mock
 
 import numpy as np
 from skimage.draw import line
@@ -11,6 +13,7 @@ from ...sprites import FireLine, ScratchLine, WetLine, Terrain
 from ..mitigation import FireLineManager, ScratchLineManager, WetLineManager
 
 
+@mock.patch.dict(os.environ, {'SDL_VIDEODRIVER': 'dummy'})
 class TestControlLineManager(unittest.TestCase):
     '''
     Tests the parent `ControlLineManager` class's `add_point` and `update` functions
@@ -34,6 +37,7 @@ class TestControlLineManager(unittest.TestCase):
         self.terrain = Terrain(fuel_arrs, flat(), self.config.area.terrain_size,
                                self.config.area.screen_size)
 
+    @mock.patch.dict(os.environ, {'SDL_VIDEODRIVER': 'dummy'})
     def test_add_point(self) -> None:
         '''
         Test that a point is added to the self.sprites list correctly.
@@ -83,6 +87,7 @@ class TestControlLineManager(unittest.TestCase):
                                   f'{fireline_points}'))
 
 
+@mock.patch.dict(os.environ, {'SDL_VIDEODRIVER': 'dummy'})
 class TestFireLineManager(unittest.TestCase):
     '''
     Meant to test the `FireLineManager` class. Will eventually test the different physics
@@ -125,6 +130,7 @@ class TestFireLineManager(unittest.TestCase):
                          msg=('FireLine.sprite_type is not a FireLine sprite'))
 
 
+@mock.patch.dict(os.environ, {'SDL_VIDEODRIVER': 'dummy'})
 class TestScratchLineManager(unittest.TestCase):
     '''
     Meant to test the `ScratchLineManager` class. Will eventually test the different
@@ -167,6 +173,7 @@ class TestScratchLineManager(unittest.TestCase):
                          msg=('FireLine.sprite_type is not a FireLine sprite'))
 
 
+@mock.patch.dict(os.environ, {'SDL_VIDEODRIVER': 'dummy'})
 class TestWetLineManager(unittest.TestCase):
     '''
     Meant to test the `WetLineManager` class. Will eventually test the different physics

@@ -18,6 +18,7 @@ class Game():
     '''
     def __init__(self,
                  screen_size: int,
+                 headless: bool = False,
                  show_wind_magnitude: bool = False,
                  show_wind_direction: bool = False,
                  mw_speed_min: float = None,
@@ -29,6 +30,7 @@ class Game():
 
         Arguments:
             screen_size: The (n,n) size of the game screen/display
+            headless: Flag to run in a headless state
         '''
         self.screen_size = screen_size
         self.show_wind_magnitude = show_wind_magnitude
@@ -39,19 +41,26 @@ class Game():
         self.dw_speed_max = dw_deg_max
 
         self.screen = pygame.display.set_mode((screen_size, screen_size))
+        self.headless = headless
 
-        pygame.display.set_caption('Rothermel 2D Simulator')
-        with resources.path('assets.icons', 'fireline_logo.png') as path:
-            fireline_logo_path = path
-        pygame.display.set_icon(load_image(fireline_logo_path))
+        if not self.headless:
+            pygame.init()
+            self.screen = pygame.display.set_mode((screen_size, screen_size))
+            pygame.display.set_caption('Rothermel 2D Simulator')
+            with resources.path('assets.icons', 'fireline_logo.png') as path:
+                fireline_logo_path = path
+            pygame.display.set_icon(load_image(fireline_logo_path))
 
         # Create the background so it doesn't have to be recreated every update
-        self.background = pygame.Surface(self.screen.get_size())
-        self.background = self.background.convert()
-        self.background.fill((0, 0, 0))
+        if self.headless:
+            self.background = None
+        else:
+            self.background = pygame.Surface(self.screen.get_size())
+            self.background = self.background.convert()
+            self.background.fill((0, 0, 0))
+
         # Map to track which pixels are on fire or have burned
-        self.fire_map = np.full(pygame.display.get_surface().get_size(),
-                                BurnStatus.UNBURNED)
+        self.fire_map = np.full((screen_size, screen_size), BurnStatus.UNBURNED)
 
     def _toggle_wind_magnitude_display(self):
         '''
@@ -259,31 +268,34 @@ class Game():
         '''
         status = GameStatus.RUNNING
 
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                status = GameStatus.QUIT
+        if not self.headless:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    status = GameStatus.QUIT
 
-            if event.type == pygame.KEYDOWN:
-                keys = pygame.key.get_pressed()
-                if keys[pygame.K_m] is True:
-                    self._disable_wind_direction_display()
-                    self._toggle_wind_magnitude_display()
+                if event.type == pygame.KEYDOWN:
+                    keys = pygame.key.get_pressed()
+                    if keys[pygame.K_m] is True:
+                        self._disable_wind_direction_display()
+                        self._toggle_wind_magnitude_display()
 
-                if keys[pygame.K_n] is True:
-                    self._disable_wind_magnitude_display()
-                    self._toggle_wind_direction_display()
+                    if keys[pygame.K_n] is True:
+                        self._disable_wind_magnitude_display()
+                        self._toggle_wind_direction_display()
 
         # Create a layered group so that the fire appears on top
         fire_sprites_group = pygame.sprite.LayeredUpdates(fire_sprites, fireline_sprites)
         all_sprites = pygame.sprite.LayeredUpdates(fire_sprites_group, terrain)
 
         # Update and draw the sprites
-        for sprite in all_sprites.sprites():
-            self.screen.blit(self.background, sprite.rect, sprite.rect)
+        if not self.headless:
+            for sprite in all_sprites.sprites():
+                self.screen.blit(self.background, sprite.rect, sprite.rect)
 
         fire_sprites_group.update()
         terrain.update(self.fire_map)
-        all_sprites.draw(self.screen)
+        if not self.headless:
+            all_sprites.draw(self.screen)
 
         if self.show_wind_magnitude is True:
             wind_mag_surf = self._get_wind_mag_surf(wind_magnitude_map)

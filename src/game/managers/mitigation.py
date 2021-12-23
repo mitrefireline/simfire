@@ -17,7 +17,11 @@ class ControlLineManager():
 
     Call `update()` to add points.
     '''
-    def __init__(self, size: int, pixel_scale: int, terrain: Terrain) -> None:
+    def __init__(self,
+                 size: int,
+                 pixel_scale: int,
+                 terrain: Terrain,
+                 headless: bool = False) -> None:
         '''
         Initialize the class with the display size of each `ControlLine` sprite,
         the `pixel_scale`, and the `Terrain` that the `ControlLine`s will be placed.
@@ -30,6 +34,8 @@ class ControlLineManager():
                          a pixel/location to catch on fire depending on the
                          rate of spread.
             terrain: The Terrain that describes the simulation/game
+            headless: Flag to run in a headless state. This will allow PyGame objects to
+                      not be initialized.
 
         Returns:
             None
@@ -40,12 +46,13 @@ class ControlLineManager():
         self.line_type = None
         self.sprite_type = None
         self.sprites = []
+        self.headless = headless
 
     def _add_point(self, point: PointType) -> None:
         '''
         Updates self.sprites to add a new point to the control line
         '''
-        self.sprites.append(self.sprite_type(point, self.size))
+        self.sprites.append(self.sprite_type(point, self.size, self.headless))
 
     def update(self, fire_map: np.ndarray, points: PointsType = []) -> np.ndarray:
         '''
@@ -72,7 +79,11 @@ class FireLineManager(ControlLineManager):
 
     Call `update()` to add points.
     '''
-    def __init__(self, size: int, pixel_scale: int, terrain: Terrain) -> None:
+    def __init__(self,
+                 size: int,
+                 pixel_scale: int,
+                 terrain: Terrain,
+                 headless: bool = False) -> None:
         '''
         Initialize the class with the display size of each `FireLine` sprite,
         the `pixel_scale`, and the `Terrain` that the `FireLine`s will be placed.
@@ -87,11 +98,16 @@ class FireLineManager(ControlLineManager):
                          a pixel/location to catch on fire depending on the
                          rate of spread.
             terrain: The Terrain that describes the simulation/game
+            headless: Flag to run in a headless state. This will allow PyGame objects to
+                      not be initialized.
 
         Returns:
             None
         '''
-        super().__init__(size=size, pixel_scale=pixel_scale, terrain=terrain)
+        super().__init__(size=size,
+                         pixel_scale=pixel_scale,
+                         terrain=terrain,
+                         headless=headless)
         self.line_type = BurnStatus.FIRELINE
         self.sprite_type = FireLine
 
@@ -103,7 +119,11 @@ class ScratchLineManager(ControlLineManager):
 
     Call `update()` to add points.
     '''
-    def __init__(self, size: int, pixel_scale: int, terrain: Terrain) -> None:
+    def __init__(self,
+                 size: int,
+                 pixel_scale: int,
+                 terrain: Terrain,
+                 headless: bool = False) -> None:
         '''
         Initialize the class with the display size of each `ScratchLine` sprite,
         the `pixel_scale`, and the `Terrain` that the `ScratchLine`s will be placed.
@@ -124,7 +144,10 @@ class ScratchLineManager(ControlLineManager):
         Returns:
             None
         '''
-        super().__init__(size=size, pixel_scale=pixel_scale, terrain=terrain)
+        super().__init__(size=size,
+                         pixel_scale=pixel_scale,
+                         terrain=terrain,
+                         headless=headless)
         self.line_type = BurnStatus.SCRATCHLINE
         self.sprite_type = ScratchLine
 
@@ -136,7 +159,11 @@ class WetLineManager(ControlLineManager):
 
     Call `update()` to add points.
     '''
-    def __init__(self, size: int, pixel_scale: int, terrain: Terrain) -> None:
+    def __init__(self,
+                 size: int,
+                 pixel_scale: int,
+                 terrain: Terrain,
+                 headless: bool = False) -> None:
         '''
         Initialize the class with the display size of each `WetLine` sprite,
         the `pixel_scale`, and the `Terrain` that the `WetLine`s will be placed.
@@ -157,6 +184,9 @@ class WetLineManager(ControlLineManager):
         Returns:
             None
         '''
-        super().__init__(size=size, pixel_scale=pixel_scale, terrain=terrain)
+        super().__init__(size=size,
+                         pixel_scale=pixel_scale,
+                         terrain=terrain,
+                         headless=headless)
         self.line_type = BurnStatus.WETLINE
         self.sprite_type = WetLine

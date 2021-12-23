@@ -1,13 +1,16 @@
+import os
 import unittest
+from unittest import mock
+
 import numpy as np
 
-from ...enums import BurnStatus, GameStatus
 from ...game.game import Game
+from ...utils.config import Config
+from ...game.sprites import Terrain
+from ...enums import BurnStatus, GameStatus
+from ...rl_env.fireline_env import FireLineEnv, RLEnv
 from ...game.managers.fire import RothermelFireManager
 from ...game.managers.mitigation import FireLineManager
-from ...game.sprites import Terrain
-from ...rl_env.fireline_env import FireLineEnv, RLEnv
-from ...utils.config import Config
 from ...world.parameters import Environment, FuelParticle
 
 
@@ -151,6 +154,7 @@ class RLEnvTest(unittest.TestCase):
             f'should be {new_agent_loc}.')
 
 
+@mock.patch.dict(os.environ, {'SDL_VIDEODRIVER': 'dummy'})
 class FireLineEnvTest(unittest.TestCase):
     def setUp(self) -> None:
         '''

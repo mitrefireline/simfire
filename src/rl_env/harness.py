@@ -1,11 +1,13 @@
-from simulation import Simulation
 import gym
 from copy import deepcopy
 from typing import Dict, Tuple, List
 import numpy as np
 
+from simulation import Simulation
+from harness_utils import (SimulationConversion, ActionsToInt, HarnessConversion)
 
-class RLEnv(gym.Env):
+
+class RLEnvironment(gym.Env):
     '''
     TODO: create functions to convert action / attributes list to
             correct gym action / obervation space
@@ -103,10 +105,14 @@ class RLEnv(gym.Env):
         self.simulation = simulation
         self.actions = actions
         self.attributes = attributes
-        channel_lows = np.array([[[self.simulation.observ_spaces[channel][0]]]
-                                 for channel in self.simulation.observ_spaces.keys()])
-        channel_highs = np.array([[[self.simulation.observ_spaces[channel][1]]]
-                                  for channel in self.simulation.observ_spaces.keys()])
+
+        self.observ_spaces = {'position': (0, 1)}
+        self.observ_spaces.update({attribute: (0, 1) for attribute in self.attributes})
+
+        channel_lows = np.array([[[self.observ_spaces[channel][0]]]
+                                 for channel in self.observ_spaces.keys()])
+        channel_highs = np.array([[[self.observ_spaces[channel][1]]]
+                                  for channel in self.observ_spaces.keys()])
 
         self.low = np.repeat(np.repeat(channel_lows,
                                        self.simulation.config.screen_size,
@@ -119,6 +125,13 @@ class RLEnv(gym.Env):
                                         axis=1),
                               self.simulation.config.screen_size,
                               axis=2)
+
+        self.observation_space = gym.spaces.Box(
+            np.float32(self.low),
+            np.float32(self.high),
+            shape=(len(self.observ_spaces.keys()), self.simulation.config.screen_size,
+                   self.simulation.config.screen_size),
+            dtype=np.float64)
 
     def step(self, action):
         '''
@@ -148,14 +161,18 @@ class RLEnv(gym.Env):
         # Make the action on the env at agent's current location
         self.state[-1][self.current_agent_loc] = action
 
+        # convert mitigation map to correct simulation format
+        sim_mitigation_map = HarnessConversion(self.state[-1], self.sim_actions,
+                                               self.actions)
+
         # make a copy
         old_loc = deepcopy(self.current_agent_loc)
 
         # if we want to render as we step through the game
         if self.simulation.config.render_inline:
-            self.simulation._render(self.state[-1][self.current_agent_loc],
-                                    self.current_agent_loc,
-                                    inline=True)
+            self.simulation.render(sim_mitigation_map[self.current_agent_loc],
+                                   self.current_agent_loc,
+                                   inline=True)
 
         # set the old position back to 0
         self.state[0][self.current_agent_loc] = 0
@@ -171,19 +188,19 @@ class RLEnv(gym.Env):
         done = old_loc == self.current_agent_loc
         if done:
             # compare the state spaces
-            fire_map = self.simulation._run(self.state[-1], self.state[0])
+            fire_map = self.simulation.run(sim_mitigation_map, self.state[0])
             # render only agent
             if self.simulation.config.render_post_agent:
-                self.simulation._render(self.state[-1], self.state[0])
+                self.simulation.render(sim_mitigation_map, self.state[0])
 
-            fire_map_with_agent = self.simulation._run(self.state[-1], self.state[0],
-                                                       True)
+            fire_map_with_agent = self.simulation.run(sim_mitigation_map, self.state[0],
+                                                      True)
             # render fire with agents mitigation in place
             if self.simulation.config.render_post_agent_with_fire:
-                self.simulation._render(self.state[-1],
-                                        self.state[0],
-                                        mitigation_only=False,
-                                        mitigation_and_fire_spread=True)
+                self.simulation.render(sim_mitigation_map,
+                                       self.state[0],
+                                       mitigation_only=False,
+                                       mitigation_and_fire_spread=True)
             reward = self._compare_states(fire_map, fire_map_with_agent)
 
         return self.state, reward, done, {}
@@ -238,7 +255,7 @@ class RLEnv(gym.Env):
             `self.state`, a dictionary with the following structure:
 
         '''
-        self.state = self.simulation._reset_state()
+        self.state = self._reset_state()
 
         # Place agent at location (0,0)
         self.current_agent_loc = (0, 0)
@@ -336,10 +353,14 @@ class RLEnv(gym.Env):
         Returns:
             state: The reset state of the simulation.
         '''
-        reset_position = np.zeros([self.config.screen_size, self.config.screen_size])
+        reset_position = np.zeros(
+            [self.simulation.config.screen_size, self.simulation.config.screen_size])
 
-        self.simulation.get_observations()
-        self.simulation.get_actions()
+        self.sim_attributes = self.simulation.get_attributes()
+        self.sim_actions = self.simulation.get_actions()
 
-        state = reset_position
+        observations = SimulationConversion(self.sim_attributes, self.attributes)
+        self.actions_as_ints = ActionsToInt(self.sim_actions, self.actions)
+
+        state = np.vstack((reset_position, observations))
         return state

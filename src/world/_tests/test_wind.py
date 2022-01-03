@@ -10,8 +10,8 @@ class TestWindNoise(unittest.TestCase):
         self.octaves: int = 3
         self.persistence: float = 0.7
         self.lacunarity: float = 2.0
-        self.range_min: float = 616.0
-        self.range_max: float = 4136.0
+        self.range_min: float = 7
+        self.range_max: float = 47
         self.screen_size = 150
         self.test_wind = WindNoise()
         self.test_wind.set_noise_parameters(self.seed, self.scale, self.octaves,

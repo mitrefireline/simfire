@@ -1,10 +1,15 @@
 import pygame
 import random
-import src.config as cfg
+from pathlib import Path
+from src.utils.config import Config
 from src.rl_env.fireline_env import FireLineEnv, RLEnv
+from src.rl_env.harness import RLEnvironment
+from src.rl_env.simulation import Simulation
 
 
 def main():
+    cfg_path = Path('./config.yml')
+    cfg = Config(cfg_path)
     seed = None
     if seed is not None:
         env_config = FireLineEnv(cfg, seed)
@@ -20,6 +25,27 @@ def main():
         final_reward += reward
 
     pygame.quit()
+
+
+def main_v2():
+    cfg_path = Path('./config.yml')
+    cfg = Config(cfg_path)
+    seed = 1234
+    actions = ['none', 'fireline']
+    observations = ['w0, elevation, mitigation, wind']
+
+    if seed is not None:
+        simulation = Simulation(cfg, seed)
+    else:
+        simulation = Simulation(cfg)
+    rl_environment = RLEnvironment(simulation, actions, observations)
+    state = rl_environment.reset()
+    done = False
+    final_reward = 0
+    while not done:
+        action = some_action_func(state)
+        state, reward, done, _ = rl_environment.step(action)
+        final_reward += reward
 
 
 def some_action_func(state):

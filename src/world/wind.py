@@ -1,6 +1,9 @@
-from typing import Sequence
-from noise import snoise2
 import numpy as np
+from noise import snoise2
+
+from typing import Sequence
+
+from ..utils.units import mph_to_ftpm
 
 
 class WindNoise():
@@ -109,9 +112,12 @@ class WindController():
             lacunarity: Controls increase in frequency of octaves per pass.
                         Frequency = lacunarity & (pass number).
                         Higher lacunarity, higher frequency per pass.
-
+            range_min: The minimum speed of the wind in mph.
+            range_min: The maximum speed of the wind in mph.
             screen_size: Size of screen (both heigh and width) MUST BE SQUARE
         '''
+        range_min = mph_to_ftpm(range_min)
+        range_max = mph_to_ftpm(range_max)
         self.speed_layer.set_noise_parameters(seed, scale, octaves, persistence,
                                               lacunarity, range_min, range_max)
 
@@ -134,7 +140,8 @@ class WindController():
             lacunarity: Controls increase in frequency of octaves per pass.
                         Frequency = lacunarity & (pass number).
                         Higher lacunarity, higher frequency per pass.
-
+            range_min: The minimum angle of wind in degrees clockwise.
+            range_min: The maximum angle of wind in degrees clockwise.
             screen_size: Size of screen (both heigh and width) MUST BE SQUARE
         '''
         self.direction_layer.set_noise_parameters(seed, scale, octaves, persistence,

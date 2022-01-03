@@ -2,8 +2,8 @@ from typing import Dict, List
 import numpy as np
 
 
-def _convert_attributes_to_harness(sim_attributes: Dict[str, int],
-                                   harness_attributes: List[str]) -> np.ndarray:
+def SimulationConversion(sim_attributes: Dict[str, int],
+                         harness_attributes: List[str]) -> np.ndarray:
     '''
     This function will convert the returns of the Simulation.get_attributes()
         to the RL harness np.ndarray structure
@@ -20,18 +20,17 @@ def _convert_attributes_to_harness(sim_attributes: Dict[str, int],
             A numpy array of the converted attributes for the RL harness to use
 
     '''
-
-    res = [
-        list(filter(lambda value: value in key, sim_attributes))
-        for key in harness_attributes
-    ]
+    res = []
+    for harness_attr in harness_attributes:
+        if harness_attr in sim_attributes.keys():
+            res.append(sim_attributes[harness_attr])
 
     res = np.asarray(res)
 
     return res
 
 
-def _convert_actions(harness_actions: List[str]) -> List[int]:
+def ActionsToInt(harness_actions: List[str]) -> List[int]:
     '''
     This function will convert the actions to a list of integers that is
         zero-indexed
@@ -46,12 +45,11 @@ def _convert_actions(harness_actions: List[str]) -> List[int]:
 
     '''
 
-    return [int(x) for x in len(harness_actions)]
+    return [int(x) for x in range(len(harness_actions))]
 
 
-def _convert_harness_actions_to_sim(mitigation_map: np.ndarray, sim_actions: Dict[str,
-                                                                                  int],
-                                    harness_actions: List[str]) -> np.ndarray:
+def HarnessConversion(mitigation_map: np.ndarray, sim_actions: Dict[str, int],
+                      harness_actions: List[str]) -> np.ndarray:
     '''
     This function will convert the returns of the Simulation.get_actions()
         to the RL harness List of ints structure where the simulation action
@@ -91,10 +89,11 @@ def _convert_harness_actions_to_sim(mitigation_map: np.ndarray, sim_actions: Dic
         for i in range(len(harness_actions))
     }
 
-    def convert_ints(value):
-        action = harness_dict.keys()[harness_dict.values().index(value)]
-        new_value = sim_actions[action]
-        return new_value
+    sim_mitigation_map = []
+    for mitigation_i in mitigation_map:
+        for mitigation_j in mitigation_i:
+            action = [key for key, value in harness_dict.items() if value == mitigation_j]
+            sim_mitigation_map.append(sim_actions[action[0]])
 
-    sim_mitigation_map = map(convert_ints, mitigation_map)
-    return sim_mitigation_map
+    return np.asarray(sim_mitigation_map).reshape(len(mitigation_map[0]),
+                                                  len(mitigation_map[1]))

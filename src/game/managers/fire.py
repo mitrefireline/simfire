@@ -31,7 +31,8 @@ class FireManager():
                  init_pos: Tuple[int, int],
                  fire_size: int,
                  max_fire_duration: int,
-                 attenuate_line_ros: bool = True) -> None:
+                 attenuate_line_ros: bool = True,
+                 headless: bool = False) -> None:
         '''
         Initialize the class by recording the initial fire location and size.
         Create the fire sprite and fire_map and mark the location of the
@@ -52,6 +53,8 @@ class FireManager():
                                 values found in `enums.RoSAttenuation` from the initial
                                 rate of spread calculation. If set to `False`, all
                                 different control lines will completely stop the fire.
+            headless: Flag to run in a headless state. This will allow PyGame objects to
+                      not be initialized.
         Returns:
             None
         '''
@@ -59,8 +62,9 @@ class FireManager():
         self.fire_size = fire_size
         self.max_fire_duration = max_fire_duration
         self.attenuate_line_ros = attenuate_line_ros
+        self.headless = headless
 
-        init_fire = Fire(self.init_pos, self.fire_size)
+        init_fire = Fire(self.init_pos, self.fire_size, headless=self.headless)
         self.sprites: List[Fire] = [init_fire]
         self.durations: List[int] = [0]
 
@@ -209,7 +213,8 @@ class RothermelFireManager(FireManager):
                  fuel_particle: FuelParticle,
                  terrain: Terrain,
                  environment: Environment,
-                 attenuate_line_ros: bool = True) -> None:
+                 attenuate_line_ros: bool = True,
+                 headless: bool = False) -> None:
         '''
         Initialize the class by recording the initial fire location and size.
         Create the fire sprite and fire_map and mark the location of the
@@ -240,11 +245,14 @@ class RothermelFireManager(FireManager):
                                 values found in `enums.RoSAttenuation` from the initial
                                 rate of spread calculation. If set to `False`, all
                                 different control lines will completely stop the fire.
+            headless: Flag to run in a headless state. This will allow PyGame objects to
+                      not be initialized.
 
         Returns:
             None
         '''
-        super().__init__(init_pos, fire_size, max_fire_duration, attenuate_line_ros)
+        super().__init__(init_pos, fire_size, max_fire_duration, attenuate_line_ros,
+                         headless)
         self.pixel_scale = pixel_scale
         self.update_rate = update_rate
         self.fuel_particle = fuel_particle
@@ -433,7 +441,7 @@ class RothermelFireManager(FireManager):
         y_coords, x_coords = np.unique(np.vstack((y_coords, x_coords)), axis=1)
         new_burn = np.argwhere(self.burn_amounts[y_coords, x_coords] > self.pixel_scale)
         new_sprites = [
-            Fire((x_coords[burn[0]], y_coords[burn[0]]), self.fire_size)
+            Fire((x_coords[burn[0]], y_coords[burn[0]]), self.fire_size, self.headless)
             for burn in new_burn
         ]
         new_durations = [0] * len(new_sprites)
@@ -498,7 +506,7 @@ class ConstantSpreadFireManager(FireManager):
                 # and verify they are unburned to start a new fire there
                 new_locs = self._get_new_locs(x, y, fire_map)
                 for loc in new_locs:
-                    new_sprite = Fire(loc, self.fire_size)
+                    new_sprite = Fire(loc, self.fire_size, self.headless)
                     self.sprites.append(new_sprite)
                     fire_map[loc[1], loc[0]] = BurnStatus.BURNING
             else:

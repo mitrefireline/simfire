@@ -1,7 +1,5 @@
 from typing import Dict
-
 import numpy as np
-
 from .. import config
 from ..enums import GameStatus, BurnStatus
 from ..game.game import Game
@@ -50,7 +48,7 @@ class Simulation():
         '''
         pass
 
-    def get_observations(self) -> Dict[str, np.ndarray]:
+    def get_attributes(self) -> Dict[str, np.ndarray]:
         '''
         This function will return the observation space for the simulation
 
@@ -163,7 +161,7 @@ class RothermalSimulation(Simulation):
             'wetline': BurnStatus.WETLINE
         }
 
-    def get_observations(self) -> Dict[str, np.ndarray]:
+    def get_attributes(self) -> Dict[str, np.ndarray]:
         '''
         This function will initialize and return the observation
             space for the simulation
@@ -182,10 +180,26 @@ class RothermalSimulation(Simulation):
 
         return {
             'mitigation':
-            np.zeros((self.config.screen_size, self.config.screen_size)),
-            'w_0':
+            np.array((BurnStatus.UNBURNED, BurnStatus.UNBURNED),
+                     size=(self.config.screen_size, self.config.screen_size)),
+            'w0':
             np.array([[
                 self.terrain.fuel_arrs[i][j].fuel.w_0
+                for j in range(self.config.screen_size)
+            ] for i in range(self.config.screen_size)]),
+            'sigma':
+            np.array([[
+                self.terrain.fuel_arrs[i][j].fuel.sigma
+                for j in range(self.config.screen_size)
+            ] for i in range(self.config.screen_size)]),
+            'delta':
+            np.array([[
+                self.terrain.fuel_arrs[i][j].fuel.delta
+                for j in range(self.config.screen_size)
+            ] for i in range(self.config.screen_size)]),
+            'M_x':
+            np.array([[
+                self.terrain.fuel_arrs[i][j].fuel.M_x
                 for j in range(self.config.screen_size)
             ] for i in range(self.config.screen_size)]),
             'elevation':
@@ -225,10 +239,10 @@ class RothermalSimulation(Simulation):
                     if mitigation_state[(i, j)] == 1:
                         self.points.add((i, j))
 
-    def _run(self,
-             mitigation_state: np.ndarray,
-             position_state: np.ndarray,
-             mitigation: bool = False):
+    def run(self,
+            mitigation_state: np.ndarray,
+            position_state: np.ndarray,
+            mitigation: bool = False):
         '''
         Runs the simulation with or without mitigation lines
 
@@ -270,12 +284,12 @@ class RothermalSimulation(Simulation):
             if self.fire_status == GameStatus.QUIT:
                 return self.fire_map
 
-    def _render(self,
-                mitigation_state: np.ndarray,
-                position_state: np.ndarray,
-                mitigation_only: bool = True,
-                mitigation_and_fire_spread: bool = False,
-                inline: bool = False) -> None:
+    def render(self,
+               mitigation_state: np.ndarray,
+               position_state: np.ndarray,
+               mitigation_only: bool = True,
+               mitigation_and_fire_spread: bool = False,
+               inline: bool = False) -> None:
         '''
         This will take the pygame update command and perform the display updates
             for the following scenarios:

@@ -9,20 +9,11 @@ from .harness_utils import (SimulationConversion, ActionsToInt, HarnessConversio
 
 class RLEnvironment(gym.Env):
     '''
-    TODO: create functions to convert action / attributes list to
-            correct gym action / obervation space
 
-    TODO: create funcs to convert mitigation map to Rothermal / QUIC Simulation
-            format
     This Environment Catcher will record all environments/actions for the RL return
     states.
 
     This includes: Observation, Reward (or Penalty), "done", and any meta-data.
-
-    This class will incorporate all gamelogic, input and rendering.
-
-    It will also incorporate everything related to pygame into the `render()` method and
-    separate `__init__()` and `init_render()` methods.
 
     We can then render ML routines using the step() and reset() method w/o loading the
     pygame package each step - if the environment is loaded, the rendering is not needed
@@ -35,31 +26,23 @@ class RLEnvironment(gym.Env):
     | Number | Observation | min | max |
     |--------|-------------|-----|-----|
     | 0      | Position    | 0   | 1   |
-    | 1      | Fuel (w_0)  | 0   | 1   |
-    | 2      | Elevation   | 0   | 1.0 |
-    | 3      | Mitigation  | 0   | 1   |
+    | 1      | Mitigation  | 0   | 1   |
+    | 2      | w0          | 0   | 1   |
+    | 3      | Elevation   | 0   | 1   |
+    | 4      | wind speed  | 0   | 1   |
+    | 5      | wind dir    | 0   | 1   |
 
-    In Reactive Case:
-    -----------------
-    Type: gym.spaces.Dict(Box(low=min, high=max, shape=(255,255,len(max))))
-
-    | Number | Observation | min | max |
-    |--------|-------------|-----|-----|
-    | 0      | Position    | 0   | 1   |
-    | 1      | Fuel (w_0)  | 0   | 1   |
-    | 2      | Elevation   | 0   | 1   |
-    | 3      | Mitigation  | 0   | 1   |
 
     Actions:
     --------
     Type: Discrete(4) -- real-valued (on / off)
 
-    | Num | Action            |
-    |-----|-------------------|
-    | 0   | None              |
-    | 1   | Fireline          |
-    | 2   | Scratchline (TBD) |
-    | 3   | Wetline (TBD)     |
+    | Num                   | Action            |
+    |-----                  |-------------------|
+    | BurnStatus.UNBURNED   | none              |
+    | BurnSatus.FIRELINE    | fireline          |
+    | BurnSatus.SCRATCHLINE | scratchline       |
+    | BurnSatus.WETLINE     | wetline           |
 
 
     Reward:
@@ -89,6 +72,8 @@ class RLEnvironment(gym.Env):
 
           1. Let the agent step through the space and draw firelines
           2. Let the environemnt progress w/o agent
+
+        NOTE: self.state will be in SAME order of `actions` list provided
 
         Arguments:
             simulation: Simulation()
@@ -158,14 +143,13 @@ class RLEnvironment(gym.Env):
         Returns:
             A tuple of the `self.state` dictionary seen below:
 
-            {'position': (screen_size, screen_size, 1),
-            'mitigation': (screen_size, screen_size, 1),
-             'elevation': (screen_size, screen_size, 1),
-             'wind_speed': (screen_size, screen_size, 1),
-             'wind_direction': (screen_size, screen_size, 1)
+            {'position': (screen_size, screen_size),
+             'mitigation': (screen_size, screen_size),
+             'w0': (screen_size, screen_size),
+             'elevation': (screen_size, screen_size),
+             'wind_speed': (screen_size, screen_size),
+             'wind_direction': (screen_size, screen_size)
              }
-
-
 
             The reward for the step, whether or not the simulation is `done`, and a
             dictionary containing metadata.
@@ -173,15 +157,14 @@ class RLEnvironment(gym.Env):
         # Make the mitigation action on the env at agent's current location
         self.state[1][self.current_agent_loc] = action
 
-        # convert mitigation map to correct simulation format
-        sim_mitigation_map = HarnessConversion(self.state[1], self.sim_actions,
-                                               self.actions)
-
         # make a copy
         old_loc = deepcopy(self.current_agent_loc)
 
         # if we want to render as we step through the game
         if self.simulation.config.render.inline:
+            # convert mitigation map to correct simulation format
+            sim_mitigation_map = HarnessConversion(self.state[1], self.sim_actions,
+                                                   self.actions)
             self.simulation.render(sim_mitigation_map[self.current_agent_loc],
                                    self.current_agent_loc,
                                    inline=True)
@@ -198,6 +181,9 @@ class RLEnvironment(gym.Env):
         # If the agent is at the last location (cannot move forward)
         done = old_loc == self.current_agent_loc
         if done:
+            # convert mitigation map to correct simulation format
+            sim_mitigation_map = HarnessConversion(self.state[1], self.sim_actions,
+                                                   self.actions)
             # compare the state spaces
             fire_map = self.simulation.run(sim_mitigation_map, self.state[0])
             # render only agent
@@ -274,6 +260,31 @@ class RLEnvironment(gym.Env):
 
         return self.state
 
+    def _reset_state(self) -> np.ndarray:
+        '''
+        This function will convert the initialized terrain
+            to the gym.spaces.Box format.
+
+        Arguments:
+            None
+
+        Returns:
+            state: The reset state of the simulation.
+        '''
+        reset_position = np.zeros([
+            self.simulation.config.area.screen_size,
+            self.simulation.config.area.screen_size
+        ])
+        reset_position = np.expand_dims(reset_position, axis=0)
+
+        self.sim_attributes = self.simulation.get_attributes()
+        self.sim_actions = self.simulation.get_actions()
+
+        observations = SimulationConversion(self.sim_attributes, self.attributes)
+
+        state = np.vstack((reset_position, observations))
+        return state
+
     def _compare_states(self, fire_map: np.ndarray,
                         fire_map_with_agent: np.ndarray) -> float:
         '''
@@ -310,8 +321,8 @@ class RLEnvironment(gym.Env):
         reward = 0
         mod = 0
         unmod = 0
-        for x in range(self.config.area.screen_size):
-            for y in range(self.config.area.screen_size):
+        for x in range(self.simulation.config.area.screen_size):
+            for y in range(self.simulation.config.area.screen_size):
                 modified = fire_map_with_agent[x][y]
                 unmodified = fire_map[x][y]
 
@@ -337,43 +348,5 @@ class RLEnvironment(gym.Env):
                 mod += mod_reward
                 unmod += unmod_reward
 
-        return reward / (self.config.area.screen_size * self.config.area.screen_size)
-
-    def _reset_state(self) -> np.ndarray:
-        '''
-        TODO: use conversion funcs to get actions and obersvations
-
-
-        This function will convert the initialized terrain
-            to the gym.spaces.Box format.
-
-        ```
-        self.current_agent_loc --> [:,:,0]
-        self.terrain.fuel_arrs.type --> [:,:,1[0]]
-        self.terrain.fuel_arrs.w_0 --> [:,:,1[1]]
-        self.terrain.fuel_arrs.sigma --> [:,:,1[2]]
-        self.terrain.fuel_arrs.delta --> [:,:,1[3]]
-        self.terrain.fuel_arrs.M_x --> [:,:,1[4]]
-        self.elevation --> [:,:,2]
-        self.mitigation --> [:,:,3]
-        ```
-
-        Arguments:
-            None
-
-        Returns:
-            state: The reset state of the simulation.
-        '''
-        reset_position = np.zeros([
-            self.simulation.config.area.screen_size,
-            self.simulation.config.area.screen_size
-        ])
-        reset_position = np.expand_dims(reset_position, axis=0)
-
-        self.sim_attributes = self.simulation.get_attributes()
-        self.sim_actions = self.simulation.get_actions()
-
-        observations = SimulationConversion(self.sim_attributes, self.attributes)
-
-        state = np.vstack((reset_position, observations))
-        return state
+        return reward / (self.simulation.config.area.screen_size *
+                         self.simulation.config.area.screen_size)

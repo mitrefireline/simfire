@@ -8,6 +8,9 @@ def SimulationConversion(sim_attributes: Dict[str, int],
     This function will convert the returns of the Simulation.get_attributes()
         to the RL harness np.ndarray structure
 
+    NOTE: 'elevation' attribute is scaled [-x,x] in config.yml but RL Harness
+            expects 'elevation' on [0, 1] normalized scale
+
     Attributes:
         sim_attributes: Dict[str, np.ndarray]
             A Dict of attrbutes and the associated arrays
@@ -23,6 +26,8 @@ def SimulationConversion(sim_attributes: Dict[str, int],
     res = []
     for harness_attr in harness_attributes:
         if harness_attr in sim_attributes.keys():
+            if harness_attr == 'elevation':
+                sim_attributes[harness_attr] = normalize(sim_attributes[harness_attr])
             res.append(sim_attributes[harness_attr])
 
     res = np.stack(res, axis=0)
@@ -94,3 +99,11 @@ def HarnessConversion(mitigation_map: np.ndarray, sim_actions: Dict[str, int],
 
     return np.asarray(sim_mitigation_map).reshape(len(mitigation_map[0]),
                                                   len(mitigation_map[1]))
+
+
+def normalize(x: np.ndarray) -> np.ndarray:
+    '''
+    Function to normalize array to [0,1]
+    '''
+    norm = (x - x.min()) / (x.max() - x.min())
+    return norm

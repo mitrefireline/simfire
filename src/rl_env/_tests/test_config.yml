@@ -16,7 +16,7 @@ terrain:
   elevation_function: perlin
   perlin:
     amplitude: 500
-    shape: (225, 225)
+    shape: (9, 9)
     resolution: (1, 1)
     seed: 1111
   gaussian:

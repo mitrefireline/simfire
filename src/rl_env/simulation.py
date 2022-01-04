@@ -72,25 +72,8 @@ class RothermalSimulation(Simulation):
         '''
         This function will initialize the terrain
         '''
-        # if self.seed:
-        #     np.random.seed(self.seed)
-        #     seed_tuple = random_seed_list(self.config.area.terrain_size, self.seed)
-        #     self.config.terrain_map = tuple(
-        #         tuple(
-        #             chaparral(seed=seed_tuple[outer][inner])
-        #             for inner in range(self.config.area.terrain_size))
-        #         for outer in range(self.config.area.terrain_size))
-        # else:
-        #     self.config.terrain_map = tuple(
-        #         tuple(chaparral() for _ in range(self.config.area.terrain_size))
-        #         for _ in range(self.config.area.terrain_size))
 
         self.fuel_particle = FuelParticle()
-        # self.fuel_arrs = [[
-        #     FuelArray(Tile(j, i, self.config.terrain_scale, self.config.terrain_scale),
-        #               self.config.terrain_map[i][j])
-        #     for j in range(self.config.area.terrain_size)
-        # ] for i in range(self.config.area.terrain_size)]
         self.fuel_arrs = [[
             self.config.terrain.fuel_array_function(x, y)
             for x in range(self.config.area.terrain_size)
@@ -108,14 +91,16 @@ class RothermalSimulation(Simulation):
         This function will initialize the mitigation strategies
         '''
         # initialize all mitigation strategies
-        self.fireline_manager = FireLineManager(size=self.config.area.terrain_size,
-                                                pixel_scale=self.config.area.pixel_scale,
-                                                terrain=self.terrain)
+        self.fireline_manager = FireLineManager(
+            size=self.config.display.control_line_size,
+            pixel_scale=self.config.area.pixel_scale,
+            terrain=self.terrain)
 
-        self.scratchline_manager = ScratchLineManager(self.config.area.terrain_size,
-                                                      self.config.area.pixel_scale,
-                                                      self.terrain)
-        self.wetline_manager = WetLineManager(size=self.config.area.terrain_size,
+        self.scratchline_manager = ScratchLineManager(
+            size=self.config.display.control_line_size,
+            pixel_scale=self.config.area.pixel_scale,
+            terrain=self.terrain)
+        self.wetline_manager = WetLineManager(size=self.config.display.control_line_size,
                                               pixel_scale=self.config.area.pixel_scale,
                                               terrain=self.terrain)
 
@@ -282,7 +267,7 @@ class RothermalSimulation(Simulation):
         self.fire_status = GameStatus.RUNNING
         # initialize fire strategy
         self.fire_manager = RothermelFireManager(
-            self.config.fire.fire_init_pos, self.config.display.fire_size,
+            self.config.fire.fire_initial_position, self.config.display.fire_size,
             self.config.fire.max_fire_duration, self.config.area.pixel_scale,
             self.config.simulation.update_rate, self.fuel_particle, self.terrain,
             self.environment)

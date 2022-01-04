@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from src.rl_env.simulation import RothermalSimulation
+from ...rl_env.simulation import RothermalSimulation
 from ...utils.config import Config
 from ...rl_env.harness import RLEnvironment
 

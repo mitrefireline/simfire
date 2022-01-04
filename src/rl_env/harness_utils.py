@@ -25,7 +25,7 @@ def SimulationConversion(sim_attributes: Dict[str, int],
         if harness_attr in sim_attributes.keys():
             res.append(sim_attributes[harness_attr])
 
-    res = np.asarray(res)
+    res = np.stack(res, axis=0)
 
     return res
 
@@ -84,10 +84,7 @@ def HarnessConversion(mitigation_map: np.ndarray, sim_actions: Dict[str, int],
     '''
 
     harness_ints = np.unique(mitigation_map)
-    harness_dict = {
-        harness_actions[i]: harness_ints[i]
-        for i in range(len(harness_actions))
-    }
+    harness_dict = {harness_actions[i]: harness_ints[i] for i in range(len(harness_ints))}
 
     sim_mitigation_map = []
     for mitigation_i in mitigation_map:

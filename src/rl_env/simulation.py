@@ -1,19 +1,17 @@
 from typing import Dict
 import numpy as np
-from .. import config
 from ..enums import GameStatus, BurnStatus
 from ..game.game import Game
 from ..game.sprites import Terrain
 from ..world.wind import WindController
 from ..game.managers.fire import RothermelFireManager
-from ..world.parameters import Environment, FuelArray, FuelParticle, Tile
+from ..world.parameters import Environment, FuelParticle
 from ..game.managers.mitigation import (FireLineManager, ScratchLineManager,
                                         WetLineManager)
-from ..utils.terrain import Chaparral, RandomSeedList
 
 
 class Simulation():
-    def __init__(self, config: config, seed: int = None):
+    def __init__(self, config, seed: int = None):
         '''
         This will initialize the Simulation object for interacting with the base
             simulation and the RL harness.
@@ -57,43 +55,52 @@ class Simulation():
 
 
 class RothermalSimulation(Simulation):
-    def __init__(self, config: config, seed: int = None):
+    def __init__(self, config):
         '''
         This object will initialize the Rothermal Simualtion
         '''
         self.config = config
-        self.seed = seed
-
         self.game_status = GameStatus.RUNNING
         self.fire_status = GameStatus.RUNNING
+        self.points = set([])
+        self._create_wind()
+        self._create_terrain()
+        self._create_fire()
+        self._create_mitigations()
 
     def _create_terrain(self):
         '''
         This function will initialize the terrain
         '''
-        if self.seed:
-            np.random.seed(self.seed)
-            seed_tuple = RandomSeedList(self.config.terrain_size, self.seed)
-            self.config.terrain_map = tuple(
-                tuple(
-                    Chaparral(seed=seed_tuple[outer][inner])
-                    for inner in range(self.config.terrain_size))
-                for outer in range(self.config.terrain_size))
-        else:
-            self.config.terrain_map = tuple(
-                tuple(Chaparral() for _ in range(self.config.terrain_size))
-                for _ in range(self.config.terrain_size))
+        # if self.seed:
+        #     np.random.seed(self.seed)
+        #     seed_tuple = random_seed_list(self.config.area.terrain_size, self.seed)
+        #     self.config.terrain_map = tuple(
+        #         tuple(
+        #             chaparral(seed=seed_tuple[outer][inner])
+        #             for inner in range(self.config.area.terrain_size))
+        #         for outer in range(self.config.area.terrain_size))
+        # else:
+        #     self.config.terrain_map = tuple(
+        #         tuple(chaparral() for _ in range(self.config.area.terrain_size))
+        #         for _ in range(self.config.area.terrain_size))
 
         self.fuel_particle = FuelParticle()
+        # self.fuel_arrs = [[
+        #     FuelArray(Tile(j, i, self.config.terrain_scale, self.config.terrain_scale),
+        #               self.config.terrain_map[i][j])
+        #     for j in range(self.config.area.terrain_size)
+        # ] for i in range(self.config.area.terrain_size)]
         self.fuel_arrs = [[
-            FuelArray(Tile(j, i, self.config.terrain_scale, self.config.terrain_scale),
-                      self.config.terrain_map[i][j])
-            for j in range(self.config.terrain_size)
-        ] for i in range(self.config.terrain_size)]
-        self.terrain = Terrain(self.fuel_arrs, self.config.elevation_fn,
-                               self.config.terrain_size, self.config.screen_size)
+            self.config.terrain.fuel_array_function(x, y)
+            for x in range(self.config.area.terrain_size)
+        ] for y in range(self.config.area.terrain_size)]
+        self.terrain = Terrain(self.fuel_arrs, self.config.terrain.elevation_function,
+                               self.config.area.terrain_size,
+                               self.config.area.screen_size)
 
-        self.environment = Environment(self.config.M_f, self.wind_map.map_wind_speed,
+        self.environment = Environment(self.config.environment.moisture,
+                                       self.wind_map.map_wind_speed,
                                        self.wind_map.map_wind_direction)
 
     def _create_mitigations(self):
@@ -101,15 +108,15 @@ class RothermalSimulation(Simulation):
         This function will initialize the mitigation strategies
         '''
         # initialize all mitigation strategies
-        self.fireline_manager = FireLineManager(size=self.config.control_line_size,
-                                                pixel_scale=self.config.pixel_scale,
+        self.fireline_manager = FireLineManager(size=self.config.area.terrain_size,
+                                                pixel_scale=self.config.area.pixel_scale,
                                                 terrain=self.terrain)
 
-        self.scratchline_manager = ScratchLineManager(self.config.control_line_size,
-                                                      self.config.pixel_scale,
+        self.scratchline_manager = ScratchLineManager(self.config.area.terrain_size,
+                                                      self.config.area.pixel_scale,
                                                       self.terrain)
-        self.wetline_manager = WetLineManager(size=self.config.control_line_size,
-                                              pixel_scale=self.config.pixel_scale,
+        self.wetline_manager = WetLineManager(size=self.config.area.terrain_size,
+                                              pixel_scale=self.config.area.pixel_scale,
                                               terrain=self.terrain)
 
         self.fireline_sprites = self.fireline_manager.sprites
@@ -123,13 +130,15 @@ class RothermalSimulation(Simulation):
         '''
         self.wind_map = WindController()
         self.wind_map.init_wind_speed_generator(
-            self.config.mw_seed, self.config.mw_scale, self.config.mw_octaves,
-            self.config.mw_persistence, self.config.mw_lacunarity,
-            self.config.mw_speed_min, self.config.mw_speed_max, self.config.screen_size)
+            self.config.wind.speed.seed, self.config.wind.speed.scale,
+            self.config.wind.speed.octaves, self.config.wind.speed.persistence,
+            self.config.wind.speed.lacunarity, self.config.wind.speed.min,
+            self.config.wind.speed.max, self.config.area.screen_size)
         self.wind_map.init_wind_direction_generator(
-            self.config.dw_seed, self.config.dw_scale, self.config.dw_octaves,
-            self.config.dw_persistence, self.config.dw_lacunarity, self.config.dw_deg_min,
-            self.config.dw_deg_max, self.config.screen_size)
+            self.config.wind.direction.seed, self.config.wind.direction.scale,
+            self.config.wind.direction.octaves, self.config.wind.direction.persistence,
+            self.config.wind.direction.lacunarity, self.config.wind.direction.min,
+            self.config.wind.direction.max, self.config.area.screen_size)
 
     def _create_fire(self):
         '''
@@ -137,9 +146,10 @@ class RothermalSimulation(Simulation):
         '''
 
         self.fire_manager = RothermelFireManager(
-            self.config.fire_init_pos, self.config.fire_size,
-            self.config.max_fire_duration, self.config.pixel_scale,
-            self.config.update_rate, self.fuel_particle, self.terrain, self.environment)
+            self.config.fire.fire_initial_position, self.config.display.fire_size,
+            self.config.fire.max_fire_duration, self.config.area.pixel_scale,
+            self.config.simulation.update_rate, self.fuel_particle, self.terrain,
+            self.environment)
         self.fire_sprites = self.fire_manager.sprites
 
     def get_actions(self) -> Dict[str, int]:
@@ -152,7 +162,6 @@ class RothermalSimulation(Simulation):
         Returns:
             The action / mitgiation strategies available: Dict[str, int]
         '''
-        self._create_mitigations
 
         return {
             'none': BurnStatus.UNBURNED,
@@ -173,39 +182,37 @@ class RothermalSimulation(Simulation):
             observations: Dict[str, np.ndarray]
 
         '''
-        self._create_fire
-        self._create_terrain(self.seed)
-        self._create_fire
-        self._create_wind
 
         return {
             'mitigation':
-            np.array((BurnStatus.UNBURNED, BurnStatus.UNBURNED),
-                     size=(self.config.screen_size, self.config.screen_size)),
+            np.full((self.config.area.screen_size, self.config.area.screen_size),
+                    BurnStatus.UNBURNED),
             'w0':
             np.array([[
                 self.terrain.fuel_arrs[i][j].fuel.w_0
-                for j in range(self.config.screen_size)
-            ] for i in range(self.config.screen_size)]),
+                for j in range(self.config.area.screen_size)
+            ] for i in range(self.config.area.screen_size)]),
             'sigma':
             np.array([[
                 self.terrain.fuel_arrs[i][j].fuel.sigma
-                for j in range(self.config.screen_size)
-            ] for i in range(self.config.screen_size)]),
+                for j in range(self.config.area.screen_size)
+            ] for i in range(self.config.area.screen_size)]),
             'delta':
             np.array([[
                 self.terrain.fuel_arrs[i][j].fuel.delta
-                for j in range(self.config.screen_size)
-            ] for i in range(self.config.screen_size)]),
+                for j in range(self.config.area.screen_size)
+            ] for i in range(self.config.area.screen_size)]),
             'M_x':
             np.array([[
                 self.terrain.fuel_arrs[i][j].fuel.M_x
-                for j in range(self.config.screen_size)
-            ] for i in range(self.config.screen_size)]),
+                for j in range(self.config.area.screen_size)
+            ] for i in range(self.config.area.screen_size)]),
             'elevation':
             self.terrain.elevations,
-            'wind':
-            self.wind_map
+            'wind_speed':
+            self.wind_map.map_wind_speed,
+            'wind_direction':
+            self.wind_map.map_wind_direction
         }
 
     def _update_sprite_points(self,
@@ -229,14 +236,22 @@ class RothermalSimulation(Simulation):
             None
         '''
         if inline:
-            if mitigation_state == 1:
+            if mitigation_state == BurnStatus.FIRELINE:
+                self.points.add(position_state)
+            elif mitigation_state == BurnStatus.SCRATCHLINE:
+                self.points.add(position_state)
+            elif mitigation_state == BurnStatus.WETLINE:
                 self.points.add(position_state)
 
         else:
             # update the location to pass to the sprite
-            for i in range(self.config.screen_size):
-                for j in range(self.config.screen_size):
-                    if mitigation_state[(i, j)] == 1:
+            for i in range(self.config.area.screen_size):
+                for j in range(self.config.area.screen_size):
+                    if mitigation_state[(i, j)] == BurnStatus.FIRELINE:
+                        self.points.add((i, j))
+                    elif mitigation_state[(i, j)] == BurnStatus.SCRATCHLINE:
+                        self.points.add((i, j))
+                    elif mitigation_state[(i, j)] == BurnStatus.WETLINE:
                         self.points.add((i, j))
 
     def run(self,
@@ -267,12 +282,14 @@ class RothermalSimulation(Simulation):
         self.fire_status = GameStatus.RUNNING
         # initialize fire strategy
         self.fire_manager = RothermelFireManager(
-            self.config.fire_init_pos, self.config.fire_size,
-            self.config.max_fire_duration, self.config.pixel_scale,
-            self.config.update_rate, self.fuel_particle, self.terrain, self.environment)
+            self.config.fire.fire_init_pos, self.config.display.fire_size,
+            self.config.fire.max_fire_duration, self.config.area.pixel_scale,
+            self.config.simulation.update_rate, self.fuel_particle, self.terrain,
+            self.environment)
 
-        self.fire_map = np.full((self.config.screen_size, self.config.screen_size),
-                                BurnStatus.UNBURNED)
+        self.fire_map = np.full(
+            (self.config.area.screen_size, self.config.area.screen_size),
+            BurnStatus.UNBURNED)
         if mitigation:
             # update firemap with agent actions before initializing fire spread
             self._update_sprite_points(mitigation_state, position_state)
@@ -316,10 +333,11 @@ class RothermalSimulation(Simulation):
         '''
 
         self.fire_manager = RothermelFireManager(
-            self.config.fire_init_pos, self.config.fire_size,
-            self.config.max_fire_duration, self.config.pixel_scale,
-            self.config.update_rate, self.fuel_particle, self.terrain, self.environment)
-        self.game = Game(self.config.screen_size)
+            self.config.fire.fire_initial_position, self.config.display.fire_size,
+            self.config.fire.max_fire_duration, self.config.area.pixel_scale,
+            self.config.simulation.update_rate, self.fuel_particle, self.terrain,
+            self.environment)
+        self.game = Game(self.config.area.screen_size)
         self.fire_map = self.game.fire_map
 
         if mitigation_only:

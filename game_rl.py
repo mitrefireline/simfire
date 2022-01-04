@@ -4,7 +4,7 @@ from pathlib import Path
 from src.utils.config import Config
 from src.rl_env.fireline_env import FireLineEnv, RLEnv
 from src.rl_env.harness import RLEnvironment
-from src.rl_env.simulation import Simulation
+from src.rl_env.simulation import RothermalSimulation
 
 
 def main():
@@ -30,14 +30,11 @@ def main():
 def main_v2():
     cfg_path = Path('./config.yml')
     cfg = Config(cfg_path)
-    seed = 1234
-    actions = ['none', 'fireline']
-    observations = ['w0, elevation, mitigation, wind']
 
-    if seed is not None:
-        simulation = Simulation(cfg, seed)
-    else:
-        simulation = Simulation(cfg)
+    actions = ['none', 'fireline']
+    observations = ['mitigation', 'w0', 'elevation', 'wind_speed', 'wind_direction']
+    simulation = RothermalSimulation(cfg)
+
     rl_environment = RLEnvironment(simulation, actions, observations)
     state = rl_environment.reset()
     done = False
@@ -53,9 +50,9 @@ def some_action_func(state):
     A dummy function to show how the rl side ingests the state
         and returns a dict() of the fire mitigation stategy
     '''
-    fire_mitigation = random.choices([0, 1], weights=[0.95, 0.05])
+    fire_mitigation = random.choices([0, 1], weights=[0.85, 0.05])
     return fire_mitigation[0]
 
 
 if __name__ == '__main__':
-    main()
+    main_v2()

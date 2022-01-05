@@ -8,6 +8,7 @@ from .simulation import Simulation
 from .simulation import RothermelSimulation
 from .harness_utils import (SimulationConversion, ActionsToInt, HarnessConversion)
 
+
 class RLHarness(gym.Env, ABC):
     @abstractmethod
     def __init__(self, simulation: Simulation, actions: List[str],
@@ -17,16 +18,13 @@ class RLHarness(gym.Env, ABC):
         self.attributes = attributes
 
     @abstractmethod
-    def step(action) -> (gym.spaces.Box, float, bool, Dict):
+    def step(action) -> Tuple[gym.spaces.Box, float, bool, Dict]:
         pass
 
     @abstractmethod
     def reset() -> gym.spaces.Box:
         pass
 
-    # @abstractmethod
-    # def render():
-    #     pass
 
 class AgentBasedHarness(RLHarness):
     '''
@@ -82,7 +80,7 @@ class AgentBasedHarness(RLHarness):
     The agent has traversed all pixels (screen_size, screen_size)
     '''
     def __init__(self, simulation: RothermelSimulation, actions: List[str],
-                attributes: List[str]) -> None:
+                    attributes: List[str]) -> None:
         '''
         Initialize the class by recording the state space
 
@@ -145,7 +143,7 @@ class AgentBasedHarness(RLHarness):
             shape=(self.simulation.config.area.screen_size,
                    self.simulation.config.area.screen_size))
 
-    def step(self, action):
+    def step(self, action) -> Tuple[gym.spaces.Box, float, bool, Dict]:
         '''
         This function will apply the action to the agent in the current state.
 
@@ -369,6 +367,3 @@ class AgentBasedHarness(RLHarness):
 
         return reward / (self.simulation.config.area.screen_size *
                          self.simulation.config.area.screen_size)
-    
-    # def render():
-    #     env.simulation._render(self.state[-1,:,:], self.state[0,:,:], True, False, False)

@@ -14,7 +14,8 @@ class AgentBasedHarnessTest(unittest.TestCase):
         self.actions = ['none', 'fireline']
         self.attributes = ['mitigation', 'w0', 'elevation']
         self.simulation = RothermelSimulation(self.config)
-        self.rl_harness = AgentBasedHarness(self.simulation, self.actions, self.attributes)
+        self.rl_harness = AgentBasedHarness(self.simulation, self.actions,
+                                                self.attributes)
 
         self.action = 1
 

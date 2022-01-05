@@ -2,16 +2,16 @@ from typing import Dict
 import unittest
 import numpy as np
 from ...utils.config import Config
-from ...rl_env.simulation import RothermalSimulation
+from ...rl_env.simulation import RothermelSimulation
 from ...enums import BurnStatus, GameStatus
 
 
-class RothermalSimulationTest(unittest.TestCase):
+class RothermelSimulationTest(unittest.TestCase):
     def setUp(self) -> None:
         '''
         '''
         self.config = Config('./src/rl_env/_tests/test_config.yml')
-        self.simulation = RothermalSimulation(self.config)
+        self.simulation = RothermelSimulation(self.config)
 
     def test__create_terrain(self) -> None:
         '''
@@ -43,7 +43,7 @@ class RothermalSimulationTest(unittest.TestCase):
 
     def test_get_actions(self) -> None:
         '''
-        Test that the call to get_actions() runs properly and returns all Rothermal
+        Test that the call to get_actions() runs properly and returns all Rothermel
             FireLineManager() features.
         '''
         simulation_actions = self.simulation.get_actions()
@@ -51,7 +51,7 @@ class RothermalSimulationTest(unittest.TestCase):
 
     def test_get_attributes(self) -> None:
         '''
-        Test that the call to get_actions() runs properly and returns all Rothermal
+        Test that the call to get_actions() runs properly and returns all Rothermel
             features (Fire, Wind, FireLine, Terrain).
 
         '''

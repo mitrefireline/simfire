@@ -1,8 +1,8 @@
 import random
 from pathlib import Path
 from src.utils.config import Config
-from src.rl_env.harness import RLEnvironment
-from src.rl_env.simulation import RothermalSimulation
+from src.rl_env.harness import AgentBasedHarness
+from src.rl_env.simulation import RothermelSimulation
 
 
 def main():
@@ -11,9 +11,9 @@ def main():
 
     actions = ['none', 'fireline']
     observations = ['mitigation', 'w0', 'elevation', 'wind_speed', 'wind_direction']
-    simulation = RothermalSimulation(cfg)
+    simulation = RothermelSimulation(cfg)
 
-    rl_environment = RLEnvironment(simulation, actions, observations)
+    rl_environment = AgentBasedHarness(simulation, actions, observations)
     state = rl_environment.reset()
     done = False
     final_reward = 0

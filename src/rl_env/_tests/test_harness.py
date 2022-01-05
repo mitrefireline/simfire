@@ -1,11 +1,11 @@
 import unittest
 import numpy as np
-from ...rl_env.simulation import RothermalSimulation
+from ...rl_env.simulation import RothermelSimulation
 from ...utils.config import Config
-from ...rl_env.harness import RLEnvironment
+from ...rl_env.harness import AgentBasedHarness
 
 
-class RLEnvironmentTest(unittest.TestCase):
+class AgentBasedHarnessTest(unittest.TestCase):
     def setUp(self) -> None:
         '''
         '''
@@ -13,8 +13,8 @@ class RLEnvironmentTest(unittest.TestCase):
         self.config = Config('./src/rl_env/_tests/test_config.yml')
         self.actions = ['none', 'fireline']
         self.attributes = ['mitigation', 'w0', 'elevation']
-        self.simulation = RothermalSimulation(self.config)
-        self.rl_harness = RLEnvironment(self.simulation, self.actions, self.attributes)
+        self.simulation = RothermelSimulation(self.config)
+        self.rl_harness = AgentBasedHarness(self.simulation, self.actions, self.attributes)
 
         self.action = 1
 

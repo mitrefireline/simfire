@@ -16,7 +16,7 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'fiReLine Rothermal Model'
+project = 'fiReLine Rothermel Model'
 copyright = '2021, fiReLine'
 author = 'Marissa Dotter, Michael Doyle, Chris Kempis, Michael Threet, Tim Welsh'
 

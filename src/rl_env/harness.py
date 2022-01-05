@@ -2,12 +2,33 @@ import gym
 from copy import deepcopy
 from typing import Dict, Tuple, List
 import numpy as np
+from abc import ABC, abstractmethod
 
-from .simulation import RothermalSimulation
+from .simulation import Simulation
+from .simulation import RothermelSimulation
 from .harness_utils import (SimulationConversion, ActionsToInt, HarnessConversion)
 
+class RLHarness(gym.Env, ABC):
+    @abstractmethod
+    def __init__(self, simulation: Simulation, actions: List[str],
+                 attributes: List[str]) -> None:
+        self.simulation = simulation
+        self.actions = actions
+        self.attributes = attributes
 
-class RLEnvironment(gym.Env):
+    @abstractmethod
+    def step(action) -> (gym.spaces.Box, float, bool, Dict):
+        pass
+
+    @abstractmethod
+    def reset() -> gym.spaces.Box:
+        pass
+
+    # @abstractmethod
+    # def render():
+    #     pass
+
+class AgentBasedHarness(RLHarness):
     '''
 
     This Environment Catcher will record all environments/actions for the RL return
@@ -60,8 +81,8 @@ class RLEnvironment(gym.Env):
     ---------------------
     The agent has traversed all pixels (screen_size, screen_size)
     '''
-    def __init__(self, simulation: RothermalSimulation, actions: List[str],
-                 attributes: List[str]) -> None:
+    def __init__(self, simulation: RothermelSimulation, actions: List[str],
+                attributes: List[str]) -> None:
         '''
         Initialize the class by recording the state space
 
@@ -87,9 +108,7 @@ class RLEnvironment(gym.Env):
         Returns:
             None
         '''
-        self.simulation = simulation
-        self.actions = actions
-        self.attributes = attributes
+        super().__init__(simulation, actions, attributes)
 
         self.observ_spaces = {'position': (0, 1)}
         self.observ_spaces.update({attribute: (0, 1) for attribute in self.attributes})
@@ -236,7 +255,7 @@ class RLEnvironment(gym.Env):
 
         self.current_agent_loc = (row, column)
 
-    def reset(self) -> Dict[str, Tuple[int, int, int]]:
+    def reset(self) -> gym.spaces.Box:
         '''
         Reset environment to initial state.
 
@@ -350,3 +369,6 @@ class RLEnvironment(gym.Env):
 
         return reward / (self.simulation.config.area.screen_size *
                          self.simulation.config.area.screen_size)
+    
+    # def render():
+    #     env.simulation._render(self.state[-1,:,:], self.state[0,:,:], True, False, False)

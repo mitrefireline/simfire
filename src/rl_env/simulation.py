@@ -1,5 +1,6 @@
 from typing import Dict
 import numpy as np
+from abc import ABC, abstractmethod
 from ..enums import GameStatus, BurnStatus
 from ..game.game import Game
 from ..game.sprites import Terrain
@@ -10,8 +11,8 @@ from ..game.managers.mitigation import (FireLineManager, ScratchLineManager,
                                         WetLineManager)
 
 
-class Simulation():
-    def __init__(self, config, seed: int = None):
+class Simulation(ABC):
+    def __init__(self, config):
         '''
         This will initialize the Simulation object for interacting with the base
             simulation and the RL harness.
@@ -20,19 +21,17 @@ class Simulation():
         ----------
         config: Config
             The config which specifies simulation parameters
-
-        seed: int
-            The seed value to create the terrain fuel tiles
         '''
         self.config = config
-        self.seed = seed
 
+    @abstractmethod
     def run(self) -> np.ndarray:
         '''
         This function will run the simulation
         '''
         pass
 
+    @abstractmethod
     def render(self) -> None:
         '''
         This function will run the pygame simulation and display the simulation and
@@ -40,12 +39,14 @@ class Simulation():
         '''
         pass
 
+    @abstractmethod
     def get_actions(self) -> Dict[str, int]:
         '''
         This function will return the action space for the simulation
         '''
         pass
 
+    @abstractmethod
     def get_attributes(self) -> Dict[str, np.ndarray]:
         '''
         This function will return the observation space for the simulation
@@ -54,12 +55,12 @@ class Simulation():
         pass
 
 
-class RothermalSimulation(Simulation):
+class RothermelSimulation(Simulation):
     def __init__(self, config):
         '''
-        This object will initialize the Rothermal Simualtion
+        This object will initialize the Rothermel Simulation
         '''
-        self.config = config
+        super().__init__(config)
         self.game_status = GameStatus.RUNNING
         self.fire_status = GameStatus.RUNNING
         self.points = set([])
@@ -127,7 +128,7 @@ class RothermalSimulation(Simulation):
 
     def _create_fire(self):
         '''
-        This function will initialize the rothermal fire strategies
+        This function will initialize the rothermel fire strategies
         '''
 
         self.fire_manager = RothermelFireManager(
@@ -139,7 +140,7 @@ class RothermalSimulation(Simulation):
 
     def get_actions(self) -> Dict[str, int]:
         '''
-        This function will return the action space for the rothermal simulation
+        This function will return the action space for the rothermel simulation
 
         Arguments:
             None

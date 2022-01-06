@@ -12,6 +12,7 @@ from ..game.managers.mitigation import (FireLineManager, ScratchLineManager,
 
 
 class Simulation(ABC):
+
     def __init__(self, config):
         '''
         This will initialize the Simulation object for interacting with the base
@@ -56,6 +57,7 @@ class Simulation(ABC):
 
 
 class RothermelSimulation(Simulation):
+
     def __init__(self, config):
         '''
         This object will initialize the Rothermel Simulation
@@ -170,9 +172,6 @@ class RothermelSimulation(Simulation):
         '''
 
         return {
-            'mitigation':
-            np.full((self.config.area.screen_size, self.config.area.screen_size),
-                    BurnStatus.UNBURNED),
             'w0':
             np.array([[
                 self.terrain.fuel_arrs[i][j].fuel.w_0

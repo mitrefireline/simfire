@@ -5,11 +5,10 @@ import numpy as np
 from abc import ABC, abstractmethod
 
 from .simulation import Simulation
-from .simulation import RothermelSimulation
-from .harness_utils import (SimulationConversion, ActionsToInt, HarnessConversion)
 
 
 class RLHarness(gym.Env, ABC):
+
     @abstractmethod
     def __init__(self, simulation: Simulation, actions: List[str],
                  attributes: List[str]) -> None:
@@ -17,13 +16,111 @@ class RLHarness(gym.Env, ABC):
         self.actions = actions
         self.attributes = attributes
 
+        self.sim_attributes = self.simulation.get_attributes()
+        self.min_maxes, self.sim_attributes = self.simulation_conversion(['elevation'])
+        self.add_nonsim_min_max()
+
+        channel_lows = np.array([[[self.min_maxes[channel][0]]]
+                                 for channel in self.attributes])
+        channel_highs = np.array([[[self.min_maxes[channel][1]]]
+                                  for channel in self.attributes])
+
+        self.low = np.repeat(np.repeat(channel_lows,
+                                       self.simulation.config.area.screen_size,
+                                       axis=1),
+                             self.simulation.config.area.screen_size,
+                             axis=2)
+
+        self.high = np.repeat(np.repeat(channel_highs,
+                                        self.simulation.config.area.screen_size,
+                                        axis=1),
+                              self.simulation.config.area.screen_size,
+                              axis=2)
+
+        self.observation_space = gym.spaces.Box(
+            np.float32(self.low),
+            np.float32(self.high),
+            shape=(len(self.attributes), self.simulation.config.area.screen_size,
+                   self.simulation.config.area.screen_size),
+            dtype=np.float64)
+
+        self.actions_as_ints = [int(x) for x in range(len(self.actions))]
+        self.sim_actions = self.simulation.get_actions()
+        self.action_space = gym.spaces.Box(
+            min(self.actions_as_ints),
+            max(self.actions_as_ints),
+            shape=(self.simulation.config.area.screen_size,
+                   self.simulation.config.area.screen_size))
+
     @abstractmethod
-    def step(action) -> Tuple[gym.spaces.Box, float, bool, Dict]:
+    def reset(self) -> gym.spaces.Box:
+        self.sim_attributes = self.simulation.get_attributes()
+        _, observations = self.simulation_conversion(['elevation'])
+        observations.update(self.add_nonsim_attributes())
+
+        obs = []
+        for attribute in self.attributes:
+            obs.append(observations[attribute])
+
+        self.state = np.stack(obs, axis=0)
+
+        return self.state
+
+    @abstractmethod
+    def step(self, action) -> Tuple[gym.spaces.Box, float, bool, Dict]:
         pass
 
     @abstractmethod
-    def reset() -> gym.spaces.Box:
+    def simulation_conversion(
+        self, normalize_attributes: List[str]
+    ) -> Tuple[Dict[str, Tuple[int, int]], Dict[str, np.ndarray]]:
+
+        def normalize(x: np.ndarray) -> np.ndarray:
+            '''
+            Function to normalize array to [0,1]
+            '''
+            norm = (x - x.min()) / (x.max() - x.min())
+            return norm
+
+        res = {}
+        min_maxes = {}
+        for harness_attr in self.attributes:
+            if harness_attr in self.sim_attributes.keys():
+                if harness_attr in normalize_attributes:
+                    self.sim_attributes[harness_attr] = normalize(
+                        self.sim_attributes[harness_attr])
+                res[harness_attr] = self.sim_attributes[harness_attr]
+                min_maxes[harness_attr] = (self.sim_attributes[harness_attr].min(),
+                                           self.sim_attributes[harness_attr].max())
+
+        return min_maxes, res
+
+    @abstractmethod
+    def harness_conversion(self, mitigation_map: np.ndarray) -> np.ndarray:
+        harness_ints = np.unique(mitigation_map)
+        harness_dict = {
+            self.actions[i]: harness_ints[i]
+            for i in range(len(harness_ints))
+        }
+
+        sim_mitigation_map = []
+        for mitigation_i in mitigation_map:
+            for mitigation_j in mitigation_i:
+                action = [
+                    key for key, value in harness_dict.items() if value == mitigation_j
+                ]
+                sim_mitigation_map.append(self.sim_actions[action[0]])
+
+        return np.asarray(sim_mitigation_map).reshape(len(mitigation_map[0]),
+                                                      len(mitigation_map[1]))
+
+    @abstractmethod
+    def add_nonsim_min_max(self) -> None:
         pass
+
+    @abstractmethod
+    def add_nonsim_attributes(self) -> Dict[str, np.ndarray]:
+        return {}
 
 
 class AgentBasedHarness(RLHarness):
@@ -79,8 +176,9 @@ class AgentBasedHarness(RLHarness):
     ---------------------
     The agent has traversed all pixels (screen_size, screen_size)
     '''
-    def __init__(self, simulation: RothermelSimulation, actions: List[str],
-                    attributes: List[str]) -> None:
+
+    def __init__(self, simulation: Simulation, actions: List[str],
+                 attributes: List[str]) -> None:
         '''
         Initialize the class by recording the state space
 
@@ -107,41 +205,6 @@ class AgentBasedHarness(RLHarness):
             None
         '''
         super().__init__(simulation, actions, attributes)
-
-        self.observ_spaces = {'position': (0, 1)}
-        self.observ_spaces.update({attribute: (0, 1) for attribute in self.attributes})
-
-        channel_lows = np.array([[[self.observ_spaces[channel][0]]]
-                                 for channel in self.observ_spaces.keys()])
-        channel_highs = np.array([[[self.observ_spaces[channel][1]]]
-                                  for channel in self.observ_spaces.keys()])
-
-        self.low = np.repeat(np.repeat(channel_lows,
-                                       self.simulation.config.area.screen_size,
-                                       axis=1),
-                             self.simulation.config.area.screen_size,
-                             axis=2)
-
-        self.high = np.repeat(np.repeat(channel_highs,
-                                        self.simulation.config.area.screen_size,
-                                        axis=1),
-                              self.simulation.config.area.screen_size,
-                              axis=2)
-
-        self.observation_space = gym.spaces.Box(
-            np.float32(self.low),
-            np.float32(self.high),
-            shape=(len(self.observ_spaces.keys()),
-                   self.simulation.config.area.screen_size,
-                   self.simulation.config.area.screen_size),
-            dtype=np.float64)
-
-        self.actions_as_ints = ActionsToInt(self.actions)
-        self.action_space = gym.spaces.Box(
-            min(self.actions_as_ints),
-            max(self.actions_as_ints),
-            shape=(self.simulation.config.area.screen_size,
-                   self.simulation.config.area.screen_size))
 
     def step(self, action) -> Tuple[gym.spaces.Box, float, bool, Dict]:
         '''
@@ -180,8 +243,7 @@ class AgentBasedHarness(RLHarness):
         # if we want to render as we step through the game
         if self.simulation.config.render.inline:
             # convert mitigation map to correct simulation format
-            sim_mitigation_map = HarnessConversion(self.state[1], self.sim_actions,
-                                                   self.actions)
+            sim_mitigation_map = self.harness_conversion(self.state[-1])
             self.simulation.render(sim_mitigation_map[self.current_agent_loc],
                                    self.current_agent_loc,
                                    inline=True)
@@ -199,8 +261,7 @@ class AgentBasedHarness(RLHarness):
         done = old_loc == self.current_agent_loc
         if done:
             # convert mitigation map to correct simulation format
-            sim_mitigation_map = HarnessConversion(self.state[1], self.sim_actions,
-                                                   self.actions)
+            sim_mitigation_map = self.harness_conversion(self.state[-1])
             # compare the state spaces
             fire_map = self.simulation.run(sim_mitigation_map, self.state[0])
             # render only agent
@@ -252,55 +313,6 @@ class AgentBasedHarness(RLHarness):
             column += 1
 
         self.current_agent_loc = (row, column)
-
-    def reset(self) -> gym.spaces.Box:
-        '''
-        Reset environment to initial state.
-
-        NOTE: reset() must be called before you can call step() for the first time.
-
-        Terrain is received from the sim. Position matrix is assumed to be all 0's when
-        received from sim. Updated to have agent at (0,0) on reset.
-
-        Arguments:
-            None
-
-        Returns:
-            `self.state`, a dictionary with the following structure:
-
-        '''
-        self.state = self._reset_state()
-
-        # Place agent at location (0,0)
-        self.current_agent_loc = (0, 0)
-        self.state[0][self.current_agent_loc] = 1
-
-        return self.state
-
-    def _reset_state(self) -> np.ndarray:
-        '''
-        This function will convert the initialized terrain
-            to the gym.spaces.Box format.
-
-        Arguments:
-            None
-
-        Returns:
-            state: The reset state of the simulation.
-        '''
-        reset_position = np.zeros([
-            self.simulation.config.area.screen_size,
-            self.simulation.config.area.screen_size
-        ])
-        reset_position = np.expand_dims(reset_position, axis=0)
-
-        self.sim_attributes = self.simulation.get_attributes()
-        self.sim_actions = self.simulation.get_actions()
-
-        observations = SimulationConversion(self.sim_attributes, self.attributes)
-
-        state = np.vstack((reset_position, observations))
-        return state
 
     def _compare_states(self, fire_map: np.ndarray,
                         fire_map_with_agent: np.ndarray) -> float:
@@ -367,3 +379,121 @@ class AgentBasedHarness(RLHarness):
 
         return reward / (self.simulation.config.area.screen_size *
                          self.simulation.config.area.screen_size)
+
+    def reset(self) -> gym.spaces.Box:
+        '''
+        Reset environment to initial state.
+
+        NOTE: reset() must be called before you can call step() for the first time.
+
+        Terrain is received from the sim. Position matrix is assumed to be all 0's when
+        received from sim. Updated to have agent at (0,0) on reset.
+
+        Arguments:
+            None
+
+        Returns:
+            `self.state`, a dictionary with the following structure:
+
+        '''
+
+        return super().reset()
+
+    def simulation_conversion(
+        self, normalize_attributes: List[str]
+    ) -> Tuple[Dict[str, Tuple[int, int]], Dict[str, np.ndarray]]:
+        '''
+        This function will convert the returns of the Simulation.get_attributes()
+            to the RL harness np.ndarray structure
+
+        NOTE: 'elevation' attribute is scaled [-x,x] in config.yml but RL Harness
+                expects 'elevation' on [0, 1] normalized scale
+
+        Attributes:
+
+            normalize_attributes: List[str]
+                A list of strings of the desired attributes to normalize
+
+        Returns:
+            np.ndarray
+                A numpy array of the converted attributes for the RL harness to use
+
+        '''
+        return super().simulation_conversion(normalize_attributes)
+
+    def harness_conversion(self, mitigation_map: np.ndarray) -> np.ndarray:
+        '''
+        This function will convert the returns of the Simulation.get_actions()
+            to the RL harness List of ints structure where the simulation action
+            integer starts at index 0 for the RL harness
+
+        Example:    mitigation_map = (0, 1, 1, 0)
+                    sim_action = {'none': 0, 'fireline':1, 'scratchline':2, 'wetline':3}
+                    harness_actions = ['none', 'scratchline']
+
+                Harness                  Simulation
+                ---------               ------------
+                'none': 0           -->   'none': 0
+                'scratchline': 1    -->   'scratchline': 2
+
+                return (0, 2, 2, 0)
+
+        Attributes:
+            mitigation_map: np.ndarray
+                A np.ndarray of the harness mitigation map
+
+        Returns:
+            np.ndarray
+                A np.ndarray of the converted mitigation map from RL harness
+                    to the correct Simulation BurnStatus types
+
+        '''
+        return super().harness_conversion(mitigation_map)
+
+    def add_nonsim_min_max(self) -> None:
+        """
+        Add the min and max values for attributes not found in the simulation.
+
+        Raises:
+            ValueError: If an non-simulation attribute is not supported for this harness.
+        """
+        keys = self.min_maxes.keys()
+        self.nonsim_attributes = []
+        for attribute in self.attributes:
+            if attribute not in keys:
+                self.nonsim_attributes.append(attribute)
+                if attribute == 'position':
+                    self.min_maxes[attribute] = (0, 1)
+                elif attribute == 'mitigation':
+                    self.min_maxes[attribute] = (0, len(self.actions))
+                else:
+                    raise ValueError(f'Attribute {attribute} is not supported!')
+
+    def add_nonsim_attributes(self) -> Dict[str, np.ndarray]:
+        """
+        Generate the observation channels for non-simulation attributes.
+
+        Raises:
+            ValueError: If a non-simulation attribute is not supported for this harness.
+
+        Returns:
+            Dict[str, np.ndarray]: Collection of non-simulation attributes
+                and their observation channel representations.
+        """
+        res = {}
+        for attribute in self.nonsim_attributes:
+            if attribute == 'position':
+                res[attribute] = np.zeros([
+                    self.simulation.config.area.screen_size,
+                    self.simulation.config.area.screen_size
+                ])
+                self.current_agent_loc = (0, 0)
+                res[attribute][self.current_agent_loc] = 1
+            elif attribute == 'mitigation':
+                res[attribute] = np.full((self.simulation.config.area.screen_size,
+                                          self.simulation.config.area.screen_size),
+                                         self.sim_actions['none'])
+            else:
+                raise ValueError(f'Attribute {attribute} is not supported!')
+
+        return res

@@ -6,7 +6,6 @@ from ...rl_env.harness import AgentBasedHarness
 
 
 class AgentBasedHarnessTest(unittest.TestCase):
-
     def setUp(self) -> None:
         '''
         '''

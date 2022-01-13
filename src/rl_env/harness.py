@@ -8,7 +8,6 @@ from .simulation import Simulation
 
 
 class RLHarness(gym.Env, ABC):
-
     @abstractmethod
     def __init__(self, simulation: Simulation, actions: List[str],
                  attributes: List[str]) -> None:
@@ -74,7 +73,6 @@ class RLHarness(gym.Env, ABC):
     def simulation_conversion(
         self, normalize_attributes: List[str]
     ) -> Tuple[Dict[str, Tuple[int, int]], Dict[str, np.ndarray]]:
-
         def normalize(x: np.ndarray) -> np.ndarray:
             '''
             Function to normalize array to [0,1]
@@ -176,7 +174,6 @@ class AgentBasedHarness(RLHarness):
     ---------------------
     The agent has traversed all pixels (screen_size, screen_size)
     '''
-
     def __init__(self, simulation: Simulation, actions: List[str],
                  attributes: List[str]) -> None:
         '''

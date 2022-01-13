@@ -12,7 +12,6 @@ from ..game.managers.mitigation import (FireLineManager, ScratchLineManager,
 
 
 class Simulation(ABC):
-
     def __init__(self, config):
         '''
         This will initialize the Simulation object for interacting with the base
@@ -57,7 +56,6 @@ class Simulation(ABC):
 
 
 class RothermelSimulation(Simulation):
-
     def __init__(self, config):
         '''
         This object will initialize the Rothermel Simulation

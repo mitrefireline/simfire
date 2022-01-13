@@ -1,4 +1,4 @@
-fiReLine Rothermal Fire Modeler
+fiReLine Rothermel Fire Modeler
 ===============================
 
 Running The Simulation

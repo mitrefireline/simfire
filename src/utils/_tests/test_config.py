@@ -65,7 +65,7 @@ class ConfigTest(unittest.TestCase):
                          msg=f'The YAML at {self.yaml} was loaded into the Config class '
                          'incorrectly')
         self.assertEqual(self.cfg.area.screen_size, self.data['area']['screen_size'])
-        self.assertEqual(self.cfg.terrain.perlin.shape, (225, 225))
+        self.assertEqual(self.cfg.terrain.perlin.shape, (9, 9))
 
     def test__set_terrain_scale(self) -> None:
         '''
@@ -79,7 +79,7 @@ class ConfigTest(unittest.TestCase):
         '''
         Test assigning elevation Python function based on a config string
         '''
-        pnoise = PerlinNoise2D(500, (225, 225), (1, 1), 1111)
+        pnoise = PerlinNoise2D(500, (9, 9), (1, 1), 1111)
         pnoise.precompute()
         # This is the only way I could really come up with to make the correct function
         # was assigned - mdoyle

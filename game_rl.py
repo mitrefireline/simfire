@@ -1,16 +1,19 @@
-import pygame
 import random
-import src.config as cfg
-from src.rl_env.fireline_env import FireLineEnv, RLEnv
+from pathlib import Path
+from src.utils.config import Config
+from src.rl_env.harness import AgentBasedHarness
+from src.rl_env.simulation import RothermelSimulation
 
 
 def main():
-    seed = None
-    if seed is not None:
-        env_config = FireLineEnv(cfg, seed)
-    else:
-        env_config = FireLineEnv(cfg)
-    rl_environment = RLEnv(env_config)
+    cfg_path = Path('./config.yml')
+    cfg = Config(cfg_path)
+
+    actions = ['none', 'fireline']
+    observations = ['mitigation', 'w0', 'elevation', 'wind_speed', 'wind_direction']
+    simulation = RothermelSimulation(cfg)
+
+    rl_environment = AgentBasedHarness(simulation, actions, observations)
     state = rl_environment.reset()
     done = False
     final_reward = 0
@@ -19,15 +22,13 @@ def main():
         state, reward, done, _ = rl_environment.step(action)
         final_reward += reward
 
-    pygame.quit()
-
 
 def some_action_func(state):
     '''
     A dummy function to show how the rl side ingests the state
         and returns a dict() of the fire mitigation stategy
     '''
-    fire_mitigation = random.choices([0, 1], weights=[0.95, 0.05])
+    fire_mitigation = random.choices([0, 1], weights=[0.85, 0.15])
     return fire_mitigation[0]
 
 

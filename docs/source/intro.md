@@ -18,7 +18,7 @@ Then, install the requirements:
 pip install -r requirements.txt
 ```
 
-And run the `game_rothermal.py` script:
+And run the `game_rothermel.py` script:
 
 ```shell
 python game_rothermel.py

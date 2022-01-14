@@ -4,6 +4,7 @@ from typing import Dict
 from abc import ABC, abstractmethod
 
 from ..game.game import Game
+from ..utils.config import Config
 from ..game.sprites import Terrain
 from ..world.wind import WindController
 from ..enums import GameStatus, BurnStatus
@@ -14,13 +15,14 @@ from ..game.managers.mitigation import (FireLineManager, ScratchLineManager,
 
 
 class Simulation(ABC):
-    def __init__(self, config):
+    def __init__(self, config: Config) -> None:
         '''
         Initialize the Simulation object for interacting with the base simulation and the
         RL harness.
 
         Arguments:
-            config: The config file that specifies simulation parameters.
+            config: The `Config` that specifies simulation parameters, read in from a
+                    YAML file.
         '''
         self.config = config
 
@@ -54,7 +56,7 @@ class Simulation(ABC):
 
 
 class RothermelSimulation(Simulation):
-    def __init__(self, config):
+    def __init__(self, config: Config) -> None:
         '''
         Initialize the RothermelSimulation object for interacting with the base
         simulation and the RL harness.
@@ -68,7 +70,7 @@ class RothermelSimulation(Simulation):
         self._create_fire()
         self._create_mitigations()
 
-    def _create_terrain(self):
+    def _create_terrain(self) -> None:
         '''
         Initialize the terrain
         '''
@@ -85,7 +87,7 @@ class RothermelSimulation(Simulation):
                                        self.wind_map.map_wind_speed,
                                        self.wind_map.map_wind_direction)
 
-    def _create_mitigations(self):
+    def _create_mitigations(self) -> None:
         '''
         Initialize the mitigation strategies
         '''
@@ -108,7 +110,7 @@ class RothermelSimulation(Simulation):
         self.scratchline_sprites = self.scratchline_manager.sprites
         self.wetline_sprites = self.wetline_manager.sprites
 
-    def _create_wind(self):
+    def _create_wind(self) -> None:
         '''
         This function will initialize the wind strategies
         '''
@@ -124,7 +126,7 @@ class RothermelSimulation(Simulation):
             self.config.wind.direction.lacunarity, self.config.wind.direction.min,
             self.config.wind.direction.max, self.config.area.screen_size)
 
-    def _create_fire(self):
+    def _create_fire(self) -> None:
         '''
         This function will initialize the rothermel fire strategies
         '''
@@ -237,7 +239,7 @@ class RothermelSimulation(Simulation):
     def run(self,
             mitigation_state: np.ndarray,
             position_state: np.ndarray,
-            mitigation: bool = False):
+            mitigation: bool = False) -> np.ndarray:
         '''
         Runs the simulation with or without mitigation lines
 

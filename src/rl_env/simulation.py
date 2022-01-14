@@ -1,10 +1,12 @@
-from typing import Dict
 import numpy as np
+
+from typing import Dict
 from abc import ABC, abstractmethod
-from ..enums import GameStatus, BurnStatus
+
 from ..game.game import Game
 from ..game.sprites import Terrain
 from ..world.wind import WindController
+from ..enums import GameStatus, BurnStatus
 from ..game.managers.fire import RothermelFireManager
 from ..world.parameters import Environment, FuelParticle
 from ..game.managers.mitigation import (FireLineManager, ScratchLineManager,
@@ -14,43 +16,39 @@ from ..game.managers.mitigation import (FireLineManager, ScratchLineManager,
 class Simulation(ABC):
     def __init__(self, config):
         '''
-        This will initialize the Simulation object for interacting with the base
-            simulation and the RL harness.
+        Initialize the Simulation object for interacting with the base simulation and the
+        RL harness.
 
-        Parameters
-        ----------
-        config: Config
-            The config which specifies simulation parameters
+        Arguments:
+            config: The config file that specifies simulation parameters.
         '''
         self.config = config
 
     @abstractmethod
     def run(self) -> np.ndarray:
         '''
-        This function will run the simulation
+        Runs the simulation
         '''
         pass
 
     @abstractmethod
     def render(self) -> None:
         '''
-        This function will run the pygame simulation and display the simulation and
-            agent's actions
+        Runs the pygame simulation and displays the simulation's and agent's actions
         '''
         pass
 
     @abstractmethod
     def get_actions(self) -> Dict[str, int]:
         '''
-        This function will return the action space for the simulation
+        Returns the action space for the simulation
         '''
         pass
 
     @abstractmethod
     def get_attributes(self) -> Dict[str, np.ndarray]:
         '''
-        This function will return the observation space for the simulation
-
+        Returns the observation space for the simulation
         '''
         pass
 
@@ -58,7 +56,8 @@ class Simulation(ABC):
 class RothermelSimulation(Simulation):
     def __init__(self, config):
         '''
-        This object will initialize the Rothermel Simulation
+        Initialize the RothermelSimulation object for interacting with the base
+        simulation and the RL harness.
         '''
         super().__init__(config)
         self.game_status = GameStatus.RUNNING
@@ -71,9 +70,8 @@ class RothermelSimulation(Simulation):
 
     def _create_terrain(self):
         '''
-        This function will initialize the terrain
+        Initialize the terrain
         '''
-
         self.fuel_particle = FuelParticle()
         self.fuel_arrs = [[
             self.config.terrain.fuel_array_function(x, y)
@@ -89,7 +87,7 @@ class RothermelSimulation(Simulation):
 
     def _create_mitigations(self):
         '''
-        This function will initialize the mitigation strategies
+        Initialize the mitigation strategies
         '''
         # initialize all mitigation strategies
         self.fireline_manager = FireLineManager(
@@ -165,8 +163,7 @@ class RothermelSimulation(Simulation):
             None
 
         Returns:
-            observations: Dict[str, np.ndarray]
-
+            The dictionary of observations containing NumPy arrays.
         '''
 
         return {
@@ -291,20 +288,19 @@ class RothermelSimulation(Simulation):
                mitigation_and_fire_spread: bool = False,
                inline: bool = False) -> None:
         '''
-        This will take the pygame update command and perform the display updates
-            for the following scenarios:
-                1. pro-active fire mitigation - inline (during step()) (no fire)
-                2. pro-active fire mitigation (full traversal)
-                3. pro-active fire mitigation (full traversal) + fire spread
+        This will take the pygame update command and perform the display updates for the
+        following scenarios:
+
+            1. pro-active fire mitigation - inline (during step()) (no fire)
+            2. pro-active fire mitigation (full traversal)
+            3. pro-active fire mitigation (full traversal) + fire spread
 
         Arguments:
             mitigation_state: Array of either the current agent mitigation or all
                               mitigations.
             position_state: Array of either the current agent position only used when
                             `inline == True`.
-
             mitigation_only: Boolean value to only show agent mitigation stategy.
-
             mitigation_and_fire_spread: Boolean value to show agent mitigation
                                         stategy & fire spread.
                                         Only used when agent has traversed
@@ -314,7 +310,6 @@ class RothermelSimulation(Simulation):
         Returns:
             None
         '''
-
         self.fire_manager = RothermelFireManager(
             self.config.fire.fire_initial_position, self.config.display.fire_size,
             self.config.fire.max_fire_duration, self.config.area.pixel_scale,

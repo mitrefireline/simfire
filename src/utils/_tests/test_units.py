@@ -1,6 +1,6 @@
 import unittest
 
-from ..units import mph_to_ftpm, ftpm_to_mph
+from ..units import mph_to_ftpm, ftpm_to_mph, str_to_minutes
 
 
 class TestUnits(unittest.TestCase):
@@ -15,3 +15,11 @@ class TestUnits(unittest.TestCase):
         Test to make sure the conversion from MPH to ft/min is correct
         '''
         self.assertEqual(ftpm_to_mph(50), 50 / 88)
+
+    def test_str_to_minutes(self) -> None:
+        '''
+        Test to make sure the conversion from a string ('1d') turns into minutes ('1440')
+        '''
+        self.assertEqual(str_to_minutes('24h'), 1440)
+        self.assertEqual(str_to_minutes('1d'), 1440)
+        self.assertEqual(str_to_minutes('1d 23h 60m'), 2880)

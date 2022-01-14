@@ -3,7 +3,8 @@ from pathlib import Path
 from typing import Any
 from yaml.scanner import ScannerError
 
-from .log import create_logger
+from ..utils.log import create_logger
+from ..utils.units import str_to_minutes
 from ..world.elevation_functions import PerlinNoise2D, flat, gaussian
 from ..world.fuel_array_functions import chaparral_fn
 
@@ -56,6 +57,7 @@ class Config:
         self._possible_fuel_arrays = ('chaparral')
         self._load()
         self._set_attributes()
+        self._set_runtime()
         self._set_terrain_scale()
         self._set_elevation_function()
         self._set_fuel_array_function()
@@ -135,6 +137,17 @@ class Config:
                       f'{self.terrain.fuel_array_function}, when it can only be one of '
                       f'these values: {self._possible_fuel_arrays}')
             raise ValueError
+
+    def _set_runtime(self) -> None:
+        '''
+        Set the `simulation.runtime` variable to a set number of minutes based on a
+        string
+        '''
+        if isinstance(self.simulation.runtime, int):
+            runtime = f'{self.simulation.runtime}m'
+        else:
+            runtime = self.simulation.runtime
+        setattr(self.simulation, 'runtime', str_to_minutes(runtime))
 
     def save(self, path: Path) -> None:
         '''

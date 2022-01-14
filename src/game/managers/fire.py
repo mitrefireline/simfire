@@ -213,6 +213,7 @@ class RothermelFireManager(FireManager):
                  fuel_particle: FuelParticle,
                  terrain: Terrain,
                  environment: Environment,
+                 max_time: int = None,
                  attenuate_line_ros: bool = True,
                  headless: bool = False) -> None:
         '''
@@ -240,6 +241,8 @@ class RothermelFireManager(FireManager):
             fuel_particle: The parameters that describe the fuel particle
             terrain: The Terrain that describes the simulation/game
             environment: The Environment that describes the simulation/game
+            max_time: The maximum amount of time that the fire can spread for, in
+                      minutes.
             attenuate_line_ros: Whether or not to attenuate the rate of spread.
                                 Defaults to `True`. If set to `True`, will subtract
                                 values found in `enums.RoSAttenuation` from the initial
@@ -255,6 +258,8 @@ class RothermelFireManager(FireManager):
                          headless)
         self.pixel_scale = pixel_scale
         self.update_rate = update_rate
+        self.max_time = max_time
+        self.elapsed_time = 0
         self.fuel_particle = fuel_particle
         self.terrain = terrain
 
@@ -389,6 +394,9 @@ class RothermelFireManager(FireManager):
         num_sprites = len(self.sprites)
         if num_sprites == 0:
             return fire_map, GameStatus.QUIT
+        if self.max_time is not None:
+            if self.elapsed_time > self.max_time:
+                return fire_map, GameStatus.QUIT
         loc_x = []
         loc_y = []
         new_loc_x = []
@@ -449,6 +457,9 @@ class RothermelFireManager(FireManager):
         self.sprites = self.sprites + new_sprites
         self.durations = self.durations + new_durations
         fire_map[y_coords[new_burn], x_coords[new_burn]] = BurnStatus.BURNING
+
+        # Save the new elapsed_time value
+        self.elapsed_time += self.update_rate
 
         return fire_map, GameStatus.RUNNING
 

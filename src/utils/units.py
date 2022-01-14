@@ -37,7 +37,7 @@ def ftpm_to_mph(ftpm: Union[int, float]) -> Union[int, float]:
     return mph
 
 
-def convert_to_minutes(string: str) -> int:
+def str_to_minutes(string: str) -> int:
     '''
     Convert any string representation of time ('1d 2h 3m') into a number of minutes
 

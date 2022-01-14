@@ -4,7 +4,7 @@ from typing import Any
 from yaml.scanner import ScannerError
 
 from ..utils.log import create_logger
-from ..utils.units import convert_to_minutes
+from ..utils.units import str_to_minutes
 from ..world.elevation_functions import PerlinNoise2D, flat, gaussian
 from ..world.fuel_array_functions import chaparral_fn
 
@@ -147,7 +147,7 @@ class Config:
             runtime = f'{self.simulation.runtime}m'
         else:
             runtime = self.simulation.runtime
-        setattr(self.simulation, 'runtime', convert_to_minutes(runtime))
+        setattr(self.simulation, 'runtime', str_to_minutes(runtime))
 
     def save(self, path: Path) -> None:
         '''

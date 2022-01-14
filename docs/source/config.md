@@ -47,6 +47,10 @@ change how much space the control line takes up in the simulation.
 The number of minutes that each game/frame update represents in simulation time. Note
 that this can be fractional to account for times that are non-integer and/or less than 1.
 
+#### runtime
+(`str`)<br>
+The amount of time that the simulation is supposed to run. This can be expressed in days, hours, and minutes in any of the following ways and more: `2d`, `2day`, `2days`, `24h`, `1d 23h 60m`, etc. If no designation is given or if the value is given with a space in between the integer and the time span (e.g. `2 days`), the program will assume the units are in minutes.
+
 #### headless
 (`bool`)<br>
 Whether or not to run the simulation in a headless state.
@@ -155,6 +159,12 @@ All arguments that define wind speed layer generation.
 - **lacunarity** (`float`):<br>
   The level of detail added per pass. Usually kept at 2.0.
 
+- **min** (`int`):<br>
+  The *minimum* wind speed for any individual pixel location. Expressed in **miles per hour**.
+
+- **max** (`int`):<br>
+  The *maximum* wind speed for any individual pixel location. Expressed in **miles per hour**.
+
 #### direction
 All arguments that define wind direction layer generation.
 
@@ -172,6 +182,12 @@ All arguments that define wind direction layer generation.
 
 - **lacunarity** (`float`):<br>
   The level of detail added per pass. Usually kept at 2.0.
+
+- **min** (`int`):<br>
+  The *minimum* wind direction for any individual pixel location. Expressed in **degrees clockwise from North**.
+
+- **max** (`int`):<br>
+  The *maximum* wind direction for any individual pixel location. Expressed in **degrees clockwise from North**.
 
 ---
 
@@ -206,6 +222,7 @@ display:
 
 simulation:
   update_rate: 1
+  runtime: 24h
   headless: true
 
 terrain:

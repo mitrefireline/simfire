@@ -54,9 +54,14 @@ def main():
     game.fire_map = fire_map
 
     fire_manager = RothermelFireManager(cfg.fire.fire_initial_position,
-                                        cfg.display.fire_size, cfg.fire.max_fire_duration,
-                                        cfg.area.pixel_scale, cfg.simulation.update_rate,
-                                        fuel_particle, terrain, environment)
+                                        cfg.display.fire_size,
+                                        cfg.fire.max_fire_duration,
+                                        cfg.area.pixel_scale,
+                                        cfg.simulation.update_rate,
+                                        fuel_particle,
+                                        terrain,
+                                        environment,
+                                        max_time=cfg.simulation.runtime)
 
     game_status = GameStatus.RUNNING
     fire_status = GameStatus.RUNNING

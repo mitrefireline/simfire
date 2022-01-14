@@ -6,52 +6,57 @@ This file can have any name, as a path is required to load the configuration fil
 
 ## Settings
 
+---
+
 ### Area Parameters
 
 #### screen_size
-(`int`)
+(`int`)<br>
 Determines how large the simulation is in pixels. The `screen_size` sets both the
 height and the width of the screen.
 
 #### terrain_size
-(`int`)
+(`int`)<br>
 Number of terrain tiles in each row/column.
 
 #### pixel_scale
-(`float`)
+(`float`)<br>
 The number of feet across that one pixel represents. i.e. for the default value, one
 pixel represents a 50ft x 50ft square of land.
 
+---
 
 ### Display Parameters
 
 #### fire_size
-(`int`)
+(`int`)<br>
 The size of the flame/fire size in pixels. Only used for display purposes, and does
 not change fire dynamics.
 
 #### control_line_size
-(`int`)
+(`int`)<br>
 The size of the control lines in pixels. Only used for display purposes, and does not
 change how much space the control line takes up in the simulation.
 
+---
 
 ### Simulation Parameters
 
-### update_rate
-(`float`)
+#### update_rate
+(`float`)<br>
 The number of minutes that each game/frame update represents in simulation time. Note
 that this can be fractional to account for times that are non-integer and/or less than 1.
 
-### headless
-(`bool`)
+#### headless
+(`bool`)<br>
 Whether or not to run the simulation in a headless state.
 
+---
 
 ### Terrain Parameters
 
 #### elevation_function
-(`str`)
+(`str`)<br>
 The function that determines how elevation is distributed throughout the simulation area.
 The available elevation functions are currently:
 
@@ -62,48 +67,38 @@ The available elevation functions are currently:
 #### perlin
 All arguments that would be passed into the PerlinNoise2D elevation class.
 
-##### amplitude
-(`int`)
-The amplitude of the perlin noise function.
+- **amplitude** (`int`):<br>
+  The amplitude of the perlin noise function.
 
-##### shape
-(`Tuple[int, int]`)
-The output shape of the noise. Most often, should probably be `(area.screen_size, area.screen_size)`.
+- **shape** (`Tuple[int, int]`):<br>
+  The output shape of the noise. Most often, should probably be `(area.screen_size, area.screen_size)`.
 
-##### resolution
-(`Tuple[int, int]`)
-The output resolution of the noise. Could be thought of as the "altitude" and aspect ratio at which the data `(1, 1)` is seen.
+- **resolution** (`Tuple[int, int]`):<br>
+  The output resolution of the noise. Could be thought of as the "altitude" and aspect ratio at which the data `(1, 1)` is seen.
 
-##### seed
-(`int`)
-The random seed used to determine the terrain elevation so that the user can recreate
-repeatable terrain.
+- **seed** (`int`):<br>
+  The random seed used to determine the terrain elevation so that the user can recreate repeatable terrain.
 
 #### gaussian
 All arguments that would be passed into the gaussian function.
 
-##### amplitude
-(`int`)
-The amplitude of the gaussian noise function.
+- **amplitude** (`int`):<br>
+  The amplitude of the gaussian noise function.
 
-##### mu_x
-(`int`)
-The mean of the 2D normal distribution in the `x` direction.
+- **mu_x** (`int`):<br>
+  The mean of the 2D normal distribution in the `x` direction.
 
-##### mu_y
-(`int`)
-The mean of the 2D normal distribution in the `y` direction.
+- **mu_y** (`int`):<br>
+  The mean of the 2D normal distribution in the `y` direction.
 
-##### sigma_x
-(`int`)
-The variance of the 2D normal distribution in the `x` direction.
+- **sigma_x** (`int`):<br>
+  The variance of the 2D normal distribution in the `x` direction.
 
-##### sigma_x
-(`int`)
-The variance of the 2D normal distribution in the `y` direction.
+- **sigma_x** (`int`):<br>
+  The variance of the 2D normal distribution in the `y` direction.
 
 #### fuel_array_function
-(`str`)
+(`str`)<br>
 The function that determines how fuel is distributed throughout the simulation area.
 The available fuel functions are currently:
 
@@ -112,29 +107,32 @@ The available fuel functions are currently:
 #### chaparral
 All arguments that would be passed into the chaparral fuel array function.
 
-##### seed
-(`int`)
-The random seed used to determine the fuel distribution so that the user can recreate repeatable fuel patterns.
+- **seed** (`int`):<br>
+  The random seed used to determine the fuel distribution so that the user can recreate repeatable fuel patterns.
+
+---
 
 ### Fire Parameters
 
 #### fire_initial_position
-(`Tuple[int, int]`)
+(`Tuple[int, int]`)<br>
 The initial location to start the fire. This should be set every time when running the
 simulation.
 
 #### max_fire_duration
-(`int`)
+(`int`)<br>
 The maximum number of frames that a single pixel can be on fire.
 
+---
 
 ### Environment Parameters
 Defines the Environment class.
 
 #### moisture
-(`float`)
+(`float`)<br>
 Used in Rothermel calculation. Most of Southern California has the default value of 0.03.
 
+---
 
 ### Wind Parameters
 Defines wind speed and direction generation.
@@ -142,65 +140,57 @@ Defines wind speed and direction generation.
 #### speed
 All arguments that define wind speed layer generation.
 
-##### seed
-(`int`)
-The random seed used to determine the wind speed layer so that the user can recreate repeatable wind speed layers.
+- **seed** (`int`):<br>
+  The random seed used to determine the wind speed layer so that the user can recreate repeatable wind speed layers.
 
-##### scale
-(`int`)
-How large to make the noise. Can be seen as an "elevation", but don't take that literally.
+- **scale** (`int`):<br>
+  How large to make the noise. Can be seen as an "elevation", but don't take that literally.
 
-##### octaves
-(`int`)
-How many passes/layers to the noise algorithm. Each pass adds more detail.
+- **octaves** (`int`):<br>
+  How many passes/layers to the noise algorithm. Each pass adds more detail.
 
-##### persistence
-(`float`)
-How much more each successive value brings. Keep between 0 and 1.0.
+- **persistence** (`float`):<br>
+  How much more each successive value brings. Keep between 0 and 1.0.
 
-##### lacunarity
-(`float`)
-The level of detail added per pass. Usually kept at 2.0.
+- **lacunarity** (`float`):<br>
+  The level of detail added per pass. Usually kept at 2.0.
 
 #### direction
 All arguments that define wind direction layer generation.
 
-##### seed
-(`int`)
-The random seed used to determine the wind speed layer so that the user can recreate repeatable wind speed layers.
+- **seed** (`int`):<br>
+  The random seed used to determine the wind speed layer so that the user can recreate repeatable wind speed layers.
 
-##### scale
-(`int`)
-How large to make the noise. Can be seen as an "elevation", but don't take that literally.
+- **scale** (`int`):<br>
+  How large to make the noise. Can be seen as an "elevation", but don't take that literally.
 
-##### octaves
-(`int`)
-How many passes/layers to the noise algorithm. Each pass adds more detail.
+- **octaves** (`int`):<br>
+  How many passes/layers to the noise algorithm. Each pass adds more detail.
 
-##### persistence
-(`float`)
-How much more each successive value brings. Keep between 0 and 1.0.
+- **persistence** (`float`):<br>
+  How much more each successive value brings. Keep between 0 and 1.0.
 
-##### lacunarity
-(`float`)
-The level of detail added per pass. Usually kept at 2.0.
+- **lacunarity** (`float`):<br>
+  The level of detail added per pass. Usually kept at 2.0.
+
+---
 
 ### Render Parameters
 Defines rendering.
 
 #### inline
-(`bool`)
+(`bool`)<br>
 Whether or not to render at each call to the `step()` function in `FirelineEnv`.
 
 #### post_agent
-(`bool`)
+(`bool`)<br>
 Whether or not to render with post agent in place.
 
-#### post_agent
-(`bool`)
+#### post_agent_with_fire
+(`bool`)<br>
 Whether or not to render with post agent and fire in place.
 
-
+---
 
 ## Example Config File
 

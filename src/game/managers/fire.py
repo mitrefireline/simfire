@@ -373,6 +373,34 @@ class RothermelFireManager(FireManager):
 
         return [arr[i, :] for i in range(arr.shape[0])]
 
+    def _update_with_new_locs(self, y_coords: np.ndarray, x_coords: np.ndarray,
+                              fire_map: np.ndarray) -> np.ndarray:
+        '''
+        Update `self.sprites` with new sprites, `self.durations` with new durations, and
+        return an updated fire map with new burn locations
+
+        Arguments:
+            y_coords: The Y coordinates of all new fires
+            x_coords: The X coordinates of all new fires
+            fire_map: The numpy array that tracks the fire's burn status for
+                      each pixel in the simulation
+
+        Returns:
+            A NumPy array of the updated `fire_map`
+        '''
+        y_coords, x_coords = np.unique(np.vstack((y_coords, x_coords)), axis=1)
+        new_burn = np.argwhere(self.burn_amounts[y_coords, x_coords] > self.pixel_scale)
+        new_sprites = [
+            Fire((x_coords[burn[0]], y_coords[burn[0]]), self.fire_size, self.headless)
+            for burn in new_burn
+        ]
+        new_durations = [0] * len(new_sprites)
+
+        self.sprites += new_sprites
+        self.durations += new_durations
+        fire_map[y_coords[new_burn], x_coords[new_burn]] = BurnStatus.BURNING
+        return fire_map
+
     def update(self, fire_map: np.ndarray) -> Tuple[np.ndarray, GameStatus]:
         '''
         Update the spreading of the fires. This function will remove
@@ -392,11 +420,17 @@ class RothermelFireManager(FireManager):
         # Increment the durations
         self.durations = list(map(lambda x: x + 1, self.durations))
         num_sprites = len(self.sprites)
+
+        # If the number of sprites is 0, quit the sim
         if num_sprites == 0:
             return fire_map, GameStatus.QUIT
+
+        # If we've reached the end time, quit the sim
         if self.max_time is not None:
             if self.elapsed_time > self.max_time:
                 return fire_map, GameStatus.QUIT
+
+        # Initialize all the vectorized variables
         loc_x = []
         loc_y = []
         new_loc_x = []
@@ -414,6 +448,7 @@ class RothermelFireManager(FireManager):
         U_dir = []
         slope_mag = []
         slope_dir = []
+
         sprite_idxs = list(range(num_sprites))
 
         all_params = [self._accrue_sprites(idx, fire_map) for idx in sprite_idxs]
@@ -428,6 +463,7 @@ class RothermelFireManager(FireManager):
             M_f, U, U_dir, slope_mag, slope_dir
         ] = self._flatten_params(all_params)
 
+        # Compute the rate of spread with vectorized function
         R = compute_rate_of_spread(loc_x, loc_y, new_loc_x, new_loc_y, w_0, delta, M_x,
                                    sigma, h, S_T, S_e, p_p, M_f, U, U_dir, slope_mag,
                                    slope_dir)
@@ -435,9 +471,12 @@ class RothermelFireManager(FireManager):
         # Scale the rate of spread by the update rate
         R *= self.update_rate
 
+        # Create integer y_coords and x_coords
         y_coords = new_loc_y.astype(int)
         x_coords = new_loc_x.astype(int)
 
+        # Create a rate_of_spread variable that takes the same shape as self.burn_amounts
+        # and fire_map
         rate_of_spread = np.zeros_like(self.burn_amounts)
         rate_of_spread[y_coords, x_coords] = R
 
@@ -446,17 +485,9 @@ class RothermelFireManager(FireManager):
         rate_of_spread = self._update_rate_of_spread(rate_of_spread, fire_map)
         self.burn_amounts += rate_of_spread
 
-        y_coords, x_coords = np.unique(np.vstack((y_coords, x_coords)), axis=1)
-        new_burn = np.argwhere(self.burn_amounts[y_coords, x_coords] > self.pixel_scale)
-        new_sprites = [
-            Fire((x_coords[burn[0]], y_coords[burn[0]]), self.fire_size, self.headless)
-            for burn in new_burn
-        ]
-        new_durations = [0] * len(new_sprites)
-
-        self.sprites = self.sprites + new_sprites
-        self.durations = self.durations + new_durations
-        fire_map[y_coords[new_burn], x_coords[new_burn]] = BurnStatus.BURNING
+        # Update the fire_map with new burning locations and update self.sprites and
+        # self.durations
+        fire_map = self._update_with_new_locs(y_coords, x_coords, fire_map)
 
         # Save the new elapsed_time value
         self.elapsed_time += self.update_rate

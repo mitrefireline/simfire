@@ -73,6 +73,20 @@ class RLHarness(gym.Env, ABC):
     def simulation_conversion(
         self, normalize_attributes: List[str]
     ) -> Tuple[Dict[str, Tuple[int, int]], Dict[str, np.ndarray]]:
+        '''
+        This function will convert the returns of the Simulation.get_attributes()
+            to the RL harness np.ndarray structure
+
+        Attributes:
+
+            normalize_attributes: List[str]
+                A list of strings of the desired attributes to normalize
+
+        Returns:
+            np.ndarray
+                A numpy array of the converted attributes for the RL harness to use
+
+        '''
         def normalize(x: np.ndarray) -> np.ndarray:
             '''
             Function to normalize array to [0,1]
@@ -84,6 +98,8 @@ class RLHarness(gym.Env, ABC):
         min_maxes = {}
         for harness_attr in self.attributes:
             if harness_attr in self.sim_attributes.keys():
+                self.sim_attributes[harness_attr] = np.asarray(
+                    self.sim_attributes[harness_attr])
                 if harness_attr in normalize_attributes:
                     self.sim_attributes[harness_attr] = normalize(
                         self.sim_attributes[harness_attr])
@@ -95,6 +111,32 @@ class RLHarness(gym.Env, ABC):
 
     @abstractmethod
     def harness_conversion(self, mitigation_map: np.ndarray) -> np.ndarray:
+        '''
+        This function will convert the returns of the Simulation.get_actions()
+            to the RL harness List of ints structure where the simulation action
+            integer starts at index 0 for the RL harness
+
+        Example:    mitigation_map = (0, 1, 1, 0)
+                    sim_action = {'none': 0, 'fireline':1, 'scratchline':2, 'wetline':3}
+                    harness_actions = ['none', 'scratchline']
+
+                Harness                  Simulation
+                ---------               ------------
+                'none': 0           -->   'none': 0
+                'scratchline': 1    -->   'scratchline': 2
+
+                return (0, 2, 2, 0)
+
+        Attributes:
+            mitigation_map: np.ndarray
+                A np.ndarray of the harness mitigation map
+
+        Returns:
+            np.ndarray
+                A np.ndarray of the converted mitigation map from RL harness
+                    to the correct Simulation BurnStatus types
+
+        '''
         harness_ints = np.unique(mitigation_map)
         harness_dict = {
             self.actions[i]: harness_ints[i]
@@ -237,14 +279,6 @@ class AgentBasedHarness(RLHarness):
         # make a copy
         old_loc = deepcopy(self.current_agent_loc)
 
-        # if we want to render as we step through the game
-        if self.simulation.config.render.inline:
-            # convert mitigation map to correct simulation format
-            sim_mitigation_map = self.harness_conversion(self.state[-1])
-            self.simulation.render(sim_mitigation_map[self.current_agent_loc],
-                                   self.current_agent_loc,
-                                   inline=True)
-
         # set the old position back to 0
         self.state[0][self.current_agent_loc] = 0
 
@@ -252,27 +286,19 @@ class AgentBasedHarness(RLHarness):
         self._update_current_agent_loc()
         self.state[0][self.current_agent_loc] = 1
 
-        reward = 0  # if action == 0 else
+        reward = 0
 
         # If the agent is at the last location (cannot move forward)
         done = old_loc == self.current_agent_loc
         if done:
             # convert mitigation map to correct simulation format
-            sim_mitigation_map = self.harness_conversion(self.state[-1])
-            # compare the state spaces
-            fire_map = self.simulation.run(sim_mitigation_map, self.state[0])
-            # render only agent
-            if self.simulation.config.render.post_agent:
-                self.simulation.render(sim_mitigation_map, self.state[0])
+            sim_mitigation_map = self.harness_conversion(self.actions)
 
-            fire_map_with_agent = self.simulation.run(sim_mitigation_map, self.state[0],
-                                                      True)
-            # render fire with agents mitigation in place
-            if self.simulation.config.render.post_agent_with_fire:
-                self.simulation.render(sim_mitigation_map,
-                                       self.state[0],
-                                       mitigation_only=False,
-                                       mitigation_and_fire_spread=True)
+            # run simulation with agent actions + fire burning
+            fire_map = self.simulation.run(sim_mitigation_map)
+            fire_map_with_agent = self.simulation.run(sim_mitigation_map)
+
+            # compare the state spaces
             reward = self._compare_states(fire_map, fire_map_with_agent)
 
         return self.state, reward, done, {}
@@ -377,75 +403,41 @@ class AgentBasedHarness(RLHarness):
         return reward / (self.simulation.config.area.screen_size *
                          self.simulation.config.area.screen_size)
 
-    def reset(self) -> gym.spaces.Box:
-        '''
-        Reset environment to initial state.
-
-        NOTE: reset() must be called before you can call step() for the first time.
-
-        Terrain is received from the sim. Position matrix is assumed to be all 0's when
-        received from sim. Updated to have agent at (0,0) on reset.
-
-        Arguments:
-            None
-
-        Returns:
-            `self.state`, a dictionary with the following structure:
-
-        '''
-
-        return super().reset()
-
     def simulation_conversion(
         self, normalize_attributes: List[str]
     ) -> Tuple[Dict[str, Tuple[int, int]], Dict[str, np.ndarray]]:
-        '''
-        This function will convert the returns of the Simulation.get_attributes()
-            to the RL harness np.ndarray structure
 
-        NOTE: 'elevation' attribute is scaled [-x,x] in config.yml but RL Harness
-                expects 'elevation' on [0, 1] normalized scale
-
-        Attributes:
-
-            normalize_attributes: List[str]
-                A list of strings of the desired attributes to normalize
-
-        Returns:
-            np.ndarray
-                A numpy array of the converted attributes for the RL harness to use
-
-        '''
         return super().simulation_conversion(normalize_attributes)
 
     def harness_conversion(self, mitigation_map: np.ndarray) -> np.ndarray:
-        '''
-        This function will convert the returns of the Simulation.get_actions()
-            to the RL harness List of ints structure where the simulation action
-            integer starts at index 0 for the RL harness
 
-        Example:    mitigation_map = (0, 1, 1, 0)
-                    sim_action = {'none': 0, 'fireline':1, 'scratchline':2, 'wetline':3}
-                    harness_actions = ['none', 'scratchline']
-
-                Harness                  Simulation
-                ---------               ------------
-                'none': 0           -->   'none': 0
-                'scratchline': 1    -->   'scratchline': 2
-
-                return (0, 2, 2, 0)
-
-        Attributes:
-            mitigation_map: np.ndarray
-                A np.ndarray of the harness mitigation map
-
-        Returns:
-            np.ndarray
-                A np.ndarray of the converted mitigation map from RL harness
-                    to the correct Simulation BurnStatus types
-
-        '''
         return super().harness_conversion(mitigation_map)
+
+    def reset(self) -> gym.spaces.Box:
+        '''
+        For AgentBasedHarness we need agent position as they traverse.
+        Need to include in the state space with a start position in the
+            upper left corner of the simulation.
+
+        Need to override RLHarness.reset() method
+        '''
+        position = np.zeros((self.simulation.config.area.screen_size,
+                             self.simulation.config.area.screen_size))
+        position = np.expand_dims(position, axis=0)
+        position[0, 0, 0] = 1
+        self.current_agent_loc = (0, 0)
+
+        self.sim_attributes = self.simulation.get_attributes()
+        _, observations = self.simulation_conversion(['elevation'])
+        observations.update(self.add_nonsim_attributes())
+
+        obs = []
+        for attribute in self.attributes:
+            obs.append(observations[attribute])
+
+        self.state = np.vstack((position, obs))
+
+        return self.state
 
     def add_nonsim_min_max(self) -> None:
         """

@@ -57,6 +57,6 @@ wind:
     max: 360.0
 
 render:
-  inline: false
+  inline: true
   post_agent: false
-  post_agent_with_fire: true
+  post_agent_with_fire: false

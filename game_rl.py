@@ -18,17 +18,18 @@ def main():
     done = False
     final_reward = 0
     while not done:
-        action = some_action_func(state)
+        action = some_action_func()
         state, reward, done, _ = rl_environment.step(action)
+        simulation.render(state)
         final_reward += reward
 
 
-def some_action_func(state):
+def some_action_func():
     '''
     A dummy function to show how the rl side ingests the state
         and returns a dict() of the fire mitigation stategy
     '''
-    fire_mitigation = random.choices([0, 1], weights=[0.85, 0.15])
+    fire_mitigation = random.choices([0, 1], weights=[0.85, 0.55])
     return fire_mitigation[0]
 
 

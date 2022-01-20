@@ -88,7 +88,7 @@ class AgentBasedHarnessTest(unittest.TestCase):
                  f'should be [0, 0]'))
 
         # check elevation
-        elevation = state[3]
+        elevation = state[4]
         elevation_zero_min = self.simulation.terrain.elevations - \
                              self.simulation.terrain.elevations.min()
         valid_elevation = elevation_zero_min / (elevation_zero_min.max())

@@ -292,11 +292,11 @@ class AgentBasedHarness(RLHarness):
         done = old_loc == self.current_agent_loc
         if done:
             # convert mitigation map to correct simulation format
-            sim_mitigation_map = self.harness_conversion(self.actions)
+            sim_mitigation_map = self.harness_conversion(self.state[1])
 
             # run simulation with agent actions + fire burning
-            fire_map = self.simulation.run(sim_mitigation_map)
-            fire_map_with_agent = self.simulation.run(sim_mitigation_map)
+            fire_map = self.simulation.run(sim_mitigation_map, False)
+            fire_map_with_agent = self.simulation.run(sim_mitigation_map, True)
 
             # compare the state spaces
             reward = self._compare_states(fire_map, fire_map_with_agent)

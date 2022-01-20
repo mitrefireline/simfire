@@ -20,8 +20,13 @@ def main():
     while not done:
         action = some_action_func()
         state, reward, done, _ = rl_environment.step(action)
-        simulation.render(state)
+        if cfg.render.inline:
+            simulation.render(state, actions, 'inline')
         final_reward += reward
+    if cfg.render.post_agent:
+        simulation.render(state, actions, 'post agent')
+    if cfg.render.post_agent_with_fire:
+        simulation.render(state, actions, 'post agent with fire')
 
 
 def some_action_func():
@@ -29,7 +34,7 @@ def some_action_func():
     A dummy function to show how the rl side ingests the state
         and returns a dict() of the fire mitigation stategy
     '''
-    fire_mitigation = random.choices([0, 1], weights=[0.85, 0.55])
+    fire_mitigation = random.choices([0, 1], weights=[0.85, 0.05])
     return fire_mitigation[0]
 
 

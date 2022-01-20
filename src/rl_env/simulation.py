@@ -1,6 +1,6 @@
 import numpy as np
 
-from typing import Dict, List, Optional
+from typing import Dict, Optional
 from abc import ABC, abstractmethod
 
 from ..game.game import Game
@@ -17,8 +17,8 @@ from ..game.managers.mitigation import (FireLineManager, ScratchLineManager,
 class Simulation(ABC):
     def __init__(self, config: Config) -> None:
         '''
-        Initialize the Simulation object for interacting with the base simulation and the
-        RL harness.
+        Initialize the Simulation object for interacting with the base
+            simulation and the RL harness.
 
         Arguments:
             config: The `Config` that specifies simulation parameters, read in from a
@@ -53,32 +53,6 @@ class Simulation(ABC):
         Returns the observation space for the simulation
         '''
         pass
-
-    @abstractmethod
-    def conversion(self, actions: List[str], mitigation_map: np.ndarray) -> np.ndarray:
-
-        self.sim_actions = self.get_actions()
-        sim_mitigation_map = []
-        if len(mitigation_map) > 1:
-            harness_ints = np.unique(mitigation_map)
-            harness_dict = {actions[i]: harness_ints[i] for i in range(len(harness_ints))}
-            for mitigation_i in mitigation_map:
-                for mitigation_j in mitigation_i:
-                    action = [
-                        key for key, value in harness_dict.items()
-                        if value == mitigation_j
-                    ]
-                    sim_mitigation_map.append(self.sim_actions[action[0]])
-            return np.asarray(sim_mitigation_map).reshape(len(mitigation_map[0]),
-                                                          len(mitigation_map[1]))
-
-        else:
-            harness_dict = {key: val for val, key in enumerate(actions)}
-            action = [
-                key for key, value in harness_dict.items() if value == mitigation_map[0]
-            ]
-            sim_mitigation_map.append(self.sim_actions[action[0]])
-            return sim_mitigation_map
 
 
 class RothermelSimulation(Simulation):
@@ -325,18 +299,23 @@ class RothermelSimulation(Simulation):
             if self.fire_status == GameStatus.QUIT:
                 return self.fire_map
 
-    def _render_inline(self, state: np.ndarray, actions: List[str]) -> None:
+    def _render_inline(self, mitigation: np.ndarray, position: np.ndarray) -> None:
         '''
             This method will interact with the RL harness to display and update the
                 Rothermel simulation as the agent progresses through the simulation
                 (if applicable, i.e AgentBasedHarness)
 
-            Arguments:
-                mitigation: int
-                    The value of the mitigation from the RL Harness
+            TODO: position could change to a Dic[str, (int, int)]
+                    for multi-agent scenario
 
-                position: Tuple[int]
-                    The (x, y) coordinate of the agent
+
+            Arguments:
+                mitigation: np.ndarray
+                    The values of the mitigation array from the RL Harness, converted
+                        to the simulation format
+
+                position: np.ndarray
+                    The position array of the agent
 
             Returns:
                 None
@@ -349,10 +328,9 @@ class RothermelSimulation(Simulation):
         self.game = Game(self.config.area.screen_size)
         self.fire_map = self.game.fire_map
 
-        position = np.where(self._correct_pos(state[0]) == 1)
-        mitigation_only = state[1][position].astype(int)
+        position = np.where(self._correct_pos(position) == 1)
+        mitigation = mitigation[position].astype(int)
         # mitigation map needs to be associated with correct BurnStatus types
-        mitigation = self.conversion(actions, mitigation_only)
 
         self._update_sprite_points(mitigation, position)
         if self.game_status == GameStatus.RUNNING:
@@ -369,7 +347,7 @@ class RothermelSimulation(Simulation):
             self.game.fire_map = self.fire_map
         self.points = set([])
 
-    def _render_mitigations(self, state: np.ndarray, actions: List[str]) -> None:
+    def _render_mitigations(self, mitigation: np.ndarray) -> None:
         '''
         This method will render the agent's actions after the final action.
 
@@ -391,8 +369,6 @@ class RothermelSimulation(Simulation):
         self.game = Game(self.config.area.screen_size)
         self.fire_map = self.game.fire_map
 
-        mitigation = self.conversion(actions, state[1])
-
         self._update_sprite_points(mitigation)
         if self.game_status == GameStatus.RUNNING:
 
@@ -408,8 +384,7 @@ class RothermelSimulation(Simulation):
             self.game.fire_map = self.fire_map
         self.points = set([])
 
-    def _render_mitigation_fire_spread(self, state: np.ndarray,
-                                       actions: List[str]) -> None:
+    def _render_mitigation_fire_spread(self, mitigation: np.ndarray) -> None:
         '''
         This method will render the agent's actions after the final action and
             the subsequent Rothermel Fire spread.
@@ -430,8 +405,6 @@ class RothermelSimulation(Simulation):
         self.game = Game(self.config.area.screen_size)
         self.fire_map = self.game.fire_map
 
-        mitigation = self.conversion(actions, state[1])
-
         self.fire_status = GameStatus.RUNNING
         self.game_status = GameStatus.RUNNING
         self._update_sprite_points(mitigation)
@@ -451,44 +424,16 @@ class RothermelSimulation(Simulation):
 
         self.points = set([])
 
-    def render(self, state: np.ndarray, actions: List[str], type: str) -> None:
+    def render(self, type: str, mitigation: np.ndarray,
+               position: np.ndarray = ([0], [0])) -> None:
         '''
         This is a helper function that hands off to sub-functions for rendering
 
         '''
 
         if type == 'inline':
-            self._render_inline(state, actions)
+            self._render_inline(mitigation, position)
         if type == 'post agent':
-            self._render_mitigations(state, actions)
+            self._render_mitigations(mitigation)
         if type == 'post agent with fire':
-            self._render_mitigation_fire_spread(state, actions)
-
-    def conversion(self, actions: List[str], mitigation_map: np.ndarray) -> np.ndarray:
-        '''
-        This function will convert the returns of the Simulation.get_actions()
-            to the RL harness List of ints structure where the simulation action
-            integer starts at index 0 for the RL harness
-
-        Example:    mitigation_map = (0, 1, 1, 0)
-                    sim_action = {'none': 0, 'fireline':1, 'scratchline':2, 'wetline':3}
-                    harness_actions = ['none', 'scratchline']
-
-                Harness                  Simulation
-                ---------               ------------
-                'none': 0           -->   'none': 0
-                'scratchline': 1    -->   'scratchline': 2
-
-                return (0, 2, 2, 0)
-
-        Attributes:
-            mitigation_map: np.ndarray
-                A np.ndarray of the harness mitigation map
-
-        Returns:
-            np.ndarray
-                A np.ndarray of the converted mitigation map from RL harness
-                    to the correct Simulation BurnStatus types
-
-        '''
-        return super().conversion(actions, mitigation_map)
+            self._render_mitigation_fire_spread(mitigation)

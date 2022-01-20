@@ -21,12 +21,16 @@ def main():
         action = some_action_func()
         state, reward, done, _ = rl_environment.step(action)
         if cfg.render.inline:
-            simulation.render(state, actions, 'inline')
+            mitigation = rl_environment.harness_conversion(state[1])
+            position = state[0]
+            simulation.render('inline', mitigation, position)
         final_reward += reward
+
+    mitigation = rl_environment.harness_conversion(state[1])
     if cfg.render.post_agent:
-        simulation.render(state, actions, 'post agent')
+        simulation.render('post agent', mitigation)
     if cfg.render.post_agent_with_fire:
-        simulation.render(state, actions, 'post agent with fire')
+        simulation.render('post agent with fire', mitigation)
 
 
 def some_action_func():

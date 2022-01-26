@@ -79,9 +79,11 @@ class RothermelSimulation(Simulation):
             self.config.terrain.fuel_array_function(x, y)
             for x in range(self.config.area.terrain_size)
         ] for y in range(self.config.area.terrain_size)]
-        self.terrain = Terrain(self.fuel_arrs, self.config.terrain.elevation_function,
+        self.terrain = Terrain(self.fuel_arrs,
+                               self.config.terrain.elevation_function,
                                self.config.area.terrain_size,
-                               self.config.area.screen_size)
+                               self.config.area.screen_size,
+                               headless=self.config.simulation.headless)
 
         self.environment = Environment(self.config.environment.moisture,
                                        self.wind_map.map_wind_speed,
@@ -95,15 +97,18 @@ class RothermelSimulation(Simulation):
         self.fireline_manager = FireLineManager(
             size=self.config.display.control_line_size,
             pixel_scale=self.config.area.pixel_scale,
-            terrain=self.terrain)
+            terrain=self.terrain,
+            headless=self.config.simulation.headless)
 
         self.scratchline_manager = ScratchLineManager(
             size=self.config.display.control_line_size,
             pixel_scale=self.config.area.pixel_scale,
-            terrain=self.terrain)
+            terrain=self.terrain,
+            headless=self.config.simulation.headless)
         self.wetline_manager = WetLineManager(size=self.config.display.control_line_size,
                                               pixel_scale=self.config.area.pixel_scale,
-                                              terrain=self.terrain)
+                                              terrain=self.terrain,
+                                              headless=self.config.simulation.headless)
 
         self.fireline_sprites = self.fireline_manager.sprites
         self.fireline_sprites_empty = self.fireline_sprites.copy()
@@ -132,10 +137,17 @@ class RothermelSimulation(Simulation):
         '''
 
         self.fire_manager = RothermelFireManager(
-            self.config.fire.fire_initial_position, self.config.display.fire_size,
-            self.config.fire.max_fire_duration, self.config.area.pixel_scale,
-            self.config.simulation.update_rate, self.fuel_particle, self.terrain,
-            self.environment)
+            self.config.fire.fire_initial_position,
+            self.config.display.fire_size,
+            self.config.fire.max_fire_duration,
+            self.config.area.pixel_scale,
+            self.config.simulation.update_rate,
+            self.fuel_particle,
+            self.terrain,
+            self.environment,
+            max_time=self.config.simulation.runtime,
+            attenuate_line_ros=self.config.mitigation.ros_attenuation,
+            headless=self.config.simulation.headless)
         self.fire_sprites = self.fire_manager.sprites
 
     def get_actions(self) -> Dict[str, int]:
@@ -280,10 +292,17 @@ class RothermelSimulation(Simulation):
         self.fire_status = GameStatus.RUNNING
         # initialize fire strategy
         self.fire_manager = RothermelFireManager(
-            self.config.fire.fire_initial_position, self.config.display.fire_size,
-            self.config.fire.max_fire_duration, self.config.area.pixel_scale,
-            self.config.simulation.update_rate, self.fuel_particle, self.terrain,
-            self.environment)
+            self.config.fire.fire_initial_position,
+            self.config.display.fire_size,
+            self.config.fire.max_fire_duration,
+            self.config.area.pixel_scale,
+            self.config.simulation.update_rate,
+            self.fuel_particle,
+            self.terrain,
+            self.environment,
+            max_time=self.config.simulation.runtime,
+            attenuate_line_ros=self.config.mitigation.ros_attenuation,
+            headless=self.config.simulation.headless)
 
         self.fire_map = np.full(
             (self.config.area.screen_size, self.config.area.screen_size),
@@ -321,10 +340,17 @@ class RothermelSimulation(Simulation):
                 None
             '''
         self.fire_manager = RothermelFireManager(
-            self.config.fire.fire_initial_position, self.config.display.fire_size,
-            self.config.fire.max_fire_duration, self.config.area.pixel_scale,
-            self.config.simulation.update_rate, self.fuel_particle, self.terrain,
-            self.environment)
+            self.config.fire.fire_initial_position,
+            self.config.display.fire_size,
+            self.config.fire.max_fire_duration,
+            self.config.area.pixel_scale,
+            self.config.simulation.update_rate,
+            self.fuel_particle,
+            self.terrain,
+            self.environment,
+            max_time=self.config.simulation.runtime,
+            attenuate_line_ros=self.config.mitigation.ros_attenuation,
+            headless=False)
         self.game = Game(self.config.area.screen_size)
         self.fire_map = self.game.fire_map
 
@@ -362,11 +388,18 @@ class RothermelSimulation(Simulation):
             None
         '''
         self.fire_manager = RothermelFireManager(
-            self.config.fire.fire_initial_position, self.config.display.fire_size,
-            self.config.fire.max_fire_duration, self.config.area.pixel_scale,
-            self.config.simulation.update_rate, self.fuel_particle, self.terrain,
-            self.environment)
-        self.game = Game(self.config.area.screen_size)
+            self.config.fire.fire_initial_position,
+            self.config.display.fire_size,
+            self.config.fire.max_fire_duration,
+            self.config.area.pixel_scale,
+            self.config.simulation.update_rate,
+            self.fuel_particle,
+            self.terrain,
+            self.environment,
+            max_time=self.config.simulation.runtime,
+            attenuate_line_ros=self.config.mitigation.ros_attenuation,
+            headless=False)
+        self.game = Game(self.config.area.screen_size, headless=False)
         self.fire_map = self.game.fire_map
 
         self._update_sprite_points(mitigation)
@@ -398,11 +431,18 @@ class RothermelSimulation(Simulation):
 
         '''
         self.fire_manager = RothermelFireManager(
-            self.config.fire.fire_initial_position, self.config.display.fire_size,
-            self.config.fire.max_fire_duration, self.config.area.pixel_scale,
-            self.config.simulation.update_rate, self.fuel_particle, self.terrain,
-            self.environment)
-        self.game = Game(self.config.area.screen_size)
+            self.config.fire.fire_initial_position,
+            self.config.display.fire_size,
+            self.config.fire.max_fire_duration,
+            self.config.area.pixel_scale,
+            self.config.simulation.update_rate,
+            self.fuel_particle,
+            self.terrain,
+            self.environment,
+            max_time=self.config.simulation.runtime,
+            attenuate_line_ros=self.config.mitigation.ros_attenuation,
+            headless=False)
+        self.game = Game(self.config.area.screen_size, headless=False)
         self.fire_map = self.game.fire_map
 
         self.fire_status = GameStatus.RUNNING

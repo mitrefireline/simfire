@@ -427,7 +427,7 @@ class RothermelFireManager(FireManager):
 
         # If we've reached the end time, quit the sim
         if self.max_time is not None:
-            if self.elapsed_time > self.max_time:
+            if self.update_rate > self.max_time or self.elapsed_time > self.max_time:
                 return fire_map, GameStatus.QUIT
 
         # Initialize all the vectorized variables

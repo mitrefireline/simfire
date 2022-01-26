@@ -3,7 +3,7 @@ import unittest
 import numpy as np
 from ...utils.config import Config
 from ...rl_env.simulation import RothermelSimulation
-from ...enums import BurnStatus, GameStatus
+from ...enums import BurnStatus
 
 
 class RothermelSimulationTest(unittest.TestCase):
@@ -148,7 +148,8 @@ class RothermelSimulationTest(unittest.TestCase):
             (self.config.area.screen_size, self.config.area.screen_size))
         mit_point = (1, 1)
         mitigation[mit_point] = BurnStatus.FIRELINE
-
+        self.config.simulation.headless = False
+        self.simulation = RothermelSimulation(self.config)
         # Test rendering 'inline' (as agent traverses)
         self.simulation._render_inline(mitigation, current_agent_loc)
         # assert the points are placed
@@ -165,6 +166,8 @@ class RothermelSimulationTest(unittest.TestCase):
         mitigation = np.full((self.config.area.screen_size, self.config.area.screen_size),
                              BurnStatus.FIRELINE)
 
+        self.config.simulation.headless = False
+        self.simulation = RothermelSimulation(self.config)
         self.simulation._render_mitigations(mitigation)
         full_grid = self.config.area.screen_size * self.config.area.screen_size
         self.assertEqual(
@@ -183,14 +186,16 @@ class RothermelSimulationTest(unittest.TestCase):
         mitigation = np.zeros(
             (self.config.area.screen_size, self.config.area.screen_size))
         # start the fire where we have a control line
-        mitigation[self.config.fire.fire_initial_position[0] - 1:] = 1
+        mitigation[self.config.fire.fire_initial_position[0] - 1:] = 3
+        self.config.mitigation.ros_attenuation = False
+        self.config.simulation.headless = False
+        self.simulation = RothermelSimulation(self.config)
         self.simulation._render_mitigation_fire_spread(mitigation)
 
-        self.assertEqual(
-            self.simulation.fire_status,
-            GameStatus.QUIT,
-            msg=f'The returned state of the Game is {self.simulation.game_status} '
-            ' but, should be GameStatus.QUIT.')
+        # assert no fire has spread
+        self.assertTrue(len(self.simulation.fire_sprites) == 1,
+                        msg=f'The returned state of the Game should have no fire spread, '
+                        f' but, has {len(self.simulation.fire_sprites)}.')
 
     def test_render(self) -> None:
         '''

@@ -57,6 +57,14 @@ Whether or not to run the simulation in a headless state.
 
 ---
 
+### Mitigation Parameters
+
+#### ros_attenuation
+(`bool`)<br>
+Whether or not to attenuate rate of spread based on the type of line being used. These attenuation values can be seen in [`enums.py`](https://gitlab.mitre.org/fireline/rothermel-modeling/-/blob/master/src/enums.py#L48). These values will be subtracted from the rate of spread for a given pixel based on the control line type. If this value is set to `false`, all lines will completely stop a fire and the rate of spread for any pixel with a control line will be set to zero.
+
+---
+
 ### Terrain Parameters
 
 #### elevation_function
@@ -225,6 +233,9 @@ simulation:
   runtime: 24h
   headless: true
 
+mitigation:
+  ros_attenuation: true
+
 terrain:
   elevation_function: perlin
   perlin:
@@ -258,8 +269,8 @@ wind:
     octaves: 3
     persistence: 0.7
     lacunarity: 2.0
-    min: 616.0
-    max: 4136.0
+    min: 7
+    max: 47
   direction:
     seed: 650
     scale: 1500

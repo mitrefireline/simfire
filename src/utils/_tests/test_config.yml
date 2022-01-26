@@ -13,6 +13,9 @@ simulation:
   update_rate: 1
   runtime: 24h
 
+mitigation:
+  ros_attenuation: true
+
 terrain:
   elevation_function: perlin
   perlin:
@@ -46,8 +49,8 @@ wind:
     octaves: 3
     persistence: 0.7
     lacunarity: 2.0
-    min: 616.0
-    max: 4136.0
+    min: 7
+    max: 47
   direction:
     seed: 650
     scale: 1500

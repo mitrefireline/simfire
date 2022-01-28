@@ -2,7 +2,10 @@ import yaml
 import unittest
 from pathlib import Path
 
+from src.utils.units import mph_to_ftpm
+
 from ..config import ConfigType, Config
+from ...world.wind import WindController
 from ...world.fuel_array_functions import chaparral_fn
 from ...world.elevation_functions import PerlinNoise2D
 
@@ -101,6 +104,40 @@ class ConfigTest(unittest.TestCase):
                          msg='The docstring for the set terrain.fuel_array_function '
                          f'({self.cfg.terrain.fuel_array_function}) does not match the '
                          'docstring for world.fuel_array_functions.chaparral_fn.fn')
+
+    def test__set_wind_function(self) -> None:
+        '''
+        Test assigning wind speed and direction arrays based on config string
+        '''
+        speed_min = mph_to_ftpm(self.data['wind']['perlin']['speed']['min'])
+        speed_max = mph_to_ftpm(self.data['wind']['perlin']['speed']['max'])
+        wind_map = WindController()
+        wind_map.init_wind_speed_generator(
+            self.data['wind']['perlin']['speed']['seed'],
+            self.data['wind']['perlin']['speed']['scale'],
+            self.data['wind']['perlin']['speed']['octaves'],
+            self.data['wind']['perlin']['speed']['persistence'],
+            self.data['wind']['perlin']['speed']['lacunarity'], speed_min, speed_max,
+            self.data['area']['screen_size'])
+        wind_map.init_wind_direction_generator(
+            self.data['wind']['perlin']['direction']['seed'],
+            self.data['wind']['perlin']['direction']['scale'],
+            self.data['wind']['perlin']['direction']['octaves'],
+            self.data['wind']['perlin']['direction']['persistence'],
+            self.data['wind']['perlin']['direction']['lacunarity'],
+            self.data['wind']['perlin']['direction']['min'],
+            self.data['wind']['perlin']['direction']['max'],
+            self.data['area']['screen_size'])
+        self.assertEqual(wind_map.map_wind_speed,
+                         self.cfg.wind.speed,
+                         msg='The speed array set by config.py:Config does not match the '
+                         'values straight from test_config.yml. The Config class is not '
+                         'loading the wind speed correctly.')
+        self.assertEqual(wind_map.map_wind_direction,
+                         self.cfg.wind.direction,
+                         msg='The direction array set by config.py:Config does not match '
+                         'the values straight from test_config.yml. The Config class is '
+                         'notloading the wind direction correctly.')
 
     def test_save(self) -> None:
         '''

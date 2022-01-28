@@ -6,6 +6,7 @@ import pygame
 import numpy as np
 
 from .image import load_image
+from ..utils.units import mph_to_ftpm
 from ..enums import BurnStatus, GameStatus
 from .sprites import Fire, FireLine, Terrain
 
@@ -21,10 +22,10 @@ class Game():
                  headless: bool = False,
                  show_wind_magnitude: bool = False,
                  show_wind_direction: bool = False,
-                 mw_speed_min: float = None,
-                 mw_speed_max: float = None,
-                 dw_deg_min: float = None,
-                 dw_deg_max: float = None) -> None:
+                 mw_speed_min: float = 0.0,
+                 mw_speed_max: float = mph_to_ftpm(150.0),
+                 dw_deg_min: float = 0.0,
+                 dw_deg_max: float = 360.0) -> None:
         '''
         Initalize the class by creating the game display and background.
 
@@ -37,8 +38,8 @@ class Game():
         self.show_wind_direction = show_wind_direction
         self.mw_speed_min = mw_speed_min
         self.mw_speed_max = mw_speed_max
-        self.dw_speed_min = dw_deg_min
-        self.dw_speed_max = dw_deg_max
+        self.dw_deg_min = dw_deg_min
+        self.dw_deg_max = dw_deg_max
 
         self.headless = headless
 
@@ -296,13 +297,13 @@ class Game():
         if not self.headless:
             all_sprites.draw(self.screen)
 
-        if self.show_wind_magnitude is True:
-            wind_mag_surf = self._get_wind_mag_surf(wind_magnitude_map)
-            self.screen.blit(wind_mag_surf, (0, 0))
+            if self.show_wind_magnitude is True:
+                wind_mag_surf = self._get_wind_mag_surf(wind_magnitude_map)
+                self.screen.blit(wind_mag_surf, (0, 0))
 
-        if self.show_wind_direction is True:
-            wind_dir_surf = self._get_wind_dir_surf(wind_direction_map)
-            self.screen.blit(wind_dir_surf, (0, 0))
+            if self.show_wind_direction is True:
+                wind_dir_surf = self._get_wind_dir_surf(wind_direction_map)
+                self.screen.blit(wind_dir_surf, (0, 0))
 
         if not self.headless:
             pygame.display.flip()

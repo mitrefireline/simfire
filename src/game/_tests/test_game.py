@@ -7,7 +7,6 @@ from ..game import Game
 from ..sprites import Terrain
 from ...enums import GameStatus
 from ...utils.config import Config
-from ...world.wind import WindController
 from ..managers.fire import RothermelFireManager
 from ..managers.mitigation import FireLineManager
 from ...world.parameters import Environment, FuelParticle
@@ -40,20 +39,8 @@ class TestGame(unittest.TestCase):
         terrain = Terrain(tiles, self.config.terrain.elevation_function,
                           self.config.area.terrain_size, self.config.area.screen_size)
 
-        wind_map = WindController()
-        wind_map.init_wind_speed_generator(
-            self.config.wind.speed.seed, self.config.wind.speed.scale,
-            self.config.wind.speed.octaves, self.config.wind.speed.persistence,
-            self.config.wind.speed.lacunarity, self.config.wind.speed.min,
-            self.config.wind.speed.max, self.config.area.screen_size)
-        wind_map.init_wind_direction_generator(
-            self.config.wind.direction.seed, self.config.wind.direction.scale,
-            self.config.wind.direction.octaves, self.config.wind.direction.persistence,
-            self.config.wind.direction.lacunarity, self.config.wind.direction.min,
-            self.config.wind.direction.max, self.config.area.screen_size)
-
         environment = Environment(self.config.environment.moisture,
-                                  wind_map.map_wind_speed, wind_map.map_wind_direction)
+                                  self.config.wind.speed, self.config.wind.direction)
 
         fire_manager = RothermelFireManager(init_pos, fire_size, max_fire_duration,
                                             pixel_scale, update_rate, fuel_particle,
@@ -64,7 +51,7 @@ class TestGame(unittest.TestCase):
                                            terrain=terrain)
         fireline_sprites = fireline_manager.sprites
         status = self.game.update(terrain, fire_manager.sprites, fireline_sprites,
-                                  wind_map.map_wind_speed, wind_map.map_wind_direction)
+                                  self.config.wind.speed, self.config.wind.direction)
 
         self.assertEqual(status,
                          GameStatus.RUNNING,
@@ -95,20 +82,8 @@ class TestGame(unittest.TestCase):
                           self.config.area.screen_size,
                           headless=True)
 
-        wind_map = WindController()
-        wind_map.init_wind_speed_generator(
-            self.config.wind.speed.seed, self.config.wind.speed.scale,
-            self.config.wind.speed.octaves, self.config.wind.speed.persistence,
-            self.config.wind.speed.lacunarity, self.config.wind.speed.min,
-            self.config.wind.speed.max, self.config.area.screen_size)
-        wind_map.init_wind_direction_generator(
-            self.config.wind.direction.seed, self.config.wind.direction.scale,
-            self.config.wind.direction.octaves, self.config.wind.direction.persistence,
-            self.config.wind.direction.lacunarity, self.config.wind.direction.min,
-            self.config.wind.direction.max, self.config.area.screen_size)
-
         environment = Environment(self.config.environment.moisture,
-                                  wind_map.map_wind_speed, wind_map.map_wind_direction)
+                                  self.config.wind.speed, self.config.wind.direction)
 
         fire_manager = RothermelFireManager(init_pos,
                                             fire_size,
@@ -126,7 +101,7 @@ class TestGame(unittest.TestCase):
                                            headless=True)
         fireline_sprites = fireline_manager.sprites
         status = game.update(terrain, fire_manager.sprites, fireline_sprites,
-                             wind_map.map_wind_speed, wind_map.map_wind_direction)
+                             self.config.wind.speed, self.config.wind.direction)
 
         self.assertEqual(status,
                          GameStatus.RUNNING,
@@ -158,20 +133,8 @@ class TestGame(unittest.TestCase):
                           self.config.area.screen_size,
                           headless=True)
 
-        wind_map = WindController()
-        wind_map.init_wind_speed_generator(
-            self.config.wind.speed.seed, self.config.wind.speed.scale,
-            self.config.wind.speed.octaves, self.config.wind.speed.persistence,
-            self.config.wind.speed.lacunarity, self.config.wind.speed.min,
-            self.config.wind.speed.max, self.config.area.screen_size)
-        wind_map.init_wind_direction_generator(
-            self.config.wind.direction.seed, self.config.wind.direction.scale,
-            self.config.wind.direction.octaves, self.config.wind.direction.persistence,
-            self.config.wind.direction.lacunarity, self.config.wind.direction.min,
-            self.config.wind.direction.max, self.config.area.screen_size)
-
         environment = Environment(self.config.environment.moisture,
-                                  wind_map.map_wind_speed, wind_map.map_wind_direction)
+                                  self.config.wind.speed, self.config.wind.direction)
 
         fire_manager = RothermelFireManager(init_pos,
                                             fire_size,
@@ -190,8 +153,8 @@ class TestGame(unittest.TestCase):
         fireline_sprites = fireline_manager.sprites
 
         pool_size = 4
-        inputs = (terrain, fire_manager.sprites, fireline_sprites,
-                  wind_map.map_wind_speed, wind_map.map_wind_direction)
+        inputs = (terrain, fire_manager.sprites, fireline_sprites, self.config.wind.speed,
+                  self.config.wind.direction)
         inputs = [inputs] * pool_size
         with Pool(pool_size) as p:
             status = p.starmap(game.update, inputs)

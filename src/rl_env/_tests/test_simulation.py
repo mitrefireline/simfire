@@ -27,13 +27,6 @@ class RothermelSimulationTest(unittest.TestCase):
         '''
         pass
 
-    def test__create_wind(self) -> None:
-        '''
-        Test that the wind properties gets created properly. This should work as long
-            as the tests for Wind() work.
-        '''
-        pass
-
     def test_create_fire(self) -> None:
         '''
         Test that the fire (FireManager) gets created properly.

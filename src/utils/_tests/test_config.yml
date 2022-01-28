@@ -44,22 +44,27 @@ environment:
   wind_direction: 135
 
 wind:
-  speed:
-    seed: 2345
-    scale: 400
-    octaves: 3
-    persistence: 0.7
-    lacunarity: 2.0
-    min: 7
-    max: 47
-  direction:
-    seed: 650
-    scale: 1500
-    octaves: 2
-    persistence: 0.9
-    lacunarity: 1.0
-    min: 0.0
-    max: 360.0
+  wind_function: perlin
+  simple:
+    speed: 100
+    direction: 90.0
+  perlin:
+    speed:
+      seed: 2345
+      scale: 400
+      octaves: 3
+      persistence: 0.7
+      lacunarity: 2.0
+      min: 7
+      max: 47
+    direction:
+      seed: 650
+      scale: 1500
+      octaves: 2
+      persistence: 0.9
+      lacunarity: 1.0
+      min: 0.0
+      max: 360.0
 
 render:
   inline: false

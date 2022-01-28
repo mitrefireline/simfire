@@ -6,7 +6,6 @@ from abc import ABC, abstractmethod
 from ..game.game import Game
 from ..utils.config import Config
 from ..game.sprites import Terrain
-from ..world.wind import WindController
 from ..enums import GameStatus, BurnStatus
 from ..game.managers.fire import RothermelFireManager
 from ..world.parameters import Environment, FuelParticle
@@ -65,7 +64,6 @@ class RothermelSimulation(Simulation):
         self.game_status = GameStatus.RUNNING
         self.fire_status = GameStatus.RUNNING
         self.points = set([])
-        self._create_wind()
         self._create_terrain()
         self._create_fire()
         self._create_mitigations()
@@ -86,8 +84,7 @@ class RothermelSimulation(Simulation):
                                headless=self.config.simulation.headless)
 
         self.environment = Environment(self.config.environment.moisture,
-                                       self.wind_map.map_wind_speed,
-                                       self.wind_map.map_wind_direction)
+                                       self.config.wind.speed, self.config.wind.direction)
 
     def _create_mitigations(self) -> None:
         '''
@@ -114,22 +111,6 @@ class RothermelSimulation(Simulation):
         self.fireline_sprites_empty = self.fireline_sprites.copy()
         self.scratchline_sprites = self.scratchline_manager.sprites
         self.wetline_sprites = self.wetline_manager.sprites
-
-    def _create_wind(self) -> None:
-        '''
-        This function will initialize the wind strategies
-        '''
-        self.wind_map = WindController()
-        self.wind_map.init_wind_speed_generator(
-            self.config.wind.speed.seed, self.config.wind.speed.scale,
-            self.config.wind.speed.octaves, self.config.wind.speed.persistence,
-            self.config.wind.speed.lacunarity, self.config.wind.speed.min,
-            self.config.wind.speed.max, self.config.area.screen_size)
-        self.wind_map.init_wind_direction_generator(
-            self.config.wind.direction.seed, self.config.wind.direction.scale,
-            self.config.wind.direction.octaves, self.config.wind.direction.persistence,
-            self.config.wind.direction.lacunarity, self.config.wind.direction.min,
-            self.config.wind.direction.max, self.config.area.screen_size)
 
     def _create_fire(self) -> None:
         '''
@@ -204,9 +185,9 @@ class RothermelSimulation(Simulation):
             'elevation':
             self.terrain.elevations,
             'wind_speed':
-            self.wind_map.map_wind_speed,
+            self.config.wind.speed,
             'wind_direction':
-            self.wind_map.map_wind_direction
+            self.config.wind.direction
         }
 
     def _correct_pos(self, position: np.ndarray) -> np.ndarray:
@@ -366,8 +347,8 @@ class RothermelSimulation(Simulation):
             self.game.fire_map = self.fire_map
             self.game_status = self.game.update(self.terrain, self.fire_sprites,
                                                 self.fireline_sprites,
-                                                self.wind_map.map_wind_speed,
-                                                self.wind_map.map_wind_direction)
+                                                self.config.wind.speed,
+                                                self.config.wind.direction)
 
             self.fire_map = self.game.fire_map
             self.game.fire_map = self.fire_map
@@ -410,8 +391,8 @@ class RothermelSimulation(Simulation):
             self.game.fire_map = self.fire_map
             self.game_status = self.game.update(self.terrain, self.fire_sprites,
                                                 self.fireline_sprites,
-                                                self.wind_map.map_wind_speed,
-                                                self.wind_map.map_wind_direction)
+                                                self.config.wind.speed,
+                                                self.config.wind.direction)
 
             self.fire_map = self.game.fire_map
             self.game.fire_map = self.fire_map
@@ -456,8 +437,8 @@ class RothermelSimulation(Simulation):
             self.game.fire_map = self.fire_map
             self.game_status = self.game.update(self.terrain, self.fire_sprites,
                                                 self.fireline_sprites,
-                                                self.wind_map.map_wind_speed,
-                                                self.wind_map.map_wind_direction)
+                                                self.config.wind.speed,
+                                                self.config.wind.direction)
             self.fire_map, self.fire_status = self.fire_manager.update(self.fire_map)
             self.fire_map = self.game.fire_map
             self.game.fire_map = self.fire_map

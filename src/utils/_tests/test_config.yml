@@ -46,7 +46,7 @@ environment:
 wind:
   wind_function: perlin
   simple:
-    speed: 100
+    speed: 7
     direction: 90.0
   perlin:
     speed:

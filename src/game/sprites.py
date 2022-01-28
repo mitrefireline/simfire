@@ -326,11 +326,11 @@ class FireLine(pygame.sprite.Sprite):
             # When running headless, we need this to be a tuple instead of a PyGame Rect
             self.rect = pos + (size, size)
         else:
-            fire_color = np.zeros((self.size, self.size, 3))
-            fire_color[:, :, 0] = 255
-            fire_color[:, :, 1] = 153
-            fire_color[:, :, 2] = 51
-            self.image = pygame.surfarray.make_surface(fire_color)
+            fireline_color = np.zeros((self.size, self.size, 3))
+            fireline_color[:, :, 0] = 155  # R
+            fireline_color[:, :, 1] = 118  # G
+            fireline_color[:, :, 2] = 83  # B
+            self.image = pygame.surfarray.make_surface(fireline_color)
 
             self.rect = self.image.get_rect()
             self.rect = self.rect.move(self.pos[0], self.pos[1])

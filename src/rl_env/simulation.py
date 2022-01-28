@@ -1,6 +1,6 @@
 import numpy as np
 
-from typing import Dict
+from typing import Dict, Optional
 from abc import ABC, abstractmethod
 
 from ..game.game import Game
@@ -17,8 +17,8 @@ from ..game.managers.mitigation import (FireLineManager, ScratchLineManager,
 class Simulation(ABC):
     def __init__(self, config: Config) -> None:
         '''
-        Initialize the Simulation object for interacting with the base simulation and the
-        RL harness.
+        Initialize the Simulation object for interacting with the base
+            simulation and the RL harness.
 
         Arguments:
             config: The `Config` that specifies simulation parameters, read in from a
@@ -36,7 +36,7 @@ class Simulation(ABC):
     @abstractmethod
     def render(self) -> None:
         '''
-        Runs the pygame simulation and displays the simulation's and agent's actions
+        Runs the simulation and displays the simulation's and agent's actions
         '''
         pass
 
@@ -79,9 +79,11 @@ class RothermelSimulation(Simulation):
             self.config.terrain.fuel_array_function(x, y)
             for x in range(self.config.area.terrain_size)
         ] for y in range(self.config.area.terrain_size)]
-        self.terrain = Terrain(self.fuel_arrs, self.config.terrain.elevation_function,
+        self.terrain = Terrain(self.fuel_arrs,
+                               self.config.terrain.elevation_function,
                                self.config.area.terrain_size,
-                               self.config.area.screen_size)
+                               self.config.area.screen_size,
+                               headless=self.config.simulation.headless)
 
         self.environment = Environment(self.config.environment.moisture,
                                        self.wind_map.map_wind_speed,
@@ -95,15 +97,18 @@ class RothermelSimulation(Simulation):
         self.fireline_manager = FireLineManager(
             size=self.config.display.control_line_size,
             pixel_scale=self.config.area.pixel_scale,
-            terrain=self.terrain)
+            terrain=self.terrain,
+            headless=self.config.simulation.headless)
 
         self.scratchline_manager = ScratchLineManager(
             size=self.config.display.control_line_size,
             pixel_scale=self.config.area.pixel_scale,
-            terrain=self.terrain)
+            terrain=self.terrain,
+            headless=self.config.simulation.headless)
         self.wetline_manager = WetLineManager(size=self.config.display.control_line_size,
                                               pixel_scale=self.config.area.pixel_scale,
-                                              terrain=self.terrain)
+                                              terrain=self.terrain,
+                                              headless=self.config.simulation.headless)
 
         self.fireline_sprites = self.fireline_manager.sprites
         self.fireline_sprites_empty = self.fireline_sprites.copy()
@@ -132,10 +137,17 @@ class RothermelSimulation(Simulation):
         '''
 
         self.fire_manager = RothermelFireManager(
-            self.config.fire.fire_initial_position, self.config.display.fire_size,
-            self.config.fire.max_fire_duration, self.config.area.pixel_scale,
-            self.config.simulation.update_rate, self.fuel_particle, self.terrain,
-            self.environment)
+            self.config.fire.fire_initial_position,
+            self.config.display.fire_size,
+            self.config.fire.max_fire_duration,
+            self.config.area.pixel_scale,
+            self.config.simulation.update_rate,
+            self.fuel_particle,
+            self.terrain,
+            self.environment,
+            max_time=self.config.simulation.runtime,
+            attenuate_line_ros=self.config.mitigation.ros_attenuation,
+            headless=self.config.simulation.headless)
         self.fire_sprites = self.fire_manager.sprites
 
     def get_actions(self) -> Dict[str, int]:
@@ -197,10 +209,25 @@ class RothermelSimulation(Simulation):
             self.wind_map.map_wind_direction
         }
 
-    def _update_sprite_points(self,
-                              mitigation_state,
-                              position_state,
-                              inline: bool = False) -> None:
+    def _correct_pos(self, position: np.ndarray) -> np.ndarray:
+        '''
+
+        '''
+        pos = position.flatten()
+        current_pos = np.where(pos == 1)[0]
+        prev_pos = current_pos - 1
+        pos[prev_pos] = 1
+        pos[current_pos] = 0
+        position = np.reshape(
+            pos, (self.config.area.screen_size, self.config.area.screen_size))
+
+        return position
+
+    def _update_sprite_points(
+        self,
+        mitigation_state: np.ndarray,
+        position_state: Optional[np.ndarray] = ([0], [0])
+    ) -> None:
         '''
         Update sprite point list based on fire mitigation.
 
@@ -217,13 +244,13 @@ class RothermelSimulation(Simulation):
         Returns:
             None
         '''
-        if inline:
-            if mitigation_state == BurnStatus.FIRELINE:
-                self.points.add(position_state)
-            elif mitigation_state == BurnStatus.SCRATCHLINE:
-                self.points.add(position_state)
-            elif mitigation_state == BurnStatus.WETLINE:
-                self.points.add(position_state)
+        if self.config.render.inline:
+            if mitigation_state[0] == BurnStatus.FIRELINE:
+                self.points.add((position_state[0][0], position_state[1][0]))
+            elif mitigation_state[0] == BurnStatus.SCRATCHLINE:
+                self.points.add((position_state[0][0], position_state[1][0]))
+            elif mitigation_state[0] == BurnStatus.WETLINE:
+                self.points.add((position_state[0][0], position_state[1][0]))
 
         else:
             # update the location to pass to the sprite
@@ -236,10 +263,7 @@ class RothermelSimulation(Simulation):
                     elif mitigation_state[(i, j)] == BurnStatus.WETLINE:
                         self.points.add((i, j))
 
-    def run(self,
-            mitigation_state: np.ndarray,
-            position_state: np.ndarray,
-            mitigation: bool = False) -> np.ndarray:
+    def run(self, mitigation_state: np.ndarray, mitigation: bool) -> np.ndarray:
         '''
         Runs the simulation with or without mitigation lines
 
@@ -250,31 +274,42 @@ class RothermelSimulation(Simulation):
                 (to compare for reward calculation)
 
         Arguments:
-            mitigation_state: Array of mitigation value(s). 0: No Control Line,
-                              1: Control Line
-            position_state: Array of current agent position. Only used when rendering
-                            `inline`.
-            mitigation: Boolean value to update agent's mitigation staegy before fire
-                        spread.
+            mitigation_state: np.ndarray
+                Array of mitigation value(s) as BurnStatus values.
+
+            mitigation: bool
+                Boolean for running the mitigation + fire spread which updates
+                    fireline_manager sprites points or just the fire spread
+
 
         Returns:
             fire_map: Burned/Unburned/ControlLine pixel map. Values range from [0, 6]
         '''
+        # for updating sprite purposes turn the inline rendering "off"
+        self.config.render.inline = False
+
         # reset the fire status to running
         self.fire_status = GameStatus.RUNNING
         # initialize fire strategy
         self.fire_manager = RothermelFireManager(
-            self.config.fire.fire_initial_position, self.config.display.fire_size,
-            self.config.fire.max_fire_duration, self.config.area.pixel_scale,
-            self.config.simulation.update_rate, self.fuel_particle, self.terrain,
-            self.environment)
+            self.config.fire.fire_initial_position,
+            self.config.display.fire_size,
+            self.config.fire.max_fire_duration,
+            self.config.area.pixel_scale,
+            self.config.simulation.update_rate,
+            self.fuel_particle,
+            self.terrain,
+            self.environment,
+            max_time=self.config.simulation.runtime,
+            attenuate_line_ros=self.config.mitigation.ros_attenuation,
+            headless=self.config.simulation.headless)
 
         self.fire_map = np.full(
             (self.config.area.screen_size, self.config.area.screen_size),
             BurnStatus.UNBURNED)
         if mitigation:
             # update firemap with agent actions before initializing fire spread
-            self._update_sprite_points(mitigation_state, position_state)
+            self._update_sprite_points(mitigation_state)
             self.fire_map = self.fireline_manager.update(self.fire_map, self.points)
 
         while self.fire_status == GameStatus.RUNNING:
@@ -283,76 +318,162 @@ class RothermelSimulation(Simulation):
             if self.fire_status == GameStatus.QUIT:
                 return self.fire_map
 
-    def render(self,
-               mitigation_state: np.ndarray,
-               position_state: np.ndarray,
-               mitigation_only: bool = True,
-               mitigation_and_fire_spread: bool = False,
-               inline: bool = False) -> None:
+    def _render_inline(self, mitigation: np.ndarray, position: np.ndarray) -> None:
         '''
-        This will take the pygame update command and perform the display updates for the
-        following scenarios:
+            This method will interact with the RL harness to display and update the
+                Rothermel simulation as the agent progresses through the simulation
+                (if applicable, i.e AgentBasedHarness)
 
-            1. pro-active fire mitigation - inline (during step()) (no fire)
-            2. pro-active fire mitigation (full traversal)
-            3. pro-active fire mitigation (full traversal) + fire spread
+            TODO: position could change to a Dic[str, (int, int)]
+                    for multi-agent scenario
+
+
+            Arguments:
+                mitigation: np.ndarray
+                    The values of the mitigation array from the RL Harness, converted
+                        to the simulation format
+
+                position: np.ndarray
+                    The position array of the agent
+
+            Returns:
+                None
+            '''
+        self.fire_manager = RothermelFireManager(
+            self.config.fire.fire_initial_position,
+            self.config.display.fire_size,
+            self.config.fire.max_fire_duration,
+            self.config.area.pixel_scale,
+            self.config.simulation.update_rate,
+            self.fuel_particle,
+            self.terrain,
+            self.environment,
+            max_time=self.config.simulation.runtime,
+            attenuate_line_ros=self.config.mitigation.ros_attenuation,
+            headless=False)
+        self.game = Game(self.config.area.screen_size)
+        self.fire_map = self.game.fire_map
+
+        position = np.where(self._correct_pos(position) == 1)
+        mitigation = mitigation[position].astype(int)
+        # mitigation map needs to be associated with correct BurnStatus types
+
+        self._update_sprite_points(mitigation, position)
+        if self.game_status == GameStatus.RUNNING:
+
+            self.fire_map = self.fireline_manager.update(self.fire_map, self.points)
+            self.fireline_sprites = self.fireline_manager.sprites
+            self.game.fire_map = self.fire_map
+            self.game_status = self.game.update(self.terrain, self.fire_sprites,
+                                                self.fireline_sprites,
+                                                self.wind_map.map_wind_speed,
+                                                self.wind_map.map_wind_direction)
+
+            self.fire_map = self.game.fire_map
+            self.game.fire_map = self.fire_map
+        self.points = set([])
+
+    def _render_mitigations(self, mitigation: np.ndarray) -> None:
+        '''
+        This method will render the agent's actions after the final action.
+
+        NOTE: this method doesn't seem really necessary -- might omit and
+                use _render_mitigation_fire_spread() only
 
         Arguments:
-            mitigation_state: Array of either the current agent mitigation or all
-                              mitigations.
-            position_state: Array of either the current agent position only used when
-                            `inline == True`.
-            mitigation_only: Boolean value to only show agent mitigation stategy.
-            mitigation_and_fire_spread: Boolean value to show agent mitigation
-                                        stategy & fire spread.
-                                        Only used when agent has traversed
-                                        entire game board.
-            inline: Boolean value to use rendering at each call to step().
+            mitigation: np.ndarray
+                The array of the final mitigation state from the RL Harness
 
         Returns:
             None
         '''
         self.fire_manager = RothermelFireManager(
-            self.config.fire.fire_initial_position, self.config.display.fire_size,
-            self.config.fire.max_fire_duration, self.config.area.pixel_scale,
-            self.config.simulation.update_rate, self.fuel_particle, self.terrain,
-            self.environment)
-        self.game = Game(self.config.area.screen_size)
+            self.config.fire.fire_initial_position,
+            self.config.display.fire_size,
+            self.config.fire.max_fire_duration,
+            self.config.area.pixel_scale,
+            self.config.simulation.update_rate,
+            self.fuel_particle,
+            self.terrain,
+            self.environment,
+            max_time=self.config.simulation.runtime,
+            attenuate_line_ros=self.config.mitigation.ros_attenuation,
+            headless=False)
+        self.game = Game(self.config.area.screen_size, headless=False)
         self.fire_map = self.game.fire_map
 
-        if mitigation_only:
-            self._update_sprite_points(mitigation_state, position_state, inline)
-            if self.game_status == GameStatus.RUNNING:
+        self._update_sprite_points(mitigation)
+        if self.game_status == GameStatus.RUNNING:
 
-                self.fire_map = self.fireline_manager.update(self.fire_map, self.points)
-                self.fireline_sprites = self.fireline_manager.sprites
-                self.game.fire_map = self.fire_map
-                self.game_status = self.game.update(self.terrain, self.fire_sprites,
-                                                    self.fireline_sprites,
-                                                    self.wind_map.map_wind_speed,
-                                                    self.wind_map.map_wind_direction)
-
-                self.fire_map = self.game.fire_map
-                self.game.fire_map = self.fire_map
-
-        if mitigation_and_fire_spread:
-            self.fire_status = GameStatus.RUNNING
-            self.game_status = GameStatus.RUNNING
-            self._update_sprite_points(mitigation_state, position_state, inline)
-            self.fireline_sprites = self.fireline_manager.sprites
             self.fire_map = self.fireline_manager.update(self.fire_map, self.points)
-            while self.game_status == GameStatus.RUNNING and \
-                    self.fire_status == GameStatus.RUNNING:
-                self.fire_sprites = self.fire_manager.sprites
-                self.game.fire_map = self.fire_map
-                self.game_status = self.game.update(self.terrain, self.fire_sprites,
-                                                    self.fireline_sprites,
-                                                    self.wind_map.map_wind_speed,
-                                                    self.wind_map.map_wind_direction)
-                self.fire_map, self.fire_status = self.fire_manager.update(self.fire_map)
-                self.fire_map = self.game.fire_map
-                self.game.fire_map = self.fire_map
+            self.fireline_sprites = self.fireline_manager.sprites
+            self.game.fire_map = self.fire_map
+            self.game_status = self.game.update(self.terrain, self.fire_sprites,
+                                                self.fireline_sprites,
+                                                self.wind_map.map_wind_speed,
+                                                self.wind_map.map_wind_direction)
 
-        # after rendering - reset mitigation points can always recover
-        # these through the agent state info and _update_sprite_points()
+            self.fire_map = self.game.fire_map
+            self.game.fire_map = self.fire_map
         self.points = set([])
+
+    def _render_mitigation_fire_spread(self, mitigation: np.ndarray) -> None:
+        '''
+        This method will render the agent's actions after the final action and
+            the subsequent Rothermel Fire spread.
+
+        Arguments:
+            mitigation: np.ndarray
+                The array of the final mitigation state from the RL Harness
+
+        Returns:
+            None
+
+        '''
+        self.fire_manager = RothermelFireManager(
+            self.config.fire.fire_initial_position,
+            self.config.display.fire_size,
+            self.config.fire.max_fire_duration,
+            self.config.area.pixel_scale,
+            self.config.simulation.update_rate,
+            self.fuel_particle,
+            self.terrain,
+            self.environment,
+            max_time=self.config.simulation.runtime,
+            attenuate_line_ros=self.config.mitigation.ros_attenuation,
+            headless=False)
+        self.game = Game(self.config.area.screen_size, headless=False)
+        self.fire_map = self.game.fire_map
+
+        self.fire_status = GameStatus.RUNNING
+        self.game_status = GameStatus.RUNNING
+        self._update_sprite_points(mitigation)
+        self.fireline_sprites = self.fireline_manager.sprites
+        self.fire_map = self.fireline_manager.update(self.fire_map, self.points)
+        while self.game_status == GameStatus.RUNNING and \
+                self.fire_status == GameStatus.RUNNING:
+            self.fire_sprites = self.fire_manager.sprites
+            self.game.fire_map = self.fire_map
+            self.game_status = self.game.update(self.terrain, self.fire_sprites,
+                                                self.fireline_sprites,
+                                                self.wind_map.map_wind_speed,
+                                                self.wind_map.map_wind_direction)
+            self.fire_map, self.fire_status = self.fire_manager.update(self.fire_map)
+            self.fire_map = self.game.fire_map
+            self.game.fire_map = self.fire_map
+
+        self.points = set([])
+
+    def render(self, type: str, mitigation: np.ndarray,
+               position: np.ndarray = ([0], [0])) -> None:
+        '''
+        This is a helper function that hands off to sub-functions for rendering
+
+        '''
+
+        if type == 'inline':
+            self._render_inline(mitigation, position)
+        if type == 'post agent':
+            self._render_mitigations(mitigation)
+        if type == 'post agent with fire':
+            self._render_mitigation_fire_spread(mitigation)

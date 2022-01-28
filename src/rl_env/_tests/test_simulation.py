@@ -3,14 +3,14 @@ import unittest
 import numpy as np
 from ...utils.config import Config
 from ...rl_env.simulation import RothermelSimulation
-from ...enums import BurnStatus, GameStatus
+from ...enums import BurnStatus
 
 
 class RothermelSimulationTest(unittest.TestCase):
     def setUp(self) -> None:
         '''
         '''
-        self.config = Config('./src/rl_env/_tests/test_config.yml')
+        self.config = Config('./src/utils/_tests/test_config.yml')
         self.simulation = RothermelSimulation(self.config)
 
     def test__create_terrain(self) -> None:
@@ -67,18 +67,19 @@ class RothermelSimulationTest(unittest.TestCase):
         '''
 
         # assert points get updated 'inline' as agent traverses
-        current_agent_loc = (1, 1)
-        self.mitigation = BurnStatus.FIRELINE
-        points = set([current_agent_loc])
-        self.simulation._update_sprite_points(self.mitigation,
-                                              current_agent_loc,
-                                              inline=True)
+        self.config.render.inline = True
+        current_agent_loc = ([1], [1])
+        self.mitigation = ([BurnStatus.FIRELINE])
+        points = {(1, 1)}
+        self.simulation._update_sprite_points(self.mitigation, current_agent_loc)
         self.assertEqual(self.simulation.points,
                          points,
                          msg=f'The sprite was updated at {self.simulation.points}, '
                          f'but it should have been at {current_agent_loc}')
 
         # assert points get updated after agent traverses entire game
+        self.config.render.inline = False
+        self.config.render.post_agent = True
         current_agent_loc = (self.config.area.screen_size, self.config.area.screen_size)
         self.mitigation = np.full(
             (self.config.area.screen_size, self.config.area.screen_size),
@@ -86,9 +87,7 @@ class RothermelSimulationTest(unittest.TestCase):
         points = [(i, j) for j in range(self.config.area.screen_size)
                   for i in range(self.config.area.screen_size)]
         points = set(points)
-        self.simulation._update_sprite_points(self.mitigation,
-                                              current_agent_loc,
-                                              inline=False)
+        self.simulation._update_sprite_points(self.mitigation)
         self.assertEqual(
             self.simulation.points,
             points,
@@ -116,7 +115,7 @@ class RothermelSimulationTest(unittest.TestCase):
         fire_map = np.full((self.config.area.screen_size, self.config.area.screen_size),
                            BurnStatus.BURNED)
 
-        self.fire_map = self.simulation.run(mitigation, position, False)
+        self.fire_map = self.simulation.run(mitigation, False)
         # assert the fire map is all BURNED
         self.assertEqual(
             self.fire_map.max(),
@@ -126,12 +125,77 @@ class RothermelSimulationTest(unittest.TestCase):
 
         # assert fire map has BURNED and FIRELINE pixels
         fire_map[1, 0] = 3
-        self.fire_map = self.simulation.run(mitigation, position, True)
+        self.fire_map = self.simulation.run(mitigation, True)
         self.assertEqual(len(np.where(self.fire_map == 3)),
                          len(np.where(fire_map == 1)),
                          msg=f'The fire map has a mitigation sprite of length '
                          f'{len(np.where(self.fire_map == 3))}, but it should be '
                          f'{len(np.where(fire_map == 1))}')
+
+    def test__render_inline(self) -> None:
+        '''
+        Test that the call to `_render_inline()` runs through properly.
+        '''
+        self.config.render.inline = True
+        # set position array
+        current_agent_loc = np.zeros(
+            (self.config.area.screen_size, self.config.area.screen_size))
+        loc = (1, 2)
+        current_agent_loc[loc] = 1
+
+        # set correct mitigation array
+        mitigation = np.zeros(
+            (self.config.area.screen_size, self.config.area.screen_size))
+        mit_point = (1, 1)
+        mitigation[mit_point] = BurnStatus.FIRELINE
+        self.config.simulation.headless = False
+        self.simulation = RothermelSimulation(self.config)
+        # Test rendering 'inline' (as agent traverses)
+        self.simulation._render_inline(mitigation, current_agent_loc)
+        # assert the points are placed
+        self.assertEqual(self.simulation.fireline_manager.sprites[0].pos,
+                         mit_point,
+                         msg=(f'The position of the sprite is '
+                              f'{self.simulation.fireline_manager.sprites[0].pos} '
+                              f', but it should be {mit_point}'))
+
+    def test__render_mitigations(self) -> None:
+        '''
+
+        '''
+        mitigation = np.full((self.config.area.screen_size, self.config.area.screen_size),
+                             BurnStatus.FIRELINE)
+
+        self.config.simulation.headless = False
+        self.simulation = RothermelSimulation(self.config)
+        self.simulation._render_mitigations(mitigation)
+        full_grid = self.config.area.screen_size * self.config.area.screen_size
+        self.assertEqual(
+            len(self.simulation.fireline_sprites),
+            full_grid,
+            msg=f'The total number of mitigated pixels should be {full_grid} '
+            f'but are actually {len(self.simulation.fireline_sprites)}')
+
+    def test__render_mitigation_fire_spread(self) -> None:
+        '''
+
+        '''
+        # assert the points are placed and fire can spread
+        self.fireline_sprites = self.simulation.fireline_sprites_empty
+
+        mitigation = np.zeros(
+            (self.config.area.screen_size, self.config.area.screen_size))
+        # start the fire where we have a control line
+        mitigation[self.config.fire.fire_initial_position[0] - 1:] = 3
+        self.config.mitigation.ros_attenuation = False
+        self.config.simulation.headless = False
+        self.simulation = RothermelSimulation(self.config)
+        self.simulation._render_mitigation_fire_spread(mitigation)
+
+        # assert no fire has spread
+        self.assertTrue(len(self.simulation.fire_sprites) == 1,
+                        msg=f'The returned state of the Game should have no fire spread, '
+                        f' but, has {len(self.simulation.fire_sprites)}.')
 
     def test_render(self) -> None:
         '''
@@ -140,49 +204,10 @@ class RothermelSimulationTest(unittest.TestCase):
         This should be pass as long as the calls to `fireline_manager.update()` and
         `fire_map.update()` pass tests.
 
+        This should pass as long as the calls to `_render_inline`,
+            `_render_mitigations`, and `_render_mitigation_fire_spread` pass.
+
         Assert the points get updated in the `fireline_sprites` group.
 
         '''
-        current_agent_loc = (1, 1)
-
-        # Test rendering 'inline' (as agent traverses)
-        self.simulation.render(BurnStatus.FIRELINE, current_agent_loc, inline=True)
-        # assert the points are placed
-        self.assertEqual(self.simulation.fireline_manager.sprites[0].pos,
-                         current_agent_loc,
-                         msg=(f'The position of the sprite is '
-                              f'{self.simulation.fireline_manager.sprites[0].pos} '
-                              f', but it should be {current_agent_loc}'))
-
-        # Test Full Mitigation (after agent traversal)
-        self.fireline_sprites = self.simulation.fireline_sprites_empty
-        mitigation = np.full((self.config.area.screen_size, self.config.area.screen_size),
-                             BurnStatus.FIRELINE)
-        self.simulation.render(
-            mitigation, (self.config.area.screen_size, self.config.area.screen_size))
-        # assert the points are placed
-        self.assertEqual(len(self.simulation.fireline_manager.sprites),
-                         self.config.area.screen_size**2 + 1,
-                         msg=(f'The number of sprites updated is '
-                              f'{len(self.simulation.fireline_manager.sprites)} '
-                              f', but it should be {self.config.area.screen_size**2+1}'))
-
-        # Test Full Mitigation (after agent traversal) and fire spread
-
-        # assert the points are placed and fire can spread
-        self.fireline_sprites = self.simulation.fireline_sprites_empty
-
-        mitigation = np.zeros(
-            (self.config.area.screen_size, self.config.area.screen_size))
-        # start the fire where we have a control line
-        mitigation[self.config.fire.fire_initial_position[0] - 1:] = 1
-        self.simulation.render(
-            mitigation, (self.config.area.screen_size, self.config.area.screen_size),
-            mitigation_only=False,
-            mitigation_and_fire_spread=True)
-
-        self.assertEqual(
-            self.simulation.fire_status,
-            GameStatus.QUIT,
-            msg=f'The returned state of the Game is {self.simulation.game_status} '
-            ' but, should be GameStatus.QUIT.')
+        pass

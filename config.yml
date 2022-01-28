@@ -14,6 +14,9 @@ simulation:
   runtime: 24h
   headless: true
 
+mitigation:
+  ros_attenuation: true
+
 terrain:
   elevation_function: perlin
   perlin:
@@ -57,6 +60,6 @@ wind:
     max: 360.0
 
 render:
-  inline: false
+  inline: true
   post_agent: false
-  post_agent_with_fire: true
+  post_agent_with_fire: false

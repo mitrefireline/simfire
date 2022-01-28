@@ -10,7 +10,7 @@ class AgentBasedHarnessTest(unittest.TestCase):
         '''
         '''
 
-        self.config = Config('./src/rl_env/_tests/test_config.yml')
+        self.config = Config('./src/utils/_tests/test_config.yml')
         self.actions = ['none', 'fireline']
         self.attributes = ['position', 'mitigation', 'w0', 'elevation']
         self.simulation = RothermelSimulation(self.config)
@@ -88,7 +88,7 @@ class AgentBasedHarnessTest(unittest.TestCase):
                  f'should be [0, 0]'))
 
         # check elevation
-        elevation = state[3]
+        elevation = state[4]
         elevation_zero_min = self.simulation.terrain.elevations - \
                              self.simulation.terrain.elevations.min()
         valid_elevation = elevation_zero_min / (elevation_zero_min.max())

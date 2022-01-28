@@ -1,3 +1,5 @@
+import pygame
+
 import os
 import unittest
 from unittest import mock
@@ -18,6 +20,125 @@ class TestGame(unittest.TestCase):
         self.config = Config('./config.yml')
         self.screen_size = self.config.area.screen_size
         self.game = Game(self.screen_size)
+
+    def test__toggle_wind_magnitude_display(self) -> None:
+        '''
+        Test that when function is called, `game.show_wind_magnitude` is inverted
+        '''
+        self.game.show_wind_magnitude = False
+        self.game._toggle_wind_magnitude_display()
+        self.assertTrue(self.game.show_wind_magnitude,
+                        msg='Game().show_wind_magnitude was not toggled from False to '
+                        'True')
+        self.game._toggle_wind_magnitude_display()
+        self.assertFalse(self.game.show_wind_magnitude,
+                         msg='Game().show_wind_magnitude was not toggled from True to '
+                         'False')
+
+    def test__toggle_wind_direction_display(self) -> None:
+        '''
+        Test that when function is called, `game.show_wind_direction` is inverted
+        '''
+        self.game.show_wind_direction = False
+        self.game._toggle_wind_direction_display()
+        self.assertTrue(self.game.show_wind_direction,
+                        msg='Game().show_wind_direction was not toggled from False to '
+                        'True')
+        self.game._toggle_wind_direction_display()
+        self.assertFalse(self.game.show_wind_direction,
+                         msg='Game().show_wind_direction was not toggled from True to '
+                         'False')
+
+    def test__disable_wind_magnitude_display(self) -> None:
+        '''
+        Test that when function is called, `game.show_wind_magnitude` is disabled
+        '''
+        self.game.show_wind_magnitude = True
+        self.game._disable_wind_magnitude_display()
+        self.assertFalse(self.game.show_wind_magnitude,
+                         msg='Game().show_wind_magnitude was not disabled and changed '
+                         'from True to False')
+
+    def test__disable_wind_direction_display(self) -> None:
+        '''
+        Test that when function is called, `game.show_wind_direction` is disabled
+        '''
+        self.game.show_wind_direction = True
+        self.game._disable_wind_direction_display()
+        self.assertFalse(self.game.show_wind_direction,
+                         msg='Game().show_wind_direction was not disabled and changed '
+                         'from True to False')
+
+    def test__get_wind_direction_color(self) -> None:
+        '''
+        Test getting the color of the wind direction
+        '''
+        # North
+        direction = 0.0
+        rgb = (255, 0, 0)
+        returned_rgb = self.game._get_wind_direction_color(direction)
+        self.assertEqual(rgb,
+                         returned_rgb,
+                         msg=f'Direction angle of {direction} should return color of '
+                         f'{rgb} when {returned_rgb} was returned')
+        # East
+        direction = 90.0
+        rgb = (128, 255, 0)
+        returned_rgb = self.game._get_wind_direction_color(direction)
+        self.assertEqual(rgb,
+                         returned_rgb,
+                         msg=f'Direction angle of {direction} should return color of '
+                         f'{rgb} when {returned_rgb} was returned')
+        # South
+        direction = 180.0
+        rgb = (0, 255, 255)
+        returned_rgb = self.game._get_wind_direction_color(direction)
+        self.assertEqual(rgb,
+                         returned_rgb,
+                         msg=f'Direction angle of {direction} should return color of '
+                         f'{rgb} when {returned_rgb} was returned')
+        # West
+        direction = 270.0
+        rgb = (128, 0, 0)
+        returned_rgb = self.game._get_wind_direction_color(direction)
+        self.assertEqual(rgb,
+                         returned_rgb,
+                         msg=f'Direction angle of {direction} should return color of '
+                         f'{rgb} when {returned_rgb} was returned')
+
+    def test__get_wind_mag_surf(self) -> None:
+        '''
+        Test getting the wind magnitude PyGame surface
+        '''
+        surface = self.game._get_wind_mag_surf(self.config.wind.speed)
+        surface_size = surface.get_size()
+        config_size = (self.config.area.screen_size, self.config.area.screen_size)
+        self.assertIsInstance(surface,
+                              pygame.Surface,
+                              msg='The object returned from Game()._get_wind_mag_surf '
+                              f'is a {type(surface)} when it should be a pygame.Surface')
+        self.assertEqual(surface_size,
+                         config_size,
+                         msg='The size of the surface returned in '
+                         f'Game()._get_wind_mag_surf is {surface_size} when it should be '
+                         f'{config_size}')
+
+    def test__get_wind_dir_surf(self) -> None:
+        '''
+        Test getting the wind direction PyGame surface
+        '''
+        surface = self.game._get_wind_dir_surf(self.config.wind.direction)
+        surface_size = surface.get_size()
+        config_size = (self.config.area.screen_size, self.config.area.screen_size)
+        self.assertIsInstance(surface,
+                              pygame.Surface,
+                              msg='The object returned from Game()._get_wind_dir_surf '
+                              f'is a {type(surface)} when it should be a pygame.Surface')
+        self.assertEqual(surface_size,
+                         config_size,
+                         msg='The size of the surface returned in '
+                         f'Game()._get_wind_dir_surf is {surface_size} when it should be '
+                         f'{config_size}')
 
     def test_update(self) -> None:
         '''

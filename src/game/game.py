@@ -100,8 +100,7 @@ class Game():
         '''
         self.show_wind_direction = False
 
-    def _get_wind_direction_color(self, direction: float, ws_min: float,
-                                  ws_max: float) -> Tuple[int, int, int]:
+    def _get_wind_direction_color(self, direction: float) -> Tuple[int, int, int]:
         '''
         Get the color and intensity representing direction based
         on wind direction
@@ -241,8 +240,7 @@ class Game():
         for y_idx, y in enumerate(wind_direction_map):
             for x_idx, x in enumerate(y):
                 w_dir = x
-                color = self._get_wind_direction_color(w_dir, self.dw_deg_min,
-                                                       self.dw_deg_max)
+                color = self._get_wind_direction_color(w_dir)
                 pyColor = pygame.Color(color[0], color[1], color[2], a=0.75)
                 wind_dir_surf.set_at((x_idx, y_idx), pyColor)
 

@@ -149,7 +149,27 @@ Used in Rothermel calculation. Most of Southern California has the default value
 ### Wind Parameters
 Defines wind speed and direction generation.
 
-#### speed
+#### wind_function
+(`str`)<br>
+The function that determines how wind is distributed throughout the simulation area.
+The available wind functions are currently:
+
+  - simple
+  - perlin
+
+#### simple
+A function for wind that keeps direction and speed constant throughout the whole simulation area.
+
+- **speed** (`int` | `float`):<br>
+  The wind speed in **miles per hour**.
+
+- **direction** (`int` | `float`):<br>
+  The wind direction expressed in **degrees clockwise from North** (E.g. East == 90.0, South == 180.0, etc.).
+
+#### perlin
+All arguments that would be passed into the WindController class.
+
+##### speed
 All arguments that define wind speed layer generation.
 
 - **seed** (`int`):<br>
@@ -167,13 +187,13 @@ All arguments that define wind speed layer generation.
 - **lacunarity** (`float`):<br>
   The level of detail added per pass. Usually kept at 2.0.
 
-- **min** (`int`):<br>
+- **min** (`int`| `float`):<br>
   The *minimum* wind speed for any individual pixel location. Expressed in **miles per hour**.
 
-- **max** (`int`):<br>
+- **max** (`int` | `float`):<br>
   The *maximum* wind speed for any individual pixel location. Expressed in **miles per hour**.
 
-#### direction
+##### direction
 All arguments that define wind direction layer generation.
 
 - **seed** (`int`):<br>
@@ -192,10 +212,10 @@ All arguments that define wind direction layer generation.
   The level of detail added per pass. Usually kept at 2.0.
 
 - **min** (`int`):<br>
-  The *minimum* wind direction for any individual pixel location. Expressed in **degrees clockwise from North**.
+  The *minimum* wind direction for any individual pixel location. Expressed in **degrees clockwise from North** (E.g. East == 90.0, South == 180.0, etc.).
 
 - **max** (`int`):<br>
-  The *maximum* wind direction for any individual pixel location. Expressed in **degrees clockwise from North**.
+  The *maximum* wind direction for any individual pixel location. Expressed in **degrees clockwise from North** (E.g. East == 90.0, South == 180.0, etc.).
 
 ---
 
@@ -263,22 +283,27 @@ environment:
   wind_direction: 135
 
 wind:
-  speed:
-    seed: 2345
-    scale: 400
-    octaves: 3
-    persistence: 0.7
-    lacunarity: 2.0
-    min: 7
-    max: 47
-  direction:
-    seed: 650
-    scale: 1500
-    octaves: 2
-    persistence: 0.9
-    lacunarity: 1.0
-    min: 0.0
-    max: 360.0
+  wind_function: perlin
+  simple:
+    speed: 7
+    direction: 90.0
+  perlin:
+    speed:
+      seed: 2345
+      scale: 400
+      octaves: 3
+      persistence: 0.7
+      lacunarity: 2.0
+      min: 7
+      max: 47
+    direction:
+      seed: 650
+      scale: 1500
+      octaves: 2
+      persistence: 0.9
+      lacunarity: 1.0
+      min: 0.0
+      max: 360.0
 
 render:
   inline: false

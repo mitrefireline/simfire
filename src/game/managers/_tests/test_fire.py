@@ -5,7 +5,6 @@ import numpy as np
 from ....utils.config import Config
 from ...sprites import Fire, Terrain
 from ....world.presets import Chaparral
-from ....world.wind import WindController
 from ....enums import BurnStatus, GameStatus
 from ....world.elevation_functions import flat
 from ....world.parameters import Environment, FuelArray, FuelParticle, Tile
@@ -142,21 +141,8 @@ class TestRothermelFireManager(unittest.TestCase):
         self.terrain = Terrain(fuel_arrs, flat(), self.config.area.terrain_size,
                                self.config.area.screen_size)
 
-        self.wind_map = WindController()
-        self.wind_map.init_wind_speed_generator(
-            self.config.wind.speed.seed, self.config.wind.speed.scale,
-            self.config.wind.speed.octaves, self.config.wind.speed.persistence,
-            self.config.wind.speed.lacunarity, self.config.wind.speed.min,
-            self.config.wind.speed.max, self.config.area.screen_size)
-        self.wind_map.init_wind_direction_generator(
-            self.config.wind.direction.seed, self.config.wind.direction.scale,
-            self.config.wind.direction.octaves, self.config.wind.direction.persistence,
-            self.config.wind.direction.lacunarity, self.config.wind.direction.min,
-            self.config.wind.direction.max, self.config.area.screen_size)
-
         self.environment = Environment(self.config.environment.moisture,
-                                       self.wind_map.map_wind_speed,
-                                       self.wind_map.map_wind_direction)
+                                       self.config.wind.speed, self.config.wind.direction)
 
         self.fire_manager = RothermelFireManager(self.init_pos, self.fire_size,
                                                  self.max_fire_duration, self.pixel_scale,

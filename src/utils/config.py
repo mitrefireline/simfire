@@ -118,7 +118,7 @@ class Config:
                              args.sigma_y)
             setattr(self.terrain, 'elevation_function', noise.fn)
         elif self.terrain.elevation_function.lower() == 'flat':
-            setattr(self.terrain, 'elevation_function', flat)
+            setattr(self.terrain, 'elevation_function', flat())
         else:
             log.error('The user-defined elevation function is set to '
                       f'{self.terrain.elevation_function} when it can only be one of '

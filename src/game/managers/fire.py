@@ -35,6 +35,7 @@ class FireManager():
                  headless: bool = False) -> None:
         '''
         Initialize the class by recording the initial fire location and size.
+
         Create the fire sprite and fire_map and mark the location of the
         initial fire.
 

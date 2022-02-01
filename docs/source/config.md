@@ -279,8 +279,6 @@ fire:
 
 environment:
   moisture: 0.03
-  wind_speed: 13
-  wind_direction: 135
 
 wind:
   wind_function: perlin

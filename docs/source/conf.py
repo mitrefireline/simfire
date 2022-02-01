@@ -29,8 +29,20 @@ release = '0.0.0'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinx.ext.autodoc', 'sphinx.ext.napoleon', 'autoapi.extension', 'myst_parser'
+    'sphinx.ext.autodoc', 'sphinx.ext.napoleon', 'autoapi.extension', 'myst_parser',
+    'sphinx.ext.intersphinx'
 ]
+
+intersphinx_mapping = {
+    'python': ('https://docs.python.org/', None),
+    'numpy': ('https://numpy.org/doc/stable/', None),
+    'scikit-image': ('https://scikit-image.org/docs/stable/', None),
+    'matplotlib': ('https://matplotlib.org/stable/', None),
+    'numba': ('https://numba.pydata.org/numba-doc/latest/', None),
+    'PIL': ('https://pillow.readthedocs.io/en/stable/', None),
+    'pygame': ('https://www.pygame.org/docs/', None)
+}
+tls_verify = False
 
 # Autodoc settings
 autodoc_typehints = 'description'

@@ -14,10 +14,15 @@ from ..game.managers.mitigation import (FireLineManager, ScratchLineManager,
 
 
 class Simulation(ABC):
+    '''
+    Base class with several built in methods for interacting with different simulators.
+
+    Current simulators using this API:
+      - [RothermelSimulator](https://gitlab.mitre.org/fireline/rothermel-modeling)
+    '''
     def __init__(self, config: Config) -> None:
         '''
-        Initialize the Simulation object for interacting with the base
-            simulation and the RL harness.
+        Initialize the Simulation object for interacting with the RL harness.
 
         Arguments:
             config: The `Config` that specifies simulation parameters, read in from a
@@ -35,21 +40,59 @@ class Simulation(ABC):
     @abstractmethod
     def render(self) -> None:
         '''
-        Runs the simulation and displays the simulation's and agent's actions
+        Runs the simulation and displays the simulation's and agent's actions.
         '''
         pass
 
     @abstractmethod
     def get_actions(self) -> Dict[str, int]:
         '''
-        Returns the action space for the simulation
+        Returns the action space for the simulation.
+
+        Returns:
+            The action / mitgiation strategies available: Dict[str, int]
         '''
         pass
 
     @abstractmethod
     def get_attributes(self) -> Dict[str, np.ndarray]:
         '''
-        Returns the observation space for the simulation
+        Initialize and return the observation space for the simulation.
+
+        Arguments:
+            None
+
+        Returns:
+            The dictionary of observations containing NumPy arrays.
+        '''
+        pass
+
+    @abstractmethod
+    def get_seeds(self) -> Dict[str, int]:
+        '''
+        Returns the available randomization seeds for the simulation.
+
+        Arguments:
+            None
+
+        Returns:
+            The dictionary with all available seeds to change and their values.
+        '''
+        pass
+
+    @abstractmethod
+    def set_seeds(self, seeds: Dict[str, int]) -> None:
+        '''
+        Sets the seeds for different available randomization parameters.
+
+        Which randomization parameters can be  set depends on the simulator being used.
+        Available seeds can be retreived by calling the `self.get_seeds` method.
+
+        Arguments:
+            seeds: The dictionary of seed names and their current seed values.
+
+        Returns:
+            None
         '''
         pass
 
@@ -57,8 +100,7 @@ class Simulation(ABC):
 class RothermelSimulation(Simulation):
     def __init__(self, config: Config) -> None:
         '''
-        Initialize the RothermelSimulation object for interacting with the base
-        simulation and the RL harness.
+        Initialize the `RothermelSimulation` object for interacting with the RL harness.
         '''
         super().__init__(config)
         self.game_status = GameStatus.RUNNING
@@ -70,7 +112,7 @@ class RothermelSimulation(Simulation):
 
     def _create_terrain(self) -> None:
         '''
-        Initialize the terrain
+        Initialize the terrain.
         '''
         self.fuel_particle = FuelParticle()
         self.fuel_arrs = [[
@@ -88,7 +130,7 @@ class RothermelSimulation(Simulation):
 
     def _create_mitigations(self) -> None:
         '''
-        Initialize the mitigation strategies
+        Initialize the mitigation strategies.
         '''
         # initialize all mitigation strategies
         self.fireline_manager = FireLineManager(
@@ -102,6 +144,7 @@ class RothermelSimulation(Simulation):
             pixel_scale=self.config.area.pixel_scale,
             terrain=self.terrain,
             headless=self.config.simulation.headless)
+
         self.wetline_manager = WetLineManager(size=self.config.display.control_line_size,
                                               pixel_scale=self.config.area.pixel_scale,
                                               terrain=self.terrain,
@@ -114,9 +157,8 @@ class RothermelSimulation(Simulation):
 
     def _create_fire(self) -> None:
         '''
-        This function will initialize the rothermel fire strategies
+        This function will initialize the rothermel fire strategies.
         '''
-
         self.fire_manager = RothermelFireManager(
             self.config.fire.fire_initial_position,
             self.config.display.fire_size,
@@ -133,7 +175,7 @@ class RothermelSimulation(Simulation):
 
     def get_actions(self) -> Dict[str, int]:
         '''
-        This function will return the action space for the rothermel simulation
+        Return the action space for the Rothermel simulation.
 
         Arguments:
             None
@@ -141,7 +183,6 @@ class RothermelSimulation(Simulation):
         Returns:
             The action / mitgiation strategies available: Dict[str, int]
         '''
-
         return {
             'none': BurnStatus.UNBURNED,
             'fireline': BurnStatus.FIRELINE,
@@ -151,8 +192,7 @@ class RothermelSimulation(Simulation):
 
     def get_attributes(self) -> Dict[str, np.ndarray]:
         '''
-        This function will initialize and return the observation
-            space for the simulation
+        Initialize and return the observation space for the simulation.
 
         Arguments:
             None
@@ -160,7 +200,6 @@ class RothermelSimulation(Simulation):
         Returns:
             The dictionary of observations containing NumPy arrays.
         '''
-
         return {
             'w0':
             np.array([[
@@ -192,7 +231,6 @@ class RothermelSimulation(Simulation):
 
     def _correct_pos(self, position: np.ndarray) -> np.ndarray:
         '''
-
         '''
         pos = position.flatten()
         current_pos = np.where(pos == 1)[0]
@@ -246,25 +284,23 @@ class RothermelSimulation(Simulation):
 
     def run(self, mitigation_state: np.ndarray, mitigation: bool) -> np.ndarray:
         '''
-        Runs the simulation with or without mitigation lines
+        Runs the simulation with or without mitigation lines.
 
-        Use self.terrain to either:
+        Use `self.terrain` to either:
 
           1. Place agent's mitigation lines and then spread fire
           2. Only spread fire, with no mitigation line
                 (to compare for reward calculation)
 
         Arguments:
-            mitigation_state: np.ndarray
-                Array of mitigation value(s) as BurnStatus values.
+            mitigation_state: Array of mitigation value(s) as BurnStatus values.
 
-            mitigation: bool
-                Boolean for running the mitigation + fire spread which updates
-                    fireline_manager sprites points or just the fire spread
+            mitigation: Boolean for running the mitigation + fire spread which updates
+                        `FirelineManager` sprites points or just the fire spread.
 
 
         Returns:
-            fire_map: Burned/Unburned/ControlLine pixel map. Values range from [0, 6]
+            The Burned/Unburned/ControlLine pixel map. Values range from [0, 6].
         '''
         # for updating sprite purposes turn the inline rendering "off"
         self.config.render.inline = False
@@ -301,24 +337,18 @@ class RothermelSimulation(Simulation):
 
     def _render_inline(self, mitigation: np.ndarray, position: np.ndarray) -> None:
         '''
-            This method will interact with the RL harness to display and update the
-                Rothermel simulation as the agent progresses through the simulation
-                (if applicable, i.e AgentBasedHarness)
+        Interact with the RL harness to display and update the simulation as the agent
+        progresses through the simulation (if applicable, i.e AgentBasedHarness)
 
-            TODO: position could change to a Dic[str, (int, int)]
-                    for multi-agent scenario
+        TODO: position could change to a Dict[str, (int, int)] for multi-agent scenario
 
+        Arguments:
+            mitigation: The values of the mitigation array from the RL Harness, converted
+                        to the simulation format.
+            position: The position array of the agent.
 
-            Arguments:
-                mitigation: np.ndarray
-                    The values of the mitigation array from the RL Harness, converted
-                        to the simulation format
-
-                position: np.ndarray
-                    The position array of the agent
-
-            Returns:
-                None
+        Returns:
+            None
             '''
         self.fire_manager = RothermelFireManager(
             self.config.fire.fire_initial_position,
@@ -358,12 +388,11 @@ class RothermelSimulation(Simulation):
         '''
         This method will render the agent's actions after the final action.
 
-        NOTE: this method doesn't seem really necessary -- might omit and
-                use _render_mitigation_fire_spread() only
+        NOTE: this method doesn't seem really necessary -- might omit and use
+        `_render_mitigation_fire_spread()` only
 
         Arguments:
-            mitigation: np.ndarray
-                The array of the final mitigation state from the RL Harness
+            mitigation: The array of the final mitigation state from the RL Harness.
 
         Returns:
             None
@@ -400,16 +429,13 @@ class RothermelSimulation(Simulation):
 
     def _render_mitigation_fire_spread(self, mitigation: np.ndarray) -> None:
         '''
-        This method will render the agent's actions after the final action and
-            the subsequent Rothermel Fire spread.
+        Render the agent's actions after the final action and the subsequent fire spread.
 
         Arguments:
-            mitigation: np.ndarray
-                The array of the final mitigation state from the RL Harness
+            mitigation: The array of the final mitigation state from the RL Harness.
 
         Returns:
             None
-
         '''
         self.fire_manager = RothermelFireManager(
             self.config.fire.fire_initial_position,
@@ -448,13 +474,48 @@ class RothermelSimulation(Simulation):
     def render(self, type: str, mitigation: np.ndarray,
                position: np.ndarray = ([0], [0])) -> None:
         '''
-        This is a helper function that hands off to sub-functions for rendering
+        This is a helper function that hands off to sub-functions for rendering.
 
+        Arguments:
+            type: The type of rendering being done
+                  ('inline', 'post_agent', 'post agent with fire')
+            mitigation: The values of the mitigation array from the RL Harness, converted
+                        to the simulation format.
+            position: The position array of the agent.
+
+        Returns:
+            None
         '''
-
         if type == 'inline':
             self._render_inline(mitigation, position)
         if type == 'post agent':
             self._render_mitigations(mitigation)
         if type == 'post agent with fire':
             self._render_mitigation_fire_spread(mitigation)
+
+    def get_seeds(self) -> Dict[str, int]:
+        '''
+        Returns the available randomization seeds for the simulation.
+
+        Arguments:
+            None
+
+        Returns:
+            The dictionary with all available seeds to change and their values.
+        '''
+        pass
+
+    def set_seeds(self, seeds: Dict[str, int]) -> None:
+        '''
+        Sets the seeds for different available randomization parameters.
+
+        Which randomization parameters can be  set depends on the simulator being used.
+        Available seeds can be retreived by calling the `self.get_seeds` method.
+
+        Arguments:
+            seeds: The dictionary of seed names and the values they will be set to.
+
+        Returns:
+            None
+        '''
+        pass

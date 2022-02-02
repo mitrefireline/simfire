@@ -24,7 +24,7 @@ def gaussian(amplitude: int, mu_x: int, mu_y: int, sigma_x: int,
     '''
     def fn(x: float, y: float) -> float:
         '''
-        Return the function value at the specified point.
+        Return the gaussian function value at the specified point.
 
         Arguments:
             x: The input x coordinate
@@ -133,6 +133,16 @@ def flat() -> ElevationFn:
         A callable that computes z values for (x, y) inputs
     '''
     def fn(x: float, y: float) -> float:
+        '''
+        Return a constant, flat elevation value at every x and y point
+
+        Arguments:
+            x: The input x location (isn't used).
+            y: The input y location (isn't used).
+
+        Returns:
+            The constant, flat elevation.
+        '''
         return 0
 
     return fn

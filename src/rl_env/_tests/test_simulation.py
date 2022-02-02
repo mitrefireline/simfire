@@ -10,7 +10,7 @@ class RothermelSimulationTest(unittest.TestCase):
     def setUp(self) -> None:
         '''
         '''
-        self.config = Config('./src/utils/_tests/test_config.yml')
+        self.config = Config('./src/utils/_tests/test_configs/test_config.yml')
         self.simulation = RothermelSimulation(self.config)
 
     def test__create_terrain(self) -> None:

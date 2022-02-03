@@ -239,9 +239,6 @@ class AgentBasedHarness(RLHarness):
             attributes: List[str]
                 The attributes that the RL harness will inlcude in the
                     obersvation space
-
-        Returns:
-            None
         '''
         super().__init__(simulation, actions, attributes)
 
@@ -315,12 +312,6 @@ class AgentBasedHarness(RLHarness):
 
         Check if the x-axis is less than screen size and the y-axis is less than/equal
         to screen size --> y-axis = None, x-axis += 1
-
-        Arguments:
-            None
-
-        Returns:
-            None
         '''
         row = self.current_agent_loc[0]
         column = self.current_agent_loc[1]

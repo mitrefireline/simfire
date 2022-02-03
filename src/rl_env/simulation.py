@@ -62,9 +62,6 @@ class Simulation(ABC):
         '''
         Initialize and return the observation space for the simulation.
 
-        Arguments:
-            None
-
         Returns:
             The dictionary of observations containing NumPy arrays.
         '''
@@ -75,16 +72,13 @@ class Simulation(ABC):
         '''
         Returns the available randomization seeds for the simulation.
 
-        Arguments:
-            None
-
         Returns:
             The dictionary with all available seeds to change and their values.
         '''
         pass
 
     @abstractmethod
-    def set_seeds(self, seeds: Dict[str, int]) -> None:
+    def set_seeds(self, seeds: Dict[str, int]) -> bool:
         '''
         Sets the seeds for different available randomization parameters.
 
@@ -95,7 +89,7 @@ class Simulation(ABC):
             seeds: The dictionary of seed names and their current seed values.
 
         Returns:
-            None
+            Whether or not the method successfully set a seed value.
         '''
         pass
 
@@ -180,9 +174,6 @@ class RothermelSimulation(Simulation):
         '''
         Return the action space for the Rothermel simulation.
 
-        Arguments:
-            None
-
         Returns:
             The action / mitgiation strategies available: Dict[str, int]
         '''
@@ -196,9 +187,6 @@ class RothermelSimulation(Simulation):
     def get_attributes(self) -> Dict[str, np.ndarray]:
         '''
         Initialize and return the observation space for the simulation.
-
-        Arguments:
-            None
 
         Returns:
             The dictionary of observations containing NumPy arrays.
@@ -262,9 +250,6 @@ class RothermelSimulation(Simulation):
                     position_state to add a new point to the fireline sprites group.
                     If False, loop through all mitigation_state array to get points to add
                     to fireline sprites group.
-
-        Returns:
-            None
         '''
         if self.config.render.inline:
             if mitigation_state[0] == BurnStatus.FIRELINE:
@@ -349,9 +334,6 @@ class RothermelSimulation(Simulation):
             mitigation: The values of the mitigation array from the RL Harness, converted
                         to the simulation format.
             position: The position array of the agent.
-
-        Returns:
-            None
             '''
         self.fire_manager = RothermelFireManager(
             self.config.fire.fire_initial_position,
@@ -396,9 +378,6 @@ class RothermelSimulation(Simulation):
 
         Arguments:
             mitigation: The array of the final mitigation state from the RL Harness.
-
-        Returns:
-            None
         '''
         self.fire_manager = RothermelFireManager(
             self.config.fire.fire_initial_position,
@@ -436,9 +415,6 @@ class RothermelSimulation(Simulation):
 
         Arguments:
             mitigation: The array of the final mitigation state from the RL Harness.
-
-        Returns:
-            None
         '''
         self.fire_manager = RothermelFireManager(
             self.config.fire.fire_initial_position,
@@ -485,9 +461,6 @@ class RothermelSimulation(Simulation):
             mitigation: The values of the mitigation array from the RL Harness, converted
                         to the simulation format.
             position: The position array of the agent.
-
-        Returns:
-            None
         '''
         if type == 'inline':
             self._render_inline(mitigation, position)
@@ -499,9 +472,6 @@ class RothermelSimulation(Simulation):
     def get_seeds(self) -> Dict[str, int]:
         '''
         Returns the available randomization seeds for the simulation.
-
-        Arguments:
-            None
 
         Returns:
             The dictionary with all available seeds to change and their values.
@@ -529,9 +499,6 @@ class RothermelSimulation(Simulation):
 
         Only the 'perlin' option has a seed value associated with it.
 
-        Arguments:
-            None
-
         Returns:
             The seed for the currently configured elevation function.
         '''
@@ -547,9 +514,6 @@ class RothermelSimulation(Simulation):
         Only the 'chaparral' option has a seed value associated with it, because it's
         currently the only one.
 
-        Arguments:
-            None
-
         Returns:
             The seed for the currently configured fuel array function.
         '''
@@ -564,9 +528,6 @@ class RothermelSimulation(Simulation):
 
         Only the 'perlin' option has a seed value associated with it.
 
-        Arguments:
-            None
-
         Returns:
             The seed for the currently configured wind speed function.
         '''
@@ -580,9 +541,6 @@ class RothermelSimulation(Simulation):
         Returns the seed for the current wind direction function.
 
         Only the 'perlin' option has a seed value associated with it.
-
-        Arguments:
-            None
 
         Returns:
             The seed for the currently configured wind direction function.
@@ -603,7 +561,7 @@ class RothermelSimulation(Simulation):
             seeds: The dictionary of seed names and the values they will be set to.
 
         Returns:
-            Whether or not the method successfully set a seed value
+            Whether or not the method successfully set a seed value.
         '''
         success = False
         keys = list(seeds.keys())

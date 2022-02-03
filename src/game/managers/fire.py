@@ -251,9 +251,6 @@ class RothermelFireManager(FireManager):
                                 different control lines will completely stop the fire.
             headless: Flag to run in a headless state. This will allow PyGame objects to
                       not be initialized.
-
-        Returns:
-            None
         '''
         super().__init__(init_pos, fire_size, max_fire_duration, attenuate_line_ros,
                          headless)
@@ -279,9 +276,6 @@ class RothermelFireManager(FireManager):
         Compute the gradient/slope magnitude and direction for every point for use
         with the Rothermel calculation. This is easier than computing on the fly for
         every new location in the update() call.
-
-        Arguments:
-            None
 
         Returns:
             The gradient/slope magnitude for every pixel ([0]) and the gradient
@@ -519,9 +513,6 @@ class ConstantSpreadFireManager(FireManager):
                                interior do not have to keep being rendered.
             rate_of_spread: The number of frames that must pass before a fire
                             can spread to adjacent pixels.
-
-        Returns:
-            None
         '''
         super().__init__(init_pos, fire_size, max_fire_duration)
         self.rate_of_spread = rate_of_spread

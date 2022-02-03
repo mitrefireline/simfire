@@ -36,9 +36,6 @@ class ControlLineManager():
             terrain: The Terrain that describes the simulation/game
             headless: Flag to run in a headless state. This will allow PyGame objects to
                       not be initialized.
-
-        Returns:
-            None
         '''
         self.size = size
         self.pixel_scale = pixel_scale
@@ -100,9 +97,6 @@ class FireLineManager(ControlLineManager):
             terrain: The Terrain that describes the simulation/game
             headless: Flag to run in a headless state. This will allow PyGame objects to
                       not be initialized.
-
-        Returns:
-            None
         '''
         super().__init__(size=size,
                          pixel_scale=pixel_scale,
@@ -140,9 +134,6 @@ class ScratchLineManager(ControlLineManager):
             terrain: The Terrain that describes the simulation/game
             points: The list of all ((x1, y1), (x2, y2)) pairs of pairs that designate
                     between which two points control lines will be drawn.
-
-        Returns:
-            None
         '''
         super().__init__(size=size,
                          pixel_scale=pixel_scale,
@@ -180,9 +171,6 @@ class WetLineManager(ControlLineManager):
             terrain: The Terrain that describes the simulation/game
             points: The list of all ((x1, y1), (x2, y2)) pairs of pairs that designate
                     between which two points control lines will be drawn.
-
-        Returns:
-            None
         '''
         super().__init__(size=size,
                          pixel_scale=pixel_scale,

@@ -51,9 +51,6 @@ class Config:
         Arguments:
             path: The path to the `config.yml` file. This file can have any name, but
                   needs to be a valid YAML.
-
-        Returns:
-            None
         '''
         self.path = path
         self._possible_elevations = ('perlin', 'gaussian', 'flat')
@@ -212,9 +209,6 @@ class Config:
 
         Arguments:
             seed: The input used in generating the random elevation function.
-
-        Returns:
-            None
         '''
         # Set the seed class attribute so that the function uses it correctly
         self.terrain.perlin.seed = seed
@@ -229,9 +223,6 @@ class Config:
 
         Arguments:
             seed: The input used in generating the random fuel array function.
-
-        Returns:
-            None
         '''
         # Set the seed class attribute so that the function uses it correctly
         self.terrain.chaparral.seed = seed
@@ -250,9 +241,6 @@ class Config:
             speed_seed: The input used in generating the random wind speed function.
             direction_seed: The input used in generating the random wind direction
                             function.
-
-        Returns:
-            None
         '''
         # Set the seed class attribute so that the function uses it correctly
         # Only set each seed if it has been passed into the function to be changed
@@ -278,9 +266,6 @@ class Config:
 
         Arguments:
             path: The path and filename of the output YAML file.
-
-        Returns:
-            None
         '''
         with open(path, 'w') as f:
             yaml.dump(self.data, f)

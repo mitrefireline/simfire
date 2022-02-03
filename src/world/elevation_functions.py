@@ -55,9 +55,6 @@ class PerlinNoise2D():
             shape: The output shape of the data.
             res: The resolution of the noise.
             seed: The initialization seed for randomization.
-
-        Returns:
-            None
         '''
         self.amplitude = amplitude
         self.shape = shape
@@ -68,12 +65,6 @@ class PerlinNoise2D():
     def precompute(self) -> None:
         '''
         Precompute the noise at each (x, y) location for faster use later.
-
-        Arguments:
-            None
-
-        Returns:
-            None
         '''
         def f(t):
             return 6 * t**5 - 15 * t**4 + 10 * t**3

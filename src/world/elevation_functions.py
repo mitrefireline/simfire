@@ -117,9 +117,6 @@ def flat() -> ElevationFn:
     '''
     Create a callable that returns 0 for all elevations.
 
-    Arguments:
-        None
-
     Returns:
         A callable that computes z values for (x, y) inputs
     '''

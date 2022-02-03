@@ -6,11 +6,14 @@ from abc import ABC, abstractmethod
 from ..game.game import Game
 from ..utils.config import Config
 from ..game.sprites import Terrain
+from ..utils.log import create_logger
 from ..enums import GameStatus, BurnStatus
 from ..game.managers.fire import RothermelFireManager
 from ..world.parameters import Environment, FuelParticle
 from ..game.managers.mitigation import (FireLineManager, ScratchLineManager,
                                         WetLineManager)
+
+log = create_logger(__name__)
 
 
 class Simulation(ABC):
@@ -503,9 +506,93 @@ class RothermelSimulation(Simulation):
         Returns:
             The dictionary with all available seeds to change and their values.
         '''
-        pass
+        seeds = {
+            'elevation': self._get_elevation_seed(),
+            'fuel': self._get_fuel_seed(),
+            'wind_speed': self._get_wind_speed_seed(),
+            'wind_direction': self._get_wind_direction_seed()
+        }
+        # Make sure to delete all the seeds that are None, so the user knows not to try
+        # and set them
+        del_keys = []
+        for key, seed in seeds.items():
+            if seed is None:
+                del_keys.append(key)
+        for key in del_keys:
+            del seeds[key]
 
-    def set_seeds(self, seeds: Dict[str, int]) -> None:
+        return seeds
+
+    def _get_elevation_seed(self) -> int:
+        '''
+        Returns the seed for the current elevation function.
+
+        Only the 'perlin' option has a seed value associated with it.
+
+        Arguments:
+            None
+
+        Returns:
+            The seed for the currently configured elevation function.
+        '''
+        if 'perlin' in str(self.config.terrain.elevation_function).lower():
+            return self.config.terrain.perlin.seed
+        else:
+            return None
+
+    def _get_fuel_seed(self) -> int:
+        '''
+        Returns the seed for the current fuel array function.
+
+        Only the 'chaparral' option has a seed value associated with it, because it's
+        currently the only one.
+
+        Arguments:
+            None
+
+        Returns:
+            The seed for the currently configured fuel array function.
+        '''
+        if 'chaparral' in str(self.config.terrain.fuel_array_function).lower():
+            return self.config.terrain.chaparral.seed
+        else:
+            return None
+
+    def _get_wind_speed_seed(self) -> int:
+        '''
+        Returns the seed for the current wind speed function.
+
+        Only the 'perlin' option has a seed value associated with it.
+
+        Arguments:
+            None
+
+        Returns:
+            The seed for the currently configured wind speed function.
+        '''
+        if 'perlin' in str(self.config.wind.wind_function).lower():
+            return self.config.wind.perlin.speed.seed
+        else:
+            return None
+
+    def _get_wind_direction_seed(self) -> int:
+        '''
+        Returns the seed for the current wind direction function.
+
+        Only the 'perlin' option has a seed value associated with it.
+
+        Arguments:
+            None
+
+        Returns:
+            The seed for the currently configured wind direction function.
+        '''
+        if 'perlin' in str(self.config.wind.wind_function).lower():
+            return self.config.wind.perlin.direction.seed
+        else:
+            return None
+
+    def set_seeds(self, seeds: Dict[str, int]) -> bool:
         '''
         Sets the seeds for different available randomization parameters.
 
@@ -516,6 +603,31 @@ class RothermelSimulation(Simulation):
             seeds: The dictionary of seed names and the values they will be set to.
 
         Returns:
-            None
+            Whether or not the method successfully set a seed value
         '''
-        pass
+        success = False
+        keys = list(seeds.keys())
+        if 'elevation' in keys:
+            self.config.reset_elevation_function(seeds['elevation'])
+            success = True
+        if 'fuel' in keys:
+            self.config.reset_fuel_array_function(seeds['fuel'])
+            success = True
+        if 'wind_speed' in keys and 'wind_direction' in keys:
+            self.config.reset_wind_function(speed_seed=seeds['wind_speed'],
+                                            direction_seed=seeds['wind_direction'])
+            success = True
+        if 'wind_speed' in keys and 'wind_direction' not in keys:
+            self.config.reset_wind_function(speed_seed=seeds['wind_speed'])
+            success = True
+        if 'wind_speed' not in keys and 'wind_direction' in keys:
+            self.config.reset_wind_function(direction_seed=seeds['wind_direction'])
+            success = True
+
+        valid_keys = list(self.get_seeds().keys())
+        for key in keys:
+            if key not in valid_keys:
+                log.warn('No valid keys in the seeds dictionary were given to the '
+                         'set_seeds method. No seeds will be changed. Valid keys are: '
+                         f'{valid_keys}')
+        return success

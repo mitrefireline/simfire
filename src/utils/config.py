@@ -3,7 +3,7 @@ import numpy as np
 import yaml
 from typing import Any
 from pathlib import Path
-from yaml.scanner import ScannerError
+from yaml.parser import ParserError
 
 from ..utils.log import create_logger
 from ..world.wind import WindController
@@ -75,12 +75,10 @@ class Config:
             with open(self.path, 'r') as f:
                 try:
                     self.data = yaml.safe_load(f)
-                except ScannerError as e:
-                    log.error(f'Error parsing YAML file at {self.path}:\n' f'{e.error}')
-                    raise ScannerError
+                except ParserError:
+                    log.error(f'Error parsing YAML file at {self.path}')
         except FileNotFoundError:
             log.error(f'Error opening YAML file at {self.path}. Does it exist?')
-            raise FileNotFoundError
 
     def _set_attributes(self) -> None:
         '''
@@ -242,7 +240,9 @@ class Config:
         self.data['terrain']['chaparral']['seed'] = seed
         self._set_fuel_array_function()
 
-    def reset_wind_function(self, speed_seed: int, direction_seed: int) -> None:
+    def reset_wind_function(self,
+                            speed_seed: int = None,
+                            direction_seed: int = None) -> None:
         '''
         Reset the wind function with a different seed.
 
@@ -255,13 +255,22 @@ class Config:
             None
         '''
         # Set the seed class attribute so that the function uses it correctly
-        self.wind.perlin.speed.seed = speed_seed
-        self.wind.perlin.direction.seed = direction_seed
-        # Set the seed dictionary value so that if the config is later saved, it is
-        # reflected in the saved config.yml
-        self.data['wind']['perlin']['speed']['seed'] = speed_seed
-        self.data['wind']['perlin']['direction']['seed'] = direction_seed
-        self._set_wind_function()
+        # Only set each seed if it has been passed into the function to be changed
+        if speed_seed is not None:
+            self.wind.perlin.speed.seed = speed_seed
+            # Set the seed dictionary value so that if the config is later saved, it is
+            # reflected in the saved config.yml
+            self.data['wind']['perlin']['speed']['seed'] = speed_seed
+
+        if direction_seed is not None:
+            self.wind.perlin.direction.seed = direction_seed
+            # Set the seed dictionary value so that if the config is later saved, it is
+            # reflected in the saved config.yml
+            self.data['wind']['perlin']['direction']['seed'] = direction_seed
+
+        # No reason to run _set_wind_function if it doesn't change
+        if speed_seed is not None and direction_seed is not None:
+            self._set_wind_function()
 
     def save(self, path: Path) -> None:
         '''

@@ -40,8 +40,6 @@ class Terrain(pygame.sprite.Sprite):
             headless: Flag to run in a headless state. This will allow PyGame objects to
                       not be initialized.
 
-        Returns:
-            None
         '''
         super().__init__()
 
@@ -88,9 +86,6 @@ class Terrain(pygame.sprite.Sprite):
         Load the terrain tile texture, resize it to the correct
         shape, and convert to numpy
 
-        Arguments:
-            None
-
         Returns:
             The returned NumPy array of the texture.
         '''
@@ -112,9 +107,6 @@ class Terrain(pygame.sprite.Sprite):
 
         Additionally, create the elevation array that contains the elevation
         for each pixel in self.fuel_arrs
-
-        Arguments:
-            None
 
         Returns:
             out_surf: The pygame.Surface of the stitched together terrain
@@ -285,11 +277,6 @@ class Fire(pygame.sprite.Sprite):
         '''
         Currently unused.
 
-        Arguments:
-            None
-
-        Returns:
-            None
         '''
         pass
 
@@ -311,8 +298,6 @@ class FireLine(pygame.sprite.Sprite):
             headless: Flag to run in a headless state. This will allow PyGame objects to
                       not be initialized.
 
-        Returns:
-            None
         '''
         super().__init__()
 
@@ -343,11 +328,6 @@ class FireLine(pygame.sprite.Sprite):
         This doesn't require to be updated right now. May change in the future if we
         learn new things about the physics.
 
-        Arguments:
-            None
-
-        Returns:
-            None
         '''
         pass
 
@@ -392,11 +372,6 @@ class ScratchLine(pygame.sprite.Sprite):
         This doesn't require to be updated right now. May change in the future if we
         learn new things about the physics.
 
-        Arguments:
-            None
-
-        Returns:
-            None
         '''
         pass
 
@@ -441,10 +416,5 @@ class WetLine(pygame.sprite.Sprite):
         This doesn't require to be updated right now. May change in the future if we
         learn new things about the physics.
 
-        Arguments:
-            None
-
-        Returns:
-            None
         '''
         pass

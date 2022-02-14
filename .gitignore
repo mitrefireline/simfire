@@ -6,5 +6,6 @@ build
 dist
 **/*.egg-info
 docs/build
+*.png
 .coverage
 coverage.xml

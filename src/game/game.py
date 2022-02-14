@@ -13,9 +13,8 @@ from .sprites import Fire, FireLine, Terrain
 
 class Game():
     '''
-    Class that controls the game. This class will initalize the game
-    and allow for terrain, fire, and other sprites to be rendered and
-    interact.
+    Class that controls the game. This class will initalize the game and allow for
+    terrain, fire, and other sprites to be rendered and interact.
     '''
     def __init__(self,
                  screen_size: int,
@@ -30,8 +29,8 @@ class Game():
         Initalize the class by creating the game display and background.
 
         Arguments:
-            screen_size: The (n,n) size of the game screen/display
-            headless: Flag to run in a headless state
+            screen_size: The (n,n) size of the game screen/display.
+            headless: Flag to run in a headless state.
         '''
         self.screen_size = screen_size
         self.show_wind_magnitude = show_wind_magnitude
@@ -64,8 +63,7 @@ class Game():
 
     def _toggle_wind_magnitude_display(self):
         '''
-        Toggle display of wind MAGNITUDE over the main screen
-        Arguments: None
+        Toggle display of wind MAGNITUDE over the main screen.
         '''
         self.show_wind_magnitude = not self.show_wind_magnitude
         if self.show_wind_magnitude is False:
@@ -76,8 +74,7 @@ class Game():
 
     def _toggle_wind_direction_display(self):
         '''
-        Toggle display of wind DIRECTION over the main screen
-        Arguments: None
+        Toggle display of wind DIRECTION over the main screen.
         '''
         self.show_wind_direction = not self.show_wind_direction
         if self.show_wind_direction is False:
@@ -88,31 +85,28 @@ class Game():
 
     def _disable_wind_magnitude_display(self):
         '''
-        Toggle display of wind DIRECTION over the main screen
-        Arguments: None
+        Toggle display of wind DIRECTION over the main screen.
         '''
         self.show_wind_magnitude = False
 
     def _disable_wind_direction_display(self):
         '''
-        Toggle display of wind DIRECTION over the main screen
-        Arguments: None
+        Toggle display of wind DIRECTION over the main screen.
         '''
         self.show_wind_direction = False
 
     def _get_wind_direction_color(self, direction: float) -> Tuple[int, int, int]:
         '''
-        Get the color and intensity representing direction based
-        on wind direction
+        Get the color and intensity representing direction based on wind direction.
+
         0/360: Black, 90: Red, 180: White, Blue: 270
 
-        Returns tuple of RGBa where a is alpha channel or
-        transparency of the color
+        Returns tuple of RGBa where a is alpha channel or transparency of the color
 
         Arguments:
-            direction: Float value of the angle 0-360
-            ws_min: minimum wind speed
-            ws_max: maximum wind speed
+            direction: Float value of the angle 0-360.
+            ws_min: Minimum wind speed.
+            ws_max: Maximum wind speed.
         '''
         north_min = 0.0
         north_max = 360.0

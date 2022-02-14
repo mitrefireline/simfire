@@ -1,6 +1,9 @@
-from typing import Dict
-import unittest
 import numpy as np
+
+import unittest
+from typing import Dict
+from pathlib import Path
+
 from ...utils.config import Config
 from ...rl_env.simulation import RothermelSimulation
 from ...enums import BurnStatus
@@ -10,8 +13,12 @@ class RothermelSimulationTest(unittest.TestCase):
     def setUp(self) -> None:
         '''
         '''
-        self.config = Config('./src/utils/_tests/test_config.yml')
+        self.config = Config('./src/utils/_tests/test_configs/test_config.yml')
+        self.config_flat_simple = Config(
+            Path(self.config.path).parent / 'test_config_flat_simple.yml')
+
         self.simulation = RothermelSimulation(self.config)
+        self.simulation_flat = RothermelSimulation(self.config_flat_simple)
 
     def test__create_terrain(self) -> None:
         '''
@@ -70,6 +77,22 @@ class RothermelSimulationTest(unittest.TestCase):
                          msg=f'The sprite was updated at {self.simulation.points}, '
                          f'but it should have been at {current_agent_loc}')
 
+        # do the previous one again but with a SCRATCHLINE
+        self.mitigation = ([BurnStatus.SCRATCHLINE])
+        self.simulation._update_sprite_points(self.mitigation, current_agent_loc)
+        self.assertEqual(self.simulation.points,
+                         points,
+                         msg=f'The sprite was updated at {self.simulation.points}, '
+                         f'but it should have been at {current_agent_loc}')
+
+        # do the previous one again but with a WETLINE
+        self.mitigation = ([BurnStatus.WETLINE])
+        self.simulation._update_sprite_points(self.mitigation, current_agent_loc)
+        self.assertEqual(self.simulation.points,
+                         points,
+                         msg=f'The sprite was updated at {self.simulation.points}, '
+                         f'but it should have been at {current_agent_loc}')
+
         # assert points get updated after agent traverses entire game
         self.config.render.inline = False
         self.config.render.post_agent = True
@@ -77,6 +100,11 @@ class RothermelSimulationTest(unittest.TestCase):
         self.mitigation = np.full(
             (self.config.area.screen_size, self.config.area.screen_size),
             BurnStatus.FIRELINE)
+        mitigations = np.array(
+            [BurnStatus.FIRELINE, BurnStatus.SCRATCHLINE, BurnStatus.WETLINE])
+        self.mitigation = mitigations[np.random.randint(
+            len(mitigations),
+            size=(self.config.area.screen_size, self.config.area.screen_size))]
         points = [(i, j) for j in range(self.config.area.screen_size)
                   for i in range(self.config.area.screen_size)]
         points = set(points)
@@ -204,3 +232,91 @@ class RothermelSimulationTest(unittest.TestCase):
 
         '''
         pass
+
+    def test_get_seeds(self) -> None:
+        '''
+        Test the get_seeds method and ensure it returns all available seeds
+        '''
+        seeds = self.simulation.get_seeds()
+        flat_seeds = self.simulation_flat.get_seeds()
+
+        for key, seed in seeds.items():
+            msg = (f'The seed for {key} ({seed}) does not match that found in '
+                   '{self.config.path}')
+            if key == 'elevation':
+                self.assertEqual(seed, self.config.terrain.perlin.seed, msg=msg)
+            if key == 'fuel':
+                self.assertEqual(seed, self.config.terrain.chaparral.seed, msg=msg)
+            if key == 'wind_speed':
+                self.assertEqual(seed, self.config.wind.perlin.speed.seed, msg=msg)
+            if key == 'wind_direction':
+                self.assertEqual(seed, self.config.wind.perlin.direction.seed, msg=msg)
+
+        # Test for different use-cases where not all functions have seeds
+        self.assertNotIn('elevation', flat_seeds)
+        self.assertNotIn('wind_speed', flat_seeds)
+        self.assertNotIn('wind_direction', flat_seeds)
+
+        for key, seed in flat_seeds.items():
+            msg = (f'The seed for {key} ({seed}) does not match that found in '
+                   '{self.config.path}')
+            if key == 'fuel':
+                self.assertEqual(seed,
+                                 self.config_flat_simple.terrain.chaparral.seed,
+                                 msg=msg)
+
+    def test_set_seeds(self) -> None:
+        '''
+        Test the set_seeds method and ensure it re-instantiates the required functions
+        '''
+        seed = 1234
+        seeds = {
+            'elevation': seed,
+            'fuel': seed,
+            'wind_speed': seed,
+            'wind_direction': seed
+        }
+        self.simulation.set_seeds(seeds)
+        returned_seeds = self.simulation.get_seeds()
+
+        self.assertEqual(seeds,
+                         returned_seeds,
+                         msg=f'The input seeds ({seeds}) do not match the returned seeds '
+                         f'({returned_seeds})')
+
+        # Only set wind_speed and not wind_direction
+        seed = 2345
+        seeds = {'elevation': seed, 'fuel': seed, 'wind_speed': seed}
+        self.simulation.set_seeds(seeds)
+        returned_seeds = self.simulation.get_seeds()
+
+        # Put the previous value for wind_direction into the dictionary so we can check
+        # to make sure it wasn't changed
+        seeds['wind_direction'] = 1234
+        self.assertEqual(seeds,
+                         returned_seeds,
+                         msg=f'The input seeds ({seeds}) do not match the returned seeds '
+                         f'({returned_seeds})')
+
+        # Only set wind_direction and not wind_speed
+        seed = 3456
+        seeds = {'wind_direction': seed}
+        self.simulation.set_seeds(seeds)
+        returned_seeds = self.simulation.get_seeds()
+
+        # Put the previous value for wind_direction into the dictionary so we can check
+        # to make sure it wasn't changed
+        seeds['elevation'] = 2345
+        seeds['fuel'] = 2345
+        seeds['wind_speed'] = 2345
+        self.assertEqual(seeds,
+                         returned_seeds,
+                         msg=f'The input seeds ({seeds}) do not match the returned seeds '
+                         f'({returned_seeds})')
+
+        # Give no valid keys to hit the log warning
+        seeds = {'not_valid': 1111}
+        success = self.simulation.set_seeds(seeds)
+        self.assertFalse(success,
+                         msg='The set_seeds method should have returned False '
+                         f'with input seeds set to {seeds}')

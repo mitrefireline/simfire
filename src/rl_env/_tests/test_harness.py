@@ -10,7 +10,7 @@ class AgentBasedHarnessTest(unittest.TestCase):
         '''
         '''
 
-        self.config = Config('./src/utils/_tests/test_config.yml')
+        self.config = Config('./src/utils/_tests/test_configs/test_config.yml')
         self.actions = ['none', 'fireline']
         self.attributes = ['position', 'mitigation', 'w0', 'elevation']
         self.simulation = RothermelSimulation(self.config)

@@ -10,18 +10,23 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
+import os
+from datetime import date
 # import sys
 # sys.path.insert(0, os.path.abspath('../../'))
 
 # -- Project information -----------------------------------------------------
 
 project = 'fiReLine Rothermel Model'
-copyright = '2021, fiReLine'
-author = 'Marissa Dotter, Michael Doyle, Chris Kempis, Michael Threet, Tim Welsh'
+copyright = f'{date.today().year}, fiReLine'
+author = ('Marissa Dotter, Michael Doyle, Dhanuj Gandikota, Chris Kempis, Alex Tapley, '
+          'Michael Threet, Tim Welsh')
 
 # The full version, including alpha/beta/rc tags
-release = '0.0.0'
+if os.environ.get('CI_COMMIT_TAG'):
+    release = os.environ['CI_COMMIT_TAG']
+else:
+    release = '0.0.0'
 
 # -- General configuration ---------------------------------------------------
 
@@ -29,8 +34,20 @@ release = '0.0.0'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinx.ext.autodoc', 'sphinx.ext.napoleon', 'autoapi.extension', 'myst_parser'
+    'sphinx.ext.autodoc', 'sphinx.ext.napoleon', 'autoapi.extension', 'myst_parser',
+    'sphinx.ext.intersphinx'
 ]
+
+intersphinx_mapping = {
+    'python': ('https://docs.python.org/', None),
+    'numpy': ('https://numpy.org/doc/stable/', None),
+    'scikit-image': ('https://scikit-image.org/docs/stable/', None),
+    'matplotlib': ('https://matplotlib.org/stable/', None),
+    'numba': ('https://numba.pydata.org/numba-doc/latest/', None),
+    'PIL': ('https://pillow.readthedocs.io/en/stable/', None),
+    'pygame': ('https://www.pygame.org/docs/', None)
+}
+tls_verify = False
 
 # Autodoc settings
 autodoc_typehints = 'description'
@@ -57,7 +74,7 @@ html_theme = 'sphinx_rtd_theme'
 html_logo = '../../assets/icons/rl_logo.png'
 html_theme_options = {
     'logo_only': False,
-    'display_version': False,
+    'display_version': True,
 }
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,

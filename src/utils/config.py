@@ -1,9 +1,9 @@
 import numpy as np
 
 import yaml
-from pathlib import Path
 from typing import Any
-from yaml.scanner import ScannerError
+from pathlib import Path
+from yaml.parser import ParserError
 
 from ..utils.log import create_logger
 from ..world.wind import WindController
@@ -51,9 +51,6 @@ class Config:
         Arguments:
             path: The path to the `config.yml` file. This file can have any name, but
                   needs to be a valid YAML.
-
-        Returns:
-            None
         '''
         self.path = path
         self._possible_elevations = ('perlin', 'gaussian', 'flat')
@@ -75,12 +72,10 @@ class Config:
             with open(self.path, 'r') as f:
                 try:
                     self.data = yaml.safe_load(f)
-                except ScannerError as e:
-                    log.error(f'Error parsing YAML file at {self.path}:\n' f'{e.error}')
-                    raise ScannerError
+                except ParserError:
+                    log.error(f'Error parsing YAML file at {self.path}')
         except FileNotFoundError:
             log.error(f'Error opening YAML file at {self.path}. Does it exist?')
-            raise FileNotFoundError
 
     def _set_attributes(self) -> None:
         '''
@@ -107,17 +102,24 @@ class Config:
         calling this, it becomes an actual function with all of the precompute values
         from the config passed in.
         '''
-        if self.terrain.elevation_function.lower() == 'perlin':
+        # Now we can set the function again
+        if 'perlin' in str(self.terrain.elevation_function).lower():
+            # Reset the value, if we are resetting the function
+            self.terrain.elevation_function = 'perlin'
             args = self.terrain.perlin
             noise = PerlinNoise2D(args.amplitude, args.shape, args.resolution, args.seed)
             noise.precompute()
             setattr(self.terrain, 'elevation_function', noise.fn)
-        elif self.terrain.elevation_function.lower() == 'gaussian':
+        elif 'gaussian' in str(self.terrain.elevation_function).lower():
+            # Reset the value, if we are resetting the function
+            self.terrain.elevation_function = 'gaussian'
             args = self.terrain.gaussian
             noise = gaussian(args.amplitude, args.mu_x, args.mu_y, args.sigma_x,
                              args.sigma_y)
-            setattr(self.terrain, 'elevation_function', noise.fn)
-        elif self.terrain.elevation_function.lower() == 'flat':
+            setattr(self.terrain, 'elevation_function', noise)
+        elif 'flat' in str(self.terrain.elevation_function).lower():
+            # Reset the value, if we are resetting the function
+            self.terrain.elevation_function = 'flat'
             setattr(self.terrain, 'elevation_function', flat())
         else:
             log.error('The user-defined elevation function is set to '
@@ -133,7 +135,9 @@ class Config:
         calling this, it becomes an actual function with all of the precompute values
         from the config passed in.
         '''
-        if self.terrain.fuel_array_function.lower() == 'chaparral':
+        # Now we can set the function again
+        if 'chaparral' in str(self.terrain.fuel_array_function).lower():
+            self.terrain.fuel_array_function = 'chaparral'
             args = self.terrain.chaparral
             fn = chaparral_fn(self.area.pixel_scale, self.area.pixel_scale, args.seed)
             setattr(self.terrain, 'fuel_array_function', fn)
@@ -141,7 +145,6 @@ class Config:
             log.error('The user-defined fuel array function is set to '
                       f'{self.terrain.fuel_array_function}, when it can only be one of '
                       f'these values: {self._possible_fuel_arrays}')
-            raise ValueError
 
     def _set_wind_function(self) -> None:
         '''
@@ -188,7 +191,6 @@ class Config:
             log.error('The user-defined wind function is set to '
                       f'{self.wind.wind_function} when it can only be one of '
                       f'these values: {self._possible_wind}')
-            raise ValueError
 
     def _set_runtime(self) -> None:
         '''
@@ -201,15 +203,69 @@ class Config:
             runtime = self.simulation.runtime
         setattr(self.simulation, 'runtime', str_to_minutes(runtime))
 
+    def reset_elevation_function(self, seed: int) -> None:
+        '''
+        Reset the elevation function with a different seed.
+
+        Arguments:
+            seed: The input used in generating the random elevation function.
+        '''
+        # Set the seed class attribute so that the function uses it correctly
+        self.terrain.perlin.seed = seed
+        # Set the seed dictionary value so that if the config is later saved, it is
+        # reflected in the saved config.yml
+        self.data['terrain']['perlin']['seed'] = seed
+        self._set_elevation_function()
+
+    def reset_fuel_array_function(self, seed: int) -> None:
+        '''
+        Reset the fuel array function with a different seed.
+
+        Arguments:
+            seed: The input used in generating the random fuel array function.
+        '''
+        # Set the seed class attribute so that the function uses it correctly
+        self.terrain.chaparral.seed = seed
+        # Set the seed dictionary value so that if the config is later saved, it is
+        # reflected in the saved config.yml
+        self.data['terrain']['chaparral']['seed'] = seed
+        self._set_fuel_array_function()
+
+    def reset_wind_function(self,
+                            speed_seed: int = None,
+                            direction_seed: int = None) -> None:
+        '''
+        Reset the wind function with a different seed.
+
+        Arguments:
+            speed_seed: The input used in generating the random wind speed function.
+            direction_seed: The input used in generating the random wind direction
+                            function.
+        '''
+        # Set the seed class attribute so that the function uses it correctly
+        # Only set each seed if it has been passed into the function to be changed
+        if speed_seed is not None:
+            self.wind.perlin.speed.seed = speed_seed
+            # Set the seed dictionary value so that if the config is later saved, it is
+            # reflected in the saved config.yml
+            self.data['wind']['perlin']['speed']['seed'] = speed_seed
+
+        if direction_seed is not None:
+            self.wind.perlin.direction.seed = direction_seed
+            # Set the seed dictionary value so that if the config is later saved, it is
+            # reflected in the saved config.yml
+            self.data['wind']['perlin']['direction']['seed'] = direction_seed
+
+        # No reason to run _set_wind_function if it doesn't change
+        if speed_seed is not None and direction_seed is not None:
+            self._set_wind_function()
+
     def save(self, path: Path) -> None:
         '''
         Save the current config to the specified `path`
 
         Arguments:
             path: The path and filename of the output YAML file.
-
-        Returns:
-            None
         '''
         with open(path, 'w') as f:
             yaml.dump(self.data, f)

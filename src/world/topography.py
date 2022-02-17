@@ -45,13 +45,7 @@ class MERITLayer():
         self.BR = (self.BL[0], self.TR[1])
         self.TL = (self.TR[0], self.BL[1])
         self.datapath = Path('/nfs/lslab2/fireline/topographic/coarse')
-
-        self._get_lat_long_bbox()
-        self._get_nearest_tile()
-        self.tiles = self._stack_tiles()
-        print(self.tiles)
         self._get_dems()
-        self._generate_contours()
 
     def _get_dems(self) -> List[Path]:
         '''
@@ -64,21 +58,16 @@ class MERITLayer():
             None
 
         '''
-
+        self._get_nearest_tile()
+        self.tiles = self._stack_tiles()
         self.tif_filenames = []
 
         for _, ranges in self.tiles.items():
-            if len(ranges) == 1:
-                (five_deg_n, five_deg_w) = ranges
+            for range in ranges:
+                (five_deg_n, five_deg_w) = range
                 tif_data_region = Path(f'n{five_deg_n}w{five_deg_w}_dem.tif')
                 tif_file = self.datapath / tif_data_region
                 self.tif_filenames.append(tif_file)
-            else:
-                for ranges in ranges:
-                    (five_deg_n, five_deg_w) = ranges
-                    tif_data_region = Path(f'n{five_deg_n}w{five_deg_w}_dem.tif')
-                    tif_file = self.datapath / tif_data_region
-                    self.tif_filenames.append(tif_file)
 
     def _get_nearest_tile(self) -> None:
         '''
@@ -136,7 +125,7 @@ class MERITLayer():
         self.five_deg_west_min = min_max
         self.five_deg_west_max = max_min
 
-    def _stack_tiles(self) -> Dict[str, Tuple[int]]:
+    def _stack_tiles(self) -> Dict[str, Tuple[Tuple[int]]]:
         '''
         Method to stack DEM tiles correctly.
 
@@ -152,44 +141,54 @@ class MERITLayer():
         if self.five_deg_north_min == self.five_deg_north_max and \
                 self.five_deg_west_max == self.five_deg_west_min:
             # 1 Tile (Simple)
-            return {'single': ((self.five_deg_north_min, self.five_deg_west_max))}
+            return {'single': ((self.five_deg_north_min, self.five_deg_west_max), )}
 
         elif self.five_deg_north_max > self.five_deg_north_min:
             if self.five_deg_north_max - self.five_deg_north_min > 5:
                 # 3 Tiles northernly
                 return {
-                    'north': ((self.five_deg_north_min, self.five_deg_west_max),
-                              (self.five_deg_north_max - 5, self.five_deg_west_max),
-                              (self.five_deg_north_max, self.five_deg_west_max))
+                    'north': (
+                        (self.five_deg_north_min, self.five_deg_west_max),
+                        (self.five_deg_north_max - 5, self.five_deg_west_max),
+                        (self.five_deg_north_max, self.five_deg_west_max),
+                    )
                 }
             elif self.five_deg_west_max > self.five_deg_west_min:
                 # 4 Tiles
                 return {
-                    'square': ((self.five_deg_north_min, self.five_deg_west_max),
-                               (self.five_deg_north_min, self.five_deg_west_min),
-                               (self.five_deg_north_max, self.five_deg_west_min),
-                               (self.five_deg_north_max, self.five_deg_west_max))
+                    'square': (
+                        (self.five_deg_north_min, self.five_deg_west_max),
+                        (self.five_deg_north_min, self.five_deg_west_min),
+                        (self.five_deg_north_max, self.five_deg_west_min),
+                        (self.five_deg_north_max, self.five_deg_west_max),
+                    )
                 }
             else:
                 # 2 Tiles northernly
                 return {
-                    'north': ((self.five_deg_north_min, self.five_deg_west_max),
-                              (self.five_deg_north_max, self.five_deg_west_max))
+                    'north': (
+                        (self.five_deg_north_min, self.five_deg_west_max),
+                        (self.five_deg_north_max, self.five_deg_west_max),
+                    )
                 }
         elif self.five_deg_north_min == self.five_deg_north_max:
             if self.five_deg_west_max > self.five_deg_west_min:
                 if self.five_deg_west_max - self.five_deg_west_min > 5:
                     # 3 Tiles easternly
                     return {
-                        'east': ((self.five_deg_north_min, self.five_deg_west_max),
-                                 (self.five_deg_north_min, self.five_deg_west_max - 5),
-                                 (self.five_deg_north_min, self.five_deg_west_max))
+                        'east': (
+                            (self.five_deg_north_min, self.five_deg_west_max),
+                            (self.five_deg_north_min, self.five_deg_west_max - 5),
+                            (self.five_deg_north_min, self.five_deg_west_min),
+                        )
                     }
                 else:
                     # 2 Tiles easternly
                     return {
-                        'east': ((self.five_deg_north_min, self.five_deg_west_min),
-                                 (self.five_deg_north_min, self.five_deg_west_max))
+                        'east': (
+                            (self.five_deg_north_min, self.five_deg_west_max),
+                            (self.five_deg_north_min, self.five_deg_west_min),
+                        )
                     }
 
     def _generate_contours(self) -> np.ndarray:
@@ -206,39 +205,43 @@ class MERITLayer():
         '''
         elevation_data = Image.open(self.tif_filenames[0])
         elevation_data = np.asarray(elevation_data)
-        data_array = np.expand_dims(elevation_data, axis=0)
+        self.data_array = np.expand_dims(elevation_data, axis=-1)
         for key, val in self.tiles.items():
             corners = [(val[0][0], val[0][1]), (val[0][0], val[0][1] - 5),
-                       (val[0][0] + 5, val[0][1]), (val[0][0] + 5, val[0][1] - 5)]
+                       (val[0][0] + 5, val[0][1] - 5), (val[0][0] + 5, val[0][1])]
             if key == 'single':
                 # simple case
                 self._generate_lat_long(corners)
-                return data_array[self.bl:self.br, self.tr:self.tl]
+                return self.data_array[self.bl:self.br, self.tr:self.tl]
+            tmp_array = elevation_data
             for idx, dem in enumerate(self.tif_filenames[1:]):
                 elevation_data = Image.open(dem)
                 elevation_data = np.asarray(elevation_data)
-                elevation_data = np.expand_dims(elevation_data, axis=0)
+                elevation_data = np.expand_dims(elevation_data, axis=-1)
 
                 if key == 'north':
                     # stack tiles along axis = 0 -> leftmost: bottom, rightmost: top
-                    data_array = np.append(data_array, elevation_data, axis=0)
-                    corners = self._get_lat_long_bbox(corners, val[idx], key)
+                    self.data_array = np.vstack((elevation_data, self.data_array))
+                    corners = self._get_lat_long_bbox(corners, val[idx + 1], key)
                 elif key == 'east':
                     # stack tiles along axis = 2 -> leftmost, rightmost
-                    data_array = np.append(data_array, elevation_data, axis=2)
-                    corners = self._get_lat_long_bbox(corners, val[idx], key)
+                    self.data_array = np.hstack((self.data_array, elevation_data))
+                    corners = self._get_lat_long_bbox(corners, val[idx + 1], key)
                 elif key == 'square':
                     # stack tiles into a square ->
                     # leftmost: bottom-left, rightmost: top-left
-                    corners = self._get_lat_long_bbox(corners, val[idx], key, idx)
-                    if idx == 1:
-                        data_array = np.append(data_array, elevation_data, axis=2)
-                    elif idx == 2:
-                        data_array = np.append(data_array, elevation_data, axis=0)
-                    elif idx == 3:
-                        data_array = np.append(data_array, elevation_data, axis=1)
+                    corners = self._get_lat_long_bbox(corners, val[idx + 1], key, idx)
+                    if idx + 1 == 1:
+                        self.data_array = np.hstack((elevation_data, self.data_array))
+                    elif idx + 1 == 2:
+                        tmp_array = elevation_data
+                    elif idx + 1 == 3:
+                        tmp_array = np.hstack((elevation_data, tmp_array))
+
+                        self.data_array = np.vstack((tmp_array, self.data_array))
+
         self._generate_lat_long(corners)
-        return data_array[self.bl:self.br, self.tr:self.tl]
+        return self.data_array[self.bl:self.br, self.tr:self.tl]
 
     def _save_contour_map(self) -> None:
         '''
@@ -254,12 +257,8 @@ class MERITLayer():
         Returns
             None
         '''
-        # if len(self.tif_filenames) >= 2:
-        #     #
-
-        # else:
-        elevation_data = Image.open(str(self.tif_file))
-        data_array = np.asarray(elevation_data)
+        self._get_dems()
+        data_array = self._generate_contours()
 
         # replace missing values if necessary
         if np.any(data_array == -9999.0):
@@ -270,11 +269,14 @@ class MERITLayer():
         plt.title('Elevation Contours')
         # cbar = plt.colorbar()
         plt.gca().set_aspect('equal', adjustable='box')
-        plt.savefig(f'img_{self.tif_file.stem}.png')
+        plt.savefig(f'img_n{self.BL[0]}_w{self.BL[1]}_n{self.TR[0]}_w{self.TR[1]}.png')
 
         return data_array
 
-    def _generate_lat_long(self, corners: List[Tuple[int]]) -> Tuple[int]:
+    def _generate_lat_long(self,
+                           corners: List[Tuple[int]],
+                           height: int = 6000,
+                           width: int = 6000) -> Tuple[int]:
         '''
         Use tile name to set bounding box of tile:
 
@@ -297,6 +299,8 @@ class MERITLayer():
 
         Arguments:
             corners: List[Tuple[int]]
+                A list of the lat/long tuple for each corner in the standard order:
+                    [bottom left, bottom right, top right, top left]
 
 
         Return:
@@ -304,36 +308,49 @@ class MERITLayer():
 
         '''
 
-        # calculate dimensions
-        if corners[0][1] == corners[1][1]:
-            width = 6000
-            if corners[3][0] > corners[0][0] and corners[3][0] - corners[0][0] > 5:
-                height = 6000 * 2
+        if corners[0][1] > corners[1][1]:
+            # calculate dimensions (W)
+            if corners[0][1] - corners[1][1] > 5:
+                width = width * 2
+            else:
+                width = 6000
+
+        if corners[0][0] > corners[2][0]:
+            # calculate dimensions (N)
+            if corners[0][0] - corners[2][0] > 5:
+                height = height * 2
             else:
                 height = 6000
-        elif corners[0][1] > corners[1][1] and corners[0][1] - corners[1][1] > 5:
-            width = 6000
 
         # create list[Tuple[floats]] with width and height
-        y = np.arange(corners[0][0], corners[3][0], height)
-        x = np.arange(corners[0][1], corners[1][1], width)
-        elev_array = [[(i, j) for j in y] for i in x]
-        elev_array = np.asarray(elev_array)
+        y = np.linspace(float(corners[0][0]), float(corners[2][0]), height)
+        x = np.linspace(float(corners[0][1]), float(corners[1][1]), width)
+        elev_array = [[(j, i) for j in y] for i in x]
+        self.elev_array = np.asarray(elev_array)
 
-        # get indices, make sure it makes a box with even sides (h, w)
-        self.bl = np.where(
-            min(elev_array,
-                key=lambda point: (point[0] - self.BL[0])**2 +
-                (point[1] - self.BL[1])**2))
-        self.tr = np.where(
-            min(elev_array,
-                key=lambda point: (point[0] - self.TR[0])**2 +
-                (point[1] - self.TR[1])**2))
-        self.tl = np.where(
-            min(elev_array,
-                key=lambda point: (point[0] - self.TL[0])**2 +
-                (point[1] - self.TL[1])**2))
-        self.br = (self.tr[0], self.bl[0])
+        # find indices where elevation matches bbox corners
+        # bl = np.unravel_index((np.abs(elev_array - self.BL)).argmin(), elev_array.shape)
+        elev_array_stacked = np.reshape(
+            self.elev_array, (self.elev_array.shape[0] * self.elev_array.shape[1], 2))
+        bl = min(elev_array_stacked,
+                 key=lambda c: (c[0] - self.BL[0])**2 + (c[1] - self.BL[1])**2)
+
+        self.bl = np.where((self.elev_array == bl).all(axis=-1))
+
+        br = min(elev_array_stacked,
+                 key=lambda c: (c[0] - self.BR[0])**2 + (c[1] - self.BR[1])**2)
+
+        self.br = np.where((self.elev_array == br).all(axis=-1))
+
+        tr = min(elev_array_stacked,
+                 key=lambda c: (c[0] - self.TR[0])**2 + (c[1] - self.TR[1])**2)
+
+        self.tr = np.where((self.elev_array == tr).all(axis=-1))
+
+        tl = min(elev_array_stacked,
+                 key=lambda c: (c[0] - self.TL[0])**2 + (c[1] - self.TL[1])**2)
+
+        self.tl = np.where((self.elev_array == tl).all(axis=-1))
 
     def _get_lat_long_bbox(self,
                            corners: List[Tuple[int]],
@@ -350,12 +367,19 @@ class MERITLayer():
             new_corner: Tuple[int]
                 A new index to compare the current corners against
 
+            stack: str
+                The order in which to stack the tiles and therefore update the
+                    corner
+
+            idx: int (Optional)
+                Only used for the 'square' case, to keep track of which tile we are on
+                    Tiles are stacked according to standard order:
+                    [bottom left, bottom right, top right, top left]
+
         Returns:
             List[Tuple[int]
-                The indices/bbox of the corners (bottom left,
-                                                bottom right,
-                                                top right,
-                                                top left)
+                The indices/bbox of the corners according to standard order:
+                    [bottom left, bottom right, top right, top left]
         '''
         BL = corners[0]
 

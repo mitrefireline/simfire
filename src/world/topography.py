@@ -1,10 +1,11 @@
 import numpy as np
-# from osgeo import gdal
 from PIL import Image
 import matplotlib.pyplot as plt
 from typing import Tuple, List, Dict
 from pathlib import Path
 import math
+
+from utils.layers import DataLayer
 
 
 # Developing a function to round to a multiple
@@ -17,7 +18,7 @@ def round_down_to_multiple(num, divisor):
     return divisor * math.floor(num / divisor)
 
 
-class MERITLayer():
+class MERITLayer(DataLayer):
     def __init__(self, BL: Tuple[float], TR: Tuple[float]) -> None:
         '''
 

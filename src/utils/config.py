@@ -6,7 +6,7 @@ from pathlib import Path
 from yaml.parser import ParserError
 
 from ..utils.log import create_logger
-from ..world.wind import WindController
+from ..world.wind_mechanics.wind_controller import WindController, WindController2
 from ..utils.units import str_to_minutes, mph_to_ftpm
 from ..world.elevation_functions import PerlinNoise2D, flat, gaussian
 from ..world.fuel_array_functions import chaparral_fn
@@ -159,7 +159,12 @@ class Config:
         `self.wind.speed` and `self.wind.direction` to arrays of size
         (`self.area.screen_size`, `self.area.screen_size`) with wind values at each pixel.
         '''
-        if self.wind.wind_function.lower() == 'perlin':
+        if self.wind.wind_function.lower() == 'cfd':
+            source_speed = mph_to_ftpm(self.wind.cfd.speed)
+            source_direction = self.wind.cfd.direction
+            wind_map = WindController2()
+            wind_map.initialize_wind_fields(source_direction, source_speed, self.area.screen_size)
+        elif self.wind.wind_function.lower() == 'perlin':
             speed_min = mph_to_ftpm(self.wind.perlin.speed.min)
             speed_max = mph_to_ftpm(self.wind.perlin.speed.max)
             wind_map = WindController()

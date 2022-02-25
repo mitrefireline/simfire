@@ -42,7 +42,10 @@ environment:
   moisture: 0.03
 
 wind:
-  wind_function: perlin
+  wind_function: cfd
+  cfd:
+    speed: 19
+    direction: north
   simple:
     speed: 7
     direction: 90.0

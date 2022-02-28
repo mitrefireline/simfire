@@ -1,8 +1,8 @@
 import random
 from pathlib import Path
-from src.utils.config import Config
-from src.rl_env.harness import AgentBasedHarness
-from src.rl_env.simulation import RothermelSimulation
+from ..utils.config import Config
+from .harness import AgentBasedHarness
+from .simulation import RothermelSimulation
 
 
 def main():

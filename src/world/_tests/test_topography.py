@@ -13,24 +13,27 @@ class TestTopoLayer(unittest.TestCase):
         Test that the call to _get_dems() runs properly.
         This method will generate a list of the DEMs in the fireline /nfs/
         '''
+
+        resolution = 30
+
         # Single Tile
-        BL = (31, 112)
-        TR = (32, 113)
-        topographyGen = TopoLayer(BL, TR, '90m')
+        center = (32.2, 115.6)
+        area = 1600**2
+        topographyGen = TopoLayer(center, area, resolution)
         topographyGen._get_dems()
         self.assertEqual(1, len(topographyGen.tif_filenames))
 
         # 2 Tiles
-        BL = (31, 113)
-        TR = (36, 111)
-        topographyGen = TopoLayer(BL, TR, '90m')
+        center = (32.4, 115.0)
+        area = 3200**2
+        topographyGen = TopoLayer(center, area, resolution)
         topographyGen._get_dems()
         self.assertEqual(2, len(topographyGen.tif_filenames))
 
         # 4 Tiles
-        BL = (33.2, 112.4)
-        TR = (37, 108)
-        topographyGen = TopoLayer(BL, TR, '90m')
+        center = (34.001, 116.008)
+        area = 3200**2
+        topographyGen = TopoLayer(center, area, resolution)
         topographyGen._get_dems()
         self.assertEqual(4, len(topographyGen.tif_filenames))
 
@@ -41,32 +44,21 @@ class TestTopoLayer(unittest.TestCase):
             contain the latitude and longitude specified
         '''
         # 2 Tiles
-        BL = (31, 113)
-        TR = (36, 111)
-        topographyGen = TopoLayer(BL, TR, '90m')
-        test_output_dems = ((30, 115), (35, 115))
+        center = (32.4, 115.004)
+        area = 3200**2
+        topographyGen = TopoLayer(center, area, 30)
+        test_output_dems = ((32, 116), (32, 115))
         topographyGen._get_nearest_tile()
         self.assertEqual(topographyGen.five_deg_north_min, test_output_dems[0][0])
         self.assertEqual(topographyGen.five_deg_north_max, test_output_dems[1][0])
-        self.assertEqual(topographyGen.five_deg_west_min, test_output_dems[0][1])
-        self.assertEqual(topographyGen.five_deg_west_max, test_output_dems[1][1])
-
-        # 3 Tiles
-        BL = (32.4, 114.2)
-        TR = (41, 112)
-        topographyGen = TopoLayer(BL, TR, '90m')
-        test_output_dems = ((30, 115), (35, 115), (40, 115))
-        topographyGen._get_nearest_tile()
-        self.assertEqual(topographyGen.five_deg_north_min, test_output_dems[0][0])
-        self.assertEqual(topographyGen.five_deg_north_max, test_output_dems[2][0])
-        self.assertEqual(topographyGen.five_deg_west_min, test_output_dems[0][1])
-        self.assertEqual(topographyGen.five_deg_west_max, test_output_dems[1][1])
+        self.assertEqual(topographyGen.five_deg_west_min, test_output_dems[1][1])
+        self.assertEqual(topographyGen.five_deg_west_max, test_output_dems[0][1])
 
         # 4 Tiles
-        BL = (33.2, 112.4)
-        TR = (37, 108)
-        topographyGen = TopoLayer(BL, TR, '90m')
-        test_output_dems = ((30, 115), (30, 110), (35, 110), (35, 115))
+        center = (33.001, 115.001)
+        area = 1800**2
+        topographyGen = TopoLayer(center, area, 30)
+        test_output_dems = ((32, 116), (32, 115), (33, 115), (34, 116))
         topographyGen._get_nearest_tile()
         self.assertEqual(topographyGen.five_deg_north_min, test_output_dems[0][0])
         self.assertEqual(topographyGen.five_deg_north_max, test_output_dems[2][0])
@@ -79,29 +71,20 @@ class TestTopoLayer(unittest.TestCase):
         This method correctly stitches together tiles on (easternly, southernly, square)
         '''
         # 2 Tiles
-        BL = (31, 113)
-        TR = (36, 111)
-        topographyGen = TopoLayer(BL, TR, '90m')
-        test_output_dems = {'north': ((30, 115), (35, 115))}
+        center = (32.001, 115.6)
+        area = 1600**2
+        resolution = 30
+        topographyGen = TopoLayer(center, area, resolution)
+        test_output_dems = {'north': ((31, 116), (32, 116))}
         topographyGen._get_nearest_tile()
         test_dict = topographyGen._stack_tiles()
         self.assertEqual(test_output_dems, test_dict)
 
         # 4 Tiles
-        BL = (33.2, 112.4)
-        TR = (37, 108)
-        topographyGen = TopoLayer(BL, TR, '90m')
+        center = (34.9, 110.01)
+        area = 108230**2
+        topographyGen = TopoLayer(center, area, 90)
         test_output_dems = {'square': ((30, 115), (30, 110), (35, 110), (35, 115))}
-        topographyGen._get_nearest_tile()
-        test_dict = topographyGen._stack_tiles()
-
-        self.assertEqual(test_output_dems, test_dict)
-
-        # 2 Tiles
-        BL = (34.8, 117.2)
-        TR = (31, 111)
-        topographyGen = TopoLayer(BL, TR, '90m')
-        test_output_dems = {'east': ((30, 120), (30, 115))}
         topographyGen._get_nearest_tile()
         test_dict = topographyGen._stack_tiles()
 
@@ -114,11 +97,12 @@ class TestTopoLayer(unittest.TestCase):
             specified bounding box region of the given latitudes and longitudes.
         '''
         # 2 Tiles (easternly)
-        BL = (30.8, 116.5)
-        TR = (33, 111.76)
-        topographyGen = TopoLayer(BL, TR, '90m')
+        center = (33.4, 115.04)
+        area = 3200**2
+        resolution = 30
+        topographyGen = TopoLayer(center, area, resolution)
         data_layer = topographyGen._generate_contours()
-        self.assertEqual(data_layer.shape, (2640, 5686, 1))
+        self.assertEqual(data_layer.shape[0], data_layer.shape[1])
 
     def test__generate_lat_long(self) -> None:
         '''
@@ -132,25 +116,23 @@ class TestTopoLayer(unittest.TestCase):
             pull elevation data.
         '''
 
-        # 2 Tiles easternly
-        corners = [(30, 120), (30, 110), (35, 110), (35, 120)]
-        BL = (31.5, 115.6)
-        TR = (32.0, 114.8)
-        topographyGen = TopoLayer(BL, TR, '90m')
-        topographyGen._generate_lat_long(corners, 4, 4)
-        # 8 longitudinal indices
-        # 4 latitudinal indices
-        self.assertTrue(topographyGen.elev_array.shape == (8, 4, 2))
+        # # 2 Tiles easternly
+        corners = [(32, 116), (32, 114), (33, 114), (33, 114)]
+        center = (32.4, 115.01)
+        area = 3200**2
+        resolution = 30
+        topographyGen = TopoLayer(center, area, resolution)
+        topographyGen._generate_lat_long(corners)
+        self.assertEqual(topographyGen.elev_array.shape, (7224, 3612, 2))
 
         # 2 Tiles northernly
-        corners = [(31.5, 120), (31.5, 118.2), (37, 118.2), (37, 120)]
-        BL = (31.5, 120)
-        TR = (37, 118.2)
-        topographyGen = TopoLayer(BL, TR, '90m')
-        topographyGen._generate_lat_long(corners, 4, 4)
-        # 8 longitudinal indices
-        # 4 latitudinal indices
-        self.assertTrue(topographyGen.elev_array.shape == (4, 8, 2))
+        corners = [(31.5, 119), (31.5, 118), (34, 118), (34, 119)]
+        center = (32.001, 115.6)
+        area = 3200**2
+        resolution = 30
+        topographyGen = TopoLayer(center, area, resolution)
+        topographyGen._generate_lat_long(corners)
+        self.assertEqual(topographyGen.elev_array.shape, (3612, 7224, 2))
 
     def test__get_lat_long_bbox(self) -> None:
         '''
@@ -159,28 +141,15 @@ class TestTopoLayer(unittest.TestCase):
 
         '''
         # 2 Tiles northernly
-        BL = (31, 113)
-        TR = (36, 111)
-        corners = [(30, 115), (30, 110), (35, 110), (35, 115)]
-        new_corner = (35, 115)
-        output = [(30, 115), (30, 110), (40, 115), (40, 110)]
-        topographyGen = TopoLayer(BL, TR, '90m')
+        center = (32.001, 115.6)
+        area = 3200**2
+        resolution = 30
+        corners = [(31, 116), (31, 115), (32, 115), (32, 116)]
+        new_corner = (32, 116)
+        output = [(31, 116), (31, 115), (33, 115), (33, 116)]
+        topographyGen = TopoLayer(center, area, resolution)
         test_output = topographyGen._get_lat_long_bbox(corners, new_corner, stack='north')
 
-        self.assertEqual(output, test_output)
-
-        # 3 Tiles easternly (call twice with updated corners)
-        BL = (31, 120)
-        TR = (32, 108)
-        corners = [(30, 120), (30, 115), (35, 115), (35, 120)]
-        new_corner = (30, 115)
-        output = [(30, 120), (30, 110), (35, 110), (35, 120)]
-        topographyGen = TopoLayer(BL, TR, '90m')
-        test_output = topographyGen._get_lat_long_bbox(corners, new_corner, stack='east')
-        self.assertEqual(output, test_output)
-        new_corner = (30, 110)
-        output = [(30, 120), (30, 105), (35, 105), (35, 120)]
-        test_output = topographyGen._get_lat_long_bbox(output, new_corner, stack='east')
         self.assertEqual(output, test_output)
 
     def test_save_contour_map(self) -> None:

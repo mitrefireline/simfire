@@ -20,9 +20,9 @@ def round_down_to_multiple(num, divisor):
 
 class TopoLayer(DataLayer):
     def __init__(self,
-                 BL: Tuple[float],
-                 TR: Tuple[float],
-                 resolution: str = '10m') -> None:
+                 center: Tuple[float] = (32.1, 115.8),
+                 area: int = 1600**2,
+                 resolution: int = 30) -> None:
         '''
         This class of methods will get initialized with the config using the lat/long
             bounding box.
@@ -51,23 +51,61 @@ class TopoLayer(DataLayer):
 
 
         '''
-        self.BL = BL
-        self.TR = TR
+        self.area = area
+        self.center = center
+        self.resolution = resolution
+        self.convert_area()
         self.BR = (self.BL[0], self.TR[1])
         self.TL = (self.TR[0], self.BL[1])
         datapath = Path('/nfs/lslab2/fireline/topographic/')
         try:
-            if resolution == '10m':
+            res = str(resolution) + 'm'
+            if resolution == 10:
                 self.degrees = 1
-                self.datapath = datapath / resolution
-            elif resolution == '30m':
+                self.datapath = datapath / res
+                self.width = 10812
+                self.height = 10812
+            elif resolution == 30:
                 self.degrees = 1
-                self.datapath = datapath / resolution
-            elif resolution == '90m':
+                self.datapath = datapath / res
+                self.width = 3612
+                self.height = 3612
+            elif resolution == 90:
                 self.degrees = 5
-                self.datapath = datapath / resolution
+                self.datapath = datapath / res
+                self.width = 6000
+                self.height = 6000
         except NameError:
             print(f'{resolution} is not available, please selct from: 10m, 30m, 90m.')
+
+    def convert_area(self) -> List[Tuple[float]]:
+        '''
+        Functionality to use area to create bounding box rather than bottom left
+            and top right to specify bounding box
+
+        This function will always make a square.
+
+        Values are found from USGS website for arc-seconds to decimal degrees
+
+        Arguments:
+            None
+        Return:
+            None
+        '''
+        if self.resolution == 10:
+            # convert 5 x 5 degree, 90m resolution into pixel difference
+            dec_degree_length = 9.2593e-5
+        elif self.resolution == 30:
+            # convert 1 x 1 degree, 30m resolution into pixel difference
+            dec_degree_length = 0.00027777777803598015
+        elif self.resolution == 90:
+            # convert 5 x 5 degree, 90m resolution into pixel difference
+            dec_degree_length = 0.000833333
+
+        #  bottom_left = (ℎ+12𝐿,𝑘+12𝐿),
+        dec_deg = ((1 / 2 * (math.sqrt(self.area))) / self.resolution) * dec_degree_length
+        self.BL = (self.center[0] - dec_deg, self.center[1] + dec_deg)
+        self.TR = (self.center[0] + dec_deg, self.center[1] - dec_deg)
 
     def _get_dems(self) -> List[Path]:
         '''
@@ -87,7 +125,7 @@ class TopoLayer(DataLayer):
         for _, ranges in self.tiles.items():
             for range in ranges:
                 (five_deg_n, five_deg_w) = range
-                tif_data_region = Path(f'n{five_deg_n}w{five_deg_w}_dem.tif')
+                tif_data_region = Path(f'n{five_deg_n}w{five_deg_w}.tif')
                 tif_file = self.datapath / tif_data_region
                 self.tif_filenames.append(tif_file)
 
@@ -118,14 +156,14 @@ class TopoLayer(DataLayer):
         # round up on latitdue
         five_deg_north_min = self.BL[0]
         five_deg_north_min_min = round_up_to_multiple(five_deg_north_min, self.degrees)
-        if round(five_deg_north_min_min - five_deg_north_min, 2) <= 0.01:
+        if round(five_deg_north_min_min - five_deg_north_min, 2) <= 0.0001:
             min_max = round_up_to_multiple(five_deg_north_min, self.degrees)
         else:
             min_max = round_down_to_multiple(five_deg_north_min, self.degrees)
 
         five_deg_north_max = self.TR[0]
         five_deg_north_max_min = round_down_to_multiple(five_deg_north_max, self.degrees)
-        if round(five_deg_north_max - five_deg_north_max_min, 2) <= 0.01:
+        if round(five_deg_north_max - five_deg_north_max_min, 2) <= 0.0001:
             max_min = round_up_to_multiple(five_deg_north_max, self.degrees)
         else:
             max_min = round_down_to_multiple(five_deg_north_max, self.degrees)
@@ -136,14 +174,14 @@ class TopoLayer(DataLayer):
         # round down on longitude (w is negative)
         five_deg_west_max = abs(self.BL[1])
         five_deg_west_max_min = round_down_to_multiple(five_deg_west_max, self.degrees)
-        if round(five_deg_west_max - five_deg_west_max_min, 2) <= 0.01:
+        if round(five_deg_west_max - five_deg_west_max_min, 2) <= 0.0001:
             max_min = round_down_to_multiple(five_deg_west_max, self.degrees)
         else:
             max_min = round_up_to_multiple(five_deg_west_max, self.degrees)
 
         five_deg_west_min = abs(self.TR[1])
         five_deg_west_min_max = round_up_to_multiple(five_deg_west_min, self.degrees)
-        if round(five_deg_west_min_max - five_deg_west_min, 2) <= 0.01:
+        if round(five_deg_west_min_max - five_deg_west_min, 2) <= 0.0001:
             min_max = round_down_to_multiple(five_deg_west_min, self.degrees)
         else:
             min_max = round_up_to_multiple(five_deg_west_min, self.degrees)
@@ -177,7 +215,7 @@ class TopoLayer(DataLayer):
             return {'single': ((self.five_deg_north_min, self.five_deg_west_max), )}
 
         elif self.five_deg_north_max > self.five_deg_north_min:
-            if self.five_deg_north_max - self.five_deg_north_min > self.degrees:
+            if self.five_deg_north_max - self.five_deg_north_min > self.degrees * 3:
                 # 3 Tiles northernly
                 return {
                     'north': (
@@ -243,6 +281,7 @@ class TopoLayer(DataLayer):
         # flip axis because latitude goes up but numpy will read it down
         elevation_data = np.flip(elevation_data, 0)
         self.data_array = np.expand_dims(elevation_data, axis=-1)
+
         for key, val in self.tiles.items():
             corners = [(val[0][0], val[0][1]), (val[0][0], val[0][1] - self.degrees),
                        (val[0][0] + self.degrees, val[0][1] - self.degrees),
@@ -250,7 +289,9 @@ class TopoLayer(DataLayer):
             if key == 'single':
                 # simple case
                 self._generate_lat_long(corners)
-                return self.data_array[self.bl:self.br, self.tr:self.tl]
+                tr = (self.bl[0][0], self.tr[1][0])
+                bl = (self.tr[0][0], self.bl[1][0])
+                return self.data_array[tr[0]:bl[0], tr[1]:bl[1]]
             tmp_array = elevation_data
             for idx, dem in enumerate(self.tif_filenames[1:]):
                 elevation_data = Image.open(dem)
@@ -261,7 +302,7 @@ class TopoLayer(DataLayer):
 
                 if key == 'north':
                     # stack tiles along axis = 0 -> leftmost: bottom, rightmost: top
-                    self.data_array = np.concatenate((elevation_data, self.data_array),
+                    self.data_array = np.concatenate((self.data_array, elevation_data),
                                                      axis=0)
                     corners = self._get_lat_long_bbox(corners, val[idx + 1], key)
                 elif key == 'east':
@@ -272,26 +313,30 @@ class TopoLayer(DataLayer):
                 elif key == 'square':
                     # stack tiles into a square ->
                     # leftmost: bottom-left, rightmost: top-left
-                    corners = self._get_lat_long_bbox(corners, val[idx + 1], key, idx)
+                    corners = self._get_lat_long_bbox(corners, val[idx + 1], key, idx + 1)
+
                     if idx + 1 == 1:
+
                         self.data_array = np.concatenate(
                             (self.data_array, elevation_data), axis=1)
                     elif idx + 1 == 2:
                         tmp_array = elevation_data
+
                     elif idx + 1 == 3:
+
                         tmp_array = np.concatenate((elevation_data, tmp_array), axis=1)
 
-                        self.data_array = np.concatenate((tmp_array, self.data_array),
+                        self.data_array = np.concatenate((self.data_array, tmp_array),
                                                          axis=0)
         self._generate_lat_long(corners)
+        tr = (self.bl[0][0], self.tr[1][0])
+        bl = (self.tr[0][0], self.bl[1][0])
+        return self.data_array[tr[0]:bl[0], tr[1]:bl[1]]
 
-        return self.data_array[self.bl[1][0]:self.tr[1][0] + 1,
-                               self.bl[0][0]:self.tr[0][0] - 1]
+        # return self.data_array[self.bl[1][0]:self.tr[1][0], self.bl[0][0]:self.tr[0][0]]
+        # return self.data_array[self.tr[0][0]:self.bl[0][0], self.bl[1][0]:self.tr[1][0]]
 
-    def _generate_lat_long(self,
-                           corners: List[Tuple[int]],
-                           height: int = 6000,
-                           width: int = 6000) -> Tuple[int]:
+    def _generate_lat_long(self, corners: List[Tuple[int]]) -> Tuple[int]:
         '''
         Use tile name to set bounding box of tile:
 
@@ -328,25 +373,25 @@ class TopoLayer(DataLayer):
             # calculate dimensions (W)
             if corners[0][1] - corners[1][1] > self.degrees:
                 if corners[0][1] - corners[1][1] > self.degrees * 3:
-                    width = width * 3
+                    self.width = self.width * 3
                 else:
-                    width = width * 2
+                    self.width = self.width * 2
         else:
-            width = width
+            self.width = self.width
 
         if corners[0][0] < corners[2][0]:
             # calculate dimensions (N)
             if corners[2][0] - corners[0][0] > self.degrees:
                 if corners[2][0] - corners[0][0] > self.degrees * 3:
-                    height = height * 3
+                    self.height = self.height * 3
                 else:
-                    height = height * 2
+                    self.height = self.height * 2
         else:
-            height = height
+            self.height = self.height
 
         # create list[Tuple[floats]] with width and height
-        y = np.linspace(float(corners[0][0]), float(corners[2][0]), height)
-        x = np.linspace(float(corners[0][1]), float(corners[1][1]), width)
+        y = np.linspace(float(corners[2][0]), float(corners[0][0]), self.height)
+        x = np.linspace(float(corners[0][1]), float(corners[1][1]), self.width)
         # rotate to account for (latitude, longitude) -> (y, x)
         XX, YY = np.meshgrid(y, x)
         self.elev_array = np.stack((XX, YY), axis=2)
@@ -355,11 +400,20 @@ class TopoLayer(DataLayer):
         # this sorts it on the longitude
         elev_array_stacked = np.reshape(
             self.elev_array, (self.elev_array.shape[0] * self.elev_array.shape[1], 2))
-        bl = elev_array_stacked[spatial.KDTree(elev_array_stacked).query(self.BL)[1]]
-        self.bl = np.where((self.elev_array == bl).all(axis=-1))
+        pixels_move = int(np.round((1 / 2 * (math.sqrt(self.area))) / self.resolution))
 
-        tr = elev_array_stacked[spatial.KDTree(elev_array_stacked).query(self.TR)[1]]
-        self.tr = np.where((self.elev_array == tr).all(axis=-1))
+        center = elev_array_stacked[spatial.KDTree(elev_array_stacked).query(
+            self.center)[1]]
+        array_center = np.where((self.elev_array == center).all(axis=-1))
+
+        # get tl and br of array indices
+        self.tr = (array_center[1] + pixels_move, array_center[0] - pixels_move)
+        self.bl = (array_center[1] - pixels_move, array_center[0] + pixels_move)
+
+        # bl = elev_array_stacked[spatial.KDTree(elev_array_stacked).query(self.BL)[1]]
+        # self.bl = np.where((self.elev_array == bl).all(axis=-1))
+        # tr = elev_array_stacked[spatial.KDTree(elev_array_stacked).query(self.TR)[1]]
+        # self.tr = np.where((self.elev_array == tr).all(axis=-1))
 
     def _get_lat_long_bbox(self,
                            corners: List[Tuple[int]],
@@ -401,7 +455,7 @@ class TopoLayer(DataLayer):
             return [BL, br, tr, TL]
         elif stack == 'north':
             # top left and right need to be updated
-            return [BL, BR, tl, tr]
+            return [BL, BR, tr, tl]
         elif stack == 'square':
             # where to stack changes at each step
             if idx == 1:
@@ -427,20 +481,21 @@ class TopoLayer(DataLayer):
         Returns
             None
         '''
-        self._get_dems()
         data_array = self._generate_contours()
         data_array = data_array[:, :, 0]
 
         # replace missing values if necessary
-        if np.any(data_array == -9999.0):
-            data_array[data_array == -9999.0] = np.nan
+        if np.any(data_array == -999999.0):
+            data_array[data_array == -999999.0] = np.nan
 
         fig = plt.figure(figsize=(12, 8))
         fig.add_subplot(111)
-        plt.contour(data_array, cmap='viridis')  # levels = list(range(0, 6000, 500))
-        plt.title('Elevation Contours')
+        plt.contour(data_array, cmap='viridis')
+        plt.axis('off')
+        plt.title(f'Center: N{self.center[0]}W{self.center[1]}')
         # cbar = plt.colorbar()
         plt.gca().set_aspect('equal', adjustable='box')
+
         plt.savefig(f'img_n{self.BL[0]}_w{self.BL[1]}_n{self.TR[0]}_w{self.TR[1]}.png')
 
         return data_array

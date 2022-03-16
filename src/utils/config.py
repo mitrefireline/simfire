@@ -160,10 +160,31 @@ class Config:
         (`self.area.screen_size`, `self.area.screen_size`) with wind values at each pixel.
         '''
         if self.wind.wind_function.lower() == 'cfd':
+            args = self.terrain.perlin
+            terrain_map = np.zeros((args.shape[0], args.shape[1]))
+            for x in range(0, args.shape[0]):
+                for y in range(0, args.shape[1]):
+                    terrain_map[x][y] = self.terrain.elevation_function(x, y)
+
+            # TODO: Need to optimize cfd to work on 3d space.  For now we get the average terrain height 
+            # and for values slightly greater than that average we will count as terrain features for cfd
+            terrain_space = np.average(terrain_map) + (( np.max(terrain_map) - np.average(terrain_map) ) / 4 )
+
+            def create_cfd_terrain(e):
+                if e < terrain_space:
+                    return 0
+
+                return 1
+
+            cfd_func = np.vectorize(create_cfd_terrain)
+
+            terrain_map = cfd_func(terrain_map)
+
             source_speed = mph_to_ftpm(self.wind.cfd.speed)
             source_direction = self.wind.cfd.direction
-            wind_map = WindController2()
-            wind_map.initialize_wind_fields(source_direction, source_speed, self.area.screen_size)
+            wind_map = WindController2(terrain_features=terrain_map)
+            wind_map.initialize_wind_fields(source_direction, source_speed, 
+                                            self.area.screen_size)
         elif self.wind.wind_function.lower() == 'perlin':
             speed_min = mph_to_ftpm(self.wind.perlin.speed.min)
             speed_max = mph_to_ftpm(self.wind.perlin.speed.max)

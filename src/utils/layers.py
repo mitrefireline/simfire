@@ -459,6 +459,7 @@ class TopographyLayer(DataLayer):
         res = str(resolution) + 'm'
         self.datapath = self.path / res
         super().__init__(center, height, width, resolution)
+        self.data = self._make_contour_and_data()
 
     def _make_contour_and_data(self) -> np.ndarray:
         self._get_dems()
@@ -466,7 +467,7 @@ class TopographyLayer(DataLayer):
         data = np.asarray(data)
         # flip axis because latitude goes up but numpy will read it down
         data = np.flip(data, 0)
-        self.data = np.expand_dims(data, axis=-1)
+        data = np.expand_dims(data, axis=-1)
 
         for key, _ in self.tiles.items():
 
@@ -477,31 +478,31 @@ class TopographyLayer(DataLayer):
                 return self.data[tr[0]:bl[0], tr[1]:bl[1]]
             tmp_array = data
             for idx, dem in enumerate(self.tif_filenames[1:]):
-                data = Image.open(dem)
-                data = np.asarray(data)
+                tif_data = Image.open(dem)
+                tif_data = np.asarray(tif_data)
                 # flip axis because latitude goes up but numpy will read it down
-                data = np.flip(data, 0)
-                data = np.expand_dims(data, axis=-1)
+                tif_data = np.flip(tif_data, 0)
+                tif_data = np.expand_dims(tif_data, axis=-1)
 
                 if key == 'north':
                     # stack tiles along axis = 0 -> leftmost: bottom, rightmost: top
-                    self.data = np.concatenate((self.data, data), axis=0)
+                    data = np.concatenate((data, tif_data), axis=0)
                 elif key == 'east':
                     # stack tiles along axis = 2 -> leftmost, rightmost
-                    self.data = np.concatenate((self.data, data), axis=1)
+                    data = np.concatenate((data, tif_data), axis=1)
                 elif key == 'square':
                     if idx + 1 == 1:
-                        self.data = np.concatenate((self.data, data), axis=1)
+                        data = np.concatenate((data, tif_data), axis=1)
                     elif idx + 1 == 2:
                         tmp_array = data
                     elif idx + 1 == 3:
-                        tmp_array = np.concatenate((data, tmp_array), axis=1)
+                        tmp_array = np.concatenate((tif_data, tmp_array), axis=1)
                         self.data = np.concatenate((self.data, tmp_array), axis=0)
 
         tr = (self.bl[0][0], self.tr[1][0])
         bl = (self.tr[0][0], self.bl[1][0])
-        self.data_array = self.data[tr[0]:bl[0], tr[1]:bl[1]]
-        return self.data_array
+        data_array = data[tr[0]:bl[0], tr[1]:bl[1]]
+        return data_array
 
     def _get_dems(self) -> List[Path]:
         '''

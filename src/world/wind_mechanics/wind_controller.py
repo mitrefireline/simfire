@@ -76,19 +76,23 @@ class WindController():
 # For CFD Implementations
 class WindController2():
     '''
-    Generates and tracks objects that dictate wind magnitude and wind direction for map
-    given size of the screen
+    This is a PRECOMPUTE wind controller.  It generates and tracks objects that dictate wind magnitude and 
+    wind direction for map given size of the screen.
     '''
     def __init__(self, screen_size: int = 225, result_accuracy: int = 1, scale: int = 1,
                  timestep: float = 1.0, diffusion: float = 0.0,
                  viscosity: float = 0.0000001,
-                 terrain_features: np.ndarray = None) -> None:
+                 terrain_features: np.ndarray = None,
+                 wind_speed: float = 27,
+                 wind_direction: str = 'North') -> None:
         self.N: int = screen_size
         self.iterations: int = result_accuracy
         self.scale = scale
         self.timestep = timestep
         self.diffusion = diffusion
         self.viscosity = viscosity
+        self.wind_speed = wind_speed
+        self.wind_direction = wind_direction
 
         if terrain_features is None:
             self.terrain_features = np.zeros((self.N, self.N))
@@ -99,26 +103,35 @@ class WindController2():
         self.fvect = Fluid(self.N, self.iterations, self.scale, self.timestep, 
                            self.diffusion, self.viscosity, self.terrain_features)
 
-    def initialize_wind_fields(self, source_direction, source_speed,
-                               screen_size: int = 225):
-        time_end = time.time() + 100
-        screen = pygame.display.set_mode([225, 225])
-        screen.fill((255, 255, 255))
-        while time.time() < time_end:
-            # contiually spawn velocity
-            for v in range(0, screen_size):
-                if source_direction == 'north':
-                    self.fvect.addVelocity(v, 1, 0, source_speed)
-                elif source_direction == 'east':
-                    self.fvect.addVelocity(screen_size - 1, v, -1 * source_speed, 0)
-                elif source_direction == 'south':
-                    self.fvect.addVelocity(1, v, -1 * source_speed, 0)
-                elif source_direction == 'west':
-                    self.fvect.addVelocity(1, v, source_speed, 0)
-                else:
-                    print('Bad source direction input')
-                    return
+    def iterate_wind_step(self) -> None:
+        for v in range(0, self.N):
+            if self.wind_direction == 'north':
+                self.fvect.addVelocity(v, 1, 0, self.wind_speed)
+            elif self.wind_direction == 'east':
+                self.fvect.addVelocity(self.screen_size - 1, v, -1 * self.wind_speed, 0)
+            elif self.wind_direction == 'south':
+                self.fvect.addVelocity(1, v, -1 * self.wind_speed, 0)
+            elif self.wind_direction == 'west':
+                self.fvect.addVelocity(1, v, self.wind_speed, 0)
+            else:
+                print('Bad source direction input')
 
-            self.fvect.step()
-            self.fvect.renderD(screen)
-            pygame.display.flip()
+        self.fvect.step()
+        return
+
+    def get_wind_density_field(self) -> np.ndarray:
+        return self.fvect.density
+
+    def get_wind_velocity_field_x(self) -> np.ndarray:
+        return self.fvect.Vx
+
+    def get_wind_velocity_field_y(self) -> np.ndarray:
+        return self.fvect.Vy
+
+    def get_wind_scale(self) -> int:
+        return self.scale
+
+    def get_screen_size(self) -> None:
+        return self.N
+
+    

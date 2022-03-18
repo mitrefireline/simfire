@@ -44,6 +44,11 @@ environment:
 wind:
   wind_function: cfd
   cfd:
+    iterations: 1
+    scale: 1
+    timestep_dt: 1.0
+    diffusion: 0.0
+    viscosity: 0.0000001
     speed: 19
     direction: north
   simple:

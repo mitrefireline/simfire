@@ -46,7 +46,7 @@ class Config:
     Reads in a YAML file and assigns nested attributes to itself based on structure of
     YAML
     '''
-    def __init__(self, path: Path) -> None:
+    def __init__(self, path: Path, cfd_precompute: bool = False) -> None:
         '''
         Arguments:
             path: The path to the `config.yml` file. This file can have any name, but
@@ -62,7 +62,8 @@ class Config:
         self._set_terrain_scale()
         self._set_elevation_function()
         self._set_fuel_array_function()
-        self._set_wind_function()
+        if cfd_precompute is False:
+            self._set_wind_function()
 
     def _load(self) -> None:
         '''
@@ -173,7 +174,6 @@ class Config:
             def create_cfd_terrain(e):
                 if e < terrain_space:
                     return 0
-
                 return 1
 
             cfd_func = np.vectorize(create_cfd_terrain)
@@ -183,8 +183,8 @@ class Config:
             source_speed = mph_to_ftpm(self.wind.cfd.speed)
             source_direction = self.wind.cfd.direction
             wind_map = WindController2(terrain_features=terrain_map)
-            wind_map.initialize_wind_fields(source_direction, source_speed, 
-                                            self.area.screen_size)
+            # wind_map.generate_wind_field(source_direction, source_speed, 
+            #                                 self.area.screen_size)
         elif self.wind.wind_function.lower() == 'perlin':
             speed_min = mph_to_ftpm(self.wind.perlin.speed.min)
             speed_max = mph_to_ftpm(self.wind.perlin.speed.max)
@@ -228,6 +228,38 @@ class Config:
         else:
             runtime = self.simulation.runtime
         setattr(self.simulation, 'runtime', str_to_minutes(runtime))
+
+    def get_cfd_wind_map(self) -> WindController2:
+        args = self.terrain.perlin
+        terrain_map = np.zeros((args.shape[0], args.shape[1]))
+        for x in range(0, args.shape[0]):
+            for y in range(0, args.shape[1]):
+                terrain_map[x][y] = self.terrain.elevation_function(x, y)
+
+        '''
+        TODO: Need to optimize cfd to work on 3d space.  For now we get the average
+        terrain height and for values slightly greater than that average we will
+        count as terrain features for cfd
+        '''
+        terrain_space = np.average(terrain_map) + (( np.max(terrain_map) - np.average(terrain_map) ) / 4 )
+
+        def create_cfd_terrain(e):
+            if e < terrain_space:
+                return 0
+            return 1
+
+        cfd_func = np.vectorize(create_cfd_terrain)
+
+        terrain_map = cfd_func(terrain_map)
+
+        source_speed = mph_to_ftpm(self.wind.cfd.speed)
+        source_direction = self.wind.cfd.direction
+        wind_map = WindController2(terrain_features=terrain_map,
+                                   wind_direction=source_direction,
+                                   wind_speed=source_speed)
+        # wind_map.generate_wind_field(source_direction, source_speed, 
+        #                                 self.area.screen_size)
+        return wind_map
 
     def reset_elevation_function(self, seed: int) -> None:
         '''

@@ -1,8 +1,8 @@
 import unittest
-from ..layers import TopographyLayer
+from ..layers import DataLayer, TopographyLayer
 
 
-class TestTopographyLayer(unittest.TestCase):
+class TestDataLayer(unittest.TestCase):
     def setUp(self) -> None:
         '''
         Set up tests for reading in real topography
@@ -17,24 +17,24 @@ class TestTopographyLayer(unittest.TestCase):
         resolution = 30
 
         # 2 Tiles
-        center = (32.4, 115.004)
+        center = (33.4, 116.004)
         height, width = 1600, 1600
-        topographyGen = TopographyLayer(center, height, width, resolution)
-        test_output_dems = ((32, 116), (32, 114))
-        self.assertEqual(topographyGen.five_deg_north_min, test_output_dems[0][0])
-        self.assertEqual(topographyGen.five_deg_north_max, test_output_dems[1][0])
-        self.assertEqual(topographyGen.five_deg_west_min, test_output_dems[1][1])
-        self.assertEqual(topographyGen.five_deg_west_max, test_output_dems[0][1])
+        data_layer = DataLayer(center, height, width, resolution)
+        test_output_dems = ((33, 117), (33, 115))
+        self.assertEqual(data_layer.five_deg_north_min, test_output_dems[0][0])
+        self.assertEqual(data_layer.five_deg_north_max, test_output_dems[1][0])
+        self.assertEqual(data_layer.five_deg_west_min, test_output_dems[1][1])
+        self.assertEqual(data_layer.five_deg_west_max, test_output_dems[0][1])
 
         # 4 Tiles
-        center = (33.001, 115.001)
+        center = (35.001, 117.001)
         height, width = 1600, 1600
-        topographyGen = TopographyLayer(center, height, width, resolution)
-        test_output_dems = ((32, 116), (32, 115), (33, 115), (34, 116))
-        self.assertEqual(topographyGen.five_deg_north_min, test_output_dems[0][0])
-        self.assertEqual(topographyGen.five_deg_north_max, test_output_dems[2][0])
-        self.assertEqual(topographyGen.five_deg_west_min, test_output_dems[1][1])
-        self.assertEqual(topographyGen.five_deg_west_max, test_output_dems[0][1])
+        data_layer = DataLayer(center, height, width, resolution)
+        test_output_dems = ((34, 118), (34, 117), (35, 117), (35, 118))
+        self.assertEqual(data_layer.five_deg_north_min, test_output_dems[0][0])
+        self.assertEqual(data_layer.five_deg_north_max, test_output_dems[2][0])
+        self.assertEqual(data_layer.five_deg_west_min, test_output_dems[1][1])
+        self.assertEqual(data_layer.five_deg_west_max, test_output_dems[0][1])
 
     def test__stack_tiles(self) -> None:
         '''
@@ -44,19 +44,19 @@ class TestTopographyLayer(unittest.TestCase):
 
         # 2 Tiles
         resolution = 30
-        center = (32.001, 115.6)
+        center = (35.001, 115.6)
         height, width = 1600, 1600
-        topographyGen = TopographyLayer(center, height, width, resolution)
-        test_output_dems = {'north': ((31, 116), (32, 116))}
-        self.assertEqual(test_output_dems, topographyGen.tiles)
+        data_layer = DataLayer(center, height, width, resolution)
+        test_output_dems = {'north': ((34, 116), (35, 116))}
+        self.assertEqual(test_output_dems, data_layer.tiles)
 
         # 4 Tiles
         resolution = 90
-        center = (34.99, 110.001)
+        center = (34.99, 115.001)
         height, width = 3200, 3200
-        topographyGen = TopographyLayer(center, height, width, resolution)
-        test_output_dems = {'square': ((30, 115), (30, 110), (40, 110), (40, 115))}
-        self.assertEqual(test_output_dems, topographyGen.tiles)
+        data_layer = DataLayer(center, height, width, resolution)
+        test_output_dems = {'square': ((30, 120), (30, 115), (40, 115), (40, 120))}
+        self.assertEqual(test_output_dems, data_layer.tiles)
 
     def test__generate_lat_long(self) -> None:
         '''
@@ -72,16 +72,16 @@ class TestTopographyLayer(unittest.TestCase):
         resolution = 30
 
         # # 2 Tiles easternly
-        center = (32.4, 115.01)
+        center = (36.4, 118.01)
         height, width = 3200, 3200
-        topographyGen = TopographyLayer(center, height, width, resolution)
-        self.assertEqual(topographyGen.elev_array.shape, (7224, 3612, 2))
+        data_layer = DataLayer(center, height, width, resolution)
+        self.assertEqual(data_layer.elev_array.shape, (7224, 3612, 2))
 
         # 2 Tiles northernly
-        center = (32.001, 115.6)
+        center = (34.001, 115.6)
         height, width = 3200, 3200
-        topographyGen = TopographyLayer(center, height, width, resolution)
-        self.assertEqual(topographyGen.elev_array.shape, (3612, 7224, 2))
+        data_layer = DataLayer(center, height, width, resolution)
+        self.assertEqual(data_layer.elev_array.shape, (3612, 7224, 2))
 
     def test__get_lat_long_bbox(self) -> None:
         '''
@@ -92,17 +92,30 @@ class TestTopographyLayer(unittest.TestCase):
         resolution = 30
 
         # 2 Tiles northernly
-        center = (32.001, 115.6)
+        center = (34.001, 115.6)
         height, width = 3200, 3200
-        topographyGen = TopographyLayer(center, height, width, resolution)
-        output = [(31, 116), (31, 115), (33, 115), (33, 116)]
-        self.assertEqual(output, topographyGen.corners)
+        data_layer = DataLayer(center, height, width, resolution)
+        output = [(33, 116), (33, 115), (35, 115), (35, 116)]
+        self.assertEqual(output, data_layer.corners)
 
     def test_save_contour_map(self) -> None:
         '''
         Test that the call to _save_contour_map() runs propoerly.
         '''
-        pass
+        resolution = 30
+        # Single Tile
+        center = (33.5, 116.8)
+        height, width = 1600, 1600
+        data_layer = DataLayer(center, height, width, resolution)
+        topo_layer = TopographyLayer(data_layer)
+        data_layer._save_contour_map(topo_layer.data)
+
+
+class TestTopographyLayer(unittest.TestCase):
+    def setUp(self) -> None:
+        '''
+
+        '''
 
     def test__make_contour_and_data(self) -> None:
         '''
@@ -116,9 +129,9 @@ class TestTopographyLayer(unittest.TestCase):
         # 2 Tiles (easternly)
         center = (33.4, 115.04)
         height, width = 3200, 3200
-        topographyGen = TopographyLayer(center, height, width, resolution)
-        data_layer = topographyGen._make_contour_and_data()
-        self.assertEqual(data_layer.shape[0], data_layer.shape[1])
+        data_layer = DataLayer(center, height, width, resolution)
+        topographyGen = TopographyLayer(data_layer)
+        self.assertEqual(topographyGen.data.shape[0], topographyGen.data.shape[1])
 
     def test__get_dems(self) -> None:
         '''
@@ -128,22 +141,22 @@ class TestTopographyLayer(unittest.TestCase):
 
         resolution = 30
         # Single Tile
-        center = (32.2, 115.6)
+        center = (35.2, 115.6)
         height, width = 1600, 1600
-        topographyGen = TopographyLayer(center, height, width, resolution)
-        topographyGen._get_dems()
+        data_layer = DataLayer(center, height, width, resolution)
+        topographyGen = TopographyLayer(data_layer)
         self.assertEqual(1, len(topographyGen.tif_filenames))
 
         # 2 Tiles
-        center = (32.4, 115.0)
+        center = (38.4, 115.0)
         height, width = 1600, 1600
-        topographyGen = TopographyLayer(center, height, width, resolution)
-        topographyGen._get_dems()
+        data_layer = DataLayer(center, height, width, resolution)
+        topographyGen = TopographyLayer(data_layer)
         self.assertEqual(2, len(topographyGen.tif_filenames))
 
         # 4 Tiles
         center = (34.001, 116.008)
         height, width = 3200, 3200
-        topographyGen = TopographyLayer(center, height, width, resolution)
-        topographyGen._get_dems()
+        data_layer = DataLayer(center, height, width, resolution)
+        topographyGen = TopographyLayer(data_layer)
         self.assertEqual(4, len(topographyGen.tif_filenames))

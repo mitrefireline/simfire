@@ -57,6 +57,8 @@ class DataLayer():
 
         TODO: This method only creates a square, needs re-tooling to create a rectangle
         '''
+        assert height == width, 'height and width must be equal'
+
         self.area = height * width
         self.center = center
         self.resolution = resolution
@@ -441,9 +443,8 @@ class DataLayer():
         plt.savefig(f'img_n{self.BL[0]}_w{self.BL[1]}_n{self.TR[0]}_w{self.TR[1]}.png')
 
 
-class TopographyLayer(DataLayer):
-    def __init__(self, center: Tuple[float], height: int, width: int,
-                 resolution: int) -> None:
+class TopographyLayer():
+    def __init__(self, data_layer: DataLayer) -> None:
         '''
         Initialize the elevation layer by retrieving the correct topograpchic data
             and computing the area.
@@ -455,10 +456,11 @@ class TopographyLayer(DataLayer):
             resolution: The resolution to get data
 
         '''
+        self.data_layer = data_layer
         self.path = Path('/nfs/lslab2/fireline/data/topographic/')
-        res = str(resolution) + 'm'
+        res = str(self.data_layer.resolution) + 'm'
         self.datapath = self.path / res
-        super().__init__(center, height, width, resolution)
+
         self.data = self._make_contour_and_data()
 
     def _make_contour_and_data(self) -> np.ndarray:
@@ -469,12 +471,12 @@ class TopographyLayer(DataLayer):
         data = np.flip(data, 0)
         data = np.expand_dims(data, axis=-1)
 
-        for key, _ in self.tiles.items():
+        for key, _ in self.data_layer.tiles.items():
 
             if key == 'single':
                 # simple case
-                tr = (self.bl[0][0], self.tr[1][0])
-                bl = (self.tr[0][0], self.bl[1][0])
+                tr = (self.data_layer.bl[0][0], self.data_layer.tr[1][0])
+                bl = (self.data_layer.tr[0][0], self.data_layer.bl[1][0])
                 return data[tr[0]:bl[0], tr[1]:bl[1]]
             tmp_array = data
             for idx, dem in enumerate(self.tif_filenames[1:]):
@@ -494,13 +496,13 @@ class TopographyLayer(DataLayer):
                     if idx + 1 == 1:
                         data = np.concatenate((data, tif_data), axis=1)
                     elif idx + 1 == 2:
-                        tmp_array = data
+                        tmp_array = tif_data
                     elif idx + 1 == 3:
                         tmp_array = np.concatenate((tif_data, tmp_array), axis=1)
-                        self.data = np.concatenate((self.data, tmp_array), axis=0)
+                        data = np.concatenate((data, tmp_array), axis=0)
 
-        tr = (self.bl[0][0], self.tr[1][0])
-        bl = (self.tr[0][0], self.bl[1][0])
+        tr = (self.data_layer.bl[0][0], self.data_layer.tr[1][0])
+        bl = (self.data_layer.tr[0][0], self.data_layer.bl[1][0])
         data_array = data[tr[0]:bl[0], tr[1]:bl[1]]
         return data_array
 
@@ -518,7 +520,7 @@ class TopographyLayer(DataLayer):
 
         self.tif_filenames = []
 
-        for _, ranges in self.tiles.items():
+        for _, ranges in self.data_layer.tiles.items():
             for range in ranges:
                 (five_deg_n, five_deg_w) = range
                 tif_data_region = Path(f'n{five_deg_n}w{five_deg_w}.tif')

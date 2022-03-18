@@ -392,7 +392,7 @@ class DataLayer():
                 # simple case
                 self._generate_lat_long(self.corners)
             else:
-                for idx in range(len(val)):
+                for idx, _ in enumerate(val[1:]):
                     if key == 'north':
                         # stack tiles along axis = 0 -> leftmost: bottom, rightmost: top
                         self.corners = self._get_lat_long_bbox(self.corners, val[idx + 1],

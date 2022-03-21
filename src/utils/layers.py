@@ -5,6 +5,7 @@ import math
 from PIL import Image
 
 from ..world.elevation_functions import ElevationFn
+from ..world.presets import Chaparral
 
 
 # Developing a function to round to a multiple
@@ -528,9 +529,8 @@ class TopographyLayer():
                 self.tif_filenames.append(tif_file)
 
 
-class FuelLayer(DataLayer):
-    def __init__(self, center: Tuple[float], height: int, width: int,
-                 resolution: int) -> None:
+class FuelLayer():
+    def __init__(self, data_layer: DataLayer) -> None:
         '''
         Initialize the elevation layer by retrieving the correct topograpchic data
             and computing the area.
@@ -542,52 +542,79 @@ class FuelLayer(DataLayer):
             resolution: The resolution to get data
 
         '''
-        self.path = Path('/nfs/lslab2/fireline/fuel/')
+        self.data_layer = data_layer
+        # Temporary until we get real fuel data
+        self.path = Path('/nfs/lslab2/fireline/data/topographic/')
+        res = str(self.data_layer.resolution) + 'm'
+        self.datapath = self.path / res
 
-        super().__init__(center, height, width, resolution)
+        self.data = self._make_contour_and_data()
 
     def _make_contour_and_data(self) -> np.ndarray:
-
+        self._get_dems()
         data = Image.open(self.tif_filenames[0])
         data = np.asarray(data)
         # flip axis because latitude goes up but numpy will read it down
         data = np.flip(data, 0)
-        self.data = np.expand_dims(data, axis=-1)
+        data = np.expand_dims(data, axis=-1)
 
-        for key, _ in self.tiles.items():
+        for key, _ in self.data_layer.tiles.items():
 
             if key == 'single':
                 # simple case
-                tr = (self.bl[0][0], self.tr[1][0])
-                bl = (self.tr[0][0], self.bl[1][0])
-                return self.data[tr[0]:bl[0], tr[1]:bl[1]]
+                tr = (self.data_layer.bl[0][0], self.data_layer.tr[1][0])
+                bl = (self.data_layer.tr[0][0], self.data_layer.bl[1][0])
+                # Temporary solution until data source is added
+                return np.full((bl[0] - tr[0], bl[1] - tr[1], 1), Chaparral)
+                # return data[tr[0]:bl[0], tr[1]:bl[1]]
             tmp_array = data
             for idx, dem in enumerate(self.tif_filenames[1:]):
-                data = Image.open(dem)
-                data = np.asarray(data)
+                tif_data = Image.open(dem)
+                tif_data = np.asarray(tif_data)
                 # flip axis because latitude goes up but numpy will read it down
-                data = np.flip(data, 0)
-                data = np.expand_dims(data, axis=-1)
+                tif_data = np.flip(tif_data, 0)
+                tif_data = np.expand_dims(tif_data, axis=-1)
 
                 if key == 'north':
                     # stack tiles along axis = 0 -> leftmost: bottom, rightmost: top
-                    self.data = np.concatenate((self.data, data), axis=0)
+                    data = np.concatenate((data, tif_data), axis=0)
                 elif key == 'east':
                     # stack tiles along axis = 2 -> leftmost, rightmost
-                    self.data = np.concatenate((self.data, data), axis=1)
+                    data = np.concatenate((data, tif_data), axis=1)
                 elif key == 'square':
                     if idx + 1 == 1:
-                        self.data = np.concatenate((self.data, data), axis=1)
+                        data = np.concatenate((data, tif_data), axis=1)
                     elif idx + 1 == 2:
-                        tmp_array = data
+                        tmp_array = tif_data
                     elif idx + 1 == 3:
-                        tmp_array = np.concatenate((data, tmp_array), axis=1)
-                        self.data = np.concatenate((self.data, tmp_array), axis=0)
+                        tmp_array = np.concatenate((tif_data, tmp_array), axis=1)
+                        data = np.concatenate((data, tmp_array), axis=0)
 
-        tr = (self.bl[0][0], self.tr[1][0])
-        bl = (self.tr[0][0], self.bl[1][0])
-        self.data_array = self.data[tr[0]:bl[0], tr[1]:bl[1]]
-        return self.data_array
+        tr = (self.data_layer.bl[0][0], self.data_layer.tr[1][0])
+        bl = (self.data_layer.tr[0][0], self.data_layer.bl[1][0])
+        data_array = data[tr[0]:bl[0], tr[1]:bl[1]]
+        return data_array
+
+    def _get_dems(self) -> List[Path]:
+        '''
+        This method will use the outputed tiles and return the correct dem files
+
+        Arguments:
+            None
+
+        Return:
+            None
+
+        '''
+
+        self.tif_filenames = []
+
+        for _, ranges in self.data_layer.tiles.items():
+            for range in ranges:
+                (five_deg_n, five_deg_w) = range
+                tif_data_region = Path(f'n{five_deg_n}w{five_deg_w}.tif')
+                tif_file = self.datapath / tif_data_region
+                self.tif_filenames.append(tif_file)
 
 
 class TransportationLayer(DataLayer):

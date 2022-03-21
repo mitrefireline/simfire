@@ -268,7 +268,7 @@ class RothermelFireManager(FireManager):
         # Keep track of how much each pixel has burned.
         # This is needed since each pixel represents a specific number of feet
         # and it might take more than one update to burn
-        self.burn_amounts = np.zeros_like(self.terrain.fuel_arrs)
+        self.burn_amounts = np.zeros_like(self.terrain.fuels)
         self.slope_mag, self.slope_dir = self._compute_slopes()
 
     def _compute_slopes(self) -> Tuple[np.ndarray, np.ndarray]:
@@ -315,9 +315,7 @@ class RothermelFireManager(FireManager):
         loc_x = [x] * num_locs
         loc_y = [y] * num_locs
         n_w_0, n_delta, n_M_x, n_sigma = list(
-            zip(*[
-                astuple(arr.fuel) for arr in self.terrain.fuel_arrs[new_locs_uzip[::-1]]
-            ]))
+            zip(*[astuple(fuel) for fuel in self.terrain.fuels[new_locs_uzip[::-1]]]))
         # Set the FuelParticle parameters into arrays
         h = [self.fuel_particle.h] * num_locs
         S_T = [self.fuel_particle.S_T] * num_locs

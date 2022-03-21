@@ -17,7 +17,7 @@ class Game():
     terrain, fire, and other sprites to be rendered and interact.
     '''
     def __init__(self,
-                 screen_size: int,
+                 screen_size: Tuple[int],
                  headless: bool = False,
                  show_wind_magnitude: bool = False,
                  show_wind_direction: bool = False,
@@ -29,7 +29,7 @@ class Game():
         Initalize the class by creating the game display and background.
 
         Arguments:
-            screen_size: The (n,n) size of the game screen/display.
+            screen_size: The (n,n) size of the game screen/display in pixels.
             headless: Flag to run in a headless state.
         '''
         self.screen_size = screen_size
@@ -44,7 +44,7 @@ class Game():
 
         if not self.headless:
             pygame.init()
-            self.screen = pygame.display.set_mode((screen_size, screen_size))
+            self.screen = pygame.display.set_mode(screen_size)
             pygame.display.set_caption('Rothermel 2D Simulator')
             with resources.path('assets.icons', 'fireline_logo.png') as path:
                 fireline_logo_path = path
@@ -59,7 +59,7 @@ class Game():
             self.background.fill((0, 0, 0))
 
         # Map to track which pixels are on fire or have burned
-        self.fire_map = np.full((screen_size, screen_size), BurnStatus.UNBURNED)
+        self.fire_map = np.full(screen_size, BurnStatus.UNBURNED)
 
     def _toggle_wind_magnitude_display(self):
         '''

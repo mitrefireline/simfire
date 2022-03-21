@@ -505,6 +505,8 @@ class TopographyLayer():
         tr = (self.data_layer.bl[0][0], self.data_layer.tr[1][0])
         bl = (self.data_layer.tr[0][0], self.data_layer.bl[1][0])
         data_array = data[tr[0]:bl[0], tr[1]:bl[1]]
+        # Convert from meters to feet for use with Rothermel
+        data_array = 3.28084 * data_array
         return data_array
 
     def _get_dems(self) -> List[Path]:

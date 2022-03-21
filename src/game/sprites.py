@@ -1,10 +1,9 @@
+import tempfile
 from typing import Tuple
 
-import matplotlib.contour as mcontour
 import matplotlib.pyplot as plt
-import matplotlib.cm as cm
 import numpy as np
-from PIL import Image, ImageDraw
+from PIL import Image
 import pygame
 
 from ..enums import (BurnStatus, DRY_TERRAIN_BROWN_IMG, SpriteLayer, TERRAIN_TEXTURE_PATH,
@@ -116,7 +115,7 @@ class Terrain(pygame.sprite.Sprite):
                 image[i, j] = updated_texture
 
         cont_image = self._make_contour_image(image)
-        out_surf = pygame.surfarray.make_surface(cont_image)
+        out_surf = pygame.surfarray.make_surface(cont_image.swapaxes(0, 1))
 
         return out_surf
 
@@ -133,49 +132,18 @@ class Terrain(pygame.sprite.Sprite):
         Returns:
             out_image: The input image with the contour lines drawn on it
         '''
-        # Create a meshgrid to capture the elevations at all pixel points
-        x = np.arange(self.topo_layer.data.shape[1])
-        y = np.arange(self.topo_layer.data.shape[0])
-        X, Y = np.meshgrid(x, y)
-
-        # Convert the image to a PIL.Image.Image and draw on it
-        img = Image.fromarray(image.astype(np.uint8))
-        draw = ImageDraw.Draw(img)
-        # Use more levels for larger images (more pixels to draw on)
-        num_levels = self.topo_layer.data.shape[0] // 5
-        levels = np.linspace(np.min(self.topo_layer.data), np.max(self.topo_layer.data),
-                             num_levels)
-        cont = mcontour.QuadContourSet(plt.gca(),
-                                       X,
-                                       Y,
-                                       self.topo_layer.data.squeeze(),
-                                       levels=levels)
-
-        # Use a diverging colormap so that higher elevations are green and lower
-        # elevations are purple
-        cmap = cm.get_cmap('PRGn')
-
-        # Loop over all contours and their levels to draw them
-        for level, segs in zip(cont.levels, cont.allsegs):
-            if segs == []:
-                continue
-            seg = segs[0]
-            r = (level - cont.zmin) / (cont.zmax - cont.zmin)
-            # Remove the alpha value
-            icmap = cmap(r)[:3]
-            # Normalize to [0, 255] and convert to uint8 for Image display
-            icmap = (255 * np.array(icmap)).astype(np.uint8)
-            # The segs are returned in a numpy array of shape (num_points, 2)
-            # Map them to tuples for compatibility with ImageDraw
-            coords = tuple(map(tuple, seg))
-            draw.line(coords, fill=tuple(icmap.tolist()), width=1)
-            text_loc = seg[seg.shape[0] // 2]
-            draw.text(text_loc.tolist(), f'{int(level)}', stroke_width=1, direction='rtl')
-
-        # Convert to the desired output format
-        out_image = np.array(img).astype(np.float32)
-
-        return out_image
+        # Create a figure with axes
+        fig, ax = plt.subplots()
+        ax.imshow(image.astype(np.uint8))
+        CS = ax.contour(self.topo_layer.data.squeeze(), origin='upper')
+        ax.clabel(CS, CS.levels, inline=True, fmt=lambda x: f'{x:.0f}')
+        plt.axis('off')
+        with tempfile.NamedTemporaryFile(suffix='.png') as out_img_path:
+            fig.savefig(out_img_path.name, bbox_inches='tight', pad_inches=0)
+            out_img = Image.open(out_img_path.name).resize(image.shape[:2])
+            # Slice the alpha channel off
+            out_img = np.array(out_img)[..., :3]
+        return out_img
 
     def _update_texture_dryness(self, fuel: Fuel) -> np.ndarray:
         '''

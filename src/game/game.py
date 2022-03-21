@@ -283,7 +283,8 @@ class Game():
         # Update and draw the sprites
         if not self.headless:
             for sprite in all_sprites.sprites():
-                self.screen.blit(self.background, sprite.rect, sprite.rect)
+                # self.screen.blit(self.background, sprite.rect, sprite.rect)
+                self.screen.blit(self.background, (0, 0))
 
         fire_sprites_group.update()
         terrain.update(self.fire_map)
@@ -299,6 +300,6 @@ class Game():
                 self.screen.blit(wind_dir_surf, (0, 0))
 
         if not self.headless:
-            pygame.display.flip()
+            pygame.display.update()
 
         return status

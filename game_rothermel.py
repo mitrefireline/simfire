@@ -8,6 +8,7 @@ from src.game.managers.fire import RothermelFireManager
 from src.game.managers.mitigation import FireLineManager
 from src.game.sprites import Terrain
 from src.utils.config import Config
+from src.utils.layers import TopographyLayer
 from src.world.parameters import Environment, FuelParticle
 
 
@@ -23,8 +24,12 @@ def main():
     fuel_arrs = [[
         cfg.terrain.fuel_array_function(x, y) for x in range(cfg.area.terrain_size)
     ] for y in range(cfg.area.terrain_size)]
-    terrain = Terrain(fuel_arrs, cfg.terrain.elevation_function, cfg.area.terrain_size,
-                      cfg.area.screen_size)
+
+    center = (33.5, 116.8)
+    height, width = 1600, 1600
+    resolution = 30
+    topo_layer = TopographyLayer(center, height, width, resolution)
+    terrain = Terrain(fuel_arrs, topo_layer, cfg.area.terrain_size, cfg.area.screen_size)
 
     environment = Environment(cfg.environment.moisture, cfg.wind.speed,
                               cfg.wind.direction)

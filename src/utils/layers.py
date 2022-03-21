@@ -475,7 +475,7 @@ class TopographyLayer(DataLayer):
                 # simple case
                 tr = (self.bl[0][0], self.tr[1][0])
                 bl = (self.tr[0][0], self.bl[1][0])
-                return self.data[tr[0]:bl[0], tr[1]:bl[1]]
+                return data[tr[0]:bl[0], tr[1]:bl[1]]
             tmp_array = data
             for idx, dem in enumerate(self.tif_filenames[1:]):
                 tif_data = Image.open(dem)

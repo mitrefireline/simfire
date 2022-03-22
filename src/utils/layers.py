@@ -1,7 +1,8 @@
-import numpy as np
-from typing import Tuple, List, Dict
-from pathlib import Path
 import math
+from pathlib import Path
+from typing import Tuple, List, Dict
+
+import numpy as np
 from PIL import Image
 
 from ..world.elevation_functions import ElevationFn
@@ -566,8 +567,10 @@ class FuelLayer():
                 # simple case
                 tr = (self.data_layer.bl[0][0], self.data_layer.tr[1][0])
                 bl = (self.data_layer.tr[0][0], self.data_layer.bl[1][0])
-                # Temporary solution until data source is added
-                return np.full((bl[0] - tr[0], bl[1] - tr[1], 1), Chaparral)
+                # TODO: Temporary solution until data source is added
+                h = bl[0] - tr[0]
+                w = bl[1] - tr[1]
+                return np.full((h, w, 1), Chaparral)
                 # return data[tr[0]:bl[0], tr[1]:bl[1]]
             tmp_array = data
             for idx, dem in enumerate(self.tif_filenames[1:]):

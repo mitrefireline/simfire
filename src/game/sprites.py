@@ -138,11 +138,8 @@ class Terrain(pygame.sprite.Sprite):
         CS = ax.contour(self.topo_layer.data.squeeze(), origin='upper')
         ax.clabel(CS, CS.levels, inline=True, fmt=lambda x: f'{x:.0f}')
         plt.axis('off')
-        with tempfile.NamedTemporaryFile(suffix='.svg') as out_img_path:
-            fig.savefig(out_img_path.name,
-                        format='svg',
-                        bbox_inches='tight',
-                        pad_inches=0)
+        with tempfile.NamedTemporaryFile(suffix='.png') as out_img_path:
+            fig.savefig(out_img_path.name, bbox_inches='tight', pad_inches=0)
             out_img = Image.open(out_img_path.name).resize(image.shape[:2])
             # Slice the alpha channel off
             out_img = np.array(out_img)[..., :3]

@@ -33,7 +33,7 @@ def renderV(surface, screen_size, scale, velocity_x, velocity_y) -> None:
             y = j * scale
             vx = velocity_x[i][j]
             vy = velocity_y[i][j]
-            if (not (abs(vx) < 0.1 and abs(vy)) <= 0.1):
+            if (not(abs(vx) < 0.1 and abs(vy) <= 0.1)):
                 meanval = int(np.mean([vx, vy]))
                 if meanval < 0:
                     meanval = 0
@@ -44,8 +44,33 @@ def renderV(surface, screen_size, scale, velocity_x, velocity_y) -> None:
     return
 
 
+def generate_magnitude_array(velocity_x, velocity_y):
+    magnitude = np.zeros((velocity_x.shape[0], velocity_y.shape[1]), dtype=float)
+    shape_x = magnitude.shape[0]
+    shape_y = magnitude.shape[1]
+    for row in range(0, shape_y):
+        for col in range(0, shape_x):
+            magnitude[col][row] = np.sqrt((velocity_x[col][row] ** 2)
+                                           + (velocity_y[col][row] ** 2))
+    return magnitude
+
+
+def generate_direction_array(velocity_x, velocity_y):
+    direction = np.zeros((velocity_x.shape[0], velocity_y.shape[1]), dtype=float)
+    shape_x = direction.shape[0]
+    shape_y = direction.shape[1]
+    for row in range(0, shape_y):
+        for col in range(0, shape_x):
+            vx = velocity_x[col][row]
+            vy = (-1) * velocity_y[col][row]
+            angle_raw = np.degrees(np.arctan2(vy, vx))
+            converted_angle = np.mod(((-1) * angle_raw + 90), 360)
+            direction[col][row] = converted_angle
+    return direction
+
+
 def generate_cfd_wind_layer(display: bool = False):
-    time_end = time.time() + 10
+    time_end = time.time() + 5
     cfg_path = Path('./config.yml')
     cfg = Config(cfg_path, cfd_precompute=True)
     wind_map = cfg.get_cfd_wind_map()
@@ -70,11 +95,13 @@ def generate_cfd_wind_layer(display: bool = False):
             renderV(screen, wm_size, wm_scale, wm_velocity_x, wm_velocity_y)
             pygame.display.flip()
 
-    np.save('generated_wind_velocity_map_x', wm_velocity_x)
-    np.save('generated_wind_velocity_map_y', wm_velocity_y)
+    wm_mag = generate_magnitude_array(wm_velocity_x, wm_velocity_y)
+    wm_dir = generate_direction_array(wm_velocity_x, wm_velocity_y)
+    np.save('generated_wind_magnitudes', wm_mag)
+    np.save('generated_wind_directions', wm_dir)
 
 
 if __name__ == '__main__':
     #x = np.load('generated_wind_velocity_map_x.npy')
     #y = np.load('generated_wind_velocity_map_y.npy')
-    generate_cfd_wind_layer(False)
+    generate_cfd_wind_layer(True)

@@ -70,7 +70,8 @@ def generate_direction_array(velocity_x, velocity_y):
 
 
 def generate_cfd_wind_layer(display: bool = False):
-    time_end = time.time() + 5
+    time_bound = 1000  # in seconds
+    time_end = time.time() + time_bound
     cfg_path = Path('./config.yml')
     cfg = Config(cfg_path, cfd_precompute=True)
     wind_map = cfg.get_cfd_wind_map()
@@ -83,6 +84,7 @@ def generate_cfd_wind_layer(display: bool = False):
         screen.fill('white')
         pygame.display.flip()
 
+    print('Processing, please wait...')
     while time.time() < time_end:
         wind_map.iterate_wind_step()
         # wm_density = wind_map.get_wind_density_field()
@@ -95,6 +97,8 @@ def generate_cfd_wind_layer(display: bool = False):
             renderV(screen, wm_size, wm_scale, wm_velocity_x, wm_velocity_y)
             pygame.display.flip()
 
+    print('Complete! Generating npy files')
+
     wm_mag = generate_magnitude_array(wm_velocity_x, wm_velocity_y)
     wm_dir = generate_direction_array(wm_velocity_x, wm_velocity_y)
     np.save('generated_wind_magnitudes', wm_mag)
@@ -104,4 +108,4 @@ def generate_cfd_wind_layer(display: bool = False):
 if __name__ == '__main__':
     #x = np.load('generated_wind_velocity_map_x.npy')
     #y = np.load('generated_wind_velocity_map_y.npy')
-    generate_cfd_wind_layer(True)
+    generate_cfd_wind_layer(False)

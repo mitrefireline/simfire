@@ -1,13 +1,14 @@
 import numpy as np
 
 import yaml
+import os.path
 from typing import Any
 from pathlib import Path
 from yaml.parser import ParserError
 
 from ..utils.log import create_logger
 from ..world.wind_mechanics.wind_controller import WindController, WindController2
-from ..utils.units import str_to_minutes, mph_to_ftpm
+from ..utils.units import str_to_minutes, mph_to_ftpm, mph_to_ms, scale_ms_to_ftpm
 from ..world.elevation_functions import PerlinNoise2D, flat, gaussian
 from ..world.fuel_array_functions import chaparral_fn
 
@@ -161,31 +162,18 @@ class Config:
         (`self.area.screen_size`, `self.area.screen_size`) with wind values at each pixel.
         '''
         if self.wind.wind_function.lower() == 'cfd':
-            args = self.terrain.perlin
-            terrain_map = np.zeros((args.shape[0], args.shape[1]))
-            for x in range(0, args.shape[0]):
-                for y in range(0, args.shape[1]):
-                    terrain_map[x][y] = self.terrain.elevation_function(x, y)
-
-            # TODO: Need to optimize cfd to work on 3d space.  For now we get the average terrain height 
-            # and for values slightly greater than that average we will count as terrain features for cfd
-            terrain_space = np.average(terrain_map) + (( np.max(terrain_map) - np.average(terrain_map) ) / 4 )
-
-            def create_cfd_terrain(e):
-                if e < terrain_space:
-                    return 0
-                return 1
-
-            cfd_func = np.vectorize(create_cfd_terrain)
-
-            terrain_map = cfd_func(terrain_map)
-
-            source_speed = mph_to_ftpm(self.wind.cfd.speed)
-            source_direction = self.wind.cfd.direction
-            wind_map = WindController2(terrain_features=terrain_map)
-            # wind_map.generate_wind_field(source_direction, source_speed, 
-            #                                 self.area.screen_size)
-        elif self.wind.wind_function.lower() == 'perlin':
+            # Check if wind files have been generated
+            cfd_generated = os.path.isfile('generated_wind_directions.npy') and os.path.isfile('generated_wind_magnitudes.npy')
+            if cfd_generated is False:
+                log.error('Missing pregenerated cfd npy files, switching to perlin')
+                self.wind_function = 'perlin'
+            else:
+                map_wind_speed = np.load('generated_wind_magnitudes.npy')
+                map_wind_direction = np.load('generated_wind_directions.npy')
+                map_wind_speed = scale_ms_to_ftpm(map_wind_speed)
+                setattr(self.wind, 'speed', map_wind_speed)
+                setattr(self.wind, 'direction', np.rint(map_wind_direction))
+        if self.wind.wind_function.lower() == 'perlin':
             speed_min = mph_to_ftpm(self.wind.perlin.speed.min)
             speed_max = mph_to_ftpm(self.wind.perlin.speed.max)
             wind_map = WindController()
@@ -252,7 +240,8 @@ class Config:
 
         terrain_map = cfd_func(terrain_map)
 
-        source_speed = mph_to_ftpm(self.wind.cfd.speed)
+        # Assumption: CFD Algorithm uses m/s
+        source_speed = mph_to_ms(self.wind.cfd.speed)
         source_direction = self.wind.cfd.direction
         wind_map = WindController2(terrain_features=terrain_map,
                                    wind_direction=source_direction,

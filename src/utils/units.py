@@ -1,4 +1,5 @@
 import re
+import numpy as np
 from typing import Union
 from datetime import timedelta
 
@@ -9,6 +10,26 @@ log = create_logger(__name__)
 UNITS = {'s': 'seconds', 'm': 'minutes', 'h': 'hours', 'd': 'days', 'w': 'weeks'}
 
 
+def scale_ms_to_ftpm(ms: np.ndarray) -> np.ndarray:
+    ftpm = ms * 196.85
+    return ftpm
+
+
+def mph_to_ms(mph: Union[int, float]) -> Union[int, float]:
+    '''
+    Convert mph to m/s
+
+    Arguments:
+        mph: The speed in mph.
+
+    Returns:
+        The speed in meters per second
+    '''
+    ftpm = mph / 2.237
+
+    return ftpm
+
+
 def mph_to_ftpm(mph: Union[int, float]) -> Union[int, float]:
     '''
     Convert mph to ft/min
@@ -17,7 +38,7 @@ def mph_to_ftpm(mph: Union[int, float]) -> Union[int, float]:
         mph: The speed in mph.
 
     Returns:
-        The speed in per minute.
+        The speed in feet per minute.
     '''
     ftpm = mph * 88
     return ftpm

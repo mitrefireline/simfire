@@ -1,3 +1,4 @@
+import numpy as np
 import pygame
 
 import os
@@ -5,10 +6,12 @@ import unittest
 from unittest import mock
 from multiprocessing import get_context
 
+from . import DummyFuelLayer, DummyTopographyLayer
 from ..game import Game
 from ..sprites import Terrain
 from ...enums import GameStatus
 from ...utils.config import Config
+from ...utils.units import mph_to_ftpm
 from ..managers.fire import RothermelFireManager
 from ..managers.mitigation import FireLineManager
 from ...world.parameters import Environment, FuelParticle
@@ -18,7 +21,7 @@ from ...world.parameters import Environment, FuelParticle
 class TestGame(unittest.TestCase):
     def setUp(self) -> None:
         self.config = Config('./config.yml')
-        self.screen_size = self.config.area.screen_size
+        self.screen_size = (32, 32)
         self.game = Game(self.screen_size)
 
     def test__toggle_wind_magnitude_display(self) -> None:
@@ -112,16 +115,15 @@ class TestGame(unittest.TestCase):
         '''
         surface = self.game._get_wind_mag_surf(self.config.wind.speed)
         surface_size = surface.get_size()
-        config_size = (self.config.area.screen_size, self.config.area.screen_size)
         self.assertIsInstance(surface,
                               pygame.Surface,
                               msg='The object returned from Game()._get_wind_mag_surf '
                               f'is a {type(surface)} when it should be a pygame.Surface')
         self.assertEqual(surface_size,
-                         config_size,
+                         self.screen_size,
                          msg='The size of the surface returned in '
                          f'Game()._get_wind_mag_surf is {surface_size} when it should be '
-                         f'{config_size}')
+                         f'{self.screen_size}')
 
     def test__get_wind_dir_surf(self) -> None:
         '''
@@ -129,16 +131,46 @@ class TestGame(unittest.TestCase):
         '''
         surface = self.game._get_wind_dir_surf(self.config.wind.direction)
         surface_size = surface.get_size()
-        config_size = (self.config.area.screen_size, self.config.area.screen_size)
         self.assertIsInstance(surface,
                               pygame.Surface,
                               msg='The object returned from Game()._get_wind_dir_surf '
                               f'is a {type(surface)} when it should be a pygame.Surface')
         self.assertEqual(surface_size,
-                         config_size,
+                         self.screen_size,
                          msg='The size of the surface returned in '
                          f'Game()._get_wind_dir_surf is {surface_size} when it should be '
-                         f'{config_size}')
+                         f'{self.screen_size}')
+
+    def _setup_game(self, headless: bool) -> None:
+        '''
+        Set up all of the items needed to initialize the game as self.* attributes.
+        '''
+        fuel_particle = FuelParticle()
+        topo_layer = DummyTopographyLayer(self.screen_size)
+        fuel_layer = DummyFuelLayer(self.screen_size)
+        pixel_scale = 50  # Just an arbitrary number
+        terrain = Terrain(fuel_layer, topo_layer, self.screen_size, headless=headless)
+        # Use simple/constant wind speed
+        self.wind_speed = mph_to_ftpm(self.config.wind.simple.speed)
+        wind_speed_arr = np.full(self.screen_size, self.wind_speed)
+        environment = Environment(self.config.environment.moisture, wind_speed_arr,
+                                  self.config.wind.simple.direction)
+        fireline_manager = FireLineManager(size=self.config.display.control_line_size,
+                                           pixel_scale=pixel_scale,
+                                           terrain=terrain,
+                                           headless=headless)
+        fire_init_pos = (self.screen_size[0] // 2, self.screen_size[1] // 2)
+        fire_manager = RothermelFireManager(fire_init_pos,
+                                            self.config.display.fire_size,
+                                            self.config.fire.max_fire_duration,
+                                            pixel_scale,
+                                            self.config.simulation.update_rate,
+                                            fuel_particle,
+                                            terrain,
+                                            environment,
+                                            max_time=self.config.simulation.runtime,
+                                            headless=headless)
+        return terrain, fire_manager, fireline_manager
 
     def test_update(self) -> None:
         '''
@@ -146,32 +178,9 @@ class TestGame(unittest.TestCase):
         since the update method only calls sprite and manager update methods. In theory,
         if all the other unit tests pass, then this one should pass.
         '''
-        init_pos = (self.config.area.screen_size // 3, self.config.area.screen_size // 4)
-        fire_size = self.config.display.fire_size
-        max_fire_duration = self.config.fire.max_fire_duration
-        pixel_scale = self.config.area.pixel_scale
-        update_rate = self.config.simulation.update_rate
-        fuel_particle = FuelParticle()
+        terrain, fire_manager, fireline_manager = self._setup_game(headless=False)
 
-        tiles = [[
-            self.config.terrain.fuel_array_function(x, y)
-            for x in range(self.config.area.terrain_size)
-        ] for y in range(self.config.area.terrain_size)]
-        terrain = Terrain(tiles, self.config.terrain.elevation_function,
-                          self.config.area.terrain_size, self.config.area.screen_size)
-
-        environment = Environment(self.config.environment.moisture,
-                                  self.config.wind.speed, self.config.wind.direction)
-
-        fire_manager = RothermelFireManager(init_pos, fire_size, max_fire_duration,
-                                            pixel_scale, update_rate, fuel_particle,
-                                            terrain, environment)
-
-        fireline_manager = FireLineManager(size=self.config.display.control_line_size,
-                                           pixel_scale=self.config.area.pixel_scale,
-                                           terrain=terrain)
-        fireline_sprites = fireline_manager.sprites
-        status = self.game.update(terrain, fire_manager.sprites, fireline_sprites,
+        status = self.game.update(terrain, fire_manager.sprites, fireline_manager.sprites,
                                   self.config.wind.speed, self.config.wind.direction)
 
         self.assertEqual(status,
@@ -185,43 +194,9 @@ class TestGame(unittest.TestCase):
         This will also allow for the game to be pickle-able and used with multiprocessing.
         '''
         game = Game(self.screen_size, headless=True)
+        terrain, fire_manager, fireline_manager = self._setup_game(headless=True)
 
-        init_pos = (self.config.area.screen_size // 3, self.config.area.screen_size // 4)
-        fire_size = self.config.display.fire_size
-        max_fire_duration = self.config.fire.max_fire_duration
-        pixel_scale = self.config.area.pixel_scale
-        update_rate = self.config.simulation.update_rate
-        fuel_particle = FuelParticle()
-
-        tiles = [[
-            self.config.terrain.fuel_array_function(x, y)
-            for x in range(self.config.area.terrain_size)
-        ] for y in range(self.config.area.terrain_size)]
-        terrain = Terrain(tiles,
-                          self.config.terrain.elevation_function,
-                          self.config.area.terrain_size,
-                          self.config.area.screen_size,
-                          headless=True)
-
-        environment = Environment(self.config.environment.moisture,
-                                  self.config.wind.speed, self.config.wind.direction)
-
-        fire_manager = RothermelFireManager(init_pos,
-                                            fire_size,
-                                            max_fire_duration,
-                                            pixel_scale,
-                                            update_rate,
-                                            fuel_particle,
-                                            terrain,
-                                            environment,
-                                            headless=True)
-
-        fireline_manager = FireLineManager(size=self.config.display.control_line_size,
-                                           pixel_scale=self.config.area.pixel_scale,
-                                           terrain=terrain,
-                                           headless=True)
-        fireline_sprites = fireline_manager.sprites
-        status = game.update(terrain, fire_manager.sprites, fireline_sprites,
+        status = game.update(terrain, fire_manager.sprites, fireline_manager.sprites,
                              self.config.wind.speed, self.config.wind.direction)
 
         self.assertEqual(status,
@@ -236,46 +211,11 @@ class TestGame(unittest.TestCase):
         run in a headless state.
         '''
         game = Game(self.screen_size, headless=True)
-
-        init_pos = (self.config.area.screen_size // 3, self.config.area.screen_size // 4)
-        fire_size = self.config.display.fire_size
-        max_fire_duration = self.config.fire.max_fire_duration
-        pixel_scale = self.config.area.pixel_scale
-        update_rate = self.config.simulation.update_rate
-        fuel_particle = FuelParticle()
-
-        tiles = [[
-            self.config.terrain.fuel_array_function(x, y)
-            for x in range(self.config.area.terrain_size)
-        ] for y in range(self.config.area.terrain_size)]
-        terrain = Terrain(tiles,
-                          self.config.terrain.elevation_function,
-                          self.config.area.terrain_size,
-                          self.config.area.screen_size,
-                          headless=True)
-
-        environment = Environment(self.config.environment.moisture,
-                                  self.config.wind.speed, self.config.wind.direction)
-
-        fire_manager = RothermelFireManager(init_pos,
-                                            fire_size,
-                                            max_fire_duration,
-                                            pixel_scale,
-                                            update_rate,
-                                            fuel_particle,
-                                            terrain,
-                                            environment,
-                                            headless=True)
-
-        fireline_manager = FireLineManager(size=self.config.display.control_line_size,
-                                           pixel_scale=self.config.area.pixel_scale,
-                                           terrain=terrain,
-                                           headless=True)
-        fireline_sprites = fireline_manager.sprites
+        terrain, fire_manager, fireline_manager = self._setup_game(headless=True)
 
         pool_size = 4
-        inputs = (terrain, fire_manager.sprites, fireline_sprites, self.config.wind.speed,
-                  self.config.wind.direction)
+        inputs = (terrain, fire_manager.sprites, fireline_manager.sprites,
+                  self.config.wind.speed, self.config.wind.direction)
         inputs = [inputs] * pool_size
         with get_context('spawn').Pool(pool_size) as p:
             status = p.starmap(game.update, inputs)

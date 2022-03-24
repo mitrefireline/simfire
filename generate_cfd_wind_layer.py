@@ -70,10 +70,10 @@ def generate_direction_array(velocity_x, velocity_y):
 
 
 def generate_cfd_wind_layer(display: bool = False):
-    time_bound = 1000  # in seconds
-    time_end = time.time() + time_bound
     cfg_path = Path('./config.yml')
     cfg = Config(cfg_path, cfd_precompute=True)
+    time_bound = cfg.wind.cfd.time_to_train  # in seconds
+    time_end = time.time() + time_bound
     wind_map = cfg.get_cfd_wind_map()
 
     wm_scale = wind_map.get_wind_scale()

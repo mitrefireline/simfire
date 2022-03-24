@@ -9,7 +9,7 @@ class DummyTopographyLayer():
     def __init__(self, shape: Tuple[int, int]) -> None:
         # Add the 1-dimension to match what the real layers look like
         self.shape = (shape) + (1, )
-        self.data = np.random.uniform(0, 300, self.shape)
+        self.data = np.zeros(self.shape)
 
 
 class DummyFuelLayer():

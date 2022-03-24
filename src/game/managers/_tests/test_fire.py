@@ -2,12 +2,13 @@ import unittest
 
 import numpy as np
 
-from ....utils.config import Config
-from ...sprites import Fire, Terrain
-from ....world.presets import Chaparral
 from ....enums import BurnStatus, GameStatus
-from ....world.elevation_functions import flat
-from ....world.parameters import Environment, FuelArray, FuelParticle, Tile
+from ....game._tests import DummyFuelLayer, DummyTopographyLayer
+from ....game.managers.mitigation import FireLineManager
+from ...sprites import Fire, Terrain
+from ....utils.config import Config
+from ....utils.units import mph_to_ftpm
+from ....world.parameters import Environment, FuelParticle
 from ..fire import ConstantSpreadFireManager, FireManager, RothermelFireManager
 
 
@@ -121,33 +122,31 @@ class TestFireManager(unittest.TestCase):
 class TestRothermelFireManager(unittest.TestCase):
     def setUp(self) -> None:
         self.config = Config('./config.yml')
-        self.init_pos = (self.config.area.screen_size // 3,
-                         self.config.area.screen_size // 4)
-        self.fire_size = self.config.display.fire_size
-        self.max_fire_duration = self.config.fire.max_fire_duration
-        self.pixel_scale = self.config.area.pixel_scale
-        self.update_rate = self.config.simulation.update_rate
-        self.fuel_particle = FuelParticle()
-
-        terrain_map = tuple(
-            tuple(Chaparral for _ in range(self.config.area.terrain_size))
-            for _ in range(self.config.area.terrain_size))
-        fuel_arrs = [[
-            FuelArray(
-                Tile(j, i, self.config.area.terrain_scale,
-                     self.config.area.terrain_scale), terrain_map[i][j])
-            for j in range(self.config.area.terrain_size)
-        ] for i in range(self.config.area.terrain_size)]
-        self.terrain = Terrain(fuel_arrs, flat(), self.config.area.terrain_size,
-                               self.config.area.screen_size)
-
-        self.environment = Environment(self.config.environment.moisture,
-                                       self.config.wind.speed, self.config.wind.direction)
-
-        self.fire_manager = RothermelFireManager(self.init_pos, self.fire_size,
-                                                 self.max_fire_duration, self.pixel_scale,
-                                                 self.update_rate, self.fuel_particle,
-                                                 self.terrain, self.environment)
+        self.screen_size = (32, 32)
+        fuel_particle = FuelParticle()
+        topo_layer = DummyTopographyLayer(self.screen_size)
+        fuel_layer = DummyFuelLayer(self.screen_size)
+        pixel_scale = 50  # Just an arbitrary number
+        self.terrain = Terrain(fuel_layer, topo_layer, self.screen_size)
+        # Use simple/constant wind speed
+        self.wind_speed = mph_to_ftpm(1)
+        wind_speed_arr = np.full(self.screen_size, self.wind_speed)
+        environment = Environment(self.config.environment.moisture, wind_speed_arr,
+                                  self.config.wind.simple.direction)
+        self.fireline_manager = FireLineManager(
+            size=self.config.display.control_line_size,
+            pixel_scale=pixel_scale,
+            terrain=self.terrain)
+        self.fire_init_pos = (self.screen_size[0] // 2, self.screen_size[1] // 2)
+        self.fire_manager = RothermelFireManager(self.fire_init_pos,
+                                                 self.config.display.fire_size,
+                                                 self.config.fire.max_fire_duration,
+                                                 pixel_scale,
+                                                 self.config.simulation.update_rate,
+                                                 fuel_particle,
+                                                 self.terrain,
+                                                 environment,
+                                                 max_time=self.config.simulation.runtime)
 
     def test_update(self) -> None:
         '''
@@ -156,10 +155,10 @@ class TestRothermelFireManager(unittest.TestCase):
         Instead, check that the fire will spread correctly once enough time has passed.
         '''
         # Create simulation parameters that will guarantee fire spread
-        fire_map = np.full_like(self.terrain.fuel_arrs, BurnStatus.UNBURNED)
+        fire_map = np.full_like(self.terrain.fuels, BurnStatus.UNBURNED)
         self.fire_manager.pixel_scale = 0
-        new_locs = self.fire_manager._get_new_locs(self.init_pos[0], self.init_pos[1],
-                                                   fire_map)
+        new_locs = self.fire_manager._get_new_locs(self.fire_init_pos[0],
+                                                   self.fire_init_pos[1], fire_map)
         new_locs_uzip = tuple(zip(*new_locs))
         self.fire_manager.burn_amounts[new_locs_uzip] = -1
 

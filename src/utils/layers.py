@@ -19,10 +19,10 @@ def round_down_to_multiple(num, divisor):
     return divisor * math.floor(num / divisor)
 
 
-class DataLayer():
+class LatLongBox():
     '''
-    Layer class that allows for simulation data layers to be stored and used. A layer
-    represents data at every pixel/point in the simulation area.
+    Class that creates a square coordinate box using a center lat/long point.
+    This is used by any DataLayer that needs real coordinates to access data.
     '''
     def __init__(self,
                  center: Tuple[float] = (32.1, 115.8),
@@ -445,8 +445,20 @@ class DataLayer():
         plt.savefig(f'img_n{self.BL[0]}_w{self.BL[1]}_n{self.TR[0]}_w{self.TR[1]}.png')
 
 
-class TopographyLayer():
-    def __init__(self, data_layer: DataLayer) -> None:
+class DataLayer():
+    '''
+    Base class for any data that affects the terrain.
+    The data in this class should have a value for every pixel in the terrain.
+    '''
+    def __init__(self) -> None:
+        '''
+        This parent class only exists to set a base value for self.data
+        '''
+        self.data = None
+
+
+class TopographyLayer(DataLayer):
+    def __init__(self, lat_long_box: LatLongBox) -> None:
         '''
         Initialize the elevation layer by retrieving the correct topograpchic data
             and computing the area.
@@ -458,9 +470,9 @@ class TopographyLayer():
             resolution: The resolution to get data
 
         '''
-        self.data_layer = data_layer
+        self.lat_long_box = lat_long_box
         self.path = Path('/nfs/lslab2/fireline/data/topographic/')
-        res = str(self.data_layer.resolution) + 'm'
+        res = str(self.lat_long_box.resolution) + 'm'
         self.datapath = self.path / res
 
         self.data = self._make_contour_and_data()
@@ -473,12 +485,12 @@ class TopographyLayer():
         data = np.flip(data, 0)
         data = np.expand_dims(data, axis=-1)
 
-        for key, _ in self.data_layer.tiles.items():
+        for key, _ in self.lat_long_box.tiles.items():
 
             if key == 'single':
                 # simple case
-                tr = (self.data_layer.bl[0][0], self.data_layer.tr[1][0])
-                bl = (self.data_layer.tr[0][0], self.data_layer.bl[1][0])
+                tr = (self.lat_long_box.bl[0][0], self.lat_long_box.tr[1][0])
+                bl = (self.lat_long_box.tr[0][0], self.lat_long_box.bl[1][0])
                 return data[tr[0]:bl[0], tr[1]:bl[1]]
             tmp_array = data
             for idx, dem in enumerate(self.tif_filenames[1:]):
@@ -503,8 +515,8 @@ class TopographyLayer():
                         tmp_array = np.concatenate((tif_data, tmp_array), axis=1)
                         data = np.concatenate((data, tmp_array), axis=0)
 
-        tr = (self.data_layer.bl[0][0], self.data_layer.tr[1][0])
-        bl = (self.data_layer.tr[0][0], self.data_layer.bl[1][0])
+        tr = (self.lat_long_box.bl[0][0], self.lat_long_box.tr[1][0])
+        bl = (self.lat_long_box.tr[0][0], self.lat_long_box.bl[1][0])
         data_array = data[tr[0]:bl[0], tr[1]:bl[1]]
         # Convert from meters to feet for use with Rothermel
         data_array = 3.28084 * data_array
@@ -524,7 +536,7 @@ class TopographyLayer():
 
         self.tif_filenames = []
 
-        for _, ranges in self.data_layer.tiles.items():
+        for _, ranges in self.lat_long_box.tiles.items():
             for range in ranges:
                 (five_deg_n, five_deg_w) = range
                 tif_data_region = Path(f'n{five_deg_n}w{five_deg_w}.tif')
@@ -532,8 +544,8 @@ class TopographyLayer():
                 self.tif_filenames.append(tif_file)
 
 
-class FuelLayer():
-    def __init__(self, data_layer: DataLayer) -> None:
+class FuelLayer(DataLayer):
+    def __init__(self, lat_long_box: LatLongBox) -> None:
         '''
         Initialize the elevation layer by retrieving the correct topograpchic data
             and computing the area.
@@ -545,10 +557,10 @@ class FuelLayer():
             resolution: The resolution to get data
 
         '''
-        self.data_layer = data_layer
+        self.lat_long_box = lat_long_box
         # Temporary until we get real fuel data
         self.path = Path('/nfs/lslab2/fireline/data/topographic/')
-        res = str(self.data_layer.resolution) + 'm'
+        res = str(self.lat_long_box.resolution) + 'm'
         self.datapath = self.path / res
 
         self.data = self._make_contour_and_data()
@@ -561,12 +573,12 @@ class FuelLayer():
         data = np.flip(data, 0)
         data = np.expand_dims(data, axis=-1)
 
-        for key, _ in self.data_layer.tiles.items():
+        for key, _ in self.lat_long_box.tiles.items():
 
             if key == 'single':
                 # simple case
-                tr = (self.data_layer.bl[0][0], self.data_layer.tr[1][0])
-                bl = (self.data_layer.tr[0][0], self.data_layer.bl[1][0])
+                tr = (self.lat_long_box.bl[0][0], self.lat_long_box.tr[1][0])
+                bl = (self.lat_long_box.tr[0][0], self.lat_long_box.bl[1][0])
                 # TODO: Temporary solution until data source is added
                 h = bl[0] - tr[0]
                 w = bl[1] - tr[1]
@@ -595,8 +607,8 @@ class FuelLayer():
                         tmp_array = np.concatenate((tif_data, tmp_array), axis=1)
                         data = np.concatenate((data, tmp_array), axis=0)
 
-        tr = (self.data_layer.bl[0][0], self.data_layer.tr[1][0])
-        bl = (self.data_layer.tr[0][0], self.data_layer.bl[1][0])
+        tr = (self.lat_long_box.bl[0][0], self.lat_long_box.tr[1][0])
+        bl = (self.lat_long_box.tr[0][0], self.lat_long_box.bl[1][0])
         data_array = data[tr[0]:bl[0], tr[1]:bl[1]]
         return data_array
 
@@ -614,7 +626,7 @@ class FuelLayer():
 
         self.tif_filenames = []
 
-        for _, ranges in self.data_layer.tiles.items():
+        for _, ranges in self.lat_long_box.tiles.items():
             for range in ranges:
                 (five_deg_n, five_deg_w) = range
                 tif_data_region = Path(f'n{five_deg_n}w{five_deg_w}.tif')
@@ -684,7 +696,7 @@ class TransportationLayer(DataLayer):
         return self.data_array
 
 
-class ElevationLayer(DataLayer):
+class FunctionalElevationLayer(DataLayer):
     '''
     Layer that stores elevation data computed from a function.
     '''
@@ -698,9 +710,11 @@ class ElevationLayer(DataLayer):
             elevation_fn: A callable function that converts (x, y) coorindates to
                           elevations.
         '''
-        super().__init__(height, width)
+        super().__init__()
+        self.height = height
+        self.width = width
         self.elevation_fn = elevation_fn
-        self.data = self._make_contour_and_data()
+        self.data = self._make_data()
 
     def _make_data(self) -> np.ndarray:
         '''
@@ -717,5 +731,7 @@ class ElevationLayer(DataLayer):
         X, Y = np.meshgrid(x, y)
         elevation_fn_vect = np.vectorize(self.elevation_fn)
         elevations = elevation_fn_vect(X, Y)
+        # Expand third dimension to align with data layers
+        elevations = np.expand_dims(elevations, axis=-1)
 
         return elevations

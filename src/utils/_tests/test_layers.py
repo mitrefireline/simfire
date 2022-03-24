@@ -1,8 +1,8 @@
 import unittest
-from ..layers import DataLayer, TopographyLayer
+from ..layers import FunctionalElevationLayer, LatLongBox, TopographyLayer
 
 
-class TestDataLayer(unittest.TestCase):
+class TestLatLongBox(unittest.TestCase):
     def setUp(self) -> None:
         '''
         Set up tests for reading in real topography
@@ -19,22 +19,22 @@ class TestDataLayer(unittest.TestCase):
         # 2 Tiles
         center = (33.4, 116.004)
         height, width = 1600, 1600
-        data_layer = DataLayer(center, height, width, resolution)
+        lat_long_box = LatLongBox(center, height, width, resolution)
         test_output_dems = ((33, 117), (33, 115))
-        self.assertEqual(data_layer.five_deg_north_min, test_output_dems[0][0])
-        self.assertEqual(data_layer.five_deg_north_max, test_output_dems[1][0])
-        self.assertEqual(data_layer.five_deg_west_min, test_output_dems[1][1])
-        self.assertEqual(data_layer.five_deg_west_max, test_output_dems[0][1])
+        self.assertEqual(lat_long_box.five_deg_north_min, test_output_dems[0][0])
+        self.assertEqual(lat_long_box.five_deg_north_max, test_output_dems[1][0])
+        self.assertEqual(lat_long_box.five_deg_west_min, test_output_dems[1][1])
+        self.assertEqual(lat_long_box.five_deg_west_max, test_output_dems[0][1])
 
         # 4 Tiles
         center = (35.001, 117.001)
         height, width = 1600, 1600
-        data_layer = DataLayer(center, height, width, resolution)
+        lat_long_box = LatLongBox(center, height, width, resolution)
         test_output_dems = ((34, 118), (34, 117), (35, 117), (35, 118))
-        self.assertEqual(data_layer.five_deg_north_min, test_output_dems[0][0])
-        self.assertEqual(data_layer.five_deg_north_max, test_output_dems[2][0])
-        self.assertEqual(data_layer.five_deg_west_min, test_output_dems[1][1])
-        self.assertEqual(data_layer.five_deg_west_max, test_output_dems[0][1])
+        self.assertEqual(lat_long_box.five_deg_north_min, test_output_dems[0][0])
+        self.assertEqual(lat_long_box.five_deg_north_max, test_output_dems[2][0])
+        self.assertEqual(lat_long_box.five_deg_west_min, test_output_dems[1][1])
+        self.assertEqual(lat_long_box.five_deg_west_max, test_output_dems[0][1])
 
     def test__stack_tiles(self) -> None:
         '''
@@ -46,17 +46,17 @@ class TestDataLayer(unittest.TestCase):
         resolution = 30
         center = (35.001, 115.6)
         height, width = 1600, 1600
-        data_layer = DataLayer(center, height, width, resolution)
+        lat_long_box = LatLongBox(center, height, width, resolution)
         test_output_dems = {'north': ((34, 116), (35, 116))}
-        self.assertEqual(test_output_dems, data_layer.tiles)
+        self.assertEqual(test_output_dems, lat_long_box.tiles)
 
         # 4 Tiles
         resolution = 90
         center = (34.99, 115.001)
         height, width = 3200, 3200
-        data_layer = DataLayer(center, height, width, resolution)
+        lat_long_box = LatLongBox(center, height, width, resolution)
         test_output_dems = {'square': ((30, 120), (30, 115), (40, 115), (40, 120))}
-        self.assertEqual(test_output_dems, data_layer.tiles)
+        self.assertEqual(test_output_dems, lat_long_box.tiles)
 
     def test__generate_lat_long(self) -> None:
         '''
@@ -74,14 +74,14 @@ class TestDataLayer(unittest.TestCase):
         # # 2 Tiles easternly
         center = (36.4, 118.01)
         height, width = 3200, 3200
-        data_layer = DataLayer(center, height, width, resolution)
-        self.assertEqual(data_layer.elev_array.shape, (7224, 3612, 2))
+        lat_long_box = LatLongBox(center, height, width, resolution)
+        self.assertEqual(lat_long_box.elev_array.shape, (7224, 3612, 2))
 
         # 2 Tiles northernly
         center = (34.001, 115.6)
         height, width = 3200, 3200
-        data_layer = DataLayer(center, height, width, resolution)
-        self.assertEqual(data_layer.elev_array.shape, (3612, 7224, 2))
+        lat_long_box = LatLongBox(center, height, width, resolution)
+        self.assertEqual(lat_long_box.elev_array.shape, (3612, 7224, 2))
 
     def test__get_lat_long_bbox(self) -> None:
         '''
@@ -94,9 +94,9 @@ class TestDataLayer(unittest.TestCase):
         # 2 Tiles northernly
         center = (34.001, 115.6)
         height, width = 3200, 3200
-        data_layer = DataLayer(center, height, width, resolution)
+        lat_long_box = LatLongBox(center, height, width, resolution)
         output = [(33, 116), (33, 115), (35, 115), (35, 116)]
-        self.assertEqual(output, data_layer.corners)
+        self.assertEqual(output, lat_long_box.corners)
 
     def test_save_contour_map(self) -> None:
         '''
@@ -106,9 +106,9 @@ class TestDataLayer(unittest.TestCase):
         # Single Tile
         center = (33.5, 116.8)
         height, width = 1600, 1600
-        data_layer = DataLayer(center, height, width, resolution)
-        topo_layer = TopographyLayer(data_layer)
-        data_layer._save_contour_map(topo_layer.data)
+        lat_long_box = LatLongBox(center, height, width, resolution)
+        topo_layer = TopographyLayer(lat_long_box)
+        lat_long_box._save_contour_map(topo_layer.data)
 
 
 class TestTopographyLayer(unittest.TestCase):
@@ -129,8 +129,8 @@ class TestTopographyLayer(unittest.TestCase):
         # 2 Tiles (easternly)
         center = (33.4, 115.04)
         height, width = 3200, 3200
-        data_layer = DataLayer(center, height, width, resolution)
-        topographyGen = TopographyLayer(data_layer)
+        lat_long_box = LatLongBox(center, height, width, resolution)
+        topographyGen = TopographyLayer(lat_long_box)
         self.assertEqual(topographyGen.data.shape[0], topographyGen.data.shape[1])
 
     def test__get_dems(self) -> None:
@@ -143,20 +143,42 @@ class TestTopographyLayer(unittest.TestCase):
         # Single Tile
         center = (35.2, 115.6)
         height, width = 1600, 1600
-        data_layer = DataLayer(center, height, width, resolution)
-        topographyGen = TopographyLayer(data_layer)
+        lat_long_box = LatLongBox(center, height, width, resolution)
+        topographyGen = TopographyLayer(lat_long_box)
         self.assertEqual(1, len(topographyGen.tif_filenames))
 
         # 2 Tiles
         center = (38.4, 115.0)
         height, width = 1600, 1600
-        data_layer = DataLayer(center, height, width, resolution)
-        topographyGen = TopographyLayer(data_layer)
+        lat_long_box = LatLongBox(center, height, width, resolution)
+        topographyGen = TopographyLayer(lat_long_box)
         self.assertEqual(2, len(topographyGen.tif_filenames))
 
         # 4 Tiles
         center = (34.001, 116.008)
         height, width = 3200, 3200
-        data_layer = DataLayer(center, height, width, resolution)
-        topographyGen = TopographyLayer(data_layer)
+        lat_long_box = LatLongBox(center, height, width, resolution)
+        topographyGen = TopographyLayer(lat_long_box)
         self.assertEqual(4, len(topographyGen.tif_filenames))
+
+
+class TestFunctionalElevationLayer(unittest.TestCase):
+    def setUp(self) -> None:
+        # Create arbitrary function to test
+        self.fn = lambda x, y: x + y
+        # Set arbitrary screen size
+        self.screen_size = (32, 32)
+        return super().setUp()
+
+    def test_data(self) -> None:
+        '''
+        Test that the FuncitonalElevationLayer creates the correct data
+        '''
+        height = self.screen_size[0]
+        width = self.screen_size[1]
+        layer = FunctionalElevationLayer(height, width, self.fn)
+        correct_data_shape = self.screen_size + (1, )
+        self.assertTupleEqual(correct_data_shape,
+                              layer.data.shape,
+                              msg=f'The layer data has shape {layer.data.shape}, '
+                              f'but should have shape {correct_data_shape}')

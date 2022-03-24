@@ -5,6 +5,7 @@ from ...utils.config import Config
 from ...rl_env.harness import AgentBasedHarness
 
 
+@unittest.skip('This functionality is not used in production and is semi-deprecated')
 class AgentBasedHarnessTest(unittest.TestCase):
     def setUp(self) -> None:
         '''

@@ -17,7 +17,7 @@ class Game():
     terrain, fire, and other sprites to be rendered and interact.
     '''
     def __init__(self,
-                 screen_size: Tuple[int],
+                 screen_size: Tuple[int, int],
                  headless: bool = False,
                  show_wind_magnitude: bool = False,
                  show_wind_direction: bool = False,
@@ -283,8 +283,8 @@ class Game():
         # Update and draw the sprites
         if not self.headless:
             for sprite in all_sprites.sprites():
-                # self.screen.blit(self.background, sprite.rect, sprite.rect)
-                self.screen.blit(self.background, (0, 0))
+                self.screen.blit(self.background, sprite.rect, sprite.rect)
+                # self.screen.blit(self.background, (0, 0))
 
         fire_sprites_group.update()
         terrain.update(self.fire_map)

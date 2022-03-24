@@ -95,7 +95,7 @@ class Simulation(ABC):
 
 
 class RothermelSimulation(Simulation):
-    def __init__(self, config: Config) -> None:
+    def __init__(self, config: Config, do_not_init: bool = False) -> None:
         '''
         Initialize the `RothermelSimulation` object for interacting with the RL harness.
         '''
@@ -103,9 +103,13 @@ class RothermelSimulation(Simulation):
         self.game_status = GameStatus.RUNNING
         self.fire_status = GameStatus.RUNNING
         self.points = set([])
-        self._create_terrain()
-        self._create_fire()
-        self._create_mitigations()
+
+        # for testing purposes
+        self.do_not_init = do_not_init
+        if not self.do_not_init:
+            self._create_terrain()
+            self._create_fire()
+            self._create_mitigations()
 
     def _create_terrain(self) -> None:
         '''
@@ -116,11 +120,11 @@ class RothermelSimulation(Simulation):
             self.config.terrain.fuel_array_function(x, y)
             for x in range(self.config.area.terrain_size)
         ] for y in range(self.config.area.terrain_size)]
-        self.terrain = Terrain(self.fuel_arrs,
-                               self.config.terrain.elevation_function,
-                               self.config.area.terrain_size,
-                               self.config.area.screen_size,
-                               headless=self.config.simulation.headless)
+        self.terrain = Terrain(
+            self.fuel_arrs,
+            self.config.terrain.elevation_function,
+            (self.config.area.screen_size, self.config.area.screen_size),
+            headless=self.config.simulation.headless)
 
         self.environment = Environment(self.config.environment.moisture,
                                        self.config.wind.speed, self.config.wind.direction)
@@ -194,23 +198,21 @@ class RothermelSimulation(Simulation):
         return {
             'w0':
             np.array([[
-                self.terrain.fuel_arrs[i][j].fuel.w_0
-                for j in range(self.config.area.screen_size)
+                self.terrain.fuels[i][j].w_0 for j in range(self.config.area.screen_size)
             ] for i in range(self.config.area.screen_size)]),
             'sigma':
             np.array([[
-                self.terrain.fuel_arrs[i][j].fuel.sigma
+                self.terrain.fuels[i][j].sigma
                 for j in range(self.config.area.screen_size)
             ] for i in range(self.config.area.screen_size)]),
             'delta':
             np.array([[
-                self.terrain.fuel_arrs[i][j].fuel.delta
+                self.terrain.fuels[i][j].delta
                 for j in range(self.config.area.screen_size)
             ] for i in range(self.config.area.screen_size)]),
             'M_x':
             np.array([[
-                self.terrain.fuel_arrs[i][j].fuel.M_x
-                for j in range(self.config.area.screen_size)
+                self.terrain.fuels[i][j].M_x for j in range(self.config.area.screen_size)
             ] for i in range(self.config.area.screen_size)]),
             'elevation':
             self.terrain.elevations,
@@ -346,8 +348,10 @@ class RothermelSimulation(Simulation):
             self.environment,
             max_time=self.config.simulation.runtime,
             attenuate_line_ros=self.config.mitigation.ros_attenuation,
-            headless=False)
-        self.game = Game(self.config.area.screen_size)
+            headless=self.config.simulation.headless)
+        self.game = Game(screen_size=(self.config.area.screen_size,
+                                      self.config.area.screen_size),
+                         headless=self.config.simulation.headless)
         self.fire_map = self.game.fire_map
 
         position = np.where(self._correct_pos(position) == 1)
@@ -390,8 +394,10 @@ class RothermelSimulation(Simulation):
             self.environment,
             max_time=self.config.simulation.runtime,
             attenuate_line_ros=self.config.mitigation.ros_attenuation,
-            headless=False)
-        self.game = Game(self.config.area.screen_size, headless=False)
+            headless=self.config.simulation.headless)
+        self.game = Game(screen_size=(self.config.area.screen_size,
+                                      self.config.area.screen_size),
+                         headless=self.config.simulation.headless)
         self.fire_map = self.game.fire_map
 
         self._update_sprite_points(mitigation)
@@ -427,8 +433,11 @@ class RothermelSimulation(Simulation):
             self.environment,
             max_time=self.config.simulation.runtime,
             attenuate_line_ros=self.config.mitigation.ros_attenuation,
-            headless=False)
-        self.game = Game(self.config.area.screen_size, headless=False)
+            headless=self.config.simulation.headless)
+
+        self.game = Game(screen_size=(self.config.area.screen_size,
+                                      self.config.area.screen_size),
+                         headless=self.config.simulation.headless)
         self.fire_map = self.game.fire_map
 
         self.fire_status = GameStatus.RUNNING

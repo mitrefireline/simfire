@@ -4,21 +4,78 @@ import unittest
 from typing import Dict
 from pathlib import Path
 
+from ...game.sprites import Terrain
 from ...utils.config import Config
+from ...game._tests import DummyFuelLayer, DummyTopographyLayer
+from ...world.parameters import Environment, FuelParticle
 from ...rl_env.simulation import RothermelSimulation
 from ...enums import BurnStatus
+from ...game.managers.mitigation import (FireLineManager, ScratchLineManager,
+                                         WetLineManager)
+from ...game.managers.fire import RothermelFireManager
 
 
 class RothermelSimulationTest(unittest.TestCase):
     def setUp(self) -> None:
-        '''
-        '''
         self.config = Config('./src/utils/_tests/test_configs/test_config.yml')
         self.config_flat_simple = Config(
             Path(self.config.path).parent / 'test_config_flat_simple.yml')
 
-        self.simulation = RothermelSimulation(self.config)
-        self.simulation_flat = RothermelSimulation(self.config_flat_simple)
+        self.screen_size = (self.config.area.screen_size, self.config.area.screen_size)
+
+        self.simulation = RothermelSimulation(self.config, True)
+        self.simulation_flat = RothermelSimulation(self.config_flat_simple, True)
+
+        topo_layer = DummyTopographyLayer(self.screen_size)
+        fuel_layer = DummyFuelLayer(self.screen_size)
+        self.terrain = Terrain(fuel_layer, topo_layer, self.screen_size)
+        self.simulation.terrain = self.terrain
+        self.simulation.environment = Environment(self.config.environment.moisture,
+                                                  self.config.wind.speed,
+                                                  self.config.wind.direction)
+        self.simulation.fuel_particle = FuelParticle()
+        self.simulation.fuel_arrs = [[
+            self.config.terrain.fuel_array_function(x, y)
+            for x in range(self.config.area.terrain_size)
+        ] for y in range(self.config.area.terrain_size)]
+
+        # initialize all mitigation strategies
+        self.simulation.fireline_manager = FireLineManager(
+            size=self.config.display.control_line_size,
+            pixel_scale=self.config.area.pixel_scale,
+            terrain=self.simulation.terrain,
+            headless=self.config.simulation.headless)
+
+        self.simulation.scratchline_manager = ScratchLineManager(
+            size=self.config.display.control_line_size,
+            pixel_scale=self.config.area.pixel_scale,
+            terrain=self.simulation.terrain,
+            headless=self.config.simulation.headless)
+
+        self.simulation.wetline_manager = WetLineManager(
+            size=self.config.display.control_line_size,
+            pixel_scale=self.config.area.pixel_scale,
+            terrain=self.simulation.terrain,
+            headless=self.config.simulation.headless)
+
+        self.simulation.fireline_sprites = self.simulation.fireline_manager.sprites
+        self.simulation.fireline_sprites_empty = self.simulation.fireline_sprites.copy()
+        self.simulation.scratchline_sprites = self.simulation.scratchline_manager.sprites
+        self.simulation.wetline_sprites = self.simulation.wetline_manager.sprites
+
+        self.simulation.fire_manager = RothermelFireManager(
+            self.config.fire.fire_initial_position,
+            self.config.display.fire_size,
+            self.config.fire.max_fire_duration,
+            self.config.area.pixel_scale,
+            self.config.simulation.update_rate,
+            self.simulation.fuel_particle,
+            self.simulation.terrain,
+            self.simulation.environment,
+            max_time=self.config.simulation.runtime,
+            attenuate_line_ros=self.config.mitigation.ros_attenuation,
+            headless=self.config.simulation.headless)
+        self.simulation.fire_sprites = self.simulation.fire_manager.sprites
 
     def test__create_terrain(self) -> None:
         '''
@@ -46,6 +103,7 @@ class RothermelSimulationTest(unittest.TestCase):
         Test that the call to get_actions() runs properly and returns all Rothermel
             FireLineManager() features.
         '''
+
         simulation_actions = self.simulation.get_actions()
         self.assertIsInstance(simulation_actions, Dict)
 
@@ -55,6 +113,7 @@ class RothermelSimulationTest(unittest.TestCase):
             features (Fire, Wind, FireLine, Terrain).
 
         '''
+
         simulation_attributes = self.simulation.get_attributes()
         self.assertIsInstance(simulation_attributes, Dict)
 
@@ -169,8 +228,7 @@ class RothermelSimulationTest(unittest.TestCase):
             (self.config.area.screen_size, self.config.area.screen_size))
         mit_point = (1, 1)
         mitigation[mit_point] = BurnStatus.FIRELINE
-        self.config.simulation.headless = False
-        self.simulation = RothermelSimulation(self.config)
+        self.config.simulation.headless = True
         # Test rendering 'inline' (as agent traverses)
         self.simulation._render_inline(mitigation, current_agent_loc)
         # assert the points are placed
@@ -187,8 +245,7 @@ class RothermelSimulationTest(unittest.TestCase):
         mitigation = np.full((self.config.area.screen_size, self.config.area.screen_size),
                              BurnStatus.FIRELINE)
 
-        self.config.simulation.headless = False
-        self.simulation = RothermelSimulation(self.config)
+        self.config.simulation.headless = True
         self.simulation._render_mitigations(mitigation)
         full_grid = self.config.area.screen_size * self.config.area.screen_size
         self.assertEqual(
@@ -209,8 +266,7 @@ class RothermelSimulationTest(unittest.TestCase):
         # start the fire where we have a control line
         mitigation[self.config.fire.fire_initial_position[0] - 1:] = 3
         self.config.mitigation.ros_attenuation = False
-        self.config.simulation.headless = False
-        self.simulation = RothermelSimulation(self.config)
+        self.config.simulation.headless = True
         self.simulation._render_mitigation_fire_spread(mitigation)
 
         # assert no fire has spread

@@ -213,7 +213,7 @@ class TestGame(unittest.TestCase):
         game = Game(self.screen_size, headless=True)
         terrain, fire_manager, fireline_manager = self._setup_game(headless=True)
 
-        pool_size = 4
+        pool_size = 1
         inputs = (terrain, fire_manager.sprites, fireline_manager.sprites,
                   self.config.wind.speed, self.config.wind.direction)
         inputs = [inputs] * pool_size

@@ -39,6 +39,8 @@ unittests:
   tags:
     - docker
   script:
+    - echo $CI_IDENTITY_FILE >> ~/.ssh/id_rsa
+    - ssh mt-rothermel@rlord
     - SDL_VIDEODRIVER="dummy" python -m unittest discover -s src -t .. -p "test_*.py"
   needs: []
   only:

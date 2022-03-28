@@ -163,7 +163,9 @@ class Config:
         '''
         if self.wind.wind_function.lower() == 'cfd':
             # Check if wind files have been generated
-            cfd_generated = os.path.isfile('generated_wind_directions.npy') and os.path.isfile('generated_wind_magnitudes.npy')
+            cfd_generated = os.path.isfile(
+                'generated_wind_directions.npy') and os.path.isfile(
+                    'generated_wind_magnitudes.npy')
             if cfd_generated is False:
                 log.error('Missing pregenerated cfd npy files, switching to perlin')
                 self.wind_function = 'perlin'
@@ -223,13 +225,13 @@ class Config:
         for x in range(0, args.shape[0]):
             for y in range(0, args.shape[1]):
                 terrain_map[x][y] = self.terrain.elevation_function(x, y)
-
         '''
         TODO: Need to optimize cfd to work on 3d space.  For now we get the average
         terrain height and for values slightly greater than that average we will
         count as terrain features for cfd
         '''
-        terrain_space = np.average(terrain_map) + (( np.max(terrain_map) - np.average(terrain_map) ) / 4 )
+        terrain_space = np.average(terrain_map) + (
+            (np.max(terrain_map) - np.average(terrain_map)) / 4)
 
         def create_cfd_terrain(e):
             if e < terrain_space:
@@ -246,7 +248,7 @@ class Config:
         wind_map = WindController2(terrain_features=terrain_map,
                                    wind_direction=source_direction,
                                    wind_speed=source_speed)
-        # wind_map.generate_wind_field(source_direction, source_speed, 
+        # wind_map.generate_wind_field(source_direction, source_speed,
         #                                 self.area.screen_size)
         return wind_map
 

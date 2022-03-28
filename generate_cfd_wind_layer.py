@@ -1,16 +1,14 @@
-
 import pygame
 # import fluid
 import numpy as np
-import random
 import time
 from pathlib import Path
 from src.utils.config import Config
-from src.world.wind_mechanics.wind_controller import WindController2
+
 pygame.init()
 
-# Seperate file to precompute wind layer, currently using wind with a single time slice due
-# to processing limitations
+# Seperate file to precompute wind layer, currently using wind with a single time slice
+# due to processing limitations
 
 
 def renderD(surface, screen_size, scale, density) -> None:
@@ -33,14 +31,14 @@ def renderV(surface, screen_size, scale, velocity_x, velocity_y) -> None:
             y = j * scale
             vx = velocity_x[i][j]
             vy = velocity_y[i][j]
-            if (not(abs(vx) < 0.1 and abs(vy) <= 0.1)):
+            if (not (abs(vx) < 0.1 and abs(vy) <= 0.1)):
                 meanval = int(np.mean([vx, vy]))
                 if meanval < 0:
                     meanval = 0
                 if meanval > 255:
                     meanval = 255
-                pygame.draw.line(surface, [meanval, meanval, meanval, meanval],
-                                 [x, y], [x + vx, y + vy])
+                pygame.draw.line(surface, [meanval, meanval, meanval, meanval], [x, y],
+                                 [x + vx, y + vy])
     return
 
 
@@ -50,8 +48,8 @@ def generate_magnitude_array(velocity_x, velocity_y):
     shape_y = magnitude.shape[1]
     for row in range(0, shape_y):
         for col in range(0, shape_x):
-            magnitude[col][row] = np.sqrt((velocity_x[col][row] ** 2)
-                                           + (velocity_y[col][row] ** 2))
+            magnitude[col][row] = np.sqrt((velocity_x[col][row]**2) +
+                                          (velocity_y[col][row]**2))
     return magnitude
 
 
@@ -106,6 +104,6 @@ def generate_cfd_wind_layer(display: bool = False):
 
 
 if __name__ == '__main__':
-    #x = np.load('generated_wind_velocity_map_x.npy')
-    #y = np.load('generated_wind_velocity_map_y.npy')
+    #  x = np.load('generated_wind_velocity_map_x.npy')
+    #  y = np.load('generated_wind_velocity_map_y.npy')
     generate_cfd_wind_layer(False)

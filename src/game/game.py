@@ -212,9 +212,9 @@ class Game():
             for x_idx, x in enumerate(y):
                 w_mag = x
                 wind_speed_range = (max(wind_magnitude_map) - min(wind_magnitude_map))
-                color_grad = (255 - 0)
+                gradient = (255 - 0)
                 color_mag = int(((
-                    (w_mag - min(wind_magnitude_map)) * color_grad) / wind_speed_range) + 0)
+                    (w_mag - min(wind_magnitude_map)) * gradient) / wind_speed_range) + 0)
                 wind_mag_surf.set_at((x_idx, y_idx), pygame.Color(0, color_mag, 0))
         return wind_mag_surf
 

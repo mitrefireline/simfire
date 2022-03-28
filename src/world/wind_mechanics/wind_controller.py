@@ -1,9 +1,9 @@
 import numpy as np
-import time
 from ..wind_mechanics.perlin_wind import WindNoise
 from ..wind_mechanics.cfd_wind import Fluid
 
 import pygame
+
 pygame.init
 
 
@@ -76,11 +76,15 @@ class WindController():
 # For CFD Implementations
 class WindController2():
     '''
-    This is a PRECOMPUTE wind controller.  It generates and tracks objects that dictate wind magnitude and 
-    wind direction for map given size of the screen.
+    This is a PRECOMPUTE wind controller.  It generates and tracks objects that dictate
+    wind magnitude and wind direction for map given size of the screen.
     '''
-    def __init__(self, screen_size: int = 225, result_accuracy: int = 1, scale: int = 1,
-                 timestep: float = 1.0, diffusion: float = 0.0,
+    def __init__(self,
+                 screen_size: int = 225,
+                 result_accuracy: int = 1,
+                 scale: int = 1,
+                 timestep: float = 1.0,
+                 diffusion: float = 0.0,
                  viscosity: float = 0.0000001,
                  terrain_features: np.ndarray = None,
                  wind_speed: float = 27,
@@ -100,7 +104,7 @@ class WindController2():
             self.terrain_features = np.array(terrain_features)
         # TODO Load terrain setup here
 
-        self.fvect = Fluid(self.N, self.iterations, self.scale, self.timestep, 
+        self.fvect = Fluid(self.N, self.iterations, self.scale, self.timestep,
                            self.diffusion, self.viscosity, self.terrain_features)
 
     def iterate_wind_step(self) -> None:
@@ -133,5 +137,3 @@ class WindController2():
 
     def get_screen_size(self) -> None:
         return self.N
-
-    

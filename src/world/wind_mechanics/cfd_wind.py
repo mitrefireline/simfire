@@ -81,6 +81,7 @@ class Fluid():
                                      [x, y], [x + vx, y + vy])
         pygame.display.flip()
 
+
 # SUPPORT FUNCTIONS
 
 # mirrors vector values on boundary edges of cells, allows for fluid to cross over
@@ -91,18 +92,18 @@ def set_bnd(b: int, x: np.ndarray, N: int):
     # Y Boundaries
     for i in range(1, N - 1):
         x[i][0] = -x[i][1] if b == 2 else x[i][1]
-        x[i][N - 1] = -x[i][N - 2] if b == 2 else x[i][N - 2];
+        x[i][N - 1] = -x[i][N - 2] if b == 2 else x[i][N - 2]
 
     # X Boundaries
     for j in range(1, N - 1):
-        x[0][j] = -x[1][j] if b == 1 else x[1][j];
-        x[N - 1][j] = -x[N - 2][j] if b == 1 else x[N - 2][j];
+        x[0][j] = -x[1][j] if b == 1 else x[1][j]
+        x[N - 1][j] = -x[N - 2][j] if b == 1 else x[N - 2][j]
 
     # Handle corners
-    x[0][0] = 0.5 * (x[1][0] + x[0][1]);
-    x[0][N - 1] = 0.5 * (x[1][N - 1] + x[0][N - 2]);
-    x[N - 1][0] = 0.5 * (x[N - 2][0] + x[N - 1][1]);
-    x[N - 1][N - 1] = 0.5 * (x[N - 2][N - 1] + x[N - 1][N - 2]);
+    x[0][0] = 0.5 * (x[1][0] + x[0][1])
+    x[0][N - 1] = 0.5 * (x[1][N - 1] + x[0][N - 2])
+    x[N - 1][0] = 0.5 * (x[N - 2][0] + x[N - 1][1])
+    x[N - 1][N - 1] = 0.5 * (x[N - 2][N - 1] + x[N - 1][N - 2])
 
     # Handle Terrain Collisions
     global terrain_features
@@ -158,12 +159,7 @@ def lin_solve(b: int, x: np.ndarray, x0: np.ndarray, a: float, c: float, itr: in
         for j in range(1, N - 1):
             for i in range(1, N - 1):
                 calc = (x0[i][j] + a *
-                            (x[i + 1][j] +
-                             x[i - 1][j] +
-                             x[i][j + 1] +
-                             x[i][j - 1]
-                             )
-                        ) * cRecip
+                        (x[i + 1][j] + x[i - 1][j] + x[i][j + 1] + x[i][j - 1])) * cRecip
                 global terrain_features
                 if terrain_features[i][j] != 1.0:
                     x[i][j] = calc
@@ -171,13 +167,15 @@ def lin_solve(b: int, x: np.ndarray, x0: np.ndarray, a: float, c: float, itr: in
                     x[i][j] = 0.0
         set_bnd(b, x, N)
 
+
 # Precalculates a value and passes everything to lin_solve
 
 
 def diffuse(b: int, x: np.ndarray, x0: np.ndarray, diff: float, dt: float, itr: int,
             N: int):
     a = dt * diff * (N - 2) * (N - 2)
-    lin_solve(b, x, x0, a, 1+6 * a, itr, N)
+    lin_solve(b, x, x0, a, 1 + 6 * a, itr, N)
+
 
 # Incompressible object, clean up stage for each cell
 
@@ -186,11 +184,8 @@ def project(velocX: np.ndarray, velocY: np.ndarray, p: np.ndarray, div: np.ndarr
             itr: int, N: int):
     for j in range(1, N - 1):
         for i in range(1, N - 1):
-            div[i][j] = (-0.5 * (velocX[i + 1][j] -
-                                 velocX[i - 1][j] +
-                                 velocY[i][j + 1] -
-                                 velocY[i][j - 1]
-                                 )) / N
+            div[i][j] = (-0.5 * (velocX[i + 1][j] - velocX[i - 1][j] + velocY[i][j + 1] -
+                                 velocY[i][j - 1])) / N
             p[i][j] = 0
 
     set_bnd(0, div, N)
@@ -204,6 +199,7 @@ def project(velocX: np.ndarray, velocY: np.ndarray, p: np.ndarray, div: np.ndarr
 
     set_bnd(1, velocX, N)
     set_bnd(2, velocY, N)
+
 
 # Responsible for actually moving things around, looks at each cell and grabs its velocity
 # then fllows that velocity back in time and sees where it lands.  takes weighted average
@@ -248,6 +244,6 @@ def advect(b: int, d: np.ndarray, d0: np.ndarray, velocX: np.ndarray, velocY: np
             j1i = int(j1)
 
             d[i][j] = s0 * (t0 * d0[i0i][j0i] + t1 * d0[i0i][j1i])
-            + s1 * (t0 * d0[i1i][j0i] + t1 * d0[i1i][j1i])
+            +s1 * (t0 * d0[i1i][j0i] + t1 * d0[i1i][j1i])
 
     set_bnd(b, d, N)

@@ -79,6 +79,3 @@ class WindNoise():
         denormalized_value = self._denormalize_noise_value(value)
 
         return denormalized_value
-
-
-

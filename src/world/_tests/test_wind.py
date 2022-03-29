@@ -1,6 +1,5 @@
 import unittest
-
-from ..wind import WindNoise
+from ..wind_mechanics.perlin_wind import WindNoise
 
 
 class TestWindNoise(unittest.TestCase):

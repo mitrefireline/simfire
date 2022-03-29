@@ -5,7 +5,7 @@ from pathlib import Path
 from src.utils.units import mph_to_ftpm
 
 from ..config import ConfigType, Config
-from ...world.wind import WindController
+from ...world.wind_mechanics.wind_controller import WindController
 from ...world.fuel_array_functions import chaparral_fn
 from ...world.elevation_functions import PerlinNoise2D
 

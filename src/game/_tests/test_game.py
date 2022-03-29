@@ -3,7 +3,7 @@ import pygame
 import os
 import unittest
 from unittest import mock
-from multiprocessing import Pool
+from multiprocessing import get_context
 
 from ..game import Game
 from ..sprites import Terrain
@@ -277,7 +277,7 @@ class TestGame(unittest.TestCase):
         inputs = (terrain, fire_manager.sprites, fireline_sprites, self.config.wind.speed,
                   self.config.wind.direction)
         inputs = [inputs] * pool_size
-        with Pool(pool_size) as p:
+        with get_context('spawn').Pool(pool_size) as p:
             status = p.starmap(game.update, inputs)
 
         valid_status = [GameStatus.RUNNING] * pool_size

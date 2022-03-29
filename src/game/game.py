@@ -208,14 +208,15 @@ class Game():
             The PyGame Surface for the wind magnitude
         '''
         wind_mag_surf = pygame.Surface(self.screen.get_size())
+        w_max = np.amax(wind_magnitude_map)
+        w_min = np.amin(wind_magnitude_map)
+        wind_speed_range = (w_max - w_min)
         for y_idx, y in enumerate(wind_magnitude_map):
             for x_idx, x in enumerate(y):
                 w_mag = x
-                wind_speed_range = (self.mw_speed_max - self.mw_speed_min)
-                color_grad = (255 - 0)
-                color_mag = int(((
-                    (w_mag - self.mw_speed_min) * color_grad) / wind_speed_range) + 0)
-                wind_mag_surf.set_at((x_idx, y_idx), pygame.Color(0, 0, color_mag, a=1))
+                gradient = (255 - 0)
+                color_mag = int((((w_mag - w_min) * gradient) / wind_speed_range) + 0)
+                wind_mag_surf.set_at((x_idx, y_idx), pygame.Color(0, color_mag, 0))
         return wind_mag_surf
 
     def _get_wind_dir_surf(self, wind_direction_map: Sequence[Sequence[float]]) -> \

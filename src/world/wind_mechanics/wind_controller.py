@@ -1,7 +1,6 @@
 import numpy as np
-from ..wind_mechanics.perlin_wind import WindNoise
-from ..wind_mechanics.cfd_wind import Fluid
-
+from perlin_wind import WindNoise
+from cfd_wind import Fluid
 import pygame
 
 pygame.init

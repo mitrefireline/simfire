@@ -3,6 +3,7 @@ import unittest
 import numpy as np
 import pygame
 
+from . import DummyFuelLayer, DummyTopographyLayer
 from ..sprites import Fire, Terrain
 from ...utils.config import Config
 from ...enums import BURNED_RGB_COLOR, BurnStatus, SpriteLayer
@@ -11,14 +12,10 @@ from ...enums import BURNED_RGB_COLOR, BurnStatus, SpriteLayer
 class TestTerrain(unittest.TestCase):
     def setUp(self) -> None:
         self.config = Config('./config.yml')
-        self.tiles = [[
-            self.config.terrain.fuel_array_function(x, y)
-            for x in range(self.config.area.terrain_size)
-        ] for y in range(self.config.area.terrain_size)]
-
-        self.terrain = Terrain(self.tiles, self.config.terrain.elevation_function,
-                               self.config.area.terrain_size,
-                               self.config.area.screen_size)
+        self.screen_size = (32, 32)
+        self.fuel_layer = DummyFuelLayer(self.screen_size)
+        self.topo_layer = DummyTopographyLayer(self.screen_size)
+        self.terrain = Terrain(self.fuel_layer, self.topo_layer, self.screen_size)
 
     def test_image_loc_and_size(self) -> None:
         '''
@@ -28,12 +25,11 @@ class TestTerrain(unittest.TestCase):
         self.assertTupleEqual((x, y), (0, 0),
                               msg=('The terrain image/texture location is '
                                    f'({x}, {y}), but should be (0, 0)'))
-        valid_tuple = (self.config.area.screen_size, self.config.area.screen_size)
         self.assertTupleEqual((w, h),
-                              valid_tuple,
+                              self.screen_size,
                               msg=('The terrain image/texture location is '
                                    f'({w}, {h}), but should be '
-                                   f'{valid_tuple}'))
+                                   f'{self.screen_size}'))
 
     def test_image_creation(self) -> None:
         '''
@@ -41,21 +37,20 @@ class TestTerrain(unittest.TestCase):
         created successfully.
         '''
         self.terrain._make_terrain_image()
-        true_shape = (self.config.area.screen_size, self.config.area.screen_size)
         self.assertIsInstance(self.terrain.image,
                               pygame.Surface,
                               msg=('The terrain image should have type pygame.Surface, '
                                    f'but has type {type(self.terrain.image)}'))
-        self.assertCountEqual(self.terrain.fuel_arrs.shape,
-                              true_shape,
-                              msg=('The FuelArray image has shape '
-                                   f'{self.terrain.fuel_arrs.shape}, but should have '
-                                   f'shape {true_shape}'))
+        self.assertCountEqual(self.terrain.fuels.shape,
+                              self.screen_size,
+                              msg=('The terrain fuels have shape '
+                                   f'{self.terrain.fuels.shape}, but should have '
+                                   f'shape {self.screen_size}'))
         self.assertCountEqual(self.terrain.elevations.shape,
-                              true_shape,
+                              self.screen_size,
                               msg=('The terrain elevations have shape '
                                    f'{self.terrain.elevations.shape}, but should have '
-                                   f'shape {true_shape}'))
+                                   f'shape {self.screen_size}'))
 
     def test_update(self) -> None:
         '''
@@ -65,8 +60,8 @@ class TestTerrain(unittest.TestCase):
 
         fire_map = np.full((h, w), BurnStatus.UNBURNED)
 
-        burned_x = self.config.area.screen_size // 2
-        burned_y = self.config.area.screen_size // 2
+        burned_x = self.screen_size[1] // 2
+        burned_y = self.screen_size[0] // 2
         fire_map[burned_y, burned_x] = BurnStatus.BURNED
 
         self.terrain.update(fire_map)

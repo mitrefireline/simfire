@@ -1,6 +1,6 @@
 '''
 Package
-=======
+-------
 This will be used in CI to make sure that we can import all of the packages/modules in the
 installed package. If it fails, there is likely a `src` imported somewhere instead of a
 relative import.

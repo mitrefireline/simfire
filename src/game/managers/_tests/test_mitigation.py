@@ -6,9 +6,9 @@ import numpy as np
 from skimage.draw import line
 
 from ....enums import BurnStatus
+from ....game._tests import DummyFuelLayer, DummyTopographyLayer
 from ....game.game import Game
 from ....utils.config import Config
-from ....world.elevation_functions import flat
 from ...sprites import FireLine, ScratchLine, WetLine, Terrain
 from ..mitigation import FireLineManager, ScratchLineManager, WetLineManager
 
@@ -21,21 +21,17 @@ class TestControlLineManager(unittest.TestCase):
     '''
     def setUp(self) -> None:
         self.config = Config('./config.yml')
-        points = line(self.config.area.terrain_size, self.config.area.terrain_size + 1,
-                      self.config.area.terrain_size, self.config.area.terrain_size + 1)
+        self.screen_size = (32, 32)
+        self.pixel_scale = 50  # Just an arbitrary number
+        points = line(self.screen_size[0] // 4, 0, 0, self.screen_size[1] // 4)
         y = points[0].tolist()
         x = points[1].tolist()
         self.manager = FireLineManager
         self.points = list(zip(x, y))
-        self.game = Game(self.config.area.screen_size)
-
-        fuel_arrs = [[
-            self.config.terrain.fuel_array_function(x, y)
-            for x in range(self.config.area.terrain_size)
-        ] for y in range(self.config.area.terrain_size)]
-
-        self.terrain = Terrain(fuel_arrs, flat(), self.config.area.terrain_size,
-                               self.config.area.screen_size)
+        self.game = Game(self.screen_size)
+        topo_layer = DummyTopographyLayer(self.screen_size)
+        fuel_layer = DummyFuelLayer(self.screen_size)
+        self.terrain = Terrain(fuel_layer, topo_layer, self.screen_size)
 
     @mock.patch.dict(os.environ, {'SDL_VIDEODRIVER': 'dummy'})
     def test_add_point(self) -> None:
@@ -43,7 +39,7 @@ class TestControlLineManager(unittest.TestCase):
         Test that a point is added to the self.sprites list correctly.
         '''
         manager = self.manager(size=self.config.display.control_line_size,
-                               pixel_scale=self.config.area.pixel_scale,
+                               pixel_scale=self.pixel_scale,
                                terrain=self.terrain)
 
         manager._add_point(self.points[0])
@@ -67,7 +63,7 @@ class TestControlLineManager(unittest.TestCase):
                            BurnStatus.UNBURNED)
 
         manager = self.manager(size=self.config.display.control_line_size,
-                               pixel_scale=self.config.area.pixel_scale,
+                               pixel_scale=self.pixel_scale,
                                terrain=self.terrain)
         fire_map = self.game.fire_map
         fire_map = manager.update(fire_map, self.points)
@@ -79,12 +75,12 @@ class TestControlLineManager(unittest.TestCase):
 
         # Test to see if we have the same locations in the resulting fire_map that we
         # supplied to self.update
-        self.assertListEqual(fireline_points,
-                             self.points,
-                             msg=('The points given as parameters to '
-                                  f'FireLineManager.update(): {self.points} do not '
-                                  'match those in the returned fire_map: '
-                                  f'{fireline_points}'))
+        self.assertCountEqual(fireline_points,
+                              self.points,
+                              msg=('The points given as parameters to '
+                                   f'FireLineManager.update(): {self.points} do not '
+                                   'match those in the returned fire_map: '
+                                   f'{fireline_points}'))
 
 
 @mock.patch.dict(os.environ, {'SDL_VIDEODRIVER': 'dummy'})
@@ -95,27 +91,24 @@ class TestFireLineManager(unittest.TestCase):
     '''
     def setUp(self) -> None:
         self.config = Config('./config.yml')
-        points = line(100, 15, 100, 200)
+        self.screen_size = (32, 32)
+        self.pixel_scale = 50  # Just an arbitrary number
+        points = line(self.screen_size[0] // 4, 0, 0, self.screen_size[1] // 4)
         y = points[0].tolist()
         x = points[1].tolist()
         self.manager = FireLineManager
         self.points = list(zip(x, y))
-        self.game = Game(self.config.area.screen_size)
-
-        fuel_arrs = [[
-            self.config.terrain.fuel_array_function(x, y)
-            for x in range(self.config.area.terrain_size)
-        ] for y in range(self.config.area.terrain_size)]
-
-        self.terrain = Terrain(fuel_arrs, flat(), self.config.area.terrain_size,
-                               self.config.area.screen_size)
+        self.game = Game(self.screen_size)
+        topo_layer = DummyTopographyLayer(self.screen_size)
+        fuel_layer = DummyFuelLayer(self.screen_size)
+        self.terrain = Terrain(fuel_layer, topo_layer, self.screen_size)
 
     def test_init(self) -> None:
         '''
         Test to make sure that `self.sprite_type` and `self.line_type` are set correctly
         '''
         manager = self.manager(size=self.config.display.control_line_size,
-                               pixel_scale=self.config.area.pixel_scale,
+                               pixel_scale=self.pixel_scale,
                                terrain=self.terrain)
 
         # Make sure line_type is the same
@@ -138,27 +131,24 @@ class TestScratchLineManager(unittest.TestCase):
     '''
     def setUp(self) -> None:
         self.config = Config('./config.yml')
-        points = line(100, 15, 100, 200)
+        self.screen_size = (32, 32)
+        self.pixel_scale = 50  # Just an arbitrary number
+        points = line(self.screen_size[0] // 4, 0, 0, self.screen_size[1] // 4)
         y = points[0].tolist()
         x = points[1].tolist()
         self.manager = ScratchLineManager
         self.points = list(zip(x, y))
-        self.game = Game(self.config.area.screen_size)
-
-        fuel_arrs = [[
-            self.config.terrain.fuel_array_function(x, y)
-            for x in range(self.config.area.terrain_size)
-        ] for y in range(self.config.area.terrain_size)]
-
-        self.terrain = Terrain(fuel_arrs, flat(), self.config.area.terrain_size,
-                               self.config.area.screen_size)
+        self.game = Game(self.screen_size)
+        topo_layer = DummyTopographyLayer(self.screen_size)
+        fuel_layer = DummyFuelLayer(self.screen_size)
+        self.terrain = Terrain(fuel_layer, topo_layer, self.screen_size)
 
     def test_init(self) -> None:
         '''
         Test to make sure that `self.sprite_type` and `self.line_type` are set correctly
         '''
         manager = self.manager(size=self.config.display.control_line_size,
-                               pixel_scale=self.config.area.pixel_scale,
+                               pixel_scale=self.pixel_scale,
                                terrain=self.terrain)
 
         # Make sure line_type is the same
@@ -181,27 +171,24 @@ class TestWetLineManager(unittest.TestCase):
     '''
     def setUp(self) -> None:
         self.config = Config('./config.yml')
-        points = line(100, 15, 100, 200)
+        self.screen_size = (32, 32)
+        self.pixel_scale = 50  # Just an arbitrary number
+        points = line(self.screen_size[0] // 4, 0, 0, self.screen_size[1] // 4)
         y = points[0].tolist()
         x = points[1].tolist()
         self.manager = WetLineManager
         self.points = list(zip(x, y))
-        self.game = Game(self.config.area.screen_size)
-
-        fuel_arrs = [[
-            self.config.terrain.fuel_array_function(x, y)
-            for x in range(self.config.area.terrain_size)
-        ] for y in range(self.config.area.terrain_size)]
-
-        self.terrain = Terrain(fuel_arrs, flat(), self.config.area.terrain_size,
-                               self.config.area.screen_size)
+        self.game = Game(self.screen_size)
+        topo_layer = DummyTopographyLayer(self.screen_size)
+        fuel_layer = DummyFuelLayer(self.screen_size)
+        self.terrain = Terrain(fuel_layer, topo_layer, self.screen_size)
 
     def test_init(self) -> None:
         '''
         Test to make sure that `self.sprite_type` and `self.line_type` are set correctly
         '''
         manager = self.manager(size=self.config.display.control_line_size,
-                               pixel_scale=self.config.area.pixel_scale,
+                               pixel_scale=self.pixel_scale,
                                terrain=self.terrain)
 
         # Make sure line_type is the same

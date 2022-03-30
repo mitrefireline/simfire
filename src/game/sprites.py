@@ -143,6 +143,7 @@ class Terrain(pygame.sprite.Sprite):
             out_img = Image.open(out_img_path.name).resize(image.shape[:2])
             # Slice the alpha channel off
             out_img = np.array(out_img)[..., :3]
+        plt.close(fig)
         return out_img
 
     def _update_texture_dryness(self, fuel: Fuel) -> np.ndarray:

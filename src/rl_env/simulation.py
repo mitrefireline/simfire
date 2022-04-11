@@ -182,7 +182,6 @@ class RothermelSimulation(Simulation):
             The action / mitgiation strategies available: Dict[str, int]
         '''
         return {
-            'none': BurnStatus.UNBURNED,
             'fireline': BurnStatus.FIRELINE,
             'scratchline': BurnStatus.SCRATCHLINE,
             'wetline': BurnStatus.WETLINE

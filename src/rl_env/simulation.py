@@ -104,9 +104,10 @@ class RothermelSimulation(Simulation):
         self.fire_status = GameStatus.RUNNING
         self.points = set([])
 
-        # for testing purposes
-        self.do_not_init = do_not_init
-        if not self.do_not_init:
+        self.fire_map = np.full((self.config.area.screen_size,
+                                 self.config.area.screen_size),
+                                BurnStatus.UNBURNED)
+
             self._create_terrain()
             self._create_fire()
             self._create_mitigations()
@@ -271,7 +272,35 @@ class RothermelSimulation(Simulation):
                     elif mitigation_state[(i, j)] == BurnStatus.WETLINE:
                         self.points.add((i, j))
 
-    def run(self, mitigation_state: np.ndarray, mitigation: bool) -> np.ndarray:
+    def update_mitigation(self, points: Iterable[Tuple[int, int, int]]) -> None:
+        '''
+        Update the `self.fire_map` with new mitigation points
+
+        Arguments:
+            points: A list of `(x, y, mitigation)` tuples. These will be added to
+                   `self.fire_map`.
+        '''
+        firelines = []
+        scratchlines = []
+        wetlines = []
+
+        # Loop through all points, and add the mitigations to their respective lists
+        for i, (x, y, mitigation) in enumerate(points):
+            if mitigation == BurnStatus.FIRELINE:
+                firelines.append((x, y))
+            elif mitigation == BurnStatus.SCRATCHLINE:
+                scratchlines.append((x, y))
+            elif mitigation == BurnStatus.WETLINE:
+                wetlines.append((x, y))
+            else:
+                log.warning(f'The mitigation,{mitigation}, provided at location[{i}] is '
+                            'not an available mitigation strategy... Skipping')
+
+        # Update the self.fire_map using the managers
+        self.fire_map = self.fireline_manager.update(self.fire_map, firelines)
+        self.fire_map = self.scratchline_manager.update(self.fire_map, firelines)
+        self.fire_map = self.wetline_manager.update(self.fire_map, firelines)
+
         '''
         Runs the simulation with or without mitigation lines.
 

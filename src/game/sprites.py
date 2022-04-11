@@ -111,7 +111,7 @@ class Terrain(pygame.sprite.Sprite):
         for i in range(self.fuels.shape[0]):
             for j in range(self.fuels.shape[1]):
                 # Need these pixel level coordinates to span the correct range
-                updated_texture = self._update_texture_dryness(self.fuels[i][i])
+                updated_texture = self._update_texture_dryness(self.fuels[i][j])
                 image[i, j] = updated_texture
 
         cont_image = self._make_contour_image(image)
@@ -149,7 +149,7 @@ class Terrain(pygame.sprite.Sprite):
     def _update_texture_dryness(self, fuel: Fuel) -> np.ndarray:
         '''
         Determine the percent change to make the terrain look drier (i.e.
-        more red/yellow/brown) by using the FuelArray values. Then, update
+        more red/yellow/brown) by using the Fuel values. Then, update
         the texture color using PIL and image blending with a preset
         yellow-brown color/image.
 

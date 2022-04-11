@@ -1,5 +1,5 @@
 from typing import Sequence
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 
 @dataclass
@@ -19,26 +19,6 @@ class FuelParticle:
 
 
 @dataclass
-class Tile:
-    '''
-    Class that records the location of each terrain tile for a FuelArray.
-    '''
-    # x coordinate of the top-left corner of the tile in the array
-    x: float
-    # y coordinate of the top-left corner of the tile in the array
-    y: float
-    # Tile width in the x direction (ft)
-    w: float
-    # Tile height in the y direction (ft)
-    h: float
-    # Area of the tile (ft^2)
-    area: float = field(init=False)
-
-    def __post_init__(self):
-        self.area = self.w * self.h
-
-
-@dataclass
 class Fuel:
     '''
     Class that describes the parameters of a fuel type
@@ -51,19 +31,6 @@ class Fuel:
     M_x: float
     # Surface-area-to-volume ratio (ft^2/ft^3)
     sigma: float
-
-
-@dataclass
-class FuelArray:
-    '''
-    These parameters relate to the fuel in a tile. Need a Tile as a
-    parameter to get area and volume information. Need a Fuel parameter
-    to get information on how the FuelArray will burn.
-    '''
-    # Tile on which the fuel exists
-    tile: Tile
-    # Fuel properties that describe the FuelArray
-    fuel: Fuel
 
 
 @dataclass

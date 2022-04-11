@@ -33,7 +33,7 @@ class TestTerrain(unittest.TestCase):
 
     def test_image_creation(self) -> None:
         '''
-        Test that the image with contour map, FuelArray array, and elevation array are
+        Test that the image with contour map, Fuel array, and elevation array are
         created successfully.
         '''
         self.terrain._make_terrain_image()

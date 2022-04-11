@@ -1,6 +1,6 @@
 import math
 from pathlib import Path
-from typing import Tuple, List, Dict
+from typing import Callable, Tuple, List, Dict
 
 import numpy as np
 from PIL import Image
@@ -700,7 +700,8 @@ class FunctionalElevationLayer(DataLayer):
     '''
     Layer that stores elevation data computed from a function.
     '''
-    def __init__(self, height, width, elevation_fn: ElevationFn) -> None:
+    def __init__(self, height: int, width: int, elevation_fn: ElevationFn,
+                 name: str = None) -> None:
         '''
         Initialize the elvation layer by computing the elevations and contours.
 
@@ -709,11 +710,14 @@ class FunctionalElevationLayer(DataLayer):
             width: The width of the data layer
             elevation_fn: A callable function that converts (x, y) coorindates to
                           elevations.
+            name: The name of the function. Should be set by the config to 'perlin',
+                  'gaussian', etc.
         '''
         super().__init__()
         self.height = height
         self.width = width
         self.elevation_fn = elevation_fn
+        self.name = name
         self.data = self._make_data()
 
     def _make_data(self) -> np.ndarray:
@@ -735,3 +739,48 @@ class FunctionalElevationLayer(DataLayer):
         elevations = np.expand_dims(elevations, axis=-1)
 
         return elevations
+
+
+class FunctionalFuelLayer(DataLayer):
+    '''
+    Layer that stores fuel data computed from a function.
+    '''
+    def __init__(self, height: int, width: int, fuel_array_fn: Callable,
+                 name: str = None) -> None:
+        '''
+        Initialize the elvation layer by computing the elevations and contours.
+
+        Arguments:
+            height: The height of the data layer
+            width: The width of the data layer
+            fuel_array_fn: A callable function that converts (x, y) coorindates to
+                           elevations.
+            name: The name of the function. Should be set by the config to 'chaparral',
+                  etc.
+        '''
+        super().__init__()
+        self.height = height
+        self.width = width
+        self.fuel_array_fn = fuel_array_fn
+        self.name = name
+        self.data = self._make_data()
+
+    def _make_data(self) -> np.ndarray:
+        '''
+        Use `self.fuel_array_fn` to make the elevation data layer.
+
+        Arguments:
+            None
+
+        Returns:
+            A numpy array containing the elevation data
+        '''
+        x = np.arange(self.width)
+        y = np.arange(self.height)
+        X, Y = np.meshgrid(x, y)
+        fuel_array_fn_vect = np.vectorize(self.fuel_array_fn)
+        fuel_arrays = fuel_array_fn_vect(X, Y)
+        # Expand third dimension to align with data layers
+        fuel_arrays = np.expand_dims(fuel_arrays, axis=-1)
+
+        return fuel_arrays

@@ -6,6 +6,8 @@ from typing import Any
 from pathlib import Path
 from yaml.parser import ParserError
 
+from src.utils.layers import FunctionalElevationLayer, FunctionalFuelLayer
+
 from ..utils.log import create_logger
 from ..world.wind_mechanics.wind_controller import WindController, WindController2
 from ..utils.units import str_to_minutes, mph_to_ftpm, mph_to_ms, scale_ms_to_ftpm
@@ -104,6 +106,9 @@ class Config:
         calling this, it becomes an actual function with all of the precompute values
         from the config passed in.
         '''
+        if isinstance(self.terrain.elevation_function, FunctionalElevationLayer):
+            self.terrain.elevation_function = self.terrain.elevation_function.name
+
         # Now we can set the function again
         if 'perlin' in str(self.terrain.elevation_function).lower():
             # Reset the value, if we are resetting the function
@@ -111,18 +116,29 @@ class Config:
             args = self.terrain.perlin
             noise = PerlinNoise2D(args.amplitude, args.shape, args.resolution, args.seed)
             noise.precompute()
-            setattr(self.terrain, 'elevation_function', noise.fn)
+            topo_layer = FunctionalElevationLayer(self.area.screen_size,
+                                                  self.area.screen_size,
+                                                  noise.fn,
+                                                  name='perlin')
+            setattr(self.terrain, 'elevation_function', topo_layer)
         elif 'gaussian' in str(self.terrain.elevation_function).lower():
             # Reset the value, if we are resetting the function
             self.terrain.elevation_function = 'gaussian'
             args = self.terrain.gaussian
             noise = gaussian(args.amplitude, args.mu_x, args.mu_y, args.sigma_x,
                              args.sigma_y)
-            setattr(self.terrain, 'elevation_function', noise)
+            topo_layer = FunctionalElevationLayer(self.area.screen_size,
+                                                  self.area.screen_size,
+                                                  noise,
+                                                  name='gaussian')
+            setattr(self.terrain, 'elevation_function', topo_layer)
         elif 'flat' in str(self.terrain.elevation_function).lower():
             # Reset the value, if we are resetting the function
-            self.terrain.elevation_function = 'flat'
-            setattr(self.terrain, 'elevation_function', flat())
+            topo_layer = FunctionalElevationLayer(self.area.screen_size,
+                                                  self.area.screen_size,
+                                                  flat(),
+                                                  name='flat')
+            setattr(self.terrain, 'elevation_function', topo_layer)
         else:
             log.error('The user-defined elevation function is set to '
                       f'{self.terrain.elevation_function} when it can only be one of '
@@ -137,12 +153,19 @@ class Config:
         calling this, it becomes an actual function with all of the precompute values
         from the config passed in.
         '''
+        if isinstance(self.terrain.fuel_array_function, FunctionalFuelLayer):
+            self.terrain.fuel_array_function = self.terrain.fuel_array_function.name
+
         # Now we can set the function again
         if 'chaparral' in str(self.terrain.fuel_array_function).lower():
             self.terrain.fuel_array_function = 'chaparral'
             args = self.terrain.chaparral
             fn = chaparral_fn(self.area.pixel_scale, self.area.pixel_scale, args.seed)
-            setattr(self.terrain, 'fuel_array_function', fn)
+            fuel_layer = FunctionalFuelLayer(self.area.screen_size,
+                                             self.area.screen_size,
+                                             fn,
+                                             name='chaparral')
+            setattr(self.terrain, 'fuel_array_function', fuel_layer)
         else:
             log.error('The user-defined fuel array function is set to '
                       f'{self.terrain.fuel_array_function}, when it can only be one of '

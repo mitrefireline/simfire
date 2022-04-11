@@ -353,6 +353,14 @@ class RothermelSimulation(Simulation):
             if self.fire_status == GameStatus.QUIT:
                 return self.fire_map
 
+    def reset_fire_map(self) -> None:
+        '''
+        Resets the `self.fire_map` attribute to entirely `BurnStatus.UNBURNED`
+        '''
+        self.fire_map = np.full((self.config.area.screen_size,
+                                 self.config.area.screen_size),
+                                BurnStatus.UNBURNED)
+
     def _render_inline(self, mitigation: np.ndarray, position: np.ndarray) -> None:
         '''
         Interact with the RL harness to display and update the simulation as the agent

@@ -1,5 +1,6 @@
 from typing import Sequence, Tuple
 
+import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
 
@@ -74,7 +75,7 @@ class FireSpreadGraph():
                     # newly burning node
                     self.graph.add_edge(adj_loc, (x, y))
 
-    def draw(self) -> None:
+    def draw(self) -> plt.Figure:
         '''
         Draw the graph with the nodes/pixels in the correct locations and the
         edges shown as arrows connecting the nodes/pixels.
@@ -86,4 +87,9 @@ class FireSpreadGraph():
             None
         '''
         # TODO: Write this function that returns a pyplot Figure or Axes object
-        pass
+        # Will need to set the `pos` argument in the draw() functions
+        pos = {(x, y): (x, self.screen_size[0] - y) for (x, y) in self.nodes}
+        fig = plt.figure()
+        nx.draw_networkx(self.graph, pos, with_labels=False)
+
+        return fig

@@ -22,9 +22,10 @@ class TestFireSpreadGraph(unittest.TestCase):
 
         num_nodes_in_graph = len(self.fs_graph.graph.nodes)
         true_num_nodes = self.screen_size[0] * self.screen_size[1]
-        self.assertEqual(num_nodes_in_graph, true_num_nodes,
+        self.assertEqual(num_nodes_in_graph,
+                         true_num_nodes,
                          msg='The number of nodes created and in the graph are '
-                             f'{num_nodes_in_graph}, but should be {true_num_nodes}')
+                         f'{num_nodes_in_graph}, but should be {true_num_nodes}')
 
     def test_add_vertices_from_manager(self) -> None:
         '''
@@ -38,9 +39,11 @@ class TestFireSpreadGraph(unittest.TestCase):
         y_coords = (0, 0, 2)
 
         self.fs_graph.add_edges_from_manager(x_coords, y_coords, fire_map)
+        self.fs_graph.draw()
 
         edges = list(self.fs_graph.graph.edges)
         true_edges = [(burning_loc, (x, y)) for x, y in zip(x_coords, y_coords)]
-        self.assertListEqual(edges, true_edges,
+        self.assertListEqual(edges,
+                             true_edges,
                              msg=f'The created edges {edges} do not match what the '
-                                 f'true edges should be {true_edges}')
+                             f'true edges should be {true_edges}')

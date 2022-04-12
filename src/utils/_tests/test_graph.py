@@ -20,13 +20,11 @@ class TestFireSpreadGraph(unittest.TestCase):
         Test that the graph is initialized with the correct number of nodes.
         '''
 
-        num_nodes_created = len(self.fs_graph.nodes)
-        num_nodes_in_graph = (self.fs_graph.graph.nodes)
+        num_nodes_in_graph = len(self.fs_graph.graph.nodes)
         true_num_nodes = self.screen_size[0] * self.screen_size[1]
-        self.assertEqual(num_nodes_created, num_nodes_in_graph, true_num_nodes,
+        self.assertEqual(num_nodes_in_graph, true_num_nodes,
                          msg='The number of nodes created and in the graph are '
-                             f'{num_nodes_created} and {num_nodes_in_graph}, but should '
-                             f'be {true_num_nodes}')
+                             f'{num_nodes_in_graph}, but should be {true_num_nodes}')
 
     def test_add_vertices_from_manager(self) -> None:
         '''

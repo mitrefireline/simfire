@@ -6,8 +6,7 @@ from pathlib import Path
 
 from ...game.sprites import Terrain
 from ...utils.config import Config
-from ...game._tests import DummyFuelLayer, DummyTopographyLayer
-from ...world.parameters import Environment, FuelParticle
+from ...world.parameters import Environment
 from ...rl_env.simulation import RothermelSimulation
 from ...enums import BurnStatus
 from ...game.managers.mitigation import (FireLineManager, ScratchLineManager,
@@ -23,21 +22,16 @@ class RothermelSimulationTest(unittest.TestCase):
 
         self.screen_size = (self.config.area.screen_size, self.config.area.screen_size)
 
-        self.simulation = RothermelSimulation(self.config, True)
-        self.simulation_flat = RothermelSimulation(self.config_flat_simple, True)
+        self.simulation = RothermelSimulation(self.config)
+        self.simulation_flat = RothermelSimulation(self.config_flat_simple)
 
-        topo_layer = DummyTopographyLayer(self.screen_size)
-        fuel_layer = DummyFuelLayer(self.screen_size)
+        topo_layer = self.config.terrain.elevation_function
+        fuel_layer = self.config.terrain.fuel_array_function
         self.terrain = Terrain(fuel_layer, topo_layer, self.screen_size)
         self.simulation.terrain = self.terrain
         self.simulation.environment = Environment(self.config.environment.moisture,
                                                   self.config.wind.speed,
                                                   self.config.wind.direction)
-        self.simulation.fuel_particle = FuelParticle()
-        self.simulation.fuel_arrs = [[
-            self.config.terrain.fuel_array_function(x, y)
-            for x in range(self.config.area.terrain_size)
-        ] for y in range(self.config.area.terrain_size)]
 
         # initialize all mitigation strategies
         self.simulation.fireline_manager = FireLineManager(
@@ -79,41 +73,41 @@ class RothermelSimulationTest(unittest.TestCase):
 
     def test__create_terrain(self) -> None:
         '''
-        Test that the terrain gets created properly. This should work as long
-            as the tests for Terrain() work.
+        Test that the terrain gets created properly.
+
+        This should work as long as the tests for Terrain() work.
         '''
         pass
 
     def test__create_mitigations(self) -> None:
         '''
         Test that the mitigation (FireLineManager) gets created properly.
-            This should work as long as the tests for FireLineManager() work.
+
+        This should work as long as the tests for FireLineManager() work.
         '''
         pass
 
     def test_create_fire(self) -> None:
         '''
         Test that the fire (FireManager) gets created properly.
-            This should work as long as the tests for FireManager() work.
+
+        This should work as long as the tests for FireManager() work.
         '''
         pass
 
     def test_get_actions(self) -> None:
         '''
-        Test that the call to get_actions() runs properly and returns all Rothermel
-            FireLineManager() features.
+        Test that the call to `get_actions()` runs properly and returns all Rothermel
+        `FireLineManager()` features.
         '''
-
         simulation_actions = self.simulation.get_actions()
         self.assertIsInstance(simulation_actions, Dict)
 
     def test_get_attributes(self) -> None:
         '''
         Test that the call to get_actions() runs properly and returns all Rothermel
-            features (Fire, Wind, FireLine, Terrain).
-
+        features (Fire, Wind, FireLine, Terrain).
         '''
-
         simulation_attributes = self.simulation.get_attributes()
         self.assertIsInstance(simulation_attributes, Dict)
 
@@ -186,16 +180,11 @@ class RothermelSimulationTest(unittest.TestCase):
         This should pass as long as the calls to `fireline_manager.update()`
         and `fire_map.update()` pass tests.
         '''
-        mitigation = np.zeros(
-            (self.config.area.screen_size, self.config.area.screen_size))
-        mitigation[1, 0] = 1
-        position = np.zeros((self.config.area.screen_size, self.config.area.screen_size))
-        position[self.config.area.screen_size - 1, self.config.area.screen_size - 1] = 1
-
+        # Check against a completely burned fire_map
         fire_map = np.full((self.config.area.screen_size, self.config.area.screen_size),
                            BurnStatus.BURNED)
 
-        self.fire_map = self.simulation.run(mitigation, False)
+        self.fire_map = self.simulation_flat.run(time='1h')
         # assert the fire map is all BURNED
         self.assertEqual(
             self.fire_map.max(),
@@ -203,14 +192,15 @@ class RothermelSimulationTest(unittest.TestCase):
             msg=f'The fire map has a maximum BurnStatus of {self.fire_map.max()} '
             f', but it should be {fire_map.max()}')
 
-        # assert fire map has BURNED and FIRELINE pixels
-        fire_map[1, 0] = 3
-        self.fire_map = self.simulation.run(mitigation, True)
-        self.assertEqual(len(np.where(self.fire_map == 3)),
-                         len(np.where(fire_map == 1)),
-                         msg=f'The fire map has a mitigation sprite of length '
-                         f'{len(np.where(self.fire_map == 3))}, but it should be '
-                         f'{len(np.where(fire_map == 1))}')
+        self.simulation_flat.reset()
+
+        # Check that we can run for one step
+        self.fire_map = self.simulation_flat.run(time=1)
+        self.assertEqual(self.simulation_flat.elapsed_time,
+                         self.config.simulation.update_rate,
+                         msg=f'Only {self.config.simulation.update_rate}m should  '
+                             f'passed, but {self.simulation_flat.elapsed_time}m has '
+                             'passed.')
 
     def test__render_inline(self) -> None:
         '''

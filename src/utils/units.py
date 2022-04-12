@@ -64,7 +64,7 @@ def str_to_minutes(string: str) -> int:
 
     Arguments:
         string: The input string represented in any of the following ways and more: `2d`,
-        `2 d`, `2 days`, `24h`, `1d 23h 60m`.
+        `2days`, `24h`, `1d 23h 60m`.
 
     Returns:
         The number of minutes represented by the string.

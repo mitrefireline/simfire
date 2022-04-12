@@ -1,12 +1,13 @@
 import numpy as np
 
-from typing import Dict, Optional
 from abc import ABC, abstractmethod
+from typing import Dict, Optional, Union, Tuple, Iterable
 
 from ..game.game import Game
 from ..utils.config import Config
 from ..game.sprites import Terrain
 from ..utils.log import create_logger
+from ..utils.units import str_to_minutes
 from ..enums import GameStatus, BurnStatus
 from ..game.managers.fire import RothermelFireManager
 from ..world.parameters import Environment, FuelParticle
@@ -95,7 +96,7 @@ class Simulation(ABC):
 
 
 class RothermelSimulation(Simulation):
-    def __init__(self, config: Config, do_not_init: bool = False) -> None:
+    def __init__(self, config: Config) -> None:
         '''
         Initialize the `RothermelSimulation` object for interacting with the RL harness.
         '''
@@ -103,26 +104,27 @@ class RothermelSimulation(Simulation):
         self.game_status = GameStatus.RUNNING
         self.fire_status = GameStatus.RUNNING
         self.points = set([])
+        self.reset()
 
-        self.fire_map = np.full((self.config.area.screen_size,
-                                 self.config.area.screen_size),
-                                BurnStatus.UNBURNED)
-
-            self._create_terrain()
-            self._create_fire()
-            self._create_mitigations()
+    def reset(self) -> None:
+        '''
+        Reset the `self.fire_map`, `self.terrain`, `self.fire_manager`,
+        and all mitigations to initial conditions
+        '''
+        self.points = set([])
+        self._create_fire_map()
+        self._create_terrain()
+        self._create_fire()
+        self._create_mitigations()
 
     def _create_terrain(self) -> None:
         '''
         Initialize the terrain.
         '''
         self.fuel_particle = FuelParticle()
-        self.fuel_arrs = [[
-            self.config.terrain.fuel_array_function(x, y)
-            for x in range(self.config.area.terrain_size)
-        ] for y in range(self.config.area.terrain_size)]
+
         self.terrain = Terrain(
-            self.fuel_arrs,
+            self.config.terrain.fuel_array_function,
             self.config.terrain.elevation_function,
             (self.config.area.screen_size, self.config.area.screen_size),
             headless=self.config.simulation.headless)
@@ -198,7 +200,8 @@ class RothermelSimulation(Simulation):
         return {
             'w0':
             np.array([[
-                self.terrain.fuels[i][j].w_0 for j in range(self.config.area.screen_size)
+                self.terrain.fuels[i][j].w_0
+                for j in range(self.config.area.screen_size)
             ] for i in range(self.config.area.screen_size)]),
             'sigma':
             np.array([[
@@ -212,7 +215,8 @@ class RothermelSimulation(Simulation):
             ] for i in range(self.config.area.screen_size)]),
             'M_x':
             np.array([[
-                self.terrain.fuels[i][j].M_x for j in range(self.config.area.screen_size)
+                self.terrain.fuels[i][j].M_x
+                for j in range(self.config.area.screen_size)
             ] for i in range(self.config.area.screen_size)]),
             'elevation':
             self.terrain.elevations,
@@ -235,11 +239,8 @@ class RothermelSimulation(Simulation):
 
         return position
 
-    def _update_sprite_points(
-        self,
-        mitigation_state: np.ndarray,
-        position_state: Optional[np.ndarray] = ([0], [0])
-    ) -> None:
+    def _update_sprite_points(self, points: Iterable[Tuple[int, int, int]],
+                              position_state: Optional[np.ndarray] = ([0], [0])) -> None:
         '''
         Update sprite point list based on fire mitigation.
 
@@ -254,23 +255,11 @@ class RothermelSimulation(Simulation):
                     to fireline sprites group.
         '''
         if self.config.render.inline:
-            if mitigation_state[0] == BurnStatus.FIRELINE:
-                self.points.add((position_state[0][0], position_state[1][0]))
-            elif mitigation_state[0] == BurnStatus.SCRATCHLINE:
-                self.points.add((position_state[0][0], position_state[1][0]))
-            elif mitigation_state[0] == BurnStatus.WETLINE:
-                self.points.add((position_state[0][0], position_state[1][0]))
+            [self.points.add((position_state[0][0], position_state[1][0]))
+             for _ in points]
 
         else:
-            # update the location to pass to the sprite
-            for i in range(self.config.area.screen_size):
-                for j in range(self.config.area.screen_size):
-                    if mitigation_state[(i, j)] == BurnStatus.FIRELINE:
-                        self.points.add((i, j))
-                    elif mitigation_state[(i, j)] == BurnStatus.SCRATCHLINE:
-                        self.points.add((i, j))
-                    elif mitigation_state[(i, j)] == BurnStatus.WETLINE:
-                        self.points.add((i, j))
+            [self.points.add((y, x)) for y, x, _ in points]
 
     def update_mitigation(self, points: Iterable[Tuple[int, int, int]]) -> None:
         '''
@@ -301,6 +290,7 @@ class RothermelSimulation(Simulation):
         self.fire_map = self.scratchline_manager.update(self.fire_map, firelines)
         self.fire_map = self.wetline_manager.update(self.fire_map, firelines)
 
+    def run(self, time: Union[str, int]) -> np.ndarray:
         '''
         Runs the simulation with or without mitigation lines.
 
@@ -316,46 +306,49 @@ class RothermelSimulation(Simulation):
             mitigation: Boolean for running the mitigation + fire spread which updates
                         `FirelineManager` sprites points or just the fire spread.
 
+            time: Either how many updates to run the simulation, based on the config
+                  value, `config.simulation.update_rate`, or a length of time expressed
+                  as a string (e.g. `120m`, `2h`, `2hour`, `2hours`, `1h 60m`, etc.)
 
         Returns:
-            The Burned/Unburned/ControlLine pixel map. Values range from [0, 6].
+            The Burned/Unburned/ControlLine pixel map (`self.fire_map`).
+            Values range from [0, 6].
         '''
         # for updating sprite purposes turn the inline rendering "off"
         self.config.render.inline = False
 
         # reset the fire status to running
         self.fire_status = GameStatus.RUNNING
-        # initialize fire strategy
-        self.fire_manager = RothermelFireManager(
-            self.config.fire.fire_initial_position,
-            self.config.display.fire_size,
-            self.config.fire.max_fire_duration,
-            self.config.area.pixel_scale,
-            self.config.simulation.update_rate,
-            self.fuel_particle,
-            self.terrain,
-            self.environment,
-            max_time=self.config.simulation.runtime,
-            attenuate_line_ros=self.config.mitigation.ros_attenuation,
-            headless=self.config.simulation.headless)
 
-        self.fire_map = np.full(
-            (self.config.area.screen_size, self.config.area.screen_size),
-            BurnStatus.UNBURNED)
-        if mitigation:
-            # update firemap with agent actions before initializing fire spread
-            self._update_sprite_points(mitigation_state)
-            self.fire_map = self.fireline_manager.update(self.fire_map, self.points)
+        # if mitigation:
+        #     # update firemap with agent actions before initializing fire spread
+        #     self._update_sprite_points(mitigation_state)
+        #     self.fire_map = self.fireline_manager.update(self.fire_map, self.points)
 
-        while self.fire_status == GameStatus.RUNNING:
+        if isinstance(time, str):
+            # Convert the string to a number of minutes
+            time = str_to_minutes(time)
+            # Then determine how many times to step through the loop
+            total_updates = round(time / self.config.simulation.update_rate)
+        elif isinstance(time, int):
+            total_updates = time
+
+        num_updates = 0
+        self.elapsed_time = self.fire_manager.elapsed_time
+
+        while self.fire_status == GameStatus.RUNNING and num_updates < total_updates:
             self.fire_sprites = self.fire_manager.sprites
             self.fire_map, self.fire_status = self.fire_manager.update(self.fire_map)
-            if self.fire_status == GameStatus.QUIT:
-                return self.fire_map
+            num_updates += 1
+            # elapsed_time is in minutes
+            self.elapsed_time = self.fire_manager.elapsed_time
 
-    def reset_fire_map(self) -> None:
+        return self.fire_map
+
+    def _create_fire_map(self) -> None:
         '''
-        Resets the `self.fire_map` attribute to entirely `BurnStatus.UNBURNED`
+        Resets the `self.fire_map` attribute to entirely `BurnStatus.UNBURNED` and
+        reinstantiates the `FireManager`
         '''
         self.fire_map = np.full((self.config.area.screen_size,
                                  self.config.area.screen_size),
@@ -547,7 +540,7 @@ class RothermelSimulation(Simulation):
         Returns:
             The seed for the currently configured elevation function.
         '''
-        if 'perlin' in str(self.config.terrain.elevation_function).lower():
+        if 'perlin' == self.config.terrain.elevation_function.name:
             return self.config.terrain.perlin.seed
         else:
             return None
@@ -562,7 +555,7 @@ class RothermelSimulation(Simulation):
         Returns:
             The seed for the currently configured fuel array function.
         '''
-        if 'chaparral' in str(self.config.terrain.fuel_array_function).lower():
+        if 'chaparral' == self.config.terrain.fuel_array_function.name:
             return self.config.terrain.chaparral.seed
         else:
             return None

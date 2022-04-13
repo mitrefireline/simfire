@@ -3,7 +3,7 @@ from pathlib import Path
 import numpy as np
 from skimage.draw import line
 
-from src.enums import GameStatus
+from src.enums import BurnStatus, GameStatus
 from src.game.game import Game
 from src.game.managers.fire import RothermelFireManager
 from src.game.managers.mitigation import FireLineManager
@@ -26,7 +26,7 @@ def main():
     fuel_particle = FuelParticle()
 
     center = (33.5, 116.8)
-    height, width = 5000, 5000
+    height, width = 2500, 2500
     resolution = 30
     lat_long_box = LatLongBox(center, height, width, resolution)
     topo_layer = TopographyLayer(lat_long_box)
@@ -66,6 +66,7 @@ def main():
                                        terrain=terrain)
 
     fire_map = game.fire_map
+    fire_map[cfg.fire.fire_initial_position] = BurnStatus.BURNING
     fire_map = fireline_manager.update(fire_map, points)
     game.fire_map = fire_map
 
@@ -90,6 +91,9 @@ def main():
         fire_map = fireline_manager.update(fire_map)
         fire_map, fire_status = fire_manager.update(fire_map)
         game.fire_map = fire_map
+
+    fig = fire_manager.draw_spread_graph(game.screen)
+    fig.savefig('spread_graph.png')
 
 
 if __name__ == '__main__':

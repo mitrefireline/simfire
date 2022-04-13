@@ -41,6 +41,7 @@ class FireSpreadGraph():
         Returns:
             A tuple all the (x, y) nodes needed for the graph
         '''
+        # Each (x, y) pixel point is a node
         nodes = tuple((x, y) for x in range(self.screen_size[1])
                       for y in range(self.screen_size[0]))
 
@@ -62,12 +63,24 @@ class FireSpreadGraph():
         Returns:
             None
         '''
+        # Singular numpy arrays called with arr.tolist() are returned as single
+        # values. Convert to list for compatibility
+        if isinstance(x_coords, int):
+            x_coords = [x_coords]
+            y_coords = [y_coords]
+        # Check that the x and y coordinates will align
         if (x_len := len(x_coords)) != (y_len := len(y_coords)):
             raise ValueError(f'The length of x_coords ({x_len}) should match '
                              f'the length of y_coords ({y_len}')
+
         for x, y in zip(x_coords, y_coords):
             adj_locs = ((x + 1, y), (x + 1, y + 1), (x, y + 1), (x - 1, y + 1),
                         (x - 1, y), (x - 1, y - 1), (x, y - 1), (x + 1, y - 1))
+            adj_locs = tuple(
+                filter(
+                    lambda xy: xy[0] < fire_map.shape[1] and xy[0] >= 0 and xy[1] <
+                    fire_map.shape[0] and xy[1] >= 0, adj_locs))
+            # Filter any locations that are outside of the screen area
             for adj_loc in adj_locs:
                 # If an adjacent pixel is burning, it contributes to this pixel
                 if fire_map[adj_loc] == BurnStatus.BURNING:
@@ -75,21 +88,26 @@ class FireSpreadGraph():
                     # newly burning node
                     self.graph.add_edge(adj_loc, (x, y))
 
-    def draw(self) -> plt.Figure:
+    def draw(self, background_image: np.ndarray = None) -> plt.Figure:
         '''
         Draw the graph with the nodes/pixels in the correct locations and the
         edges shown as arrows connecting the nodes/pixels.
 
         Arguemnts:
-            None
+            background_image: A numpy array containing the background image on
+                              which to overlay the graph. If not specified,
+                              then no background image will be used
 
         Returns:
-            None
+            A matplotlib.pyplot.Figure of the drawn graph
         '''
-        # TODO: Write this function that returns a pyplot Figure or Axes object
-        # Will need to set the `pos` argument in the draw() functions
-        pos = {(x, y): (x, self.screen_size[0] - y) for (x, y) in self.nodes}
-        fig = plt.figure()
-        nx.draw_networkx(self.graph, pos, with_labels=False)
+        # TODO: This still doesn't quite seem to line up the image and graph
+        # Might need to manually draw_eges and draw_nodes
+        pos = {(x, y): (x, y) for (x, y) in self.nodes}
+        fig, ax = plt.subplots(1, 1)
+        fig.tight_layout()
+        nx.draw_networkx(self.graph, pos=pos, ax=ax, node_size=0, with_labels=False)
+        if background_image is not None:
+            ax.imshow(background_image)
 
         return fig

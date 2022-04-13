@@ -54,7 +54,7 @@ class Terrain(pygame.sprite.Sprite):
             self.image = None
             self.rect = None
         else:
-            self.image = self._make_terrain_image()
+            self.image, self.image_np = self._make_terrain_image()
             # The rectangle for this sprite is the entire game
             self.rect = pygame.Rect(0, 0, *self.screen_size)
 
@@ -117,7 +117,7 @@ class Terrain(pygame.sprite.Sprite):
         cont_image = self._make_contour_image(image)
         out_surf = pygame.surfarray.make_surface(cont_image.swapaxes(0, 1))
 
-        return out_surf
+        return out_surf, cont_image
 
     def _make_contour_image(self, image: np.ndarray) -> np.ndarray:
         '''

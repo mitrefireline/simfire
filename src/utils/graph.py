@@ -88,7 +88,9 @@ class FireSpreadGraph():
             edges = [(adj_loc, (x, y)) for adj_loc in adj_locs]
             self.graph.add_edges_from(edges)
 
-    def draw(self, background_image: np.ndarray = None) -> plt.Figure:
+    def draw(self,
+             background_image: np.ndarray = None,
+             show_longest_path: bool = True) -> plt.Figure:
         '''
         Draw the graph with the nodes/pixels in the correct locations and the
         edges shown as arrows connecting the nodes/pixels.
@@ -97,6 +99,7 @@ class FireSpreadGraph():
             background_image: A numpy array containing the background image on
                               which to overlay the graph. If not specified,
                               then no background image will be used
+            show_longest_path: Flag to draw/highlight the longest path in the graph
 
         Returns:
             A matplotlib.pyplot.Figure of the drawn graph
@@ -108,6 +111,19 @@ class FireSpreadGraph():
         fig.tight_layout()
         if background_image is not None:
             ax.imshow(background_image)
-        nx.draw_networkx(self.graph, pos=pos, ax=ax, node_size=0, with_labels=False)
+        if show_longest_path:
+            longest_path = nx.dag_longest_path(self.graph)
+            longest_edges = [(longest_path[i], longest_path[i + 1])
+                             for i in range(len(longest_path) - 1)]
+            edge_colors = [
+                'r' if edge in longest_edges else 'k' for edge in self.graph.edges
+            ]
+        nx.draw_networkx(self.graph,
+                         pos=pos,
+                         ax=ax,
+                         node_size=0,
+                         with_labels=False,
+                         arrowstyle='->',
+                         edge_color=edge_colors)
 
         return fig

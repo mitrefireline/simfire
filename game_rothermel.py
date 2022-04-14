@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 import numpy as np
@@ -26,7 +27,7 @@ def main():
     fuel_particle = FuelParticle()
 
     center = (33.5, 116.8)
-    height, width = 2500, 2500
+    height, width = 1000, 1000
     resolution = 30
     lat_long_box = LatLongBox(center, height, width, resolution)
     topo_layer = TopographyLayer(lat_long_box)
@@ -93,7 +94,15 @@ def main():
         game.fire_map = fire_map
 
     fig = fire_manager.draw_spread_graph(game.screen)
-    fig.savefig('spread_graph.png')
+    if cfg.simulation.headless:
+        save_path = os.curdir + 'fire_spread_graph.png'
+        print('Game is running in a headless state. Saving fire spread '
+              f'graph to {save_path}')
+        fig.savefig(save_path)
+    else:
+        print('Game is running in a non-headless state. Displaying fire spread '
+              f'graph on DISPLAY {os.environ["DISPLAY"]}')
+        fig.show()
 
 
 if __name__ == '__main__':

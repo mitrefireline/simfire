@@ -1,6 +1,7 @@
 import unittest
 from typing import Tuple
 
+import matplotlib.pyplot as plt
 import numpy as np
 
 from ..graph import FireSpreadGraph
@@ -74,12 +75,15 @@ class TestFireSpreadGraph(unittest.TestCase):
         '''
         Test that the draw method works with and without a background image.
         '''
-        fire_map, burning_loc, x_coords, y_coords = _create_map_and_coords(
-            self.screen_size)
+        fire_map, _, x_coords, y_coords = _create_map_and_coords(self.screen_size)
 
         self.fs_graph.add_edges_from_manager(x_coords, y_coords, fire_map)
 
-        # with self.subTest('With background'):
-        #     bg_image = np.full(self.screen_size + (3, ), 127)
-        #     fig = self.fs_graph.draw(bg_image)
-        #     return
+        with self.subTest('With background'):
+            bg_image = np.full(self.screen_size + (3, ), 127)
+            fig = self.fs_graph.draw(bg_image)
+            self.assertIsInstance(fig, plt.Figure)
+
+        with self.subTest('Without background'):
+            fig = self.fs_graph.draw()
+            self.assertIsInstance(fig, plt.Figure)

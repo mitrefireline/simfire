@@ -76,17 +76,17 @@ class FireSpreadGraph():
         for x, y in zip(x_coords, y_coords):
             adj_locs = ((x + 1, y), (x + 1, y + 1), (x, y + 1), (x - 1, y + 1),
                         (x - 1, y), (x - 1, y - 1), (x, y - 1), (x + 1, y - 1))
+            # Filter any locations that are outside of the screen area or not
+            # currently burning
             adj_locs = tuple(
                 filter(
-                    lambda xy: xy[0] < fire_map.shape[1] and xy[0] >= 0 and xy[1] <
-                    fire_map.shape[0] and xy[1] >= 0, adj_locs))
-            # Filter any locations that are outside of the screen area
-            for adj_loc in adj_locs:
-                # If an adjacent pixel is burning, it contributes to this pixel
-                if fire_map[adj_loc] == BurnStatus.BURNING:
-                    # Add a connection from the currently burning node to the
-                    # newly burning node
-                    self.graph.add_edge(adj_loc, (x, y))
+                    lambda xy: xy[0] < fire_map.shape[1] and xy[0] >= 0 and xy[
+                        1] < fire_map.shape[0] and xy[1] >= 0 and fire_map[xy[1], xy[0]]
+                    == BurnStatus.BURNING, adj_locs))
+            # Create the edges by connecing the adjacent locations/nodes to the
+            # current node
+            edges = [(adj_loc, (x, y)) for adj_loc in adj_locs]
+            self.graph.add_edges_from(edges)
 
     def draw(self, background_image: np.ndarray = None) -> plt.Figure:
         '''
@@ -106,8 +106,8 @@ class FireSpreadGraph():
         pos = {(x, y): (x, y) for (x, y) in self.nodes}
         fig, ax = plt.subplots(1, 1)
         fig.tight_layout()
-        nx.draw_networkx(self.graph, pos=pos, ax=ax, node_size=0, with_labels=False)
         if background_image is not None:
             ax.imshow(background_image)
+        nx.draw_networkx(self.graph, pos=pos, ax=ax, node_size=0, with_labels=False)
 
         return fig

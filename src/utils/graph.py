@@ -1,4 +1,4 @@
-from typing import Sequence, Tuple
+from typing import List, Sequence, Tuple
 
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -47,6 +47,55 @@ class FireSpreadGraph():
 
         return nodes
 
+    def _create_heatmap(self, xrange: int, yrange: int) -> np.ndarray:
+        '''
+        Create a heatmap that shows how many child nodes each node is attached to.
+
+        Arguments:
+            None
+
+        Returns:
+            The created heatmap as a numpy array
+        '''
+        # Initialize dictionary for quick lookup
+        # Keys are nodes, values are lists of all children
+        children_dict = {}
+
+        def compute_num_children(node: Tuple[int, int]) -> List[Tuple[int, int]]:
+            '''
+            Recursive function that computes how many children a node has (i.e. the
+            total number of nodes that can be reached from this node).
+
+            Arguments:
+                node: The node to compute a score for
+
+            Returns:
+                A list of all child nodes
+            '''
+            children = set()
+            # Get the out-edges from the node
+            out_edges = self.graph.edges(node)
+            # Get the connected nodes based on the edges
+            conn_nodes = [edge[1] for edge in out_edges]
+            for conn_node in conn_nodes:
+                if conn_node in children_dict:
+                    children.update(children_dict[conn_node])
+                    continue
+                else:
+                    if self.graph.out_degree(conn_node) == 0:
+                        return [node]
+                    else:
+                        children.update(compute_num_children(conn_node))
+            # Add the result to the lookup dictionary
+            children_dict[node] = children
+            return list(children)
+
+        heatmap = [[len(compute_num_children((y, x))) for y in range(yrange)]
+                   for x in range(xrange)]
+        heatmap = np.array(heatmap)
+
+        return heatmap
+
     def add_edges_from_manager(self, x_coords: Sequence[int], y_coords: Sequence[int],
                                fire_map: np.ndarray) -> None:
         '''
@@ -90,7 +139,8 @@ class FireSpreadGraph():
 
     def draw(self,
              background_image: np.ndarray = None,
-             show_longest_path: bool = True) -> plt.Figure:
+             show_longest_path: bool = True,
+             create_heatmap: bool = True) -> plt.Figure:
         '''
         Draw the graph with the nodes/pixels in the correct locations and the
         edges shown as arrows connecting the nodes/pixels.
@@ -100,6 +150,7 @@ class FireSpreadGraph():
                               which to overlay the graph. If not specified,
                               then no background image will be used
             show_longest_path: Flag to draw/highlight the longest path in the graph
+            create_heatmap: Flag to create a heatmap based on node outbound connectivity
 
         Returns:
             A matplotlib.pyplot.Figure of the drawn graph
@@ -111,19 +162,30 @@ class FireSpreadGraph():
         fig.tight_layout()
         if background_image is not None:
             ax.imshow(background_image)
+
         if show_longest_path:
             longest_path = nx.dag_longest_path(self.graph)
             longest_edges = [(longest_path[i], longest_path[i + 1])
                              for i in range(len(longest_path) - 1)]
-            edge_colors = [
+            edge_color = [
                 'r' if edge in longest_edges else 'k' for edge in self.graph.edges
             ]
+        else:
+            edge_color = 'k'
+
+        if create_heatmap:
+            # Need to compute out_degree for all nodes
+            yrange, xrange = background_image.shape[:2]
+            heatmap = self._create_heatmap(xrange, yrange)
+            # heatmap = [[self.graph.out_degree((y, x)) for y in range(yrange)]
+            #            for x in range(xrange)]
+
         nx.draw_networkx(self.graph,
                          pos=pos,
                          ax=ax,
                          node_size=0,
                          with_labels=False,
                          arrowstyle='->',
-                         edge_color=edge_colors)
+                         edge_color=edge_color)
 
         return fig

@@ -1,6 +1,6 @@
 from typing import Sequence, Tuple
 
-import matplotlib
+from matplotlib import lines as mlines
 import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
@@ -48,6 +48,36 @@ class FireSpreadGraph():
 
         return nodes
 
+    def get_descendant_heatmap(self, flat: bool = False) -> np.ndarray:
+        '''
+        Create a heatmap array showing which nodes have the most descendants.
+        This will show which nodes cause the most spread (but beware that nodes
+        close to the starting location will inherently be more impactful.
+        The heatmap can be flat for use with self.draw(), or reshaped for creating
+        an image that aligns with the game screen.
+
+        Arguments:
+            flat: Flag indicating whether the returned value should remain as a
+                  flat array where each index in the array aligns with the node
+                  in self.graph.nodes, or the returned value should be reshaped
+                  to represent an image using the (x, y) coordinates of the nodes
+
+        Returns:
+            A numpy array of shape (len(self.graph.nodes),) if flat==True
+            A numpy array of shape (Y, X), where Y is the largest y-coordinate
+            in self.nodes, and X is the largest x-coordinate in self.nodes
+        '''
+        if flat:
+            heatmap = [len(nx.descendants(self.graph, node)) for node in self.graph.nodes]
+            heatmap = np.array(heatmap)
+        else:
+            yrange, xrange = self.screen_size
+            heatmap = [[len(nx.descendants(self.graph, (y, x))) for x in range(xrange)]
+                       for y in range(yrange)]
+            heatmap = np.array(heatmap)
+
+        return heatmap
+
     def add_edges_from_manager(self, x_coords: Sequence[int], y_coords: Sequence[int],
                                fire_map: np.ndarray) -> None:
         '''
@@ -92,7 +122,7 @@ class FireSpreadGraph():
     def draw(self,
              background_image: np.ndarray = None,
              show_longest_path: bool = True,
-             create_heatmap: bool = True) -> plt.Figure:
+             use_heatmap: bool = True) -> plt.Figure:
         '''
         Draw the graph with the nodes/pixels in the correct locations and the
         edges shown as arrows connecting the nodes/pixels.
@@ -102,7 +132,8 @@ class FireSpreadGraph():
                               which to overlay the graph. If not specified,
                               then no background image will be used
             show_longest_path: Flag to draw/highlight the longest path in the graph
-            create_heatmap: Flag to create a heatmap based on node descendants
+            use_heatmap: Flag to color the nodes using a heatmap based on
+                            node descendants
 
         Returns:
             A matplotlib.pyplot.Figure of the drawn graph
@@ -110,11 +141,32 @@ class FireSpreadGraph():
         # TODO: This still doesn't quite seem to line up the image and graph
         # Might need to manually draw_eges and draw_nodes
         pos = {(x, y): (x, y) for (x, y) in self.nodes}
-        fig, ax = plt.subplots(1, 1)
+        fig, ax = plt.subplots(1, 1, figsize=(12.8, 9.6))
         fig.tight_layout()
         if background_image is not None:
             ax.imshow(background_image)
 
+        # Initialize list for potential legend elements
+        legend_elements = []
+        # Get figure facecolor for use with legened element "backgrounds"
+        facecolor = fig.get_facecolor()
+
+        # Scale the node and marker size based on the figure size
+        fig_size_pixels = fig.dpi * fig.get_size_inches().mean()
+        node_size = 0.002 * fig_size_pixels
+        markersize = 0.01 * fig_size_pixels
+
+        # Create a legend element for the edges (fire paths)
+        edge_path_artist = mlines.Line2D([0], [0],
+                                         color=facecolor,
+                                         marker='>',
+                                         markerfacecolor='k',
+                                         markersize=markersize,
+                                         label='Fire Spread Path')
+        legend_elements.append(edge_path_artist)
+
+        # All edges will be black by default. Color the edges of the longest path in
+        # red if specified
         if show_longest_path:
             longest_path = nx.dag_longest_path(self.graph)
             longest_edges = [(longest_path[i], longest_path[i + 1])
@@ -122,27 +174,57 @@ class FireSpreadGraph():
             edge_color = [
                 'r' if edge in longest_edges else 'k' for edge in self.graph.edges
             ]
+            # Create artist to add to legend
+            longest_path_artist = mlines.Line2D([0], [0],
+                                                color=facecolor,
+                                                marker='>',
+                                                markerfacecolor='r',
+                                                markersize=markersize,
+                                                label='Longest Fire Spread Path')
+            legend_elements.append(longest_path_artist)
         else:
+            # 'k' is black for matplotlib
             edge_color = 'k'
 
-        if create_heatmap:
-            node_heatmap = [
-                len(nx.descendants(self.graph, node)) for node in self.graph.nodes
-            ]
-            node_heatmap = np.array(node_heatmap)
+        # All nodes with outbound edges will red by default.
+        # 'r' is red for matplotlib
+        node_color = [
+            'r' if self.graph.out_degree(node) > 0 else (0, 0, 0, 0)
+            for node in self.graph.nodes
+        ]
+
+        # If a heatmap is used, the node sizes will be scaled based on the
+        # heatmap values
+        if use_heatmap:
+            node_heatmap = self.get_descendant_heatmap(flat=True)
             node_heatmap = node_heatmap / node_heatmap.max()
-            cmap = matplotlib.cm.get_cmap('seismic')
-            node_color = [cmap(val)[:3] for val in node_heatmap]
-            # heatmap = [[len(nx.descendants(self.graph, (y, x))) for y in range(yrange)]
-            #            for x in range(xrange)]
+            node_size = [50**val * node_size for val in node_heatmap]
+            node_size_artist = mlines.Line2D([0], [0],
+                                             color=facecolor,
+                                             marker='o',
+                                             markerfacecolor='r',
+                                             markersize=markersize,
+                                             label='Fire Node '
+                                             '(larger means more descendants)')
+        else:
+            node_size_artist = mlines.Line2D([0], [0],
+                                             color=facecolor,
+                                             marker='o',
+                                             markerfacecolor='r',
+                                             markersize=markersize,
+                                             label='Fire Node')
+
+        legend_elements.append(node_size_artist)
 
         nx.draw_networkx(self.graph,
                          pos=pos,
                          ax=ax,
-                         node_size=1,
+                         node_size=node_size,
                          node_color=node_color,
                          with_labels=False,
                          arrowstyle='->',
                          edge_color=edge_color)
+
+        ax.legend(handles=legend_elements, loc='lower right')
 
         return fig

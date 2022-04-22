@@ -54,6 +54,36 @@ class TestFireSpreadGraph(unittest.TestCase):
                          msg='The number of nodes created and in the graph are '
                          f'{num_nodes_in_graph}, but should be {true_num_nodes}')
 
+    def test_get_descendant_heatmap(self) -> None:
+        '''
+        Test that the descendant heatmap creation will work for flat and
+        non-flat cases.
+        '''
+        fire_map, _, x_coords, y_coords = _create_map_and_coords(self.screen_size)
+        self.fs_graph.add_edges_from_manager(x_coords, y_coords, fire_map)
+
+        heatmap_flat = self.fs_graph.get_descendant_heatmap(flat=True)
+        self.assertIsInstance(heatmap_flat,
+                              np.ndarray,
+                              msg='The returned flat heatmap should be of type '
+                              f'np.ndarray, but is of type {type(heatmap_flat)}')
+        true_shape = (len(self.fs_graph.graph.nodes), )
+        self.assertTupleEqual(heatmap_flat.shape,
+                              true_shape,
+                              msg='The returned flat heatmap shape should be '
+                              f'{true_shape}, but is {heatmap_flat.shape}')
+
+        heatmap_img = self.fs_graph.get_descendant_heatmap(flat=False)
+        self.assertIsInstance(heatmap_img,
+                              np.ndarray,
+                              msg='The returned image heatmap should be of type '
+                              f'np.ndarray, but is of type {type(heatmap_img)}')
+        true_shape = self.screen_size
+        self.assertTupleEqual(heatmap_img.shape,
+                              true_shape,
+                              msg='The returned image heatmap shape should be '
+                              f'{true_shape}, but is of shape {heatmap_img.shape}')
+
     def test_add_vertices_from_manager(self) -> None:
         '''
         Test that the new new burning locations passed from the FireManager
@@ -76,7 +106,6 @@ class TestFireSpreadGraph(unittest.TestCase):
         Test that the draw method works with and without a background image.
         '''
         fire_map, _, x_coords, y_coords = _create_map_and_coords(self.screen_size)
-
         self.fs_graph.add_edges_from_manager(x_coords, y_coords, fire_map)
 
         with self.subTest('With background'):

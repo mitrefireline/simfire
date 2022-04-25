@@ -1,8 +1,5 @@
 image: "python:3.9"
 
-variables:
-  DOCKER_AUTH_CONFIG: "{ 'auths': { 'https://index.docker.io/v1/': { 'auth': '$DOCKER_AUTH' } } }"
-
 before_script:
   - python --version
   - pip install -r dev-requirements.txt
@@ -42,7 +39,7 @@ unittests:
   tags:
     - lslab2
   script:
-    - SDL_VIDEODRIVER=dummy ~/.conda/envs/roth-unit/bin/python -m unittest discover -s src -t .. -p 'test_*.py'
+    - SDL_VIDEODRIVER=dummy python -m unittest discover -s src -t .. -p 'test_*.py'
   needs: []
   only:
     - merge_requests
@@ -52,7 +49,7 @@ game_rothermel.py:
   tags:
     - lslab2
   script:
-    - SDL_VIDEODRIVER="dummy" ~/.conda/envs/roth-game/bin/python game_rothermel.py
+    - SDL_VIDEODRIVER="dummy" python game_rothermel.py
   needs: []
   only:
     - merge_requests
@@ -62,7 +59,7 @@ coverage:
   tags:
   - lslab2
   script:
-    - SDL_VIDEODRIVER=dummy python -m unittest discover -s src -t .. -p 'test_*.py'
+    - pip install pytest pytest-cov
     - SDL_VIDEODRIVER=dummy python -m coverage run -m pytest
     - SDL_VIDEODRIVER=dummy python -m coverage report
     - SDL_VIDEODRIVER=dummy python -m coverage xml

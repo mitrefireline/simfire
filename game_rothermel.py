@@ -100,12 +100,13 @@ def main():
               f'graph to {save_path}')
         fig.savefig(save_path)
     else:
-        print('Game is running in a non-headless state. Displaying fire spread '
-              f'graph on DISPLAY {os.environ["DISPLAY"]}')
-        import matplotlib.pyplot as plt
-        plt.show()
-        while (plt.fignum_exists(fig.number)):
-            continue
+        if 'DISPLAY' in os.environ:
+            print('Game is running in a non-headless state. Displaying fire spread '
+                  f'graph on DISPLAY {os.environ["DISPLAY"]}')
+            import matplotlib.pyplot as plt
+            plt.show()
+            while (plt.fignum_exists(fig.number)):
+                continue
 
 
 if __name__ == '__main__':

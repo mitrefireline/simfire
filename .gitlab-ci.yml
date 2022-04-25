@@ -1,5 +1,8 @@
 image: "python:3.9"
 
+variables:
+  DOCKER_AUTH_CONFIG: "{ 'auths': { 'https://index.docker.io/v1/': { 'auth': '$DOCKER_AUTH' } } }"
+
 before_script:
   - python --version
   - pip install -r dev-requirements.txt

@@ -4,8 +4,13 @@ from typing import Tuple, List, Dict
 
 import numpy as np
 from PIL import Image
+import pygame
+
+from ..enums import (DRY_TERRAIN_BROWN_IMG, TERRAIN_TEXTURE_PATH)
 
 from ..world.elevation_functions import ElevationFn
+from ..world.fuel_array_functions import FuelArrayFn
+from ..world.parameters import Fuel
 
 
 # Developing a function to round to a multiple
@@ -547,7 +552,7 @@ class TopographyLayer(DataLayer):
                 self.tif_filenames.append(tif_file)
 
 
-class FuelLayer(DataLayer):
+class OperationalFuelLayer(DataLayer):
     def __init__(self, lat_long_box: LatLongBox, type: str = 'display') -> None:
         '''
         Initialize the elevation layer by retrieving the correct topograpchic data
@@ -573,6 +578,7 @@ class FuelLayer(DataLayer):
         self.datapath = self.path / res
 
         self.data = self._make_data()
+        self.image = self._make_pygame_image()
 
     def _make_data(self) -> np.ndarray:
         self._get_fuel_dems()
@@ -588,10 +594,6 @@ class FuelLayer(DataLayer):
                 # simple case
                 tr = (self.lat_long_box.bl[0][0], self.lat_long_box.tr[1][0])
                 bl = (self.lat_long_box.tr[0][0], self.lat_long_box.bl[1][0])
-                # # TODO: Temporary solution until data source is added
-                # h = bl[0] - tr[0]
-                # w = bl[1] - tr[1]
-                # return np.full((h, w, 1), Chaparral)
                 return data[tr[0]:bl[0], tr[1]:bl[1]]
             tmp_array = data
             for idx, dem in enumerate(self.tif_filenames[1:]):
@@ -650,67 +652,15 @@ class FuelLayer(DataLayer):
                 int_npy_file = self.datapath / int_data_region
                 self.tif_filenames.append(int_npy_file)
 
-
-class TransportationLayer(DataLayer):
-    def __init__(self, center: Tuple[float], height: int, width: int,
-                 resolution: int) -> None:
+    def _make_pygame_image(self):
         '''
-        Initialize the elevation layer by retrieving the correct topograpchic data
-            and computing the area.
-
-        Arguments:
-            center: The lat/long coordinates of the center point of the screen
-            height: The height of the screen size
-            width: The width of the screen size
-            resolution: The resolution to get data
+        Make the PyGame Image
 
         '''
-        self.path = Path('/nfs/lslab2/fireline/transportation/')
 
-        super().__init__(center, height, width, resolution)
+        out_surf = pygame.surfarray.make_surface(self.data.swapaxes(0, 1))
 
-    def _make_contour_and_data(self) -> np.ndarray:
-
-        data = Image.open(self.tif_filenames[0])
-        data = np.asarray(data)
-        # flip axis because latitude goes up but numpy will read it down
-        data = np.flip(data, 0)
-        self.data = np.expand_dims(data, axis=-1)
-
-        for key, _ in self.tiles.items():
-
-            if key == 'single':
-                # simple case
-                tr = (self.bl[0][0], self.tr[1][0])
-                bl = (self.tr[0][0], self.bl[1][0])
-                return self.data[tr[0]:bl[0], tr[1]:bl[1]]
-            tmp_array = data
-            for idx, dem in enumerate(self.tif_filenames[1:]):
-                data = Image.open(dem)
-                data = np.asarray(data)
-                # flip axis because latitude goes up but numpy will read it down
-                data = np.flip(data, 0)
-                data = np.expand_dims(data, axis=-1)
-
-                if key == 'north':
-                    # stack tiles along axis = 0 -> leftmost: bottom, rightmost: top
-                    self.data = np.concatenate((self.data, data), axis=0)
-                elif key == 'east':
-                    # stack tiles along axis = 2 -> leftmost, rightmost
-                    self.data = np.concatenate((self.data, data), axis=1)
-                elif key == 'square':
-                    if idx + 1 == 1:
-                        self.data = np.concatenate((self.data, data), axis=1)
-                    elif idx + 1 == 2:
-                        tmp_array = data
-                    elif idx + 1 == 3:
-                        tmp_array = np.concatenate((data, tmp_array), axis=1)
-                        self.data = np.concatenate((self.data, tmp_array), axis=0)
-
-        tr = (self.bl[0][0], self.tr[1][0])
-        bl = (self.tr[0][0], self.bl[1][0])
-        self.data_array = self.data[tr[0]:bl[0], tr[1]:bl[1]]
-        return self.data_array
+        return out_surf
 
 
 class FunctionalElevationLayer(DataLayer):
@@ -752,3 +702,100 @@ class FunctionalElevationLayer(DataLayer):
         elevations = np.expand_dims(elevations, axis=-1)
 
         return elevations
+
+
+class FunctionalFuelLayer(DataLayer):
+    '''
+    Layer that stores fuel data computed from a function
+    '''
+    def __init__(self, height, width, fuel_fn: FuelArrayFn) -> None:
+        '''
+
+
+        '''
+        self.height = height
+        self.width = width
+        self.fuel_fn = fuel_fn
+        self.texture = self._load_texture()
+        fuel_data = self._make_data()
+        self.image = self._make_pygame_image(fuel_data)
+
+    def _make_data(self) -> np.ndarray:
+        '''
+
+        '''
+        x = np.arange(self.width)
+        y = np.arange(self.height)
+        X, Y = np.meshgrid(x, y)
+        elevation_fn_vect = np.vectorize(self.elevation_fn)
+        elevations = elevation_fn_vect(X, Y)
+        # Expand third dimension to align with data layers
+        elevations = np.expand_dims(elevations, axis=-1)
+
+        fuel_arrs = [[self.fuel_fn(X, Y)]]
+
+        return fuel_arrs
+
+    def _make_pygame_image(self,
+                           fuel_data: np.ndarray) -> Tuple[pygame.Surface, np.ndarray]:
+        '''
+
+
+        '''
+        image = np.zeros((self.height, self.width) + (3, ))
+
+        # Loop over the high-level tiles (these are not at the pixel level)
+        for i in range(self.height):
+            for j in range(self.width):
+                # Need these pixel level coordinates to span the correct range
+                updated_texture = self._update_texture_dryness(fuel_data[i][i])
+                image[i, j] = updated_texture
+
+        out_surf = pygame.surfarray.make_surface(image.swapaxes(0, 1))
+
+        return out_surf
+
+    def _load_texture(self) -> np.ndarray:
+        '''
+        Load the terrain tile texture, resize it to the correct
+        shape, and convert to numpy
+
+        Returns:
+            The returned numpy array of the texture.
+        '''
+        out_size = (1, 1)
+        texture = Image.open(TERRAIN_TEXTURE_PATH)
+        texture = texture.resize(out_size)
+        texture = np.array(texture)
+
+        return texture
+
+    def _update_texture_dryness(self, fuel: Fuel) -> np.ndarray:
+        '''
+        Determine the percent change to make the terrain look drier (i.e.
+        more red/yellow/brown) by using the FuelArray values. Then, update
+        the texture color using PIL and image blending with a preset
+        yellow-brown color/image.
+
+        Arguments:
+            fuel: The Fuel with parameters that specify how "dry" the texture should look
+
+        Returns:
+            new_texture: The texture with RGB calues modified to look drier based
+                        on the parameters of fuel_arr
+        '''
+        # Add the numbers after normalization
+        # M_x is inverted because a lower value is more flammable
+        color_change_pct = fuel.w_0 / 0.2296 + \
+                        fuel.delta / 7 + \
+                        (0.2 - fuel.M_x) / 0.2
+        # Divide by 3 since there are 3 values
+        color_change_pct /= 3
+
+        arr = self.texture.copy()
+        arr_img = Image.fromarray(arr)
+        resized_brown = DRY_TERRAIN_BROWN_IMG.resize(arr_img.size)
+        texture_img = Image.blend(arr_img, resized_brown, color_change_pct / 2)
+        new_texture = np.array(texture_img)
+
+        return new_texture

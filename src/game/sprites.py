@@ -6,15 +6,8 @@ import numpy as np
 from PIL import Image
 import pygame
 
-from ..enums import (
-    BurnStatus,
-    DRY_TERRAIN_BROWN_IMG,
-    SpriteLayer,
-    TERRAIN_TEXTURE_PATH,
-    BURNED_RGB_COLOR,
-)
+from ..enums import (BurnStatus, SpriteLayer, BURNED_RGB_COLOR)
 from ..utils.layers import DataLayer
-from ..world.parameters import Fuel
 
 
 class Terrain(pygame.sprite.Sprite):
@@ -59,7 +52,8 @@ class Terrain(pygame.sprite.Sprite):
             self.image = None
             self.rect = None
         else:
-            self.image = self._make_terrain_image()
+            self.fuel_image = self.fuel_layer._make_pygame_image()
+            self.topo_image = self.topo_layer._make_pygame_image()
             # The rectangle for this sprite is the entire game
             self.rect = pygame.Rect(0, 0, *self.screen_size)
 
@@ -85,51 +79,36 @@ class Terrain(pygame.sprite.Sprite):
             arr = pygame.surfarray.pixels3d(self.image)
             arr[burned_idxs[::-1]] = BURNED_RGB_COLOR
 
-    def _load_texture(self) -> np.ndarray:
-        '''
-        Load the terrain tile texture, resize it to the correct
-        shape, and convert to numpy
+    # def _make_terrain_image(self) -> Tuple[pygame.Surface, np.ndarray]:
+    #     '''
+    #     Create a terrain image representing dryness using the fuel data.
+    #     This starts as a numpy array, but is then converted to a pygame.Surface for
+    #     compatibility with PyGame.
 
-        Returns:
-            The returned numpy array of the texture.
-        '''
-        out_size = (1, 1)
-        texture = Image.open(TERRAIN_TEXTURE_PATH)
-        texture = texture.resize(out_size)
-        texture = np.array(texture)
+    #     Returns:
+    #         out_surf: The pygame.Surface of the stitched together terrain
+    #                   tiles and contour lines
+    #     '''
+    #     image = np.zeros(self.screen_size + (3, ))
 
-        return texture
+    #     # Loop over the high-level tiles (these are not at the pixel level)
+    #     for i in range(self.fuels.shape[0]):
+    #         for j in range(self.fuels.shape[1]):
+    #             # Need these pixel level coordinates to span the correct range
+    #             updated_texture = self._update_texture_dryness(self.fuels[i][i])
+    #             image[i, j] = updated_texture
 
-    def _make_terrain_image(self) -> Tuple[pygame.Surface, np.ndarray]:
-        '''
-        Create a terrain image representing dryness using the fuel data.
-        This starts as a numpy array, but is then converted to a pygame.Surface for
-        compatibility with PyGame.
+    #     cont_image = self._make_contour_image(image)
+    #     out_surf = pygame.surfarray.make_surface(cont_image.swapaxes(0, 1))
 
-        Returns:
-            out_surf: The pygame.Surface of the stitched together terrain
-                      tiles and contour lines
-        '''
-        image = np.zeros(self.screen_size + (3, ))
-
-        # Loop over the high-level tiles (these are not at the pixel level)
-        for i in range(self.fuels.shape[0]):
-            for j in range(self.fuels.shape[1]):
-                # Need these pixel level coordinates to span the correct range
-                updated_texture = self._update_texture_dryness(self.fuels[i][i])
-                image[i, j] = updated_texture
-
-        cont_image = self._make_contour_image(image)
-        out_surf = pygame.surfarray.make_surface(cont_image.swapaxes(0, 1))
-
-        return out_surf
+    #     return out_surf
 
     def _make_contour_image(self, image: np.ndarray) -> np.ndarray:
         '''
         Use the image and TopographyLayer to create the elevations array and
-        compute the contours. The contours are computed with plt.contours, and the contour
-        lines are drawn by converting image to a PIL.Image.Image and using the ImageDraw
-        module.
+        compute the contours. The contours are computed with plt.contours, and the
+        contour lines are drawn by converting image to a PIL.Image.Image and using
+        the ImageDraw module.
 
         Arguments:
             image: A numpy array representing the np.float RGB terrain image for display
@@ -151,51 +130,52 @@ class Terrain(pygame.sprite.Sprite):
         plt.close(fig)
         return out_img
 
-    def _update_texture_dryness(self, fuel: Fuel) -> np.ndarray:
-        '''
-        Determine the percent change to make the terrain look drier (i.e.
-        more red/yellow/brown) by using the FuelArray values. Then, update
-        the texture color using PIL and image blending with a preset
-        yellow-brown color/image.
+    # def _update_texture_dryness(self, fuel: Fuel) -> np.ndarray:
+    #     '''
+    #     Determine the percent change to make the terrain look drier (i.e.
+    #     more red/yellow/brown) by using the FuelArray values. Then, update
+    #     the texture color using PIL and image blending with a preset
+    #     yellow-brown color/image.
 
-        Arguments:
-            fuel: The Fuel with parameters that specify how "dry" the texture should look
+    #     Arguments:
+    #         fuel: The Fuel with parameters that specify how "dry" the texture
+    #               should look
 
-        Returns:
-            new_texture: The texture with RGB calues modified to look drier based
-                         on the parameters of fuel_arr
-        '''
-        # Add the numbers after normalization
-        # M_x is inverted because a lower value is more flammable
-        color_change_pct = fuel.w_0 / 0.2296 + \
-                           fuel.delta / 7 + \
-                           (0.2 - fuel.M_x) / 0.2
-        # Divide by 3 since there are 3 values
-        color_change_pct /= 3
+    #     Returns:
+    #         new_texture: The texture with RGB calues modified to look drier based
+    #                      on the parameters of fuel_arr
+    #     '''
+    #     # Add the numbers after normalization
+    #     # M_x is inverted because a lower value is more flammable
+    #     color_change_pct = fuel.w_0 / 0.2296 + \
+    #                        fuel.delta / 7 + \
+    #                        (0.2 - fuel.M_x) / 0.2
+    #     # Divide by 3 since there are 3 values
+    #     color_change_pct /= 3
 
-        arr = self.texture.copy()
-        arr_img = Image.fromarray(arr)
-        resized_brown = DRY_TERRAIN_BROWN_IMG.resize(arr_img.size)
-        texture_img = Image.blend(arr_img, resized_brown, color_change_pct / 2)
-        new_texture = np.array(texture_img)
+    #     arr = self.texture.copy()
+    #     arr_img = Image.fromarray(arr)
+    #     resized_brown = DRY_TERRAIN_BROWN_IMG.resize(arr_img.size)
+    #     texture_img = Image.blend(arr_img, resized_brown, color_change_pct / 2)
+    #     new_texture = np.array(texture_img)
 
-        return new_texture
+    #     return new_texture
 
-    def _make_terrain_layer(self) -> Tuple[pygame.Surface, np.ndarray]:
-        '''
-            Load fuel layer RGB values and stack topographic contours
+    # def _make_terrain_layer(self) -> Tuple[pygame.Surface, np.ndarray]:
+    #     '''
+    #         Load fuel layer RGB values and stack topographic contours
 
-            Arguments:
-                image: A numpy array representing the np.float terrain image
+    #         Arguments:
+    #             image: A numpy array representing the np.float terrain image
 
-            Returns:
-                out_image: The input image with the RGB values for Fuel Model values
-        '''
+    #         Returns:
+    #             out_image: The input image with the RGB values for Fuel Model values
+    #     '''
 
-        cont_image = self._make_contour_image(self.fuels)
-        out_surf = pygame.surfarray.make_surface(cont_image.swapaxes(0, 1))
+    #     cont_image = self._make_contour_image(self.fuels)
+    #     out_surf = pygame.surfarray.make_surface(cont_image.swapaxes(0, 1))
 
-        return out_surf
+    #     return out_surf
 
 
 class Fire(pygame.sprite.Sprite):

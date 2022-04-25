@@ -31,7 +31,7 @@ class Terrain(pygame.sprite.Sprite):
         Arguments:
             fuel_layer: A FuelLayer containing a `data` parameter that is a numpy array
                         containing a Fuel objects
-            topo_layer: A TopographyLayer that desctibes the topography (elevation) of the
+            topo_layer: A TopographyLayer that describes the topography (elevation) of the
                         terrain as a numpy array in it `data` parameter
             screen_size: The game's screen size in pixels
             headless: Flag to run in a headless state. This will allow PyGame objects to
@@ -54,7 +54,7 @@ class Terrain(pygame.sprite.Sprite):
             self.image = None
             self.rect = None
         else:
-            self.image = self._make_terrain_image()
+            self.image, self.image_np = self._make_terrain_image()
             # The rectangle for this sprite is the entire game
             self.rect = pygame.Rect(0, 0, *self.screen_size)
 
@@ -117,7 +117,7 @@ class Terrain(pygame.sprite.Sprite):
         cont_image = self._make_contour_image(image)
         out_surf = pygame.surfarray.make_surface(cont_image.swapaxes(0, 1))
 
-        return out_surf
+        return out_surf, cont_image
 
     def _make_contour_image(self, image: np.ndarray) -> np.ndarray:
         '''
@@ -157,7 +157,7 @@ class Terrain(pygame.sprite.Sprite):
             fuel: The Fuel with parameters that specify how "dry" the texture should look
 
         Returns:
-            new_texture: The texture with RGB calues modified to look drier based
+            new_texture: The texture with RGB values modified to look drier based
                          on the parameters of fuel_arr
         '''
         # Add the numbers after normalization

@@ -102,7 +102,10 @@ def main():
     else:
         print('Game is running in a non-headless state. Displaying fire spread '
               f'graph on DISPLAY {os.environ["DISPLAY"]}')
-        fig.show()
+        import matplotlib.pyplot as plt
+        plt.show()
+        while (plt.fignum_exists(fig.number)):
+            continue
 
 
 if __name__ == '__main__':

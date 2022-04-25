@@ -6,9 +6,14 @@ import numpy as np
 from PIL import Image
 import pygame
 
-from ..enums import (BurnStatus, DRY_TERRAIN_BROWN_IMG, SpriteLayer, TERRAIN_TEXTURE_PATH,
-                     BURNED_RGB_COLOR)
-from ..utils.layers import FuelLayer, TopographyLayer
+from ..enums import (
+    BurnStatus,
+    DRY_TERRAIN_BROWN_IMG,
+    SpriteLayer,
+    TERRAIN_TEXTURE_PATH,
+    BURNED_RGB_COLOR,
+)
+from ..utils.layers import DataLayer
 from ..world.parameters import Fuel
 
 
@@ -20,8 +25,8 @@ class Terrain(pygame.sprite.Sprite):
     whether the pixel is a fireline or burned.
     '''
     def __init__(self,
-                 fuel_layer: FuelLayer,
-                 topo_layer: TopographyLayer,
+                 fuel_layer: DataLayer,
+                 topo_layer: DataLayer,
                  screen_size: Tuple[int, int],
                  headless: bool = False) -> None:
         '''
@@ -44,7 +49,7 @@ class Terrain(pygame.sprite.Sprite):
         self.topo_layer = topo_layer
 
         self.screen_size = screen_size
-        self.texture = self._load_texture()
+        # self.texture = self._load_texture()
         self.headless = headless
 
         self.elevations = self.topo_layer.data.squeeze()
@@ -135,7 +140,7 @@ class Terrain(pygame.sprite.Sprite):
         # Create a figure with axes
         fig, ax = plt.subplots()
         ax.imshow(image.astype(np.uint8))
-        CS = ax.contour(self.topo_layer.data.squeeze(), origin='upper')
+        CS = ax.contour(self.elevations, origin='upper')
         ax.clabel(CS, CS.levels, inline=True, fmt=lambda x: f'{x:.0f}')
         plt.axis('off')
         with tempfile.NamedTemporaryFile(suffix='.png') as out_img_path:
@@ -175,6 +180,22 @@ class Terrain(pygame.sprite.Sprite):
         new_texture = np.array(texture_img)
 
         return new_texture
+
+    def _make_terrain_layer(self) -> Tuple[pygame.Surface, np.ndarray]:
+        '''
+            Load fuel layer RGB values and stack topographic contours
+
+            Arguments:
+                image: A numpy array representing the np.float terrain image
+
+            Returns:
+                out_image: The input image with the RGB values for Fuel Model values
+        '''
+
+        cont_image = self._make_contour_image(self.fuels)
+        out_surf = pygame.surfarray.make_surface(cont_image.swapaxes(0, 1))
+
+        return out_surf
 
 
 class Fire(pygame.sprite.Sprite):

@@ -6,7 +6,6 @@ import numpy as np
 from PIL import Image
 
 from ..world.elevation_functions import ElevationFn
-from ..world.presets import Chaparral
 
 
 # Developing a function to round to a multiple
@@ -413,7 +412,7 @@ class LatLongBox():
 
         self._generate_lat_long(self.corners)
 
-    def _save_contour_map(self, data_array) -> None:
+    def _save_contour_map(self, data_array: np.ndarray, type: str) -> None:
         '''
 
         Helper function to generate a contour map of the region
@@ -436,13 +435,17 @@ class LatLongBox():
 
         fig = plt.figure(figsize=(12, 8))
         fig.add_subplot(111)
-        plt.contour(data_array, cmap='viridis')
+        if type == 'topo':
+            plt.contour(data_array, cmap='viridis')
+        else:
+            plt.imshow(data_array)
         plt.axis('off')
         plt.title(f'Center: N{self.center[0]}W{self.center[1]}')
         # cbar = plt.colorbar()
         plt.gca().set_aspect('equal', adjustable='box')
 
-        plt.savefig(f'img_n{self.BL[0]}_w{self.BL[1]}_n{self.TR[0]}_w{self.TR[1]}.png')
+        plt.savefig(
+            f'images/{type}_n{self.BL[0]}_w{self.BL[1]}_n{self.TR[0]}_w{self.TR[1]}.png')
 
 
 class DataLayer():
@@ -545,7 +548,7 @@ class TopographyLayer(DataLayer):
 
 
 class FuelLayer(DataLayer):
-    def __init__(self, lat_long_box: LatLongBox) -> None:
+    def __init__(self, lat_long_box: LatLongBox, type: str = 'display') -> None:
         '''
         Initialize the elevation layer by retrieving the correct topograpchic data
             and computing the area.
@@ -556,18 +559,24 @@ class FuelLayer(DataLayer):
             width: The width of the screen size
             resolution: The resolution to get data
 
+            type: The type of data you wnt to load: 'display' or 'simulation'
+                    display: rgb data for rothermel
+                    simulation: fuel model values for RL Harness/Simulation
+
         '''
         self.lat_long_box = lat_long_box
+        self.type = type
         # Temporary until we get real fuel data
-        self.path = Path('/nfs/lslab2/fireline/data/topographic/')
+        self.path = Path('/nfs/lslab2/fireline/data/fuel/')
         res = str(self.lat_long_box.resolution) + 'm'
+
         self.datapath = self.path / res
 
-        self.data = self._make_contour_and_data()
+        self.data = self._make_data()
 
-    def _make_contour_and_data(self) -> np.ndarray:
-        self._get_dems()
-        data = Image.open(self.tif_filenames[0])
+    def _make_data(self) -> np.ndarray:
+        self._get_fuel_dems()
+        data = np.load(self.tif_filenames[0])
         data = np.asarray(data)
         # flip axis because latitude goes up but numpy will read it down
         data = np.flip(data, 0)
@@ -579,14 +588,14 @@ class FuelLayer(DataLayer):
                 # simple case
                 tr = (self.lat_long_box.bl[0][0], self.lat_long_box.tr[1][0])
                 bl = (self.lat_long_box.tr[0][0], self.lat_long_box.bl[1][0])
-                # TODO: Temporary solution until data source is added
-                h = bl[0] - tr[0]
-                w = bl[1] - tr[1]
-                return np.full((h, w, 1), Chaparral)
-                # return data[tr[0]:bl[0], tr[1]:bl[1]]
+                # # TODO: Temporary solution until data source is added
+                # h = bl[0] - tr[0]
+                # w = bl[1] - tr[1]
+                # return np.full((h, w, 1), Chaparral)
+                return data[tr[0]:bl[0], tr[1]:bl[1]]
             tmp_array = data
             for idx, dem in enumerate(self.tif_filenames[1:]):
-                tif_data = Image.open(dem)
+                tif_data = np.load(dem)
                 tif_data = np.asarray(tif_data)
                 # flip axis because latitude goes up but numpy will read it down
                 tif_data = np.flip(tif_data, 0)
@@ -612,7 +621,7 @@ class FuelLayer(DataLayer):
         data_array = data[tr[0]:bl[0], tr[1]:bl[1]]
         return data_array
 
-    def _get_dems(self) -> List[Path]:
+    def _get_fuel_dems(self) -> List[Path]:
         '''
         This method will use the outputed tiles and return the correct dem files
 
@@ -625,13 +634,21 @@ class FuelLayer(DataLayer):
         '''
 
         self.tif_filenames = []
-
+        fuel_model = 'LF2020_FBFM13_200_CONUS'
+        fuel_data_fm = 'LC20_F13_200_projected.npy'
+        fuel_data_rgb = 'LC20_F13_200_projected_rgb.npy'
         for _, ranges in self.lat_long_box.tiles.items():
             for range in ranges:
                 (five_deg_n, five_deg_w) = range
-                tif_data_region = Path(f'n{five_deg_n}w{five_deg_w}.tif')
-                tif_file = self.datapath / tif_data_region
-                self.tif_filenames.append(tif_file)
+                if self.type == 'simulation':
+                    int_data_region = Path(
+                        f'n{five_deg_n}w{five_deg_w}/{fuel_model}/{fuel_data_fm}')
+                else:
+                    int_data_region = Path(
+                        f'n{five_deg_n}w{five_deg_w}/{fuel_model}/{fuel_data_rgb}')
+
+                int_npy_file = self.datapath / int_data_region
+                self.tif_filenames.append(int_npy_file)
 
 
 class TransportationLayer(DataLayer):

@@ -25,12 +25,12 @@ def main():
 
     fuel_particle = FuelParticle()
 
-    center = (33.5, 116.8)
-    height, width = 5000, 5000
+    center = (36.5, 117.8)
+    height, width = 4000, 4000
     resolution = 30
     lat_long_box = LatLongBox(center, height, width, resolution)
     topo_layer = TopographyLayer(lat_long_box)
-    fuel_layer = FuelLayer(lat_long_box)
+    fuel_layer = FuelLayer(lat_long_box, 'display')
 
     # Compute how many meters each pixel represents (should be close to resolution)
     pixel_scale = height / topo_layer.data.shape[0]

@@ -117,7 +117,8 @@ class ElevationConstants:
         MAX_ELEVATION: Maximum elevation (ft). Based on the elevation of the treeline in
                        California.
         MEAN_ELEVATION: Mean elevation (ft). Based on the average elevation of California.
+                        From [NRC.gov](https://www.nrc.gov/docs/ML1408/ML14086A640.pdf).
     '''
     MIN_ELEVATION: int = -282
     MAX_ELEVATION: int = 11_000
-    MEAN_ELEVATION: int = 2_900
+    MEAN_ELEVATION: int = 2_500

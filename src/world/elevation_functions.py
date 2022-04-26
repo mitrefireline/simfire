@@ -3,6 +3,8 @@ from typing import Callable, Tuple
 
 import numpy as np
 
+from ..enums import ElevationConstants
+
 ElevationFn = Callable[[float, float], float]
 
 
@@ -94,6 +96,27 @@ class PerlinNoise2D():
         self.terrain_map = self.amplitude * np.sqrt(2) * (
             (1 - t[:, :, 1]) * n0 + t[:, :, 1] * n1)
         self.terrain_map = self.terrain_map + np.min(self.terrain_map)
+        # Add the mean elevation of CA to the map
+        self.terrain_map = self.terrain_map + ElevationConstants.MEAN_ELEVATION
+        # Apply bounds to the map to prevent elevation values from being greater or less
+        # than what is possible for the state
+        self.terrain_map = self._apply_elevation_bounds(self.terrain_map)
+
+    def _apply_elevation_bounds(self, elevation_map: np.ndarray) -> np.ndarray:
+        '''
+        Apply elevation bounds to the elevation map.
+
+        Arguments:
+            elevation_map: The elevation map to apply the bounds to
+
+        Returns:
+            The elevation map with bounds applied
+        '''
+        min_elevation = ElevationConstants.MIN_ELEVATION
+        max_elevation = ElevationConstants.MAX_ELEVATION
+        elevation_map[elevation_map < min_elevation] = min_elevation
+        elevation_map[elevation_map > max_elevation] = max_elevation
+        return elevation_map
 
     def fn(self, x: int, y: int) -> float:
         '''

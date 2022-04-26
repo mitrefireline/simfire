@@ -95,7 +95,7 @@ class Terrain(pygame.sprite.Sprite):
         Returns:
             out_image: The input image with the contour lines drawn on it
         '''
-        image = self.fuel_layer.image
+        image = self.fuel_layer.image.squeeze()
         # Create a figure with axes
         fig, ax = plt.subplots()
         # The fmt argument will display the levels as whole numbers (otherwise

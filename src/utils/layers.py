@@ -587,7 +587,7 @@ class OperationalTopographyLayer(TopographyLayer):
                 self.tif_filenames.append(tif_file)
 
 
-class FunctionalElevationLayer(TopographyLayer):
+class FunctionalTopographyLayer(TopographyLayer):
     '''
     Layer that stores elevation data computed from a function.
     '''

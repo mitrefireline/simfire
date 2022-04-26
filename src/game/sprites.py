@@ -1,3 +1,4 @@
+import io
 import tempfile
 from typing import Tuple
 
@@ -5,6 +6,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
 import pygame
+from reportlab.graphics import renderPM
+from svglib.svglib import svg2rlg
 
 from ..enums import (BurnStatus, SpriteLayer, BURNED_RGB_COLOR)
 from ..utils.layers import FuelLayer, TopographyLayer
@@ -42,7 +45,6 @@ class Terrain(pygame.sprite.Sprite):
         self.topo_layer = topo_layer
 
         self.screen_size = screen_size
-        # self.texture = self._load_texture()
         self.headless = headless
 
         self.elevations = self.topo_layer.data.squeeze()
@@ -52,8 +54,10 @@ class Terrain(pygame.sprite.Sprite):
             self.image = None
             self.rect = None
         else:
-            # TODO: Create this function that overlays contours on terrain image
-            self.image = self._make_terrain_image()
+            # Create the terrain image
+            terrain_image = self._make_terrain_image()
+            # Convert the terrain image to a PyGame surface for display
+            self.image = pygame.surfarray.make_surface(terrain_image.swapaxes(0, 1))
             # The rectangle for this sprite is the entire game
             self.rect = pygame.Rect(0, 0, *self.screen_size)
 
@@ -79,79 +83,42 @@ class Terrain(pygame.sprite.Sprite):
             arr = pygame.surfarray.pixels3d(self.image)
             arr[burned_idxs[::-1]] = BURNED_RGB_COLOR
 
-    def _make_contour_image(self, image: np.ndarray) -> np.ndarray:
+    def _make_terrain_image(self) -> np.ndarray:
         '''
-        Use the image and TopographyLayer to create the elevations array and
-        compute the contours. The contours are computed with plt.contours, and the
-        contour lines are drawn by converting image to a PIL.Image.Image and using
-        the ImageDraw module.
+        Use the FuelLayer image and TopographyLayer contours to create the
+        terrain background image. This will show the FuelLayer as the landscape/overhead
+        view, with the contour lines overlaid on top.
 
         Arguments:
-            image: A numpy array representing the np.float RGB terrain image for display
+            None
 
         Returns:
             out_image: The input image with the contour lines drawn on it
         '''
+        image = self.fuel_layer.image
         # Create a figure with axes
         fig, ax = plt.subplots()
+        # The fmt argument will display the levels as whole numbers (otherwise
+        # the decimal points look messy)
+        contours = ax.contour(self.topo_layer.data.squeeze(), origin='upper')
+        ax.clabel(contours, contours.levels, inline=True, fmt=lambda x: f'{x:.0f}')
         ax.imshow(image.astype(np.uint8))
-        CS = ax.contour(self.elevations, origin='upper')
-        ax.clabel(CS, CS.levels, inline=True, fmt=lambda x: f'{x:.0f}')
         plt.axis('off')
-        with tempfile.NamedTemporaryFile(suffix='.png') as out_img_path:
+
+        # Save the figure as a vector graphic to get just the image (no axes,
+        # ticks, figure edges, etc.)
+        # Then load it, resize, and convert to numpy
+        with tempfile.NamedTemporaryFile(suffix='.svg') as out_img_path:
             fig.savefig(out_img_path.name, bbox_inches='tight', pad_inches=0)
-            out_img = Image.open(out_img_path.name).resize(image.shape[:2])
-            # Slice the alpha channel off
-            out_img = np.array(out_img)[..., :3]
+            bytes_data = io.BytesIO()
+            drawing = svg2rlg(out_img_path.name)
+            renderPM.drawToFile(drawing, bytes_data, fmt='PNG')
+            out_img_pil = Image.open(bytes_data).resize(image.shape[:2])
         plt.close(fig)
+        # Slice the alpha channel off
+        out_img = np.array(out_img_pil)[..., :3]
+
         return out_img
-
-    # def _update_texture_dryness(self, fuel: Fuel) -> np.ndarray:
-    #     '''
-    #     Determine the percent change to make the terrain look drier (i.e.
-    #     more red/yellow/brown) by using the FuelArray values. Then, update
-    #     the texture color using PIL and image blending with a preset
-    #     yellow-brown color/image.
-
-    #     Arguments:
-    #         fuel: The Fuel with parameters that specify how "dry" the texture
-    #               should look
-
-    #     Returns:
-    #         new_texture: The texture with RGB calues modified to look drier based
-    #                      on the parameters of fuel_arr
-    #     '''
-    #     # Add the numbers after normalization
-    #     # M_x is inverted because a lower value is more flammable
-    #     color_change_pct = fuel.w_0 / 0.2296 + \
-    #                        fuel.delta / 7 + \
-    #                        (0.2 - fuel.M_x) / 0.2
-    #     # Divide by 3 since there are 3 values
-    #     color_change_pct /= 3
-
-    #     arr = self.texture.copy()
-    #     arr_img = Image.fromarray(arr)
-    #     resized_brown = DRY_TERRAIN_BROWN_IMG.resize(arr_img.size)
-    #     texture_img = Image.blend(arr_img, resized_brown, color_change_pct / 2)
-    #     new_texture = np.array(texture_img)
-
-    #     return new_texture
-
-    # def _make_terrain_layer(self) -> Tuple[pygame.Surface, np.ndarray]:
-    #     '''
-    #         Load fuel layer RGB values and stack topographic contours
-
-    #         Arguments:
-    #             image: A numpy array representing the np.float terrain image
-
-    #         Returns:
-    #             out_image: The input image with the RGB values for Fuel Model values
-    #     '''
-
-    #     cont_image = self._make_contour_image(self.fuels)
-    #     out_surf = pygame.surfarray.make_surface(cont_image.swapaxes(0, 1))
-
-    #     return out_surf
 
 
 class Fire(pygame.sprite.Sprite):

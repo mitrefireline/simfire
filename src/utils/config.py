@@ -141,7 +141,7 @@ class Config:
         if 'chaparral' in str(self.terrain.fuel_array_function).lower():
             self.terrain.fuel_array_function = 'chaparral'
             args = self.terrain.chaparral
-            fn = chaparral_fn(self.area.pixel_scale, self.area.pixel_scale, args.seed)
+            fn = chaparral_fn(args.seed)
             setattr(self.terrain, 'fuel_array_function', fn)
         else:
             log.error('The user-defined fuel array function is set to '

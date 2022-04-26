@@ -494,7 +494,8 @@ class TopographyLayer(DataLayer):
         Returns:
             contours: The matplotlib contour set used for plotting
         '''
-        contours = plt.contour(self.data, origin='upper')
+        contours = plt.contour(self.data.squeeze(), origin='upper')
+        plt.close()
         return contours
 
 
@@ -816,14 +817,16 @@ class FunctionalFuelLayer(FuelLayer):
         '''
         Use the fuel data in self.data to make an RGB background image.
         '''
-        image = np.zeros(self.screen_size + (3, ))
+        image = np.zeros(self.data.shape[:2] + (3, ))
 
         # Loop over the high-level tiles (these are not at the pixel level)
-        for i in range(self.fuels.shape[0]):
-            for j in range(self.fuels.shape[1]):
+        for i in range(self.data.shape[0]):
+            for j in range(self.data.shape[1]):
                 # Need these pixel level coordinates to span the correct range
-                updated_texture = self._update_texture_dryness(self.fuels[i][i])
+                updated_texture = self._update_texture_dryness(self.data[j][i][0])
                 image[i, j] = updated_texture
+
+        return image
 
     def _update_texture_dryness(self, fuel: Fuel) -> np.ndarray:
         '''

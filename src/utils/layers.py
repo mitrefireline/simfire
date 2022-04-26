@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
 
-from ..enums import (DRY_TERRAIN_BROWN_IMG, TERRAIN_TEXTURE_PATH)
+from ..enums import (DRY_TERRAIN_BROWN_IMG, TERRAIN_TEXTURE_PATH, FuelModelToFuel)
 
 from ..world.elevation_functions import ElevationFn
 from ..world.fuel_array_functions import FuelArrayFn
@@ -689,8 +689,11 @@ class OperationalFuelLayer(FuelLayer):
         self.datapath = self.path / res
 
         self._get_fuel_dems()
-        self.data = self._make_data(self.fuel_model_filenames)
+        self.int_data = self._make_data(self.fuel_model_filenames)
+        self.data = self._make_fuel_data()
         self.image = self._make_data(self.tif_filenames)
+        self.image = self.image * 255.
+        self.image = self.image.astype(np.uint8)
 
     def _make_image(self) -> np.ndarray:
         '''
@@ -757,7 +760,7 @@ class OperationalFuelLayer(FuelLayer):
         self.tif_filenames = []
         self.fuel_model_filenames = []
         fuel_model = f'LF2020_FBFM{self.type}_200_CONUS'
-        fuel_data_fm = f'LC20_F{self.type}_200_projected.npy'
+        fuel_data_fm = f'LC20_F{self.type}_200_projected_no_whitespace.npy'
         fuel_data_rgb = f'LC20_F{self.type}_200_projected_rgb.npy'
         for _, ranges in self.lat_long_box.tiles.items():
             for range in ranges:
@@ -773,6 +776,20 @@ class OperationalFuelLayer(FuelLayer):
                 rgb_npy_file = self.datapath / rgb_data_region
                 self.tif_filenames.append(rgb_npy_file)
                 self.fuel_model_filenames.append(int_npy_file)
+
+    def _make_fuel_data(self) -> np.ndarray:
+        '''
+        Map Fire Behavior Fuel Model data to the Fuel type that Rothermel expects
+
+        Arguments:
+            None
+
+        Returns:
+            np.ndarray: Fuel
+        '''
+        func = np.vectorize(lambda x: FuelModelToFuel[x])
+        data_array = func(self.int_data)
+        return data_array
 
 
 class FunctionalFuelLayer(FuelLayer):

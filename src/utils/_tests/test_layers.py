@@ -1,5 +1,7 @@
 import unittest
 from ..layers import FunctionalElevationLayer, LatLongBox, TopographyLayer
+from ..layers import FunctionalFuelLayer, OperationalFuelLayer
+from ...world.parameters import Fuel
 
 
 class TestLatLongBox(unittest.TestCase):
@@ -111,7 +113,7 @@ class TestLatLongBox(unittest.TestCase):
         lat_long_box._save_contour_map(topo_layer.data)
 
 
-class TestTopographyLayer(unittest.TestCase):
+class TestOperationalTopographyLayer(unittest.TestCase):
     def setUp(self) -> None:
         '''
 
@@ -182,3 +184,92 @@ class TestFunctionalElevationLayer(unittest.TestCase):
                               layer.data.shape,
                               msg=f'The layer data has shape {layer.data.shape}, '
                               f'but should have shape {correct_data_shape}')
+
+
+class TestOperationalFuelLayer(unittest.TestCase):
+    def setUp(self) -> None:
+        '''
+
+        '''
+
+    def test_make_data(self) -> None:
+        '''
+
+        '''
+        resolution = 30
+        # 2 Tiles (easternly)
+        center = (33.4, 115.04)
+        height, width = 3200, 3200
+        lat_long_box = LatLongBox(center, height, width, resolution)
+        FuelGen = OperationalFuelLayer(lat_long_box)
+        self.assertEqual(FuelGen.data.shape[0], FuelGen.data.shape[1])
+
+    def test_get_fuel_dems(self) -> None:
+        '''
+
+        '''
+
+        resolution = 30
+        # Single Tile
+        center = (35.2, 115.6)
+        height, width = 1600, 1600
+        lat_long_box = LatLongBox(center, height, width, resolution)
+        FuelGen = OperationalFuelLayer(lat_long_box)
+        self.assertEqual(1, len(FuelGen.tif_filenames))
+
+        # 2 Tiles
+        center = (38.4, 115.0)
+        height, width = 1600, 1600
+        lat_long_box = LatLongBox(center, height, width, resolution)
+        FuelGen = OperationalFuelLayer(lat_long_box)
+        self.assertEqual(2, len(FuelGen.tif_filenames))
+
+        # 4 Tiles
+        center = (34.001, 116.008)
+        height, width = 3200, 3200
+        lat_long_box = LatLongBox(center, height, width, resolution)
+        FuelGen = OperationalFuelLayer(lat_long_box)
+        self.assertEqual(4, len(FuelGen.tif_filenames))
+
+    def test_make_image(self) -> None:
+        '''
+
+        '''
+        pass
+
+
+class TestFunctionalFuelLayer(unittest.TestCase):
+    def setUp(self) -> None:
+        '''
+
+        '''
+        self.height = 1000
+        self.width = 1000
+        self.fuel_fn = Fuel
+        self.FunctionalFuel = FunctionalFuelLayer(self.height, self.width, self.fuel_fn)
+
+    def test_make_data(self) -> None:
+        '''
+
+        '''
+
+    def test_make_image(self) -> None:
+        '''
+
+        '''
+
+        self.assertCountEqual(self.FunctionalFuel.image.shape,
+                              self.screen_size,
+                              msg=('The terrain fuels have shape '
+                                   f'{self.terrain.fuels.shape}, but should have '
+                                   f'shape {self.screen_size}'))
+
+    def test_load_texture(self) -> None:
+        '''
+
+        '''
+
+    def test_update_texture_dryness(self) -> None:
+        '''
+
+        '''

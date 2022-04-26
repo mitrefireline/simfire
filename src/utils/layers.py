@@ -664,7 +664,7 @@ class FuelLayer(DataLayer):
 
 
 class OperationalFuelLayer(FuelLayer):
-    def __init__(self, lat_long_box: LatLongBox, type: str = 'display') -> None:
+    def __init__(self, lat_long_box: LatLongBox, type: str = '13') -> None:
         '''
         Initialize the elevation layer by retrieving the correct topograpchic data
             and computing the area.
@@ -688,8 +688,9 @@ class OperationalFuelLayer(FuelLayer):
 
         self.datapath = self.path / res
 
-        self.data = self._make_data()
-        self.image = self._make_image()
+        self._get_fuel_dems()
+        self.data = self._make_data(self.fuel_model_filenames)
+        self.image = self._make_data(self.tif_filenames)
 
     def _make_image(self) -> np.ndarray:
         '''
@@ -697,9 +698,9 @@ class OperationalFuelLayer(FuelLayer):
         '''
         pass
 
-    def _make_data(self) -> np.ndarray:
-        self._get_fuel_dems()
-        data = np.load(self.tif_filenames[0])
+    def _make_data(self, filename: List) -> np.ndarray:
+
+        data = np.load(filename[0])
         data = np.asarray(data)
         # flip axis because latitude goes up but numpy will read it down
         data = np.flip(data, 0)
@@ -713,7 +714,7 @@ class OperationalFuelLayer(FuelLayer):
                 bl = (self.lat_long_box.tr[0][0], self.lat_long_box.bl[1][0])
                 return data[tr[0]:bl[0], tr[1]:bl[1]]
             tmp_array = data
-            for idx, dem in enumerate(self.tif_filenames[1:]):
+            for idx, dem in enumerate(filename[1:]):
                 tif_data = np.load(dem)
                 tif_data = np.asarray(tif_data)
                 # flip axis because latitude goes up but numpy will read it down
@@ -743,6 +744,7 @@ class OperationalFuelLayer(FuelLayer):
     def _get_fuel_dems(self) -> List[Path]:
         '''
         This method will use the outputed tiles and return the correct dem files
+            for both the RGB fuel model data and the fuel model data
 
         Arguments:
             None
@@ -753,21 +755,24 @@ class OperationalFuelLayer(FuelLayer):
         '''
 
         self.tif_filenames = []
-        fuel_model = 'LF2020_FBFM13_200_CONUS'
-        fuel_data_fm = 'LC20_F13_200_projected.npy'
-        fuel_data_rgb = 'LC20_F13_200_projected_rgb.npy'
+        self.fuel_model_filenames = []
+        fuel_model = f'LF2020_FBFM{self.type}_200_CONUS'
+        fuel_data_fm = f'LC20_F{self.type}_200_projected.npy'
+        fuel_data_rgb = f'LC20_F{self.type}_200_projected_rgb.npy'
         for _, ranges in self.lat_long_box.tiles.items():
             for range in ranges:
                 (five_deg_n, five_deg_w) = range
-                if self.type == 'simulation':
-                    int_data_region = Path(
-                        f'n{five_deg_n}w{five_deg_w}/{fuel_model}/{fuel_data_fm}')
-                else:
-                    int_data_region = Path(
-                        f'n{five_deg_n}w{five_deg_w}/{fuel_model}/{fuel_data_rgb}')
+
+                int_data_region = Path(
+                    f'n{five_deg_n}w{five_deg_w}/{fuel_model}/{fuel_data_fm}')
+
+                rgb_data_region = Path(
+                    f'n{five_deg_n}w{five_deg_w}/{fuel_model}/{fuel_data_rgb}')
 
                 int_npy_file = self.datapath / int_data_region
-                self.tif_filenames.append(int_npy_file)
+                rgb_npy_file = self.datapath / rgb_data_region
+                self.tif_filenames.append(rgb_npy_file)
+                self.fuel_model_filenames.append(int_npy_file)
 
 
 class FunctionalFuelLayer(FuelLayer):
@@ -790,7 +795,7 @@ class FunctionalFuelLayer(FuelLayer):
         self.fuel_fn = fuel_fn
 
         self.texture = self._load_texture()
-        self.data = self._make_data()
+        self.fuels = self._make_data()
         self.image = self._make_image()
 
     def _make_data(self) -> np.ndarray:
@@ -817,7 +822,7 @@ class FunctionalFuelLayer(FuelLayer):
         '''
         Use the fuel data in self.data to make an RGB background image.
         '''
-        image = np.zeros(self.data.shape[:2] + (3, ))
+        image = np.zeros((self.width, self.height) + (3, ))
 
         # Loop over the high-level tiles (these are not at the pixel level)
         for i in range(self.data.shape[0]):

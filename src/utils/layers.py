@@ -7,7 +7,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
 
+from ..enums import (DRY_TERRAIN_BROWN_IMG, TERRAIN_TEXTURE_PATH)
+
 from ..world.elevation_functions import ElevationFn
+from ..world.fuel_array_functions import FuelArrayFn
+from ..world.parameters import Fuel
 
 
 # Developing a function to round to a multiple
@@ -627,6 +631,38 @@ class FunctionalElevationLayer(TopographyLayer):
 
 
 class FuelLayer(DataLayer):
+    '''
+    Base class for use with operational and procedurally generated
+    fuel data. This class implements the code needed to
+    create the terrain image to use with the display.
+    '''
+    def __init__(self) -> None:
+        '''
+        Simple call to the parent DataLayer class.
+
+        Arguments:
+            None
+
+        Returns:
+            None
+        '''
+        super().__init__()
+
+    def _make_image(self) -> np.ndarray:
+        '''
+        Base method to make the terrain background image.
+
+        Arguments:
+            None
+
+        Returns:
+            A numpy array of the terrain representing an RGB image
+
+        '''
+        pass
+
+
+class OperationalFuelLayer(FuelLayer):
     def __init__(self, lat_long_box: LatLongBox, type: str = 'display') -> None:
         '''
         Initialize the elevation layer by retrieving the correct topograpchic data
@@ -652,6 +688,13 @@ class FuelLayer(DataLayer):
         self.datapath = self.path / res
 
         self.data = self._make_data()
+        self.image = self._make_image()
+
+    def _make_image(self) -> np.ndarray:
+        '''
+        Use the fuel data in self.data to make an RGB background image.
+        '''
+        pass
 
     def _make_data(self) -> np.ndarray:
         self._get_fuel_dems()
@@ -667,10 +710,6 @@ class FuelLayer(DataLayer):
                 # simple case
                 tr = (self.lat_long_box.bl[0][0], self.lat_long_box.tr[1][0])
                 bl = (self.lat_long_box.tr[0][0], self.lat_long_box.bl[1][0])
-                # # TODO: Temporary solution until data source is added
-                # h = bl[0] - tr[0]
-                # w = bl[1] - tr[1]
-                # return np.full((h, w, 1), Chaparral)
                 return data[tr[0]:bl[0], tr[1]:bl[1]]
             tmp_array = data
             for idx, dem in enumerate(self.tif_filenames[1:]):
@@ -730,66 +769,103 @@ class FuelLayer(DataLayer):
                 self.tif_filenames.append(int_npy_file)
 
 
-class TransportationLayer(DataLayer):
-    def __init__(self, center: Tuple[float], height: int, width: int,
-                 resolution: int) -> None:
+class FunctionalFuelLayer(FuelLayer):
+    '''
+    Layer that stores fuel data computed from a function.
+    '''
+    def __init__(self, height, width, fuel_fn: FuelArrayFn) -> None:
         '''
-        Initialize the elevation layer by retrieving the correct topograpchic data
-            and computing the area.
+        Initialize the fuel layer by computing the fuels.
 
         Arguments:
-            center: The lat/long coordinates of the center point of the screen
-            height: The height of the screen size
-            width: The width of the screen size
-            resolution: The resolution to get data
-
+            height: The height of the data layer
+            width: The width of the data layer
+            fuel_fn: A callable function that converts (x, y) coorindates to
+                     elevations.
         '''
-        self.path = Path('/nfs/lslab2/fireline/transportation/')
+        super().__init__()
+        self.height = height
+        self.width = width
+        self.fuel_fn = fuel_fn
 
-        super().__init__(center, height, width, resolution)
+        self.texture = self._load_texture()
+        self.data = self._make_data()
+        self.image = self._make_image()
 
-    def _make_contour_and_data(self) -> np.ndarray:
+    def _make_data(self) -> np.ndarray:
+        '''
+        Use self.fuel_fn to make the fuel data layer.
 
-        data = Image.open(self.tif_filenames[0])
-        data = np.asarray(data)
-        # flip axis because latitude goes up but numpy will read it down
-        data = np.flip(data, 0)
-        self.data = np.expand_dims(data, axis=-1)
+        Arguments:
+            None
 
-        for key, _ in self.tiles.items():
+        Returns:
+            A numpy array containing the fuel data
+        '''
+        x = np.arange(self.width)
+        y = np.arange(self.height)
+        X, Y = np.meshgrid(x, y)
+        fuel_fn_vect = np.vectorize(self.fuel_fn)
+        fuels = fuel_fn_vect(X, Y)
+        # Expand third dimension to align with data layers
+        fuels = np.expand_dims(fuels, axis=-1)
 
-            if key == 'single':
-                # simple case
-                tr = (self.bl[0][0], self.tr[1][0])
-                bl = (self.tr[0][0], self.bl[1][0])
-                return self.data[tr[0]:bl[0], tr[1]:bl[1]]
-            tmp_array = data
-            for idx, dem in enumerate(self.tif_filenames[1:]):
-                data = Image.open(dem)
-                data = np.asarray(data)
-                # flip axis because latitude goes up but numpy will read it down
-                data = np.flip(data, 0)
-                data = np.expand_dims(data, axis=-1)
+        return fuels
 
-                if key == 'north':
-                    # stack tiles along axis = 0 -> leftmost: bottom, rightmost: top
-                    self.data = np.concatenate((self.data, data), axis=0)
-                elif key == 'east':
-                    # stack tiles along axis = 2 -> leftmost, rightmost
-                    self.data = np.concatenate((self.data, data), axis=1)
-                elif key == 'square':
-                    if idx + 1 == 1:
-                        self.data = np.concatenate((self.data, data), axis=1)
-                    elif idx + 1 == 2:
-                        tmp_array = data
-                    elif idx + 1 == 3:
-                        tmp_array = np.concatenate((data, tmp_array), axis=1)
-                        self.data = np.concatenate((self.data, tmp_array), axis=0)
+    def _make_image(self) -> np.ndarray:
+        '''
+        Use the fuel data in self.data to make an RGB background image.
+        '''
+        image = np.zeros(self.screen_size + (3, ))
 
-        tr = (self.bl[0][0], self.tr[1][0])
-        bl = (self.tr[0][0], self.bl[1][0])
-        self.data_array = self.data[tr[0]:bl[0], tr[1]:bl[1]]
-        return self.data_array
+        # Loop over the high-level tiles (these are not at the pixel level)
+        for i in range(self.fuels.shape[0]):
+            for j in range(self.fuels.shape[1]):
+                # Need these pixel level coordinates to span the correct range
+                updated_texture = self._update_texture_dryness(self.fuels[i][i])
+                image[i, j] = updated_texture
 
+    def _update_texture_dryness(self, fuel: Fuel) -> np.ndarray:
+        '''
+        Determine the percent change to make the terrain look drier (i.e.
+        more red/yellow/brown) by using the FuelArray values. Then, update
+        the texture color using PIL and image blending with a preset
+        yellow-brown color/image.
 
+        Arguments:
+            fuel: The Fuel with parameters that specify how "dry" the texture should look
 
+        Returns:
+            new_texture: The texture with RGB values modified to look drier based
+                         on the parameters of fuel_arr
+        '''
+        # Add the numbers after normalization
+        # M_x is inverted because a lower value is more flammable
+        color_change_pct = fuel.w_0 / 0.2296 + \
+                           fuel.delta / 7 + \
+                           (0.2 - fuel.M_x) / 0.2
+        # Divide by 3 since there are 3 values
+        color_change_pct /= 3
+
+        arr = self.texture.copy()
+        arr_img = Image.fromarray(arr)
+        resized_brown = DRY_TERRAIN_BROWN_IMG.resize(arr_img.size)
+        texture_img = Image.blend(arr_img, resized_brown, color_change_pct / 2)
+        new_texture = np.array(texture_img)
+
+        return new_texture
+
+    def _load_texture(self) -> np.ndarray:
+        '''
+        Load the terrain tile texture, resize it to the correct
+        shape, and convert to numpy
+
+        Returns:
+            The returned numpy array of the texture.
+        '''
+        out_size = (1, 1)
+        texture = Image.open(TERRAIN_TEXTURE_PATH)
+        texture = texture.resize(out_size)
+        texture = np.array(texture)
+
+        return texture

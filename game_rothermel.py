@@ -9,7 +9,6 @@ from src.game.managers.fire import RothermelFireManager
 from src.game.managers.mitigation import FireLineManager
 from src.game.sprites import Terrain
 from src.utils.config import Config
-from src.utils.layers import FunctionalFuelLayer, LatLongBox, OperationalTopographyLayer
 from src.utils.units import mph_to_ftpm
 from src.world.parameters import Environment, FuelParticle
 
@@ -25,22 +24,10 @@ def main():
 
     fuel_particle = FuelParticle()
 
-    center = (36.5, 117.8)
-    height, width = 4000, 4000
-    resolution = 30
-    lat_long_box = LatLongBox(center, height, width, resolution)
-    topo_layer = OperationalTopographyLayer(lat_long_box)
-    fuel_layer = FunctionalFuelLayer(topo_layer.data.shape[0], topo_layer.data.shape[1],
-                                     cfg.terrain.fuel_array_function)
+    game = Game(cfg.terrain.elevation_function.data.shape[:2])
 
-    # Compute how many meters each pixel represents (should be close to resolution)
-    pixel_scale = height / topo_layer.data.shape[0]
-    # Convert to feet for use with rothermel
-    pixel_scale = 3.28084 * pixel_scale
-
-    game = Game(topo_layer.data.shape[:2])
-
-    terrain = Terrain(fuel_layer, topo_layer, game.screen_size)
+    terrain = Terrain(cfg.fuel.fuel_array_function, cfg.terrain.elevation_function,
+                      game.screen_size)
 
     # Use simple/constant wind speed for now
     wind_speed = mph_to_ftpm(cfg.wind.simple.speed)
@@ -63,7 +50,7 @@ def main():
     points = list(zip(x, y))
 
     fireline_manager = FireLineManager(size=cfg.display.control_line_size,
-                                       pixel_scale=pixel_scale,
+                                       pixel_scale=cfg.area.pixel_scale,
                                        terrain=terrain)
 
     fire_map = game.fire_map
@@ -73,7 +60,7 @@ def main():
     fire_manager = RothermelFireManager(cfg.fire.fire_initial_position,
                                         cfg.display.fire_size,
                                         cfg.fire.max_fire_duration,
-                                        pixel_scale,
+                                        cfg.area.pixel_scale,
                                         cfg.simulation.update_rate,
                                         fuel_particle,
                                         terrain,

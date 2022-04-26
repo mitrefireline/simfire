@@ -450,8 +450,7 @@ class LatLongBox():
         # cbar = plt.colorbar()
         plt.gca().set_aspect('equal', adjustable='box')
 
-        plt.savefig(
-            f'images/{type}_n{self.BL[0]}_w{self.BL[1]}_n{self.TR[0]}_w{self.TR[1]}.png')
+        plt.savefig(f'{type}_n{self.BL[0]}_w{self.BL[1]}_n{self.TR[0]}_w{self.TR[1]}.png')
 
 
 class DataLayer():

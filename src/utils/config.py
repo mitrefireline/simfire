@@ -7,10 +7,13 @@ from pathlib import Path
 from yaml.parser import ParserError
 
 from ..utils.log import create_logger
+from ..utils.layers import (FunctionalFuelLayer, LatLongBox, OperationalTopographyLayer,
+                            FunctionalTopographyLayer, OperationalFuelLayer)
 from ..world.wind_mechanics.wind_controller import WindController, WindController2
 from ..utils.units import str_to_minutes, mph_to_ftpm, mph_to_ms, scale_ms_to_ftpm
 from ..world.elevation_functions import PerlinNoise2D, flat, gaussian
 from ..world.fuel_array_functions import chaparral_fn
+from ..utils.terrain import fuel
 
 log = create_logger(__name__)
 
@@ -54,6 +57,7 @@ class Config:
                   needs to be a valid YAML.
         '''
         self.path = path
+        self._possible_layers = ('operational', 'functional')
         self._possible_elevations = ('perlin', 'gaussian', 'flat')
         self._possible_wind = ('perlin', 'simple')
         self._possible_fuel_arrays = ('chaparral')
@@ -93,8 +97,35 @@ class Config:
         Set the attribute `self.area.terrain_scale` defined as
         `self.area.pixel_scale * self.area.terrain_size`
         '''
-        setattr(self.area, 'terrain_scale',
-                self.area.pixel_scale * self.area.terrain_size)
+        if 'functional' in str(self.data['terrain']['terrain']).lower() and str(
+                self.data['fuel']['fuel']).lower():
+            setattr(self.area, 'terrain_scale',
+                    self.area.pixel_scale * self.area.terrain_size)
+        elif 'operational' in str(self.data['terrain']['terrain']).lower() and str(
+                self.data['fuel']['fuel']).lower():
+            args = self.operational
+            center = (args.latitude, args.longitude)
+            if args.seed is not None:
+                center = fuel(args.seed)
+                try:
+                    # TODO: center point may not include any data in CA, check
+                    # and/or re-try a new point
+                    self.lat_long_box = LatLongBox(center, args.height, args.width,
+                                                   args.resolution)
+                except ValueError:
+                    log.error('Latitude and longitude are not contained in center point '
+                              f'{center} in the database, retrying.')
+            else:
+                self.lat_long_box = LatLongBox(center, args.height, args.width,
+                                               args.resolution)
+            self.height = self.lat_long_box.tr[0] - self.lat_long_box.bl[0]
+            self.width = self.height[0]
+            self.screen_size = self.width
+            # Convert to feet for use with rothermel
+            self.pixel_scale = 3.28084 * args.resolution
+
+            setattr(self.area, 'screen_size', self.width)
+            setattr(self.area, 'pixel_scale', self.pixel_scale)
 
     def _set_elevation_function(self) -> None:
         '''
@@ -104,30 +135,44 @@ class Config:
         calling this, it becomes an actual function with all of the precompute values
         from the config passed in.
         '''
-        # Now we can set the function again
-        if 'perlin' in str(self.terrain.elevation_function).lower():
+        if 'functional' in str(self.terrain.terrain).lower():
+            # Now we can set the function again
+            if 'perlin' in str(self.terrain.elevation_function).lower():
+                # Reset the value, if we are resetting the function
+                self.terrain.elevation_function = 'perlin'
+                args = self.terrain.perlin
+                noise = PerlinNoise2D(args.amplitude, args.shape, args.resolution,
+                                      args.seed)
+                noise.precompute()
+                elevation_layer = FunctionalTopographyLayer(self.area.screen_size,
+                                                            self.area.screen_size,
+                                                            noise.fn)
+                setattr(self.terrain, 'elevation_function', elevation_layer)
+            elif 'gaussian' in str(self.terrain.elevation_function).lower():
+                # Reset the value, if we are resetting the function
+                self.terrain.elevation_function = 'gaussian'
+                args = self.terrain.gaussian
+                noise = gaussian(args.amplitude, args.mu_x, args.mu_y, args.sigma_x,
+                                 args.sigma_y)
+                elevation_layer = FunctionalTopographyLayer(self.area.screen_size,
+                                                            self.area.screen_size, noise)
+                setattr(self.terrain, 'elevation_function', elevation_layer)
+            elif 'flat' in str(self.terrain.elevation_function).lower():
+                # Reset the value, if we are resetting the function
+                self.terrain.elevation_function = 'flat'
+                elevation_layer = FunctionalTopographyLayer(self.area.screen_size,
+                                                            self.area.screen_size, flat())
+                setattr(self.terrain, 'elevation_function', elevation_layer)
+            else:
+                log.error('The user-defined elevation function is set to '
+                          f'{self.terrain.elevation_function} when it can only be one of '
+                          f'these values: {self._possible_elevations}')
+                raise ValueError
+        elif 'operational' in str(self.terrain.terrain).lower():
             # Reset the value, if we are resetting the function
-            self.terrain.elevation_function = 'perlin'
-            args = self.terrain.perlin
-            noise = PerlinNoise2D(args.amplitude, args.shape, args.resolution, args.seed)
-            noise.precompute()
-            setattr(self.terrain, 'elevation_function', noise.fn)
-        elif 'gaussian' in str(self.terrain.elevation_function).lower():
-            # Reset the value, if we are resetting the function
-            self.terrain.elevation_function = 'gaussian'
-            args = self.terrain.gaussian
-            noise = gaussian(args.amplitude, args.mu_x, args.mu_y, args.sigma_x,
-                             args.sigma_y)
-            setattr(self.terrain, 'elevation_function', noise)
-        elif 'flat' in str(self.terrain.elevation_function).lower():
-            # Reset the value, if we are resetting the function
-            self.terrain.elevation_function = 'flat'
-            setattr(self.terrain, 'elevation_function', flat())
-        else:
-            log.error('The user-defined elevation function is set to '
-                      f'{self.terrain.elevation_function} when it can only be one of '
-                      f'these values: {self._possible_elevations}')
-            raise ValueError
+            self.terrain.elevation_function = 'operational'
+            topo_layer = OperationalTopographyLayer(self.lat_long_box)
+            setattr(self.terrain, 'elevation_function', topo_layer)
 
     def _set_fuel_array_function(self) -> None:
         '''
@@ -137,16 +182,24 @@ class Config:
         calling this, it becomes an actual function with all of the precompute values
         from the config passed in.
         '''
-        # Now we can set the function again
-        if 'chaparral' in str(self.terrain.fuel_array_function).lower():
-            self.terrain.fuel_array_function = 'chaparral'
-            args = self.terrain.chaparral
-            fn = chaparral_fn(args.seed)
-            setattr(self.terrain, 'fuel_array_function', fn)
-        else:
-            log.error('The user-defined fuel array function is set to '
-                      f'{self.terrain.fuel_array_function}, when it can only be one of '
-                      f'these values: {self._possible_fuel_arrays}')
+        if 'functional' in str(self.fuel.fuel).lower():
+            # Now we can set the function again
+            if 'chaparral' in str(self.fuel.fuel_array_function).lower():
+                self.fuel.fuel_array_function = 'chaparral'
+                args = self.fuel.chaparral
+                fn = chaparral_fn(args.seed)
+                fuel_layer = FunctionalFuelLayer(self.area.screen_size,
+                                                 self.area.screen_size, fn)
+                setattr(self.fuel, 'fuel_array_function', fuel_layer)
+            else:
+                log.error('The user-defined fuel array function is set to '
+                          f'{self.fuel.fuel_array_function}, when it can only be one of '
+                          f'these values: {self._possible_fuel_arrays}')
+        elif 'operational' in str(self.fuel.fuel).lower():
+            # Reset the value, if we are resetting the function
+            self.fuel.fuel_array_function = 'operational'
+            topo_layer = OperationalFuelLayer(self.lat_long_box)
+            setattr(self.fuel, 'fuel_array_function', topo_layer)
 
     def _set_wind_function(self) -> None:
         '''

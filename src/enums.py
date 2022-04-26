@@ -19,6 +19,13 @@ from PIL import Image
 with resources.path('assets.textures', 'terrain.jpg') as path:
     TERRAIN_TEXTURE_PATH: Path = path
 
+from world.presets import (ShortGrass, GrassTimberShrubOverstory, TallGrass, Chaparral,
+                           Brush, DormantBrushHardwoodSlash, SouthernRough,
+                           ClosedShortNeedleTimberLitter, HardwoodLongNeedlePineTimber,
+                           TimberLitterUnderstory, LightLoggingSlash, MediumLoggingSlash,
+                           HeavyLoggingSlash, NBUrban, NBSnowIce, NBAgriculture, NBBarren,
+                           NBWater, NBNoData)
+
 DRY_TERRAIN_BROWN_IMG: Image.Image = Image.fromarray(
     np.full((10, 10, 3), (205, 133, 63), dtype=np.uint8))
 
@@ -106,15 +113,39 @@ class FuelModel13(IntEnum):
     LIGHT_LOGGING_SLASH: 11
     MEDIUM_LOGGING_SLASH: 12
     HEAVY_LOGGING_SLASH: 13
-    URBAN: 91
-    SNOW_ICE: 92
-    AGRICULTURE: 93
-    WATER: 98
-    BARREN: 99
+    NB_URBAN: 91
+    NB_SNOW_ICE: 92
+    NB_AGRICULTURE: 93
+    NB_WATER: 98
+    NB_BARREN: 99
     NO_DATA: -32768
     NO_DATA: -999
     NO_DATA: 32767
 
+
+FuelModelToFuel = {
+    1: ShortGrass,
+    2: GrassTimberShrubOverstory,
+    3: TallGrass,
+    4: Chaparral,
+    5: Brush,
+    6: DormantBrushHardwoodSlash,
+    7: SouthernRough,
+    8: ClosedShortNeedleTimberLitter,
+    9: HardwoodLongNeedlePineTimber,
+    10: TimberLitterUnderstory,
+    11: LightLoggingSlash,
+    12: MediumLoggingSlash,
+    13: HeavyLoggingSlash,
+    91: NBUrban,
+    92: NBSnowIce,
+    93: NBAgriculture,
+    98: NBWater,
+    99: NBBarren,
+    -32768: NBNoData,
+    -9999: NBNoData,
+    32767: NBNoData
+}
 
 FuelModelRGB13 = {
     1: [1.0, 1.0, 0.745098039],

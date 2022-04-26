@@ -1,6 +1,5 @@
 import os
 import unittest
-from unittest import mock
 
 import numpy as np
 from skimage.draw import line
@@ -13,6 +12,8 @@ from ...sprites import FireLine, ScratchLine, WetLine, Terrain
 from ..mitigation import FireLineManager, ScratchLineManager, WetLineManager
 
 
+# unittest.mock.patch.dict isn't working anymore
+# Can't run rests without setting display at the top of the file
 os.environ['SDL_VIDEODRIVER'] = 'dummy'
 
 
@@ -162,7 +163,6 @@ class TestScratchLineManager(unittest.TestCase):
                          msg=('FireLine.sprite_type is not a FireLine sprite'))
 
 
-@mock.patch.dict(os.environ, {'SDL_VIDEODRIVER': 'dummy'})
 class TestWetLineManager(unittest.TestCase):
     '''
     Meant to test the `WetLineManager` class. Will eventually test the different physics

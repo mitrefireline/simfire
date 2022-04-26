@@ -278,7 +278,7 @@ class TestOperationalFuelLayer(unittest.TestCase):
         self.assertEqual(1, len(FuelGen.tif_filenames))
 
         # 2 Tiles
-        center = (38.4, 115.0)
+        center = (38.4, 118.0)
         height, width = 1600, 1600
         lat_long_box = LatLongBox(center, height, width, resolution)
         FuelGen = OperationalFuelLayer(lat_long_box)

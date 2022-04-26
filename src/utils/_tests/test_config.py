@@ -108,9 +108,7 @@ class ConfigTest(unittest.TestCase):
         '''
         Test assigning fuel array Python function based on config string
         '''
-        fn = chaparral_fn(self.data['area']['pixel_scale'],
-                          self.data['area']['pixel_scale'],
-                          self.data['terrain']['chaparral']['seed'])
+        fn = chaparral_fn(self.data['terrain']['chaparral']['seed'])
         self.assertEqual(self.cfg.terrain.fuel_array_function.__doc__,
                          fn.__doc__,
                          msg='The docstring for the set terrain.fuel_array_function '

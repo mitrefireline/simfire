@@ -757,7 +757,7 @@ class OperationalFuelLayer(FuelLayer):
         self.tif_filenames = []
         self.fuel_model_filenames = []
         fuel_model = f'LF2020_FBFM{self.type}_200_CONUS'
-        fuel_data_fm = f'LC20_F{self.type}_200_projected.npy'
+        fuel_data_fm = f'LC20_F{self.type}_200_projected_no_whitespace.npy'
         fuel_data_rgb = f'LC20_F{self.type}_200_projected_rgb.npy'
         for _, ranges in self.lat_long_box.tiles.items():
             for range in ranges:
@@ -794,8 +794,8 @@ class FunctionalFuelLayer(FuelLayer):
         self.width = width
         self.fuel_fn = fuel_fn
 
+        self.data = self._make_data()
         self.texture = self._load_texture()
-        self.fuels = self._make_data()
         self.image = self._make_image()
 
     def _make_data(self) -> np.ndarray:
@@ -825,10 +825,10 @@ class FunctionalFuelLayer(FuelLayer):
         image = np.zeros((self.width, self.height) + (3, ))
 
         # Loop over the high-level tiles (these are not at the pixel level)
-        for i in range(self.data.shape[0]):
-            for j in range(self.data.shape[1]):
+        for i in range(self.height):
+            for j in range(self.width):
                 # Need these pixel level coordinates to span the correct range
-                updated_texture = self._update_texture_dryness(self.data[j][i][0])
+                updated_texture = self._update_texture_dryness(self.data[i][j][0])
                 image[i, j] = updated_texture
 
         return image

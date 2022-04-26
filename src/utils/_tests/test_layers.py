@@ -1,7 +1,13 @@
+import os
+import shutil
 import unittest
-from ..layers import FunctionalElevationLayer, LatLongBox, TopographyLayer
-from ..layers import FunctionalFuelLayer, OperationalFuelLayer
-from ...world.parameters import Fuel
+
+from ..layers import DataLayer, FunctionalTopographyLayer, LatLongBox, TopographyLayer
+from ..layers import FunctionalFuelLayer, OperationalFuelLayer, OperationalTopographyLayer
+from ...world.fuel_array_functions import chaparral_fn
+
+import matplotlib as mpl
+import numpy as np
 
 
 class TestLatLongBox(unittest.TestCase):
@@ -109,19 +115,65 @@ class TestLatLongBox(unittest.TestCase):
         center = (33.5, 116.8)
         height, width = 1600, 1600
         lat_long_box = LatLongBox(center, height, width, resolution)
-        topo_layer = TopographyLayer(lat_long_box)
-        lat_long_box._save_contour_map(topo_layer.data)
+        topo_layer = OperationalTopographyLayer(lat_long_box)
+        rmtree = False
+        if not os.path.isdir('images/'):
+            os.makedirs('images/')
+            rmtree = True
+        # Make sure that the function runs successfully
+        try:
+            lat_long_box._save_contour_map(topo_layer.data, 'topo')
+        except:  # noqa E722 (Ignore this since it's for a test)
+            if rmtree:
+                shutil.rmtree('images/')
+            self.fail('lat_long_box._save_contour_map() did not run successfully')
+        if rmtree:
+            shutil.rmtree('images/')
+
+
+class TestDataLayer(unittest.TestCase):
+    def setUp(self) -> None:
+        self.layer = DataLayer()
+        return super().setUp()
+
+    def test_data(self) -> None:
+        '''
+        Test that the data is set to None.
+        '''
+        self.assertIsNone(self.layer.data,
+                          msg='The initialized data should be None, '
+                          f'but is {self.layer.data}')
+
+
+class TestTopographyLayer(unittest.TestCase):
+    def setUp(self) -> None:
+        self.topo_layer = TopographyLayer()
+        return super().setUp()
+
+    def test__make_contours(self) -> None:
+        '''
+        Test that the contours are created correctly.
+        '''
+        # Set the data to something arbitrary
+        self.topo_layer.data = np.random.rand(10, 10)
+        contours = self.topo_layer._make_contours()
+        self.assertIsInstance(contours,
+                              mpl.contour.QuadContourSet,
+                              msg='The returned contours should be of type '
+                              'matplotlib.contour.QuadContourSet, but are of '
+                              f'type {type(contours)}')
 
 
 class TestOperationalTopographyLayer(unittest.TestCase):
     def setUp(self) -> None:
         '''
-
+        Each test requires a new layer, so nothing is done in setUp.
         '''
+        return super().setUp()
 
-    def test__make_contour_and_data(self) -> None:
+    def test__make_data(self) -> None:
         '''
-        Test that the call to _generate_contours() runs propoerly.
+        Test that the internal call to _make_data() runs properly.
         This method returns the data array containing the elevations within the
             specified bounding box region of the given latitudes and longitudes.
 
@@ -132,7 +184,7 @@ class TestOperationalTopographyLayer(unittest.TestCase):
         center = (33.4, 115.04)
         height, width = 3200, 3200
         lat_long_box = LatLongBox(center, height, width, resolution)
-        topographyGen = TopographyLayer(lat_long_box)
+        topographyGen = OperationalTopographyLayer(lat_long_box)
         self.assertEqual(topographyGen.data.shape[0], topographyGen.data.shape[1])
 
     def test__get_dems(self) -> None:
@@ -140,31 +192,30 @@ class TestOperationalTopographyLayer(unittest.TestCase):
         Test that the call to _get_dems() runs properly.
         This method will generate a list of the DEMs in the fireline /nfs/
         '''
-
         resolution = 30
         # Single Tile
         center = (35.2, 115.6)
         height, width = 1600, 1600
         lat_long_box = LatLongBox(center, height, width, resolution)
-        topographyGen = TopographyLayer(lat_long_box)
+        topographyGen = OperationalTopographyLayer(lat_long_box)
         self.assertEqual(1, len(topographyGen.tif_filenames))
 
         # 2 Tiles
         center = (38.4, 115.0)
         height, width = 1600, 1600
         lat_long_box = LatLongBox(center, height, width, resolution)
-        topographyGen = TopographyLayer(lat_long_box)
+        topographyGen = OperationalTopographyLayer(lat_long_box)
         self.assertEqual(2, len(topographyGen.tif_filenames))
 
         # 4 Tiles
         center = (34.001, 116.008)
         height, width = 3200, 3200
         lat_long_box = LatLongBox(center, height, width, resolution)
-        topographyGen = TopographyLayer(lat_long_box)
+        topographyGen = OperationalTopographyLayer(lat_long_box)
         self.assertEqual(4, len(topographyGen.tif_filenames))
 
 
-class TestFunctionalElevationLayer(unittest.TestCase):
+class TestFunctionalTopograpyLayer(unittest.TestCase):
     def setUp(self) -> None:
         # Create arbitrary function to test
         self.fn = lambda x, y: x + y
@@ -178,7 +229,7 @@ class TestFunctionalElevationLayer(unittest.TestCase):
         '''
         height = self.screen_size[0]
         width = self.screen_size[1]
-        layer = FunctionalElevationLayer(height, width, self.fn)
+        layer = FunctionalTopographyLayer(height, width, self.fn)
         correct_data_shape = self.screen_size + (1, )
         self.assertTupleEqual(correct_data_shape,
                               layer.data.shape,
@@ -186,15 +237,24 @@ class TestFunctionalElevationLayer(unittest.TestCase):
                               f'but should have shape {correct_data_shape}')
 
 
+class TestFuelLayer(unittest.TestCase):
+    def setUp(self) -> None:
+        return super().setUp()
+
+
 class TestOperationalFuelLayer(unittest.TestCase):
     def setUp(self) -> None:
         '''
-
+        Each test requires a new layer, so nothing is done in setUp.
         '''
 
     def test_make_data(self) -> None:
         '''
+        Test that the internal call to _make_data() runs properly.
+        This method returns the data array containing the elevations within the
+            specified bounding box region of the given latitudes and longitudes.
 
+        NOTE: This method should always return a square
         '''
         resolution = 30
         # 2 Tiles (easternly)
@@ -206,9 +266,9 @@ class TestOperationalFuelLayer(unittest.TestCase):
 
     def test_get_fuel_dems(self) -> None:
         '''
-
+        Test that the call to _get_dems() runs properly.
+        This method will generate a list of the DEMs in the fireline /nfs/
         '''
-
         resolution = 30
         # Single Tile
         center = (35.2, 115.6)
@@ -231,45 +291,56 @@ class TestOperationalFuelLayer(unittest.TestCase):
         FuelGen = OperationalFuelLayer(lat_long_box)
         self.assertEqual(4, len(FuelGen.tif_filenames))
 
-    def test_make_image(self) -> None:
+    def test_image(self) -> None:
         '''
+        Test that the internal call to _make_image() runs properly and
+        returns a numpy array.
+        '''
+        resolution = 30
+        # Single Tile
+        center = (35.2, 115.6)
+        height, width = 1600, 1600
+        lat_long_box = LatLongBox(center, height, width, resolution)
+        FuelGen = OperationalFuelLayer(lat_long_box)
 
-        '''
-        pass
+        self.assertIsInstance(FuelGen.image,
+                              np.ndarray,
+                              msg='The created image should be a numpy.ndarray, '
+                              f'but is of type {type(FuelGen.image)}')
 
 
 class TestFunctionalFuelLayer(unittest.TestCase):
     def setUp(self) -> None:
-        '''
-
-        '''
-        self.height = 1000
-        self.width = 1000
-        self.fuel_fn = Fuel
+        self.height = 32
+        self.width = 32
+        self.fuel_fn = chaparral_fn()
         self.FunctionalFuel = FunctionalFuelLayer(self.height, self.width, self.fuel_fn)
 
-    def test_make_data(self) -> None:
+    def test_data(self) -> None:
         '''
-
+        Test that the layer creates the data as a numpy array with the correct shape.
         '''
+        correct_data_shape = (self.height, self.width) + (1, )
+        data_shape = self.FunctionalFuel.data.shape
+        self.assertTupleEqual(data_shape,
+                              correct_data_shape,
+                              msg=f'The layer data has shape {data_shape}, '
+                              f'but should have shape {correct_data_shape}')
 
-    def test_make_image(self) -> None:
+    def test_image(self) -> None:
         '''
-
+        Test that the internal call to _make_iamge runs properly and returns
+        a numpy aray with the correct shape.
         '''
+        correct_data_shape = (self.height, self.width) + (3, )
+        image = self.FunctionalFuel.image
+        self.assertIsInstance(image,
+                              np.ndarray,
+                              msg='The created image should be a numpy.ndarray, '
+                              f'but is of type {type(image)}')
 
-        self.assertCountEqual(self.FunctionalFuel.image.shape,
-                              self.screen_size,
+        self.assertCountEqual(image.shape,
+                              correct_data_shape,
                               msg=('The terrain fuels have shape '
-                                   f'{self.terrain.fuels.shape}, but should have '
-                                   f'shape {self.screen_size}'))
-
-    def test_load_texture(self) -> None:
-        '''
-
-        '''
-
-    def test_update_texture_dryness(self) -> None:
-        '''
-
-        '''
+                                   f'{image.shape}, but should have '
+                                   f'shape {correct_data_shape}'))

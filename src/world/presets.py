@@ -16,7 +16,7 @@ from .parameters import Fuel
 
 ShortGrass = Fuel(w_0=0.0340, delta=1.000, M_x=0.1200, sigma=3500)
 
-GrassTimberShrubOverstory = Fuel(w_x=0.0918, delta=1.000, M_x=0.1500, sigma=2784)
+GrassTimberShrubOverstory = Fuel(w_0=0.0918, delta=1.000, M_x=0.1500, sigma=2784)
 
 TallGrass = Fuel(w_0=0.1377, delta=2.500, M_x=0.2500, sigma=1500)
 
@@ -38,7 +38,7 @@ LightLoggingSlash = Fuel(w_0=0.0688, delta=1.000, M_x=0.1500, sigma=1182)
 
 MediumLoggingSlash = Fuel(w_0=0.1836, delta=2.300, M_x=0.2000, sigma=1145)
 
-HeavyLoggingSlash = Fuel(w_x=0.3214, delta=3.000, M_x=0.2500, sigma=1159)
+HeavyLoggingSlash = Fuel(w_0=0.3214, delta=3.000, M_x=0.2500, sigma=1159)
 
 ShortSparseDryClimateGrass = Fuel(w_0=0.0046, delta=0.4000, M_x=0.1500, sigma=2054)
 

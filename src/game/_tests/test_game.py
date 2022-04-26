@@ -1,5 +1,4 @@
 import numpy as np
-import pygame
 
 import os
 import unittest
@@ -15,6 +14,9 @@ from ...utils.units import mph_to_ftpm
 from ..managers.fire import RothermelFireManager
 from ..managers.mitigation import FireLineManager
 from ...world.parameters import Environment, FuelParticle
+
+os.environ['SDL_VIDEODRIVER'] = 'dummy'
+import pygame  # noqa: E402
 
 
 @mock.patch.dict(os.environ, {'SDL_VIDEODRIVER': 'dummy'})

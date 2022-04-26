@@ -6,8 +6,6 @@ from src.utils.units import mph_to_ftpm
 
 from ..config import ConfigType, Config
 from ...world.wind_mechanics.wind_controller import WindController
-from ...world.fuel_array_functions import chaparral_fn
-from ...world.elevation_functions import PerlinNoise2D
 
 
 class ConfigTypeTest(unittest.TestCase):
@@ -85,21 +83,19 @@ class ConfigTest(unittest.TestCase):
         Test assigning elevation Python function based on a config string
         '''
         x, y = (5, 5)
-        pnoise = PerlinNoise2D(500, (9, 9), (1, 1), 1111)
-        pnoise.precompute()
         # This is the only way I could really come up with to make the correct function
         # was assigned - mdoyle
-        self.assertEqual(self.cfg.terrain.elevation_function.__doc__,
-                         pnoise.fn.__doc__,
-                         msg='The docstring for the set terrain.elevation_function '
-                         f'({self.cfg.terrain.elevation_function}) does not match the '
-                         'docstring for world.elevation_functions.PerlinNoise2D')
+        self.assertEqual(self.cfg.terrain.elevation_function.name,
+                         'perlin',
+                         msg='The name for the set config terrain.elevation_function '
+                         f'({self.cfg.terrain.elevation_function}) does not match '
+                         '"perlin"')
 
-        self.assertEqual(self.cfg_flat_simple.terrain.elevation_function(x, y),
+        self.assertEqual(self.cfg_flat_simple.terrain.elevation_function.data[y, x],
                          0,
                          msg='The output of the flat terrain function does not equal 0')
 
-        self.assertEqual(int(self.cfg_gaussian.terrain.elevation_function(x, y)),
+        self.assertEqual(int(self.cfg_gaussian.terrain.elevation_function.data[y, x]),
                          333,
                          msg=f'The output of the gaussian terrain function at ({x}, {y}) '
                          'does not equal 333')
@@ -108,14 +104,11 @@ class ConfigTest(unittest.TestCase):
         '''
         Test assigning fuel array Python function based on config string
         '''
-        fn = chaparral_fn(self.data['area']['pixel_scale'],
-                          self.data['area']['pixel_scale'],
-                          self.data['terrain']['chaparral']['seed'])
-        self.assertEqual(self.cfg.terrain.fuel_array_function.__doc__,
-                         fn.__doc__,
-                         msg='The docstring for the set terrain.fuel_array_function '
-                         f'({self.cfg.terrain.fuel_array_function}) does not match the '
-                         'docstring for world.fuel_array_functions.chaparral_fn.fn')
+        self.assertEqual(self.cfg.terrain.fuel_array_function.name,
+                         'chaparral',
+                         msg='The name for the set terrain.fuel_array_function '
+                         f'({self.cfg.terrain.fuel_array_function}) does not match '
+                         '"chaparral"')
 
     def test__set_wind_function(self) -> None:
         '''
@@ -170,9 +163,9 @@ class ConfigTest(unittest.TestCase):
         # test_config.yml has a seed of 1111
         seed = 1234
         x, y = (5, 5)
-        old_elevation = self.cfg.terrain.elevation_function(x, y)
+        old_elevation = self.cfg.terrain.elevation_function.data[y, x]
         self.cfg.reset_elevation_function(seed)
-        new_elevation = self.cfg.terrain.elevation_function(x, y)
+        new_elevation = self.cfg.terrain.elevation_function.data[y, x]
 
         # The seeds should be updated after calling the reset method
         self.assertEqual(seed,
@@ -195,9 +188,9 @@ class ConfigTest(unittest.TestCase):
         # test_config.yml has a seed of 1111
         seed = 1234
         x, y = (5, 5)
-        old_fuel = self.cfg.terrain.fuel_array_function(x, y)
+        old_fuel = self.cfg.terrain.fuel_array_function.data[y, x]
         self.cfg.reset_fuel_array_function(seed)
-        new_fuel = self.cfg.terrain.fuel_array_function(x, y)
+        new_fuel = self.cfg.terrain.fuel_array_function.data[y, x]
 
         # The seeds should be updated after calling the reset method
         self.assertEqual(seed,

@@ -182,7 +182,7 @@ class RothermelSimulation(Simulation):
         Return the action space for the Rothermel simulation.
 
         Returns:
-            The action / mitgiation strategies available: Dict[str, int]
+            The action / mitigation strategies available: Dict[str, int]
         '''
         return {
             'fireline': BurnStatus.FIRELINE,
@@ -301,11 +301,6 @@ class RothermelSimulation(Simulation):
                 (to compare for reward calculation)
 
         Arguments:
-            mitigation_state: Array of mitigation value(s) as BurnStatus values.
-
-            mitigation: Boolean for running the mitigation + fire spread which updates
-                        `FirelineManager` sprites points or just the fire spread.
-
             time: Either how many updates to run the simulation, based on the config
                   value, `config.simulation.update_rate`, or a length of time expressed
                   as a string (e.g. `120m`, `2h`, `2hour`, `2hours`, `1h 60m`, etc.)

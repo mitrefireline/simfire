@@ -7,7 +7,6 @@
 # import glob
 # import cv2
 
-
 # def read_csv(filename):
 #     with open(filename) as f:
 #         file_data = csv.reader(f)
@@ -16,7 +15,6 @@
 #         del d['Value']
 #         d.update((k, [float(vals) for vals in v]) for k, v in d.items())
 #         return d
-
 
 # def preprocess():
 #     '''
@@ -95,7 +93,6 @@
 #             plt.imsave(f'images/{tile[-7:]}.png', rgb_arr)
 #             plt.show()
 #             np.save(str(out_rgb_file), rgb_arr)
-
 
 # if __name__ == '__main__':
 #     preprocess()

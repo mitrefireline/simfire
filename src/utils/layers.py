@@ -2,6 +2,8 @@ import math
 from pathlib import Path
 from typing import Tuple, List, Dict
 
+from matplotlib.contour import QuadContourSet
+import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
 
@@ -461,6 +463,38 @@ class DataLayer():
 
 
 class TopographyLayer(DataLayer):
+    '''
+    Base class for use with operational and procedurally generated
+    topographic/elevation data. This class implements the code needed to
+    create the contour image to use with the display.
+    '''
+    def __init__(self) -> None:
+        '''
+        Simple call to the parent DataLayer class.
+
+        Arguments:
+            None
+
+        Returns:
+            None
+        '''
+        super().__init__()
+
+    def _make_contours(self) -> QuadContourSet:
+        '''
+        Use the data in self.data to compute the contour lines.
+
+        Arguments:
+            None
+
+        Returns:
+            contours: The matplotlib contour set used for plotting
+        '''
+        contours = plt.contour(self.data, origin='upper')
+        return contours
+
+
+class OperationalTopographyLayer(TopographyLayer):
     def __init__(self, lat_long_box: LatLongBox) -> None:
         '''
         Initialize the elevation layer by retrieving the correct topograpchic data
@@ -473,14 +507,16 @@ class TopographyLayer(DataLayer):
             resolution: The resolution to get data
 
         '''
+        super().__init__()
         self.lat_long_box = lat_long_box
         self.path = Path('/nfs/lslab2/fireline/data/topographic/')
         res = str(self.lat_long_box.resolution) + 'm'
         self.datapath = self.path / res
 
-        self.data = self._make_contour_and_data()
+        self.data = self._make_data()
+        self.contours = self._make_contours()
 
-    def _make_contour_and_data(self) -> np.ndarray:
+    def _make_data(self) -> np.ndarray:
         self._get_dems()
         data = Image.open(self.tif_filenames[0])
         data = np.asarray(data)
@@ -545,6 +581,49 @@ class TopographyLayer(DataLayer):
                 tif_data_region = Path(f'n{five_deg_n}w{five_deg_w}.tif')
                 tif_file = self.datapath / tif_data_region
                 self.tif_filenames.append(tif_file)
+
+
+class FunctionalElevationLayer(TopographyLayer):
+    '''
+    Layer that stores elevation data computed from a function.
+    '''
+    def __init__(self, height, width, elevation_fn: ElevationFn) -> None:
+        '''
+        Initialize the elvation layer by computing the elevations and contours.
+
+        Arguments:
+            height: The height of the data layer
+            width: The width of the data layer
+            elevation_fn: A callable function that converts (x, y) coorindates to
+                          elevations.
+        '''
+        super().__init__()
+        self.height = height
+        self.width = width
+        self.elevation_fn = elevation_fn
+
+        self.data = self._make_data()
+        self.contours = self._make_contours()
+
+    def _make_data(self) -> np.ndarray:
+        '''
+        Use self.elevation_fn to make the elevation data layer.
+
+        Arguments:
+            None
+
+        Returns:
+            A numpy array containing the elevation data
+        '''
+        x = np.arange(self.width)
+        y = np.arange(self.height)
+        X, Y = np.meshgrid(x, y)
+        elevation_fn_vect = np.vectorize(self.elevation_fn)
+        elevations = elevation_fn_vect(X, Y)
+        # Expand third dimension to align with data layers
+        elevations = np.expand_dims(elevations, axis=-1)
+
+        return elevations
 
 
 class FuelLayer(DataLayer):
@@ -713,42 +792,4 @@ class TransportationLayer(DataLayer):
         return self.data_array
 
 
-class FunctionalElevationLayer(DataLayer):
-    '''
-    Layer that stores elevation data computed from a function.
-    '''
-    def __init__(self, height, width, elevation_fn: ElevationFn) -> None:
-        '''
-        Initialize the elvation layer by computing the elevations and contours.
 
-        Arguments:
-            height: The height of the data layer
-            width: The width of the data layer
-            elevation_fn: A callable function that converts (x, y) coorindates to
-                          elevations.
-        '''
-        super().__init__()
-        self.height = height
-        self.width = width
-        self.elevation_fn = elevation_fn
-        self.data = self._make_data()
-
-    def _make_data(self) -> np.ndarray:
-        '''
-        Use self.elevation_fn to make the elevation data layer.
-
-        Arguments:
-            None
-
-        Returns:
-            A numpy array containing the elevation data
-        '''
-        x = np.arange(self.width)
-        y = np.arange(self.height)
-        X, Y = np.meshgrid(x, y)
-        elevation_fn_vect = np.vectorize(self.elevation_fn)
-        elevations = elevation_fn_vect(X, Y)
-        # Expand third dimension to align with data layers
-        elevations = np.expand_dims(elevations, axis=-1)
-
-        return elevations

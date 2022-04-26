@@ -1,7 +1,5 @@
-import tempfile
 from typing import Tuple
 
-import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
 import pygame
@@ -123,33 +121,6 @@ class Terrain(pygame.sprite.Sprite):
         out_surf = pygame.surfarray.make_surface(cont_image.swapaxes(0, 1))
 
         return out_surf
-
-    def _make_contour_image(self, image: np.ndarray) -> np.ndarray:
-        '''
-        Use the image and TopographyLayer to create the elevations array and
-        compute the contours. The contours are computed with plt.contours, and the contour
-        lines are drawn by converting image to a PIL.Image.Image and using the ImageDraw
-        module.
-
-        Arguments:
-            image: A numpy array representing the np.float RGB terrain image for display
-
-        Returns:
-            out_image: The input image with the contour lines drawn on it
-        '''
-        # Create a figure with axes
-        fig, ax = plt.subplots()
-        ax.imshow(image.astype(np.uint8))
-        CS = ax.contour(self.elevations, origin='upper')
-        ax.clabel(CS, CS.levels, inline=True, fmt=lambda x: f'{x:.0f}')
-        plt.axis('off')
-        with tempfile.NamedTemporaryFile(suffix='.png') as out_img_path:
-            fig.savefig(out_img_path.name, bbox_inches='tight', pad_inches=0)
-            out_img = Image.open(out_img_path.name).resize(image.shape[:2])
-            # Slice the alpha channel off
-            out_img = np.array(out_img)[..., :3]
-        plt.close(fig)
-        return out_img
 
     def _update_texture_dryness(self, fuel: Fuel) -> np.ndarray:
         '''

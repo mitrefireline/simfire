@@ -8,7 +8,7 @@ from ...world.parameters import Fuel
 
 class TerrainTest(unittest.TestCase):
     def setUp(self) -> None:
-        self.config = Config('./config.yml')
+        self.config = Config('configs/functional_config.yml')
         self.length = 3
 
     def test_chaparral(self) -> None:

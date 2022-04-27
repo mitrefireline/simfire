@@ -14,7 +14,7 @@ from ..fire import ConstantSpreadFireManager, FireManager, RothermelFireManager
 
 class TestFireManager(unittest.TestCase):
     def setUp(self) -> None:
-        self.config = Config('./config.yml')
+        self.config = Config('configs/functional_config.yml')
         self.init_pos = (self.config.area.screen_size // 2,
                          self.config.area.screen_size // 2)
         self.fire_size = self.config.display.fire_size
@@ -121,7 +121,7 @@ class TestFireManager(unittest.TestCase):
 
 class TestRothermelFireManager(unittest.TestCase):
     def setUp(self) -> None:
-        self.config = Config('./config.yml')
+        self.config = Config('configs/functional_config.yml')
         self.screen_size = (32, 32)
         fuel_particle = FuelParticle()
         topo_layer = DummyTopographyLayer(self.screen_size)
@@ -209,7 +209,7 @@ class TestRothermelFireManager(unittest.TestCase):
 
 class TestConstantSpreadFireManager(unittest.TestCase):
     def setUp(self) -> None:
-        self.config = Config('./config.yml')
+        self.config = Config('configs/functional_config.yml')
         self.init_pos = (self.config.area.screen_size // 5,
                          self.config.area.screen_size // 7)
         self.fire_size = self.config.display.fire_size

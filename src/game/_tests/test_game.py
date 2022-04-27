@@ -20,7 +20,7 @@ from ...world.parameters import Environment, FuelParticle
 @mock.patch.dict(os.environ, {'SDL_VIDEODRIVER': 'dummy'})
 class TestGame(unittest.TestCase):
     def setUp(self) -> None:
-        self.config = Config('./config.yml')
+        self.config = Config('configs/functional_config.yml')
         self.screen_size = (32, 32)
         self.game = Game(self.screen_size)
 
@@ -215,7 +215,7 @@ class TestGame(unittest.TestCase):
 @mock.patch.dict(os.environ, {'SDL_VIDEODRIVER': 'dummy'})
 class TestHeadlessGame(unittest.TestCase):
     def setUp(self) -> None:
-        self.config = Config('./config.yml')
+        self.config = Config('configs/functional_config.yml')
         self.screen_size = (32, 32)
         self.headless = True
         self.game = Game(self.screen_size, headless=self.headless)
@@ -266,7 +266,7 @@ class TestHeadlessGame(unittest.TestCase):
 @mock.patch.dict(os.environ, {'SDL_VIDEODRIVER': 'dummy'})
 class TestMultiprocessGame(unittest.TestCase):
     def setUp(self) -> None:
-        self.config = Config('./config.yml')
+        self.config = Config('configs/functional_config.yml')
         self.screen_size = (32, 32)
         self.headless = True
         self.game = Game(self.screen_size, headless=self.headless)

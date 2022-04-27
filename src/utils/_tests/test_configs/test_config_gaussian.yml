@@ -18,6 +18,7 @@ mitigation:
   ros_attenuation: true
 
 terrain:
+  terrain: functional
   elevation_function: gaussian
   perlin:
     amplitude: 500
@@ -30,9 +31,12 @@ terrain:
     mu_y: 50
     sigma_x: 50
     sigma_y: 50
-  fuel_array_function: blah
+
+fuel:
+  fuel: functional
+  fuel_array_function: chaparral
   chaparral:
-    seed: 1111
+    seed: 1113
 
 fire:
   fire_initial_position: (5, 3)
@@ -42,7 +46,7 @@ environment:
   moisture: 0.03
 
 wind:
-  wind_function: blah
+  wind_function: perlin
   simple:
     speed: 7
     direction: 90.0

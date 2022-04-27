@@ -52,3 +52,24 @@ def chaparral(seed: int = None) -> Fuel:
     '''
     w_0 = w_0_seed(seed)
     return Fuel(w_0=w_0, delta=6.000, M_x=0.2000, sigma=1739)
+
+
+def fuel(seed: int = None) -> Tuple[float, float]:
+    '''
+    Functionailty to use a random seed to define a center point.
+    To be used with operational data layers
+
+    Predefine CA latitude / longitude bounds (N, W, S, E)
+
+    '''
+
+    north = 41.81527476
+    south = 32.85980972
+    east = 113.8035177
+    west = 125.0133402
+
+    np.random.seed(seed)
+    longitude = np.random.uniform(east, west)
+    latitude = np.random.uniform(south, north)
+
+    return (latitude, longitude)

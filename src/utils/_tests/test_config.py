@@ -89,17 +89,19 @@ class ConfigTest(unittest.TestCase):
         pnoise.precompute()
         # This is the only way I could really come up with to make the correct function
         # was assigned - mdoyle
-        self.assertEqual(self.cfg.terrain.elevation_function.__doc__,
+        self.assertEqual(self.cfg.terrain.elevation_function.elevation_fn.__doc__,
                          pnoise.fn.__doc__,
                          msg='The docstring for the set terrain.elevation_function '
                          f'({self.cfg.terrain.elevation_function}) does not match the '
                          'docstring for world.elevation_functions.PerlinNoise2D')
 
-        self.assertEqual(self.cfg_flat_simple.terrain.elevation_function(x, y),
+        elevation_val = self.cfg_flat_simple.terrain.elevation_function.elevation_fn(x, y)
+        self.assertEqual(elevation_val,
                          0,
                          msg='The output of the flat terrain function does not equal 0')
 
-        self.assertEqual(int(self.cfg_gaussian.terrain.elevation_function(x, y)),
+        elevation_val = self.cfg_gaussian.terrain.elevation_function.elevation_fn(x, y)
+        self.assertEqual(int(elevation_val),
                          333,
                          msg=f'The output of the gaussian terrain function at ({x}, {y}) '
                          'does not equal 333')
@@ -108,14 +110,13 @@ class ConfigTest(unittest.TestCase):
         '''
         Test assigning fuel array Python function based on config string
         '''
-        fn = chaparral_fn(self.data['area']['pixel_scale'],
-                          self.data['area']['pixel_scale'],
-                          self.data['terrain']['chaparral']['seed'])
-        self.assertEqual(self.cfg.terrain.fuel_array_function.__doc__,
-                         fn.__doc__,
-                         msg='The docstring for the set terrain.fuel_array_function '
-                         f'({self.cfg.terrain.fuel_array_function}) does not match the '
-                         'docstring for world.fuel_array_functions.chaparral_fn.fn')
+        fn = chaparral_fn(self.data['fuel']['chaparral']['seed'])
+        self.assertEqual(
+            self.cfg.fuel.fuel_array_function.fuel_fn.__doc__,
+            fn.__doc__,
+            msg='The docstring for the set terrain.fuel_array_function '
+            f'({self.cfg.fuel.fuel_array_function.fuel_fn}) does not match the '
+            'docstring for world.fuel_array_functions.chaparral_fn.fn')
 
     def test__set_wind_function(self) -> None:
         '''
@@ -170,9 +171,9 @@ class ConfigTest(unittest.TestCase):
         # test_config.yml has a seed of 1111
         seed = 1234
         x, y = (5, 5)
-        old_elevation = self.cfg.terrain.elevation_function(x, y)
+        old_elevation = self.cfg.terrain.elevation_function.elevation_fn(x, y)
         self.cfg.reset_elevation_function(seed)
-        new_elevation = self.cfg.terrain.elevation_function(x, y)
+        new_elevation = self.cfg.terrain.elevation_function.elevation_fn(x, y)
 
         # The seeds should be updated after calling the reset method
         self.assertEqual(seed,
@@ -195,14 +196,14 @@ class ConfigTest(unittest.TestCase):
         # test_config.yml has a seed of 1111
         seed = 1234
         x, y = (5, 5)
-        old_fuel = self.cfg.terrain.fuel_array_function(x, y)
+        old_fuel = self.cfg.fuel.fuel_array_function.fuel_fn(x, y)
         self.cfg.reset_fuel_array_function(seed)
-        new_fuel = self.cfg.terrain.fuel_array_function(x, y)
+        new_fuel = self.cfg.fuel.fuel_array_function.fuel_fn(x, y)
 
         # The seeds should be updated after calling the reset method
         self.assertEqual(seed,
-                         self.cfg.terrain.chaparral.seed,
-                         msg=f'The assigned seed of {self.cfg.terrain.chaparral.seed} '
+                         self.cfg.fuel.chaparral.seed,
+                         msg=f'The assigned seed of {self.cfg.fuel.chaparral.seed} '
                          f'does not match the test seed of {seed}')
 
         # The fuel should be different at the same location now that the seed has changed

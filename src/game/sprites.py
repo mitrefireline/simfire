@@ -1,10 +1,8 @@
-import io
 import tempfile
 from typing import Tuple
 
 import matplotlib.pyplot as plt
 import numpy as np
-from PIL import Image
 import pygame
 from reportlab.graphics import renderPM
 from svglib.svglib import svg2rlg
@@ -101,9 +99,13 @@ class Terrain(pygame.sprite.Sprite):
         # The fmt argument will display the levels as whole numbers (otherwise
         # the decimal points look messy)
         contours = ax.contour(self.topo_layer.data.squeeze(),
-                              origin='upper', colors='black')
-        ax.clabel(contours, contours.levels, inline=True,
-                  fmt=lambda x: f'{x:.0f}', fontsize='large')
+                              origin='upper',
+                              colors='black')
+        ax.clabel(contours,
+                  contours.levels,
+                  inline=True,
+                  fmt=lambda x: f'{x:.0f}',
+                  fontsize='large')
         ax.imshow(image.astype(np.uint8))
         plt.axis('off')
 

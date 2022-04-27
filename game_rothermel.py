@@ -19,7 +19,7 @@ def main():
     Create the Game, Terrain, and Environment
     Create the Managers
     '''
-    cfg_path = Path('./config.yml')
+    cfg_path = Path('./operational_config.yml')
     cfg = Config(cfg_path)
 
     fuel_particle = FuelParticle()

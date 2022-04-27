@@ -202,6 +202,10 @@ class TestRothermelFireManager(unittest.TestCase):
                                    'but that location is not valid for initital '
                                    f'location ({x}, {y}) and new locations {new_locs}'))
 
+        # Output the draw graph for QA
+        fig = self.fire_manager.draw_spread_graph()
+        fig.savefig('./assets/fire_spread_graph.png')
+
 
 class TestConstantSpreadFireManager(unittest.TestCase):
     def setUp(self) -> None:

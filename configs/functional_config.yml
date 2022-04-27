@@ -47,7 +47,7 @@ fuel:
     seed: 1113
 
 fire:
-  fire_initial_position: (65, 65)
+  fire_initial_position: (16, 16)
   max_fire_duration: 4
 
 environment:

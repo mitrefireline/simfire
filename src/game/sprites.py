@@ -30,7 +30,7 @@ class Terrain(pygame.sprite.Sprite):
         Arguments:
             fuel_layer: A FuelLayer containing a `data` parameter that is a numpy array
                         containing a Fuel objects
-            topo_layer: A TopographyLayer that desctibes the topography (elevation) of the
+            topo_layer: A TopographyLayer that describes the topography (elevation) of the
                         terrain as a numpy array in it `data` parameter
             screen_size: The game's screen size in pixels
             headless: Flag to run in a headless state. This will allow PyGame objects to

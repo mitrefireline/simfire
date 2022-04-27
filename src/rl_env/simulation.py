@@ -511,7 +511,7 @@ class RothermelSimulation(Simulation):
         Returns:
             The seed for the currently configured elevation function.
         '''
-        if 'perlin' in str(self.config.terrain.elevation_function).lower():
+        if 'perlin' in str(self.config.data['terrain']['elevation_function']).lower():
             return self.config.terrain.perlin.seed
         else:
             return None

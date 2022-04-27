@@ -135,9 +135,9 @@ class Config:
         calling this, it becomes an actual function with all of the precompute values
         from the config passed in.
         '''
-        if 'functional' in str(self.terrain.terrain).lower():
+        if 'functional' in str(self.data['terrain']['terrain']).lower():
             # Now we can set the function again
-            if 'perlin' in str(self.terrain.elevation_function).lower():
+            if 'perlin' in str(self.data['terrain']['elevation_function']).lower():
                 # Reset the value, if we are resetting the function
                 self.terrain.elevation_function = 'perlin'
                 args = self.terrain.perlin
@@ -148,7 +148,7 @@ class Config:
                                                             self.area.screen_size,
                                                             noise.fn)
                 setattr(self.terrain, 'elevation_function', elevation_layer)
-            elif 'gaussian' in str(self.terrain.elevation_function).lower():
+            elif 'gaussian' in str(self.data['terrain']['elevation_function']).lower():
                 # Reset the value, if we are resetting the function
                 self.terrain.elevation_function = 'gaussian'
                 args = self.terrain.gaussian
@@ -157,7 +157,7 @@ class Config:
                 elevation_layer = FunctionalTopographyLayer(self.area.screen_size,
                                                             self.area.screen_size, noise)
                 setattr(self.terrain, 'elevation_function', elevation_layer)
-            elif 'flat' in str(self.terrain.elevation_function).lower():
+            elif 'flat' in str(self.data['terrain']['elevation_function']).lower():
                 # Reset the value, if we are resetting the function
                 self.terrain.elevation_function = 'flat'
                 elevation_layer = FunctionalTopographyLayer(self.area.screen_size,
@@ -182,9 +182,9 @@ class Config:
         calling this, it becomes an actual function with all of the precompute values
         from the config passed in.
         '''
-        if 'functional' in str(self.fuel.fuel).lower():
+        if 'functional' in str(self.data['fuel']['fuel']).lower():
             # Now we can set the function again
-            if 'chaparral' in str(self.fuel.fuel_array_function).lower():
+            if 'chaparral' in str(self.data['fuel']['fuel_array_function']).lower():
                 self.fuel.fuel_array_function = 'chaparral'
                 args = self.fuel.chaparral
                 fn = chaparral_fn(args.seed)
@@ -327,10 +327,10 @@ class Config:
             seed: The input used in generating the random fuel array function.
         '''
         # Set the seed class attribute so that the function uses it correctly
-        self.terrain.chaparral.seed = seed
+        self.fuel.chaparral.seed = seed
         # Set the seed dictionary value so that if the config is later saved, it is
         # reflected in the saved config.yml
-        self.data['terrain']['chaparral']['seed'] = seed
+        self.data['fuel']['chaparral']['seed'] = seed
         self._set_fuel_array_function()
 
     def reset_wind_function(self,

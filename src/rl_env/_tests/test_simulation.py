@@ -34,10 +34,6 @@ class RothermelSimulationTest(unittest.TestCase):
                                                   self.config.wind.speed,
                                                   self.config.wind.direction)
         self.simulation.fuel_particle = FuelParticle()
-        self.simulation.fuel_arrs = [[
-            self.config.terrain.fuel_array_function(x, y)
-            for x in range(self.config.area.terrain_size)
-        ] for y in range(self.config.area.terrain_size)]
 
         # initialize all mitigation strategies
         self.simulation.fireline_manager = FireLineManager(
@@ -335,10 +331,11 @@ class RothermelSimulationTest(unittest.TestCase):
         self.simulation.set_seeds(seeds)
         returned_seeds = self.simulation.get_seeds()
 
-        self.assertEqual(seeds,
-                         returned_seeds,
-                         msg=f'The input seeds ({seeds}) do not match the returned seeds '
-                         f'({returned_seeds})')
+        self.assertDictEqual(
+            seeds,
+            returned_seeds,
+            msg=f'The input seeds ({seeds}) do not match the returned seeds '
+            f'({returned_seeds})')
 
         # Only set wind_speed and not wind_direction
         seed = 2345
@@ -349,10 +346,11 @@ class RothermelSimulationTest(unittest.TestCase):
         # Put the previous value for wind_direction into the dictionary so we can check
         # to make sure it wasn't changed
         seeds['wind_direction'] = 1234
-        self.assertEqual(seeds,
-                         returned_seeds,
-                         msg=f'The input seeds ({seeds}) do not match the returned seeds '
-                         f'({returned_seeds})')
+        self.assertDictEqual(
+            seeds,
+            returned_seeds,
+            msg=f'The input seeds ({seeds}) do not match the returned seeds '
+            f'({returned_seeds})')
 
         # Only set wind_direction and not wind_speed
         seed = 3456
@@ -365,10 +363,11 @@ class RothermelSimulationTest(unittest.TestCase):
         seeds['elevation'] = 2345
         seeds['fuel'] = 2345
         seeds['wind_speed'] = 2345
-        self.assertEqual(seeds,
-                         returned_seeds,
-                         msg=f'The input seeds ({seeds}) do not match the returned seeds '
-                         f'({returned_seeds})')
+        self.assertDictEqual(
+            seeds,
+            returned_seeds,
+            msg=f'The input seeds ({seeds}) do not match the returned seeds '
+            f'({returned_seeds})')
 
         # Give no valid keys to hit the log warning
         seeds = {'not_valid': 1111}

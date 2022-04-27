@@ -100,8 +100,10 @@ class Terrain(pygame.sprite.Sprite):
         fig, ax = plt.subplots()
         # The fmt argument will display the levels as whole numbers (otherwise
         # the decimal points look messy)
-        contours = ax.contour(self.topo_layer.data.squeeze(), origin='upper')
-        ax.clabel(contours, contours.levels, inline=True, fmt=lambda x: f'{x:.0f}')
+        contours = ax.contour(self.topo_layer.data.squeeze(),
+                              origin='upper', colors='black')
+        ax.clabel(contours, contours.levels, inline=True,
+                  fmt=lambda x: f'{x:.0f}', fontsize='large')
         ax.imshow(image.astype(np.uint8))
         plt.axis('off')
 
@@ -110,10 +112,15 @@ class Terrain(pygame.sprite.Sprite):
         # Then load it, resize, and convert to numpy
         with tempfile.NamedTemporaryFile(suffix='.svg') as out_img_path:
             fig.savefig(out_img_path.name, bbox_inches='tight', pad_inches=0)
-            bytes_data = io.BytesIO()
             drawing = svg2rlg(out_img_path.name)
-            renderPM.drawToFile(drawing, bytes_data, fmt='PNG')
-            out_img_pil = Image.open(bytes_data).resize(image.shape[:2])
+            # Resize the SVG drawing
+            scale_x = image.shape[1] / drawing.width
+            scale_y = image.shape[0] / drawing.height
+            drawing.width = drawing.width * scale_x
+            drawing.height = drawing.height * scale_y
+            drawing.scale(scale_x, scale_y)
+            # Convert to Pillow
+            out_img_pil = renderPM.drawToPIL(drawing)
         plt.close(fig)
         # Slice the alpha channel off
         out_img = np.array(out_img_pil)[..., :3]

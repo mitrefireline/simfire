@@ -526,8 +526,8 @@ class RothermelSimulation(Simulation):
         Returns:
             The seed for the currently configured fuel array function.
         '''
-        if 'chaparral' in str(self.config.terrain.fuel_array_function).lower():
-            return self.config.terrain.chaparral.seed
+        if 'chaparral' in str(self.config.data['fuel']['fuel_array_function']).lower():
+            return self.config.fuel.chaparral.seed
         else:
             return None
 

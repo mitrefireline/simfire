@@ -298,7 +298,7 @@ class RothermelSimulationTest(unittest.TestCase):
             if key == 'elevation':
                 self.assertEqual(seed, self.config.terrain.perlin.seed, msg=msg)
             if key == 'fuel':
-                self.assertEqual(seed, self.config.terrain.chaparral.seed, msg=msg)
+                self.assertEqual(seed, self.config.fuel.chaparral.seed, msg=msg)
             if key == 'wind_speed':
                 self.assertEqual(seed, self.config.wind.perlin.speed.seed, msg=msg)
             if key == 'wind_direction':
@@ -314,7 +314,7 @@ class RothermelSimulationTest(unittest.TestCase):
                    '{self.config.path}')
             if key == 'fuel':
                 self.assertEqual(seed,
-                                 self.config_flat_simple.terrain.chaparral.seed,
+                                 self.config_flat_simple.fuel.chaparral.seed,
                                  msg=msg)
 
     def test_set_seeds(self) -> None:

@@ -116,12 +116,8 @@ class RothermelSimulation(Simulation):
         Initialize the terrain.
         '''
         self.fuel_particle = FuelParticle()
-        self.fuel_arrs = [[
-            self.config.terrain.fuel_array_function(x, y)
-            for x in range(self.config.area.terrain_size)
-        ] for y in range(self.config.area.terrain_size)]
         self.terrain = Terrain(
-            self.fuel_arrs,
+            self.config.fuel.fuel_array_function,
             self.config.terrain.elevation_function,
             (self.config.area.screen_size, self.config.area.screen_size),
             headless=self.config.simulation.headless)

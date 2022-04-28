@@ -103,12 +103,20 @@ class RothermelSimulationTest(unittest.TestCase):
         simulation_actions = self.simulation.get_actions()
         self.assertIsInstance(simulation_actions, Dict)
 
-    def test_get_attributes(self) -> None:
+    def test_get_attribute_bounds(self) -> None:
         '''
         Test that the call to get_actions() runs properly and returns all Rothermel
         features (Fire, Wind, FireLine, Terrain).
         '''
-        simulation_attributes = self.simulation.get_attributes()
+        simulation_attributes = self.simulation.get_attribute_bounds()
+        self.assertIsInstance(simulation_attributes, Dict)
+
+    def test_get_attribute_data(self) -> None:
+        '''
+        Test that the call to get_actions() runs properly and returns all Rothermel
+        features (Fire, Wind, FireLine, Terrain).
+        '''
+        simulation_attributes = self.simulation.get_attribute_data()
         self.assertIsInstance(simulation_attributes, Dict)
 
     def test__update_sprite_points(self) -> None:
@@ -199,8 +207,8 @@ class RothermelSimulationTest(unittest.TestCase):
         self.assertEqual(self.simulation_flat.elapsed_time,
                          self.config.simulation.update_rate,
                          msg=f'Only {self.config.simulation.update_rate}m should  '
-                             f'passed, but {self.simulation_flat.elapsed_time}m has '
-                             'passed.')
+                         f'passed, but {self.simulation_flat.elapsed_time}m has '
+                         'passed.')
 
     def test__render_inline(self) -> None:
         '''

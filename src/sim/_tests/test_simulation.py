@@ -7,7 +7,7 @@ from pathlib import Path
 from ...enums import BurnStatus
 from ...game.sprites import Terrain
 from ...utils.config import Config
-from ...rl_env.simulation import RothermelSimulation
+from ...sim.simulation import RothermelSimulation
 
 
 class RothermelSimulationTest(unittest.TestCase):

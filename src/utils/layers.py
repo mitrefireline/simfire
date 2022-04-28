@@ -1,12 +1,17 @@
 import math
 from pathlib import Path
-from typing import Callable, Tuple, List, Dict
+from typing import Tuple, List, Dict
 
+from matplotlib.contour import QuadContourSet
+import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
 
+from ..enums import (DRY_TERRAIN_BROWN_IMG, TERRAIN_TEXTURE_PATH, FuelModelToFuel)
+
 from ..world.elevation_functions import ElevationFn
-from ..world.presets import Chaparral
+from ..world.fuel_array_functions import FuelArrayFn
+from ..world.parameters import Fuel
 
 
 # Developing a function to round to a multiple
@@ -402,7 +407,7 @@ class LatLongBox():
 
         self._generate_lat_long(self.corners)
 
-    def _save_contour_map(self, data_array: np.ndarray) -> None:
+    def _save_contour_map(self, data_array: np.ndarray, type: str) -> None:
         '''
         Helper function to generate a contour map of the region
         specified or of the DEM file and save as `<lat_long>.png`
@@ -421,13 +426,16 @@ class LatLongBox():
 
         fig = plt.figure(figsize=(12, 8))
         fig.add_subplot(111)
-        plt.contour(data_array, cmap='viridis')
+        if type == 'topo':
+            plt.contour(data_array, cmap='viridis')
+        else:
+            plt.imshow(data_array)
         plt.axis('off')
         plt.title(f'Center: N{self.center[0]}W{self.center[1]}')
         # cbar = plt.colorbar()
         plt.gca().set_aspect('equal', adjustable='box')
 
-        plt.savefig(f'img_n{self.BL[0]}_w{self.BL[1]}_n{self.TR[0]}_w{self.TR[1]}.png')
+        plt.savefig(f'{type}_n{self.BL[0]}_w{self.BL[1]}_n{self.TR[0]}_w{self.TR[1]}.png')
 
 
 class DataLayer():
@@ -443,6 +451,39 @@ class DataLayer():
 
 
 class TopographyLayer(DataLayer):
+    '''
+    Base class for use with operational and procedurally generated
+    topographic/elevation data. This class implements the code needed to
+    create the contour image to use with the display.
+    '''
+    def __init__(self) -> None:
+        '''
+        Simple call to the parent DataLayer class.
+
+        Arguments:
+            None
+
+        Returns:
+            None
+        '''
+        super().__init__()
+
+    def _make_contours(self) -> QuadContourSet:
+        '''
+        Use the data in self.data to compute the contour lines.
+
+        Arguments:
+            None
+
+        Returns:
+            contours: The matplotlib contour set used for plotting
+        '''
+        contours = plt.contour(self.data.squeeze(), origin='upper')
+        plt.close()
+        return contours
+
+
+class OperationalTopographyLayer(TopographyLayer):
     def __init__(self, lat_long_box: LatLongBox) -> None:
         '''
         Initialize the elevation layer by retrieving the correct topograpchic data
@@ -455,19 +496,16 @@ class TopographyLayer(DataLayer):
             resolution: The resolution to get data
 
         '''
+        super().__init__()
         self.lat_long_box = lat_long_box
         self.path = Path('/nfs/lslab2/fireline/data/topographic/')
         res = str(self.lat_long_box.resolution) + 'm'
         self.datapath = self.path / res
 
-        self.data = self._make_contour_and_data()
+        self.data = self._make_data()
+        self.contours = self._make_contours()
 
-    def _make_contour_and_data(self) -> np.ndarray:
-        '''Make the contour map and the data array
-
-        Returns:
-            The data array.
-        '''
+    def _make_data(self) -> np.ndarray:
         self._get_dems()
         data = Image.open(self.tif_filenames[0])
         data = np.asarray(data)
@@ -526,8 +564,84 @@ class TopographyLayer(DataLayer):
                 self.tif_filenames.append(tif_file)
 
 
+class FunctionalTopographyLayer(TopographyLayer):
+    '''
+    Layer that stores elevation data computed from a function.
+    '''
+    def __init__(self, height, width, elevation_fn: ElevationFn, name: str) -> None:
+        '''
+        Initialize the elvation layer by computing the elevations and contours.
+
+        Arguments:
+            height: The height of the data layer
+            width: The width of the data layer
+            elevation_fn: A callable function that converts (x, y) coorindates to
+                          elevations.
+        '''
+        super().__init__()
+        self.height = height
+        self.width = width
+        self.elevation_fn = elevation_fn
+        self.name = name
+
+        self.data = self._make_data()
+        self.contours = self._make_contours()
+
+    def _make_data(self) -> np.ndarray:
+        '''
+        Use self.elevation_fn to make the elevation data layer.
+
+        Arguments:
+            None
+
+        Returns:
+            A numpy array containing the elevation data
+        '''
+        x = np.arange(self.width)
+        y = np.arange(self.height)
+        X, Y = np.meshgrid(x, y)
+        elevation_fn_vect = np.vectorize(self.elevation_fn)
+        elevations = elevation_fn_vect(X, Y)
+        # Expand third dimension to align with data layers
+        elevations = np.expand_dims(elevations, axis=-1)
+
+        return elevations
+
+
 class FuelLayer(DataLayer):
-    def __init__(self, lat_long_box: LatLongBox) -> None:
+    '''
+    Base class for use with operational and procedurally generated
+    fuel data. This class implements the code needed to
+    create the terrain image to use with the display.
+    '''
+    def __init__(self) -> None:
+        '''
+        Simple call to the parent DataLayer class.
+
+        Arguments:
+            None
+
+        Returns:
+            None
+        '''
+        super().__init__()
+
+    def _make_image(self) -> np.ndarray:
+        '''
+        Base method to make the terrain background image.
+
+        Arguments:
+            None
+
+        Returns:
+            A numpy array of the terrain representing an RGB image
+
+        '''
+        pass
+
+
+class OperationalFuelLayer(FuelLayer):
+    def __init__(self, lat_long_box: LatLongBox, type: str = '13') -> None:
         '''
         Initialize the elevation layer by retrieving the correct topograpchic data
         and computing the area.
@@ -537,18 +651,34 @@ class FuelLayer(DataLayer):
             height: The height of the screen size
             width: The width of the screen size
             resolution: The resolution to get data
+            type: The type of data you wnt to load: 'display' or 'simulation'
+                  display: rgb data for rothermel
+                  simulation: fuel model values for RL Harness/Simulation
         '''
         self.lat_long_box = lat_long_box
+        self.type = type
         # Temporary until we get real fuel data
-        self.path = Path('/nfs/lslab2/fireline/data/topographic/')
+        self.path = Path('/nfs/lslab2/fireline/data/fuel/')
         res = str(self.lat_long_box.resolution) + 'm'
+
         self.datapath = self.path / res
 
-        self.data = self._make_contour_and_data()
+        self._get_fuel_dems()
+        self.int_data = self._make_data(self.fuel_model_filenames)
+        self.data = self._make_fuel_data()
+        self.image = self._make_data(self.tif_filenames)
+        self.image = self.image * 255.
+        self.image = self.image.astype(np.uint8)
 
-    def _make_contour_and_data(self) -> np.ndarray:
-        self._get_dems()
-        data = Image.open(self.tif_filenames[0])
+    def _make_image(self) -> np.ndarray:
+        '''
+        Use the fuel data in self.data to make an RGB background image.
+        '''
+        pass
+
+    def _make_data(self, filename: List) -> np.ndarray:
+
+        data = np.load(filename[0])
         data = np.asarray(data)
         # flip axis because latitude goes up but numpy will read it down
         data = np.flip(data, 0)
@@ -560,14 +690,10 @@ class FuelLayer(DataLayer):
                 # simple case
                 tr = (self.lat_long_box.bl[0][0], self.lat_long_box.tr[1][0])
                 bl = (self.lat_long_box.tr[0][0], self.lat_long_box.bl[1][0])
-                # TODO: Temporary solution until data source is added
-                h = bl[0] - tr[0]
-                w = bl[1] - tr[1]
-                return np.full((h, w, 1), Chaparral)
-                # return data[tr[0]:bl[0], tr[1]:bl[1]]
+                return data[tr[0]:bl[0], tr[1]:bl[1]]
             tmp_array = data
-            for idx, dem in enumerate(self.tif_filenames[1:]):
-                tif_data = Image.open(dem)
+            for idx, dem in enumerate(filename[1:]):
+                tif_data = np.load(dem)
                 tif_data = np.asarray(tif_data)
                 # flip axis because latitude goes up but numpy will read it down
                 tif_data = np.flip(tif_data, 0)
@@ -593,161 +719,74 @@ class FuelLayer(DataLayer):
         data_array = data[tr[0]:bl[0], tr[1]:bl[1]]
         return data_array
 
-    def _get_dems(self) -> List[Path]:
+    def _get_fuel_dems(self) -> None:
         '''
-        Uses the outputed tiles and set `self.tif_filenames`.
+        This method will use the outputed tiles and return the correct dem files
+        for both the RGB fuel model data and the fuel model data.
         '''
         self.tif_filenames = []
-
+        self.fuel_model_filenames = []
+        fuel_model = f'LF2020_FBFM{self.type}_200_CONUS'
+        fuel_data_fm = f'LC20_F{self.type}_200_projected_no_whitespace.npy'
+        fuel_data_rgb = f'LC20_F{self.type}_200_projected_rgb.npy'
         for _, ranges in self.lat_long_box.tiles.items():
             for range in ranges:
                 (five_deg_n, five_deg_w) = range
-                tif_data_region = Path(f'n{five_deg_n}w{five_deg_w}.tif')
-                tif_file = self.datapath / tif_data_region
-                self.tif_filenames.append(tif_file)
 
+                int_data_region = Path(
+                    f'n{five_deg_n}w{five_deg_w}/{fuel_model}/{fuel_data_fm}')
 
-class TransportationLayer(DataLayer):
-    def __init__(self, center: Tuple[float], height: int, width: int,
-                 resolution: int) -> None:
+                rgb_data_region = Path(
+                    f'n{five_deg_n}w{five_deg_w}/{fuel_model}/{fuel_data_rgb}')
+
+                int_npy_file = self.datapath / int_data_region
+                rgb_npy_file = self.datapath / rgb_data_region
+                self.tif_filenames.append(rgb_npy_file)
+                self.fuel_model_filenames.append(int_npy_file)
+
+    def _make_fuel_data(self) -> np.ndarray:
         '''
-        Initialize the elevation layer by retrieving the correct topograpchic data
-            and computing the area.
+        Map Fire Behavior Fuel Model data to the Fuel type that Rothermel expects
 
         Arguments:
-            center: The lat/long coordinates of the center point of the screen
-            height: The height of the screen size
-            width: The width of the screen size
-            resolution: The resolution to get data
-        '''
-        self.path = Path('/nfs/lslab2/fireline/transportation/')
-
-        super().__init__(center, height, width, resolution)
-
-    def _make_contour_and_data(self) -> np.ndarray:
-        '''
-        Make the contour and data for the transportation layer
+            None
 
         Returns:
-            The data for the transportation layer.
+            np.ndarray: Fuel
         '''
-        data = Image.open(self.tif_filenames[0])
-        data = np.asarray(data)
-        # flip axis because latitude goes up but numpy will read it down
-        data = np.flip(data, 0)
-        self.data = np.expand_dims(data, axis=-1)
-
-        for key, _ in self.tiles.items():
-
-            if key == 'single':
-                # simple case
-                tr = (self.bl[0][0], self.tr[1][0])
-                bl = (self.tr[0][0], self.bl[1][0])
-                return self.data[tr[0]:bl[0], tr[1]:bl[1]]
-            tmp_array = data
-            for idx, dem in enumerate(self.tif_filenames[1:]):
-                data = Image.open(dem)
-                data = np.asarray(data)
-                # flip axis because latitude goes up but numpy will read it down
-                data = np.flip(data, 0)
-                data = np.expand_dims(data, axis=-1)
-
-                if key == 'north':
-                    # stack tiles along axis = 0 -> leftmost: bottom, rightmost: top
-                    self.data = np.concatenate((self.data, data), axis=0)
-                elif key == 'east':
-                    # stack tiles along axis = 2 -> leftmost, rightmost
-                    self.data = np.concatenate((self.data, data), axis=1)
-                elif key == 'square':
-                    if idx + 1 == 1:
-                        self.data = np.concatenate((self.data, data), axis=1)
-                    elif idx + 1 == 2:
-                        tmp_array = data
-                    elif idx + 1 == 3:
-                        tmp_array = np.concatenate((data, tmp_array), axis=1)
-                        self.data = np.concatenate((self.data, tmp_array), axis=0)
-
-        tr = (self.bl[0][0], self.tr[1][0])
-        bl = (self.tr[0][0], self.bl[1][0])
-        self.data_array = self.data[tr[0]:bl[0], tr[1]:bl[1]]
-        return self.data_array
+        func = np.vectorize(lambda x: FuelModelToFuel[x])
+        data_array = func(self.int_data)
+        return data_array
 
 
-class FunctionalElevationLayer(DataLayer):
-    '''
-    Layer that stores elevation data computed from a function.
-    '''
-    def __init__(self,
-                 height: int,
-                 width: int,
-                 elevation_fn: ElevationFn,
-                 name: str = None) -> None:
-        '''
-        Initialize the elvation layer by computing the elevations and contours.
-
-        Arguments:
-            height: The height of the data layer
-            width: The width of the data layer
-            elevation_fn: A callable function that converts (x, y) coorindates to
-                          elevations.
-            name: The name of the function. Should be set by the config to 'perlin',
-                  'gaussian', etc.
-        '''
-        super().__init__()
-        self.height = height
-        self.width = width
-        self.elevation_fn = elevation_fn
-        self.name = name
-        self.data = self._make_data()
-
-    def _make_data(self) -> np.ndarray:
-        '''
-        Use `self.elevation_fn` to make the elevation data layer.
-
-        Returns:
-            A numpy array containing the elevation data.
-        '''
-        x = np.arange(self.width)
-        y = np.arange(self.height)
-        X, Y = np.meshgrid(x, y)
-        elevation_fn_vect = np.vectorize(self.elevation_fn)
-        elevations = elevation_fn_vect(X, Y)
-        # Expand third dimension to align with data layers
-        elevations = np.expand_dims(elevations, axis=-1)
-
-        return elevations
-
-
-class FunctionalFuelLayer(DataLayer):
+class FunctionalFuelLayer(FuelLayer):
     '''
     Layer that stores fuel data computed from a function.
     '''
-    def __init__(self,
-                 height: int,
-                 width: int,
-                 fuel_array_fn: Callable,
-                 name: str = None) -> None:
+    def __init__(self, height, width, fuel_fn: FuelArrayFn, name: str) -> None:
         '''
-        Initialize the fuel layer by computing the fuel.
+        Initialize the fuel layer by computing the fuels.
 
         Arguments:
             height: The height of the data layer
             width: The width of the data layer
-            fuel_array_fn: A callable function that converts (x, y) coordinates to
-                           fuel.
-            name: The name of the function. Should be set by the config to 'chaparral',
-                  etc.
+            fuel_fn: A callable function that converts (x, y) coorindates to
+                     elevations.
+            name: The name of the fuel layer (e.g.: 'chaparral')
         '''
         super().__init__()
         self.height = height
         self.width = width
-        self.fuel_array_fn = fuel_array_fn
+        self.fuel_fn = fuel_fn
         self.name = name
+
         self.data = self._make_data()
+        self.texture = self._load_texture()
+        self.image = self._make_image()
 
     def _make_data(self) -> np.ndarray:
         '''
-        Use `self.fuel_array_fn` to make the fuel data layer.
+        Use self.fuel_fn to make the fuel data layer.
 
         Returns:
             A numpy array containing the fuel data
@@ -755,9 +794,72 @@ class FunctionalFuelLayer(DataLayer):
         x = np.arange(self.width)
         y = np.arange(self.height)
         X, Y = np.meshgrid(x, y)
-        fuel_array_fn_vect = np.vectorize(self.fuel_array_fn)
-        fuel_arrays = fuel_array_fn_vect(X, Y)
+        fuel_fn_vect = np.vectorize(self.fuel_fn)
+        fuels = fuel_fn_vect(X, Y)
         # Expand third dimension to align with data layers
-        fuel_arrays = np.expand_dims(fuel_arrays, axis=-1)
+        fuels = np.expand_dims(fuels, axis=-1)
 
-        return fuel_arrays
+        return fuels
+
+    def _make_image(self) -> np.ndarray:
+        '''
+        Use the fuel data in self.data to make an RGB background image.
+
+        Returns:
+            A NumPy array containing the RGB of the fuel data.
+        '''
+        image = np.zeros((self.width, self.height) + (3, ))
+
+        # Loop over the high-level tiles (these are not at the pixel level)
+        for i in range(self.height):
+            for j in range(self.width):
+                # Need these pixel level coordinates to span the correct range
+                updated_texture = self._update_texture_dryness(self.data[i][j][0])
+                image[i, j] = updated_texture
+
+        return image
+
+    def _update_texture_dryness(self, fuel: Fuel) -> np.ndarray:
+        '''
+        Determine the percent change to make the terrain look drier (i.e.
+        more red/yellow/brown) by using the FuelArray values. Then, update
+        the texture color using PIL and image blending with a preset
+        yellow-brown color/image.
+
+        Arguments:
+            fuel: The Fuel with parameters that specify how "dry" the texture should look
+
+        Returns:
+            new_texture: The texture with RGB values modified to look drier based
+                         on the parameters of fuel_arr
+        '''
+        # Add the numbers after normalization
+        # M_x is inverted because a lower value is more flammable
+        color_change_pct = fuel.w_0 / 0.2296 + \
+                           fuel.delta / 7 + \
+                           (0.2 - fuel.M_x) / 0.2
+        # Divide by 3 since there are 3 values
+        color_change_pct /= 3
+
+        arr = self.texture.copy()
+        arr_img = Image.fromarray(arr)
+        resized_brown = DRY_TERRAIN_BROWN_IMG.resize(arr_img.size)
+        texture_img = Image.blend(arr_img, resized_brown, color_change_pct / 2)
+        new_texture = np.array(texture_img)
+
+        return new_texture
+
+    def _load_texture(self) -> np.ndarray:
+        '''
+        Load the terrain tile texture, resize it to the correct
+        shape, and convert to NumPy array
+
+        Returns:
+            The returned numpy array of the texture.
+        '''
+        out_size = (1, 1)
+        texture = Image.open(TERRAIN_TEXTURE_PATH)
+        texture = texture.resize(out_size)
+        texture = np.array(texture)
+
+        return texture

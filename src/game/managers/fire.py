@@ -8,10 +8,13 @@ Defines the different `FireManager`s (`ConstantSpreadFireManager` and
 from dataclasses import astuple
 from typing import List, Tuple, Union
 
+import matplotlib.pyplot as plt
 import numpy as np
+import pygame
 
 from ..sprites import Fire, Terrain
 from ...enums import BurnStatus, RoSAttenuation, GameStatus
+from ...utils.graph import FireSpreadGraph
 from ...world.parameters import Environment, FuelParticle
 from ...world.rothermel import compute_rate_of_spread
 
@@ -269,7 +272,13 @@ class RothermelFireManager(FireManager):
         # This is needed since each pixel represents a specific number of feet
         # and it might take more than one update to burn
         self.burn_amounts = np.zeros_like(self.terrain.fuels)
+
+        # Pre-compute the slope magnitudes and directions for use with
+        # Rothermel calculation
         self.slope_mag, self.slope_dir = self._compute_slopes()
+
+        # Create a FireSpreadGraph to track the fire
+        self.fs_graph = FireSpreadGraph(self.terrain.screen_size)
 
     def _compute_slopes(self) -> Tuple[np.ndarray, np.ndarray]:
         '''
@@ -382,17 +391,51 @@ class RothermelFireManager(FireManager):
             A NumPy array of the updated `fire_map`
         '''
         y_coords, x_coords = np.unique(np.vstack((y_coords, x_coords)), axis=1)
+        # Check which coordinates have passed the threhold for burning
         new_burn = np.argwhere(self.burn_amounts[y_coords, x_coords] > self.pixel_scale)
+
+        # Create new sprites and durations for the new fire locations
         new_sprites = [
             Fire((x_coords[burn[0]], y_coords[burn[0]]), self.fire_size, self.headless)
             for burn in new_burn
         ]
         new_durations = [0] * len(new_sprites)
 
+        # Update the current list of sprites/duraions with the new ones
         self.sprites += new_sprites
         self.durations += new_durations
+
+        # Update the graph with the new burning coordinates
+        x_coords_graph = x_coords[new_burn].squeeze().tolist()
+        y_coords_graph = y_coords[new_burn].squeeze().tolist()
+        self.fs_graph.add_edges_from_manager(x_coords_graph, y_coords_graph, fire_map)
+
+        # Update the fire_map with the new burning coordinates
         fire_map[y_coords[new_burn], x_coords[new_burn]] = BurnStatus.BURNING
+
         return fire_map
+
+    def draw_spread_graph(self, game_screen: pygame.Surface = None) -> plt.Figure:
+        '''
+        Create a matplotlib Figure with the fire spread graph overlain on the
+        terrain image.
+
+        Arguments:
+            game_screen: The game's screen to use as the background. If None, use
+                         the terrain image
+
+        Returns:
+            A matplotlib.pyplot.Figure containing the graph on top of the
+                terrain image
+        '''
+        if game_screen is None:
+            background_image = pygame.surfarray.pixels3d(self.terrain.image).copy()
+        else:
+            background_image = pygame.surfarray.pixels3d(game_screen).copy()
+        background_image = background_image.swapaxes(1, 0)
+        fig = self.fs_graph.draw(background_image=background_image)
+
+        return fig
 
     def update(self, fire_map: np.ndarray) -> Tuple[np.ndarray, GameStatus]:
         '''

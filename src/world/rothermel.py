@@ -50,6 +50,9 @@ def compute_rate_of_spread(loc_x: float, loc_y: float, new_loc_x: float, new_loc
     Returns:
         R: The computed rate of spread in ft/min
     '''
+    # Check for non-burnable fuel and return 0 (no spread)
+    if w_0 == 0:
+        return 0
     # Mineral Damping Coefficient
     eta_S = min(0.174 * S_e**-0.19, 1)
     # Moisture Damping Coefficient

@@ -1,4 +1,6 @@
 from typing import Tuple
+
+import matplotlib.pyplot as plt
 import numpy as np
 
 from ...world.presets import Chaparral
@@ -10,6 +12,7 @@ class DummyTopographyLayer():
         # Add the 1-dimension to match what the real layers look like
         self.shape = (shape) + (1, )
         self.data = np.zeros(self.shape)
+        self.contours = plt.contour(self.data.squeeze())
 
 
 class DummyFuelLayer():
@@ -18,3 +21,4 @@ class DummyFuelLayer():
         # Add the 1-dimension to match what the real layers look like
         self.shape = (shape) + (1, )
         self.data = np.full(self.shape, Chaparral)
+        self.image = np.random.randint(0, 255, size=(shape) + (3, ))

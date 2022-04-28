@@ -22,7 +22,7 @@ import pygame  # noqa: E402
 
 class TestGame(unittest.TestCase):
     def setUp(self) -> None:
-        self.config = Config('./config.yml')
+        self.config = Config('configs/functional_config.yml')
         self.screen_size = (32, 32)
         self.game = Game(self.screen_size)
 
@@ -216,7 +216,7 @@ class TestGame(unittest.TestCase):
 
 class TestHeadlessGame(unittest.TestCase):
     def setUp(self) -> None:
-        self.config = Config('./config.yml')
+        self.config = Config('configs/functional_config.yml')
         self.screen_size = (32, 32)
         self.headless = True
         self.game = Game(self.screen_size, headless=self.headless)
@@ -266,7 +266,7 @@ class TestHeadlessGame(unittest.TestCase):
 
 class TestMultiprocessGame(unittest.TestCase):
     def setUp(self) -> None:
-        self.config = Config('./config.yml')
+        self.config = Config('configs/functional_config.yml')
         self.screen_size = (32, 32)
         self.headless = True
         self.game = Game(self.screen_size, headless=self.headless)

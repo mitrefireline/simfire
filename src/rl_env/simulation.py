@@ -134,8 +134,8 @@ class RothermelSimulation(Simulation):
         self.fuel_particle = FuelParticle()
 
         self.terrain = Terrain(
-            self.config.terrain.fuel_array_function,
-            self.config.terrain.elevation_function,
+            self.config.terrain.fuel.layer,
+            self.config.terrain.topography.layer,
             (self.config.area.screen_size, self.config.area.screen_size),
             headless=self.config.simulation.headless)
 
@@ -380,7 +380,7 @@ class RothermelSimulation(Simulation):
             The dictionary with all available seeds to change and their values.
         '''
         seeds = {
-            'elevation': self._get_elevation_seed(),
+            'elevation': self._get_topography_seed(),
             'fuel': self._get_fuel_seed(),
             'wind_speed': self._get_wind_speed_seed(),
             'wind_direction': self._get_wind_direction_seed()
@@ -396,7 +396,7 @@ class RothermelSimulation(Simulation):
 
         return seeds
 
-    def _get_elevation_seed(self) -> int:
+    def _get_topography_seed(self) -> int:
         '''
         Returns the seed for the current elevation function.
 
@@ -405,10 +405,16 @@ class RothermelSimulation(Simulation):
         Returns:
             The seed for the currently configured elevation function.
         '''
-        if 'perlin' == self.config.terrain.elevation_function.name:
-            return self.config.terrain.perlin.seed
-        else:
-            return None
+        if self.config.terrain.topography.type.lower() == 'functional':
+            if self.config.terrain.topography.layer.name == 'perlin':
+                return self.config.terrain.topography.functional.perlin.seed
+            else:
+                return None
+        elif self.config.terrain.topography.type.lower() == 'operational':
+            if self.config.operational.seed is not None:
+                return self.config.operational.seed
+            else:
+                return None
 
     def _get_fuel_seed(self) -> int:
         '''
@@ -420,10 +426,16 @@ class RothermelSimulation(Simulation):
         Returns:
             The seed for the currently configured fuel array function.
         '''
-        if 'chaparral' == self.config.terrain.fuel_array_function.name:
-            return self.config.terrain.chaparral.seed
-        else:
-            return None
+        if self.config.terrain.fuel.type.lower() == 'functional':
+            if self.config.terrain.fuel.layer.name == 'chaparral':
+                return self.config.terrain.fuel.functional.chaparral.seed
+            else:
+                return None
+        elif self.config.terrain.fuel.type.lower() == 'operational':
+            if self.config.operational.seed is not None:
+                return self.config.operational.seed
+            else:
+                return None
 
     def _get_wind_speed_seed(self) -> int:
         '''
@@ -434,7 +446,7 @@ class RothermelSimulation(Simulation):
         Returns:
             The seed for the currently configured wind speed function.
         '''
-        if 'perlin' in str(self.config.wind.wind_function).lower():
+        if 'perlin' in str(self.config.wind.function).lower():
             return self.config.wind.perlin.speed.seed
         else:
             return None
@@ -448,7 +460,7 @@ class RothermelSimulation(Simulation):
         Returns:
             The seed for the currently configured wind direction function.
         '''
-        if 'perlin' in str(self.config.wind.wind_function).lower():
+        if 'perlin' in str(self.config.wind.function).lower():
             return self.config.wind.perlin.direction.seed
         else:
             return None
@@ -469,10 +481,10 @@ class RothermelSimulation(Simulation):
         success = False
         keys = list(seeds.keys())
         if 'elevation' in keys:
-            self.config.reset_elevation_function(seeds['elevation'])
+            self.config.reset_topography_layer(seed=seeds['elevation'])
             success = True
         if 'fuel' in keys:
-            self.config.reset_fuel_array_function(seeds['fuel'])
+            self.config.reset_fuel_layer(seed=seeds['fuel'])
             success = True
         if 'wind_speed' in keys and 'wind_direction' in keys:
             self.config.reset_wind_function(speed_seed=seeds['wind_speed'],
@@ -491,4 +503,51 @@ class RothermelSimulation(Simulation):
                 log.warn('No valid keys in the seeds dictionary were given to the '
                          'set_seeds method. No seeds will be changed. Valid keys are: '
                          f'{valid_keys}')
+        return success
+
+    def get_layer_types(self) -> Dict[str, str]:
+        '''
+        Returns the current layer types for the simulation
+
+        Returns:
+            A dictionary of the current layer type.
+        '''
+        types = {
+            'elevation': self.config.terrain.topography.type,
+            'fuel': self.config.terrain.fuel.type
+        }
+
+        return types
+
+    def set_layer_types(self, types: Dict[str, str]) -> bool:
+        '''
+        Set the type of layers to be used in the simulation
+
+        Available keys are 'elevation' and 'fuel' and available values are 'functional'
+        and 'operational'.
+
+        Arguments:
+            types: The dictionary of layer names and the data type they will be set to.
+
+        Returns:
+            Whether or not the method successfully set a data type.
+        '''
+        success = False
+        keys = list(types.keys())
+        if 'elevation' in keys:
+            self.config.terrain.topography.type = types['elevation']
+            self.config.reset_topography_layer()
+            success = True
+        if 'fuel' in keys:
+            self.config.terrain.fuel.type = types['fuel']
+            self.config.reset_fuel_layer()
+            success = True
+
+        valid_keys = list(self.get_layer_types().keys())
+        for key in keys:
+            if key not in valid_keys:
+                log.warn('No valid keys in the types dictionary were given to the '
+                         'set_data_types method. No data types will be changed. Valid '
+                         f'keys are: {valid_keys}')
+                success = False
         return success

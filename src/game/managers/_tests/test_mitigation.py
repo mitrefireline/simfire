@@ -11,7 +11,6 @@ from ....utils.config import Config
 from ...sprites import FireLine, ScratchLine, WetLine, Terrain
 from ..mitigation import FireLineManager, ScratchLineManager, WetLineManager
 
-
 # unittest.mock.patch.dict isn't working anymore
 # Can't run rests without setting display at the top of the file
 os.environ['SDL_VIDEODRIVER'] = 'dummy'
@@ -23,7 +22,7 @@ class TestControlLineManager(unittest.TestCase):
     using the `FireLineManager` as a proxy.
     '''
     def setUp(self) -> None:
-        self.config = Config('./config.yml')
+        self.config = Config('configs/functional_config.yml')
         self.screen_size = (32, 32)
         self.pixel_scale = 50  # Just an arbitrary number
         points = line(self.screen_size[0] // 4, 0, 0, self.screen_size[1] // 4)
@@ -91,7 +90,7 @@ class TestFireLineManager(unittest.TestCase):
     present in FireLines, but right now assumes that they stop the fire in its tracks.
     '''
     def setUp(self) -> None:
-        self.config = Config('./config.yml')
+        self.config = Config('configs/functional_config.yml')
         self.screen_size = (32, 32)
         self.pixel_scale = 50  # Just an arbitrary number
         points = line(self.screen_size[0] // 4, 0, 0, self.screen_size[1] // 4)
@@ -130,7 +129,7 @@ class TestScratchLineManager(unittest.TestCase):
     physics present in ScratchLines.
     '''
     def setUp(self) -> None:
-        self.config = Config('./config.yml')
+        self.config = Config('configs/functional_config.yml')
         self.screen_size = (32, 32)
         self.pixel_scale = 50  # Just an arbitrary number
         points = line(self.screen_size[0] // 4, 0, 0, self.screen_size[1] // 4)
@@ -169,7 +168,7 @@ class TestWetLineManager(unittest.TestCase):
     present in WetLines.
     '''
     def setUp(self) -> None:
-        self.config = Config('./config.yml')
+        self.config = Config('configs/functional_config.yml')
         self.screen_size = (32, 32)
         self.pixel_scale = 50  # Just an arbitrary number
         points = line(self.screen_size[0] // 4, 0, 0, self.screen_size[1] // 4)

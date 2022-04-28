@@ -34,40 +34,12 @@ yapf:
 #########
 # Tests #
 #########
-.set-up-auth:
-  script:
-    - 'which ssh-agent || ( apt-get install -qq openssh-client )'
-    - eval $(ssh-agent -s)
-    - echo "${CI_IDENTITY_FILE}" | tr -d '\r' | ssh-add -
-    - mkdir -p ~/.ssh
-    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
-
 unittests:
   stage: Tests
   tags:
-    - docker
-  before_script:
-    - 'which ssh-agent || ( apt-get install -qq openssh-client )'
-    - eval $(ssh-agent -s)
-    - echo "${CI_IDENTITY_FILE}" | tr -d '\r' | ssh-add -
-    - mkdir -p ~/.ssh
-    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
-
-unittests:
-  stage: Tests
-  tags:
-    - docker
+    - lslab2
   script:
-    - !reference [.set-up-auth, script]
-    - >
-      ssh mt-rothermel@rlord.mitre.org
-      "cd rothermel-modeling &&
-      git checkout ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME} &&
-      /opt/conda/bin/conda create -n roth-unit python=3.9 -y &&
-      /opt/conda/bin/conda install -n roth-unit pip &&
-      ~/.conda/envs/roth-unit/bin/pip install -r dev-requirements.txt &&
-      SDL_VIDEODRIVER=dummy ~/.conda/envs/roth-unit/bin/python -m unittest discover -s src -t .. -p 'test_*.py' &&
-      /opt/conda/bin/conda env remove -n roth-unit"
+    - SDL_VIDEODRIVER=dummy python -m unittest discover -s src -t .. -p 'test_*.py'
   needs: []
   only:
     - merge_requests
@@ -75,18 +47,9 @@ unittests:
 game_rothermel.py:
   stage: Tests
   tags:
-    - docker
+    - lslab2
   script:
-    - !reference [.set-up-auth, script]
-    - >
-      ssh mt-rothermel@rlord.mitre.org
-      "cd rothermel-modeling &&
-      git checkout ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME} &&
-      /opt/conda/bin/conda create -n roth-game python=3.9 -y &&
-      /opt/conda/bin/conda install -n roth-game pip &&
-      ~/.conda/envs/roth-game/bin/pip install -r dev-requirements.txt &&
-      SDL_VIDEODRIVER="dummy" ~/.conda/envs/roth-game/bin/python game_rothermel.py &&
-      /opt/conda/bin/conda env remove -n roth-game"
+    - SDL_VIDEODRIVER="dummy" python game_rothermel.py
   needs: []
   only:
     - merge_requests
@@ -94,22 +57,12 @@ game_rothermel.py:
 coverage:
   stage: Tests
   tags:
-  - docker
+  - lslab2
   script:
-    - !reference [.set-up-auth, script]
-    - >
-      ssh mt-rothermel@rlord.mitre.org
-      "cd rothermel-modeling &&
-      git checkout ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME} &&
-      /opt/conda/bin/conda create -n roth-cov python=3.9 -y &&
-      /opt/conda/bin/conda install -n roth-cov pip &&
-      ~/.conda/envs/roth-cov/bin/pip install -r dev-requirements.txt pytest pytest-cov &&
-      SDL_VIDEODRIVER=dummy ~/.conda/envs/roth-cov/bin/python -m unittest discover -s src -t .. -p 'test_*.py' &&
-      SDL_VIDEODRIVER=dummy ~/.conda/envs/roth-cov/bin/python -m coverage run -m pytest &&
-      SDL_VIDEODRIVER=dummy ~/.conda/envs/roth-cov/bin/python -m coverage report &&
-      SDL_VIDEODRIVER=dummy ~/.conda/envs/roth-cov/bin/python -m coverage xml &&
-      /opt/conda/bin/conda env remove -n roth-cov"
-    - scp mt-rothermel@rlord.mitre.org:~/rothermel-modeling/coverage.xml ./coverage.xml
+    - pip install pytest pytest-cov
+    - SDL_VIDEODRIVER=dummy python -m coverage run -m pytest
+    - SDL_VIDEODRIVER=dummy python -m coverage report
+    - SDL_VIDEODRIVER=dummy python -m coverage xml
   artifacts:
     reports:
       cobertura: coverage.xml

@@ -210,83 +210,6 @@ class RothermelSimulationTest(unittest.TestCase):
                          f'passed, but {self.simulation_flat.elapsed_time}m has '
                          'passed.')
 
-    def test__render_inline(self) -> None:
-        '''
-        Test that the call to `_render_inline()` runs through properly.
-        '''
-        self.config.render.inline = True
-        # set position array
-        current_agent_loc = np.zeros(
-            (self.config.area.screen_size, self.config.area.screen_size))
-        loc = (1, 2)
-        current_agent_loc[loc] = 1
-
-        # set correct mitigation array
-        mitigation = np.zeros(
-            (self.config.area.screen_size, self.config.area.screen_size))
-        mit_point = (1, 1)
-        mitigation[mit_point] = BurnStatus.FIRELINE
-        self.config.simulation.headless = True
-        # Test rendering 'inline' (as agent traverses)
-        self.simulation._render_inline(mitigation, current_agent_loc)
-        # assert the points are placed
-        self.assertEqual(self.simulation.fireline_manager.sprites[0].pos,
-                         mit_point,
-                         msg=(f'The position of the sprite is '
-                              f'{self.simulation.fireline_manager.sprites[0].pos} '
-                              f', but it should be {mit_point}'))
-
-    def test__render_mitigations(self) -> None:
-        '''
-
-        '''
-        mitigation = np.full((self.config.area.screen_size, self.config.area.screen_size),
-                             BurnStatus.FIRELINE)
-
-        self.config.simulation.headless = True
-        self.simulation._render_mitigations(mitigation)
-        full_grid = self.config.area.screen_size * self.config.area.screen_size
-        self.assertEqual(
-            len(self.simulation.fireline_sprites),
-            full_grid,
-            msg=f'The total number of mitigated pixels should be {full_grid} '
-            f'but are actually {len(self.simulation.fireline_sprites)}')
-
-    def test__render_mitigation_fire_spread(self) -> None:
-        '''
-
-        '''
-        # assert the points are placed and fire can spread
-        self.fireline_sprites = self.simulation.fireline_sprites_empty
-
-        mitigation = np.zeros(
-            (self.config.area.screen_size, self.config.area.screen_size))
-        # start the fire where we have a control line
-        mitigation[self.config.fire.fire_initial_position[0] - 1:] = 3
-        self.config.mitigation.ros_attenuation = False
-        self.config.simulation.headless = True
-        self.simulation._render_mitigation_fire_spread(mitigation)
-
-        # assert no fire has spread
-        self.assertTrue(len(self.simulation.fire_sprites) == 1,
-                        msg=f'The returned state of the Game should have no fire spread, '
-                        f' but, has {len(self.simulation.fire_sprites)}.')
-
-    def test_render(self) -> None:
-        '''
-        Test that the call to `_render()` runs through properly.
-
-        This should be pass as long as the calls to `fireline_manager.update()` and
-        `fire_map.update()` pass tests.
-
-        This should pass as long as the calls to `_render_inline`,
-            `_render_mitigations`, and `_render_mitigation_fire_spread` pass.
-
-        Assert the points get updated in the `fireline_sprites` group.
-
-        '''
-        pass
-
     def test_get_seeds(self) -> None:
         '''
         Test the get_seeds method and ensure it returns all available seeds
@@ -300,7 +223,7 @@ class RothermelSimulationTest(unittest.TestCase):
             if key == 'elevation':
                 self.assertEqual(seed, self.config.terrain.perlin.seed, msg=msg)
             if key == 'fuel':
-                self.assertEqual(seed, self.config.terrain.chaparral.seed, msg=msg)
+                self.assertEqual(seed, self.config.fuel.chaparral.seed, msg=msg)
             if key == 'wind_speed':
                 self.assertEqual(seed, self.config.wind.perlin.speed.seed, msg=msg)
             if key == 'wind_direction':
@@ -316,7 +239,7 @@ class RothermelSimulationTest(unittest.TestCase):
                    '{self.config.path}')
             if key == 'fuel':
                 self.assertEqual(seed,
-                                 self.config_flat_simple.terrain.chaparral.seed,
+                                 self.config_flat_simple.fuel.chaparral.seed,
                                  msg=msg)
 
     def test_set_seeds(self) -> None:
@@ -333,10 +256,11 @@ class RothermelSimulationTest(unittest.TestCase):
         self.simulation.set_seeds(seeds)
         returned_seeds = self.simulation.get_seeds()
 
-        self.assertEqual(seeds,
-                         returned_seeds,
-                         msg=f'The input seeds ({seeds}) do not match the returned seeds '
-                         f'({returned_seeds})')
+        self.assertDictEqual(
+            seeds,
+            returned_seeds,
+            msg=f'The input seeds ({seeds}) do not match the returned seeds '
+            f'({returned_seeds})')
 
         # Only set wind_speed and not wind_direction
         seed = 2345
@@ -347,10 +271,11 @@ class RothermelSimulationTest(unittest.TestCase):
         # Put the previous value for wind_direction into the dictionary so we can check
         # to make sure it wasn't changed
         seeds['wind_direction'] = 1234
-        self.assertEqual(seeds,
-                         returned_seeds,
-                         msg=f'The input seeds ({seeds}) do not match the returned seeds '
-                         f'({returned_seeds})')
+        self.assertDictEqual(
+            seeds,
+            returned_seeds,
+            msg=f'The input seeds ({seeds}) do not match the returned seeds '
+            f'({returned_seeds})')
 
         # Only set wind_direction and not wind_speed
         seed = 3456
@@ -363,10 +288,11 @@ class RothermelSimulationTest(unittest.TestCase):
         seeds['elevation'] = 2345
         seeds['fuel'] = 2345
         seeds['wind_speed'] = 2345
-        self.assertEqual(seeds,
-                         returned_seeds,
-                         msg=f'The input seeds ({seeds}) do not match the returned seeds '
-                         f'({returned_seeds})')
+        self.assertDictEqual(
+            seeds,
+            returned_seeds,
+            msg=f'The input seeds ({seeds}) do not match the returned seeds '
+            f'({returned_seeds})')
 
         # Give no valid keys to hit the log warning
         seeds = {'not_valid': 1111}

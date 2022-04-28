@@ -2,8 +2,9 @@ import yaml
 import unittest
 from pathlib import Path
 
-from src.utils.units import mph_to_ftpm
+from numpy.testing import assert_array_almost_equal
 
+from ...utils.units import mph_to_ftpm
 from ..config import ConfigType, Config
 from ...world.wind_mechanics.wind_controller import WindController
 
@@ -68,7 +69,7 @@ class ConfigTest(unittest.TestCase):
                          msg=f'The YAML at {self.yaml} was loaded into the Config class '
                          'incorrectly')
         self.assertEqual(self.cfg.area.screen_size, self.data['area']['screen_size'])
-        self.assertEqual(self.cfg.terrain.perlin.shape, (9, 9))
+        self.assertEqual(self.cfg.terrain.topography.functional.perlin.shape, (9, 9))
 
     def test__set_terrain_scale(self) -> None:
         '''
@@ -78,36 +79,36 @@ class ConfigTest(unittest.TestCase):
             self.data['area']['terrain_size'] * self.data['area']['pixel_scale'],
             self.cfg.area.terrain_scale)
 
-    def test__set_elevation_function(self) -> None:
+    def test__set_topography_layer(self) -> None:
         '''
         Test assigning elevation Python function based on a config string
         '''
         x, y = (5, 5)
         # This is the only way I could really come up with to make the correct function
         # was assigned - mdoyle
-        self.assertEqual(self.cfg.terrain.elevation_function.name,
+        self.assertEqual(self.cfg.terrain.topography.layer.name,
                          'perlin',
                          msg='The name for the set config terrain.elevation_function '
-                         f'({self.cfg.terrain.elevation_function}) does not match '
+                         f'({self.cfg.terrain.topography.layer.name}) does not match '
                          '"perlin"')
 
-        self.assertEqual(self.cfg_flat_simple.terrain.elevation_function.data[y, x],
+        self.assertEqual(self.cfg_flat_simple.terrain.topography.layer.data[y, x],
                          0,
                          msg='The output of the flat terrain function does not equal 0')
 
-        self.assertEqual(int(self.cfg_gaussian.terrain.elevation_function.data[y, x]),
+        self.assertEqual(int(self.cfg_gaussian.terrain.topography.layer.data[y, x]),
                          333,
                          msg=f'The output of the gaussian terrain function at ({x}, {y}) '
                          'does not equal 333')
 
-    def test__set_fuel_array_function(self) -> None:
+    def test__set_fuel_layer(self) -> None:
         '''
         Test assigning fuel array Python function based on config string
         '''
-        self.assertEqual(self.cfg.terrain.fuel_array_function.name,
+        self.assertEqual(self.cfg.terrain.fuel.layer.name,
                          'chaparral',
                          msg='The name for the set terrain.fuel_array_function '
-                         f'({self.cfg.terrain.fuel_array_function}) does not match '
+                         f'({self.cfg.terrain.fuel.layer.name}) does not match '
                          '"chaparral"')
 
     def test__set_wind_function(self) -> None:
@@ -134,17 +135,19 @@ class ConfigTest(unittest.TestCase):
             self.data['wind']['perlin']['direction']['min'],
             self.data['wind']['perlin']['direction']['max'],
             self.data['area']['screen_size'])
-        self.assertEqual(wind_map.map_wind_speed,
-                         self.cfg.wind.speed,
-                         msg='The speed array set by config.py:Config does not match the '
-                         'values straight from test_config.yml. The Config class is not '
-                         'loading the wind speed correctly.')
+        assert_array_almost_equal(wind_map.map_wind_speed,
+                                  self.cfg.wind.speed,
+                                  err_msg='The speed array set by config.py:Config does '
+                                  'not match the values straight from test_config.yml. '
+                                  'The Config class is not loading the wind speed '
+                                  'correctly.')
 
-        self.assertEqual(wind_map.map_wind_direction,
-                         self.cfg.wind.direction,
-                         msg='The direction array set by config.py:Config does not match '
-                         'the values straight from test_config.yml. The Config class is '
-                         'notloading the wind direction correctly.')
+        assert_array_almost_equal(wind_map.map_wind_direction,
+                                  self.cfg.wind.direction,
+                                  err_msg='The direction array set by config.py:Config '
+                                  'does not match the values straight from '
+                                  'test_config.yml. The Config class is notloading the '
+                                  'wind direction correctly.')
 
         self.assertEqual(self.cfg_flat_simple.wind.speed[y][x],
                          616,
@@ -156,21 +159,22 @@ class ConfigTest(unittest.TestCase):
                          msg=f'The simple wind direction at ({x}, {y}) does not headed '
                          'due East')
 
-    def test_reset_elevation_function(self) -> None:
+    def test_reset_topography_layer(self) -> None:
         '''
         Test resetting the seed for the elevation function and returning a different map
         '''
         # test_config.yml has a seed of 1111
         seed = 1234
         x, y = (5, 5)
-        old_elevation = self.cfg.terrain.elevation_function.data[y, x]
-        self.cfg.reset_elevation_function(seed)
-        new_elevation = self.cfg.terrain.elevation_function.data[y, x]
+        old_elevation = self.cfg.terrain.topography.layer.data[y, x]
+        self.cfg.reset_topography_layer(seed=seed)
+        new_elevation = self.cfg.terrain.topography.layer.data[y, x]
 
         # The seeds should be updated after calling the reset method
         self.assertEqual(seed,
-                         self.cfg.terrain.perlin.seed,
-                         msg=f'The assigned seed of {self.cfg.terrain.perlin.seed} does '
+                         self.cfg.terrain.topography.functional.perlin.seed,
+                         msg='The assigned seed of '
+                         f'{self.cfg.terrain.topography.functional.perlin.seed} does '
                          f'not match the test seed of {seed}')
 
         # The elevation should be different at the same location now that the seed has
@@ -181,21 +185,22 @@ class ConfigTest(unittest.TestCase):
                             f'({old_elevation}) and the new elevation ({new_elevation}) '
                             'should be different')
 
-    def test_reset_fuel_array_function(self) -> None:
+    def test_reset_fuel_layer(self) -> None:
         '''
         Test resetting the seed for the fuel array function and returning a different map
         '''
         # test_config.yml has a seed of 1111
         seed = 1234
         x, y = (5, 5)
-        old_fuel = self.cfg.terrain.fuel_array_function.data[y, x]
-        self.cfg.reset_fuel_array_function(seed)
-        new_fuel = self.cfg.terrain.fuel_array_function.data[y, x]
+        old_fuel = self.cfg.terrain.fuel.layer.data[y, x]
+        self.cfg.reset_fuel_layer(seed=seed)
+        new_fuel = self.cfg.terrain.fuel.layer.data[y, x]
 
         # The seeds should be updated after calling the reset method
         self.assertEqual(seed,
-                         self.cfg.terrain.chaparral.seed,
-                         msg=f'The assigned seed of {self.cfg.terrain.chaparral.seed} '
+                         self.cfg.terrain.fuel.functional.chaparral.seed,
+                         msg='The assigned seed of '
+                         f'{self.cfg.terrain.fuel.functional.chaparral.seed} '
                          f'does not match the test seed of {seed}')
 
         # The fuel should be different at the same location now that the seed has changed

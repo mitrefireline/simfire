@@ -42,13 +42,6 @@ class Simulation(ABC):
         pass
 
     @abstractmethod
-    def render(self) -> None:
-        '''
-        Runs the simulation and displays the simulation's and agent's actions.
-        '''
-        pass
-
-    @abstractmethod
     def get_actions(self) -> Dict[str, int]:
         '''
         Returns the action space for the simulation.
@@ -113,7 +106,6 @@ class RothermelSimulation(Simulation):
         super().__init__(config)
         self.game_status = GameStatus.RUNNING
         self.fire_status = GameStatus.RUNNING
-        self.points = set([])
         self.reset()
 
     def reset(self) -> None:
@@ -121,7 +113,6 @@ class RothermelSimulation(Simulation):
         Reset the `self.fire_map`, `self.terrain`, `self.fire_manager`,
         and all mitigations to initial conditions
         '''
-        self.points = set([])
         self._create_fire_map()
         self._create_terrain()
         self._create_fire()
@@ -316,7 +307,6 @@ class RothermelSimulation(Simulation):
         self.fire_map = self.fireline_manager.update(self.fire_map, firelines)
         self.fire_map = self.scratchline_manager.update(self.fire_map, scratchlines)
         self.fire_map = self.wetline_manager.update(self.fire_map, wetlines)
-        self.points.append(firelines + scratchlines + wetlines)
 
     def run(self, time: Union[str, int]) -> np.ndarray:
         '''
@@ -337,9 +327,6 @@ class RothermelSimulation(Simulation):
             The Burned/Unburned/ControlLine pixel map (`self.fire_map`).
             Values range from [0, 6].
         '''
-        # for updating sprite purposes turn the inline rendering "off"
-        self.config.render.inline = False
-
         # reset the fire status to running
         self.fire_status = GameStatus.RUNNING
 

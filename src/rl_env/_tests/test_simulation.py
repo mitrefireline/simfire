@@ -4,14 +4,10 @@ import unittest
 from typing import Dict
 from pathlib import Path
 
+from ...enums import BurnStatus
 from ...game.sprites import Terrain
 from ...utils.config import Config
-from ...world.parameters import Environment
 from ...rl_env.simulation import RothermelSimulation
-from ...enums import BurnStatus
-from ...game.managers.mitigation import (FireLineManager, ScratchLineManager,
-                                         WetLineManager)
-from ...game.managers.fire import RothermelFireManager
 
 
 class RothermelSimulationTest(unittest.TestCase):
@@ -25,51 +21,9 @@ class RothermelSimulationTest(unittest.TestCase):
         self.simulation = RothermelSimulation(self.config)
         self.simulation_flat = RothermelSimulation(self.config_flat_simple)
 
-        topo_layer = self.config.terrain.elevation_function
-        fuel_layer = self.config.terrain.fuel_array_function
+        topo_layer = self.config.terrain.topography.layer
+        fuel_layer = self.config.terrain.fuel.layer
         self.terrain = Terrain(fuel_layer, topo_layer, self.screen_size)
-        self.simulation.terrain = self.terrain
-        self.simulation.environment = Environment(self.config.environment.moisture,
-                                                  self.config.wind.speed,
-                                                  self.config.wind.direction)
-
-        # initialize all mitigation strategies
-        self.simulation.fireline_manager = FireLineManager(
-            size=self.config.display.control_line_size,
-            pixel_scale=self.config.area.pixel_scale,
-            terrain=self.simulation.terrain,
-            headless=self.config.simulation.headless)
-
-        self.simulation.scratchline_manager = ScratchLineManager(
-            size=self.config.display.control_line_size,
-            pixel_scale=self.config.area.pixel_scale,
-            terrain=self.simulation.terrain,
-            headless=self.config.simulation.headless)
-
-        self.simulation.wetline_manager = WetLineManager(
-            size=self.config.display.control_line_size,
-            pixel_scale=self.config.area.pixel_scale,
-            terrain=self.simulation.terrain,
-            headless=self.config.simulation.headless)
-
-        self.simulation.fireline_sprites = self.simulation.fireline_manager.sprites
-        self.simulation.fireline_sprites_empty = self.simulation.fireline_sprites.copy()
-        self.simulation.scratchline_sprites = self.simulation.scratchline_manager.sprites
-        self.simulation.wetline_sprites = self.simulation.wetline_manager.sprites
-
-        self.simulation.fire_manager = RothermelFireManager(
-            self.config.fire.fire_initial_position,
-            self.config.display.fire_size,
-            self.config.fire.max_fire_duration,
-            self.config.area.pixel_scale,
-            self.config.simulation.update_rate,
-            self.simulation.fuel_particle,
-            self.simulation.terrain,
-            self.simulation.environment,
-            max_time=self.config.simulation.runtime,
-            attenuate_line_ros=self.config.mitigation.ros_attenuation,
-            headless=self.config.simulation.headless)
-        self.simulation.fire_sprites = self.simulation.fire_manager.sprites
 
     def test__create_terrain(self) -> None:
         '''
@@ -119,63 +73,6 @@ class RothermelSimulationTest(unittest.TestCase):
         simulation_attributes = self.simulation.get_attribute_data()
         self.assertIsInstance(simulation_attributes, Dict)
 
-    def test__update_sprite_points(self) -> None:
-        '''
-        Test that the call to `_update_sprites()` runs through properly.
-
-        Since self.action is instantiated as `1`, we need to verify that a fireline sprite
-        is created and added to the `fireline_manager`.
-        '''
-
-        # assert points get updated 'inline' as agent traverses
-        self.config.render.inline = True
-        current_agent_loc = ([1], [1])
-        self.mitigation = ([BurnStatus.FIRELINE])
-        points = {(1, 1)}
-        self.simulation._update_sprite_points(self.mitigation, current_agent_loc)
-        self.assertEqual(self.simulation.points,
-                         points,
-                         msg=f'The sprite was updated at {self.simulation.points}, '
-                         f'but it should have been at {current_agent_loc}')
-
-        # do the previous one again but with a SCRATCHLINE
-        self.mitigation = ([BurnStatus.SCRATCHLINE])
-        self.simulation._update_sprite_points(self.mitigation, current_agent_loc)
-        self.assertEqual(self.simulation.points,
-                         points,
-                         msg=f'The sprite was updated at {self.simulation.points}, '
-                         f'but it should have been at {current_agent_loc}')
-
-        # do the previous one again but with a WETLINE
-        self.mitigation = ([BurnStatus.WETLINE])
-        self.simulation._update_sprite_points(self.mitigation, current_agent_loc)
-        self.assertEqual(self.simulation.points,
-                         points,
-                         msg=f'The sprite was updated at {self.simulation.points}, '
-                         f'but it should have been at {current_agent_loc}')
-
-        # assert points get updated after agent traverses entire game
-        self.config.render.inline = False
-        self.config.render.post_agent = True
-        current_agent_loc = (self.config.area.screen_size, self.config.area.screen_size)
-        self.mitigation = np.full(
-            (self.config.area.screen_size, self.config.area.screen_size),
-            BurnStatus.FIRELINE)
-        mitigations = np.array(
-            [BurnStatus.FIRELINE, BurnStatus.SCRATCHLINE, BurnStatus.WETLINE])
-        self.mitigation = mitigations[np.random.randint(
-            len(mitigations),
-            size=(self.config.area.screen_size, self.config.area.screen_size))]
-        points = [(i, j) for j in range(self.config.area.screen_size)
-                  for i in range(self.config.area.screen_size)]
-        points = set(points)
-        self.simulation._update_sprite_points(self.mitigation)
-        self.assertEqual(
-            self.simulation.points,
-            points,
-            msg=f'The number of sprites updated was {len(self.simulation.points)} '
-            f', but it should have been {len(points)} sprites.')
-
     def test_run(self) -> None:
         '''
         Test that the call to `_run` runs the simulation properly.
@@ -221,9 +118,13 @@ class RothermelSimulationTest(unittest.TestCase):
             msg = (f'The seed for {key} ({seed}) does not match that found in '
                    '{self.config.path}')
             if key == 'elevation':
-                self.assertEqual(seed, self.config.terrain.perlin.seed, msg=msg)
+                self.assertEqual(seed,
+                                 self.config.terrain.topography.functional.perlin.seed,
+                                 msg=msg)
             if key == 'fuel':
-                self.assertEqual(seed, self.config.fuel.chaparral.seed, msg=msg)
+                self.assertEqual(seed,
+                                 self.config.terrain.fuel.functional.chaparral.seed,
+                                 msg=msg)
             if key == 'wind_speed':
                 self.assertEqual(seed, self.config.wind.perlin.speed.seed, msg=msg)
             if key == 'wind_direction':
@@ -236,11 +137,10 @@ class RothermelSimulationTest(unittest.TestCase):
 
         for key, seed in flat_seeds.items():
             msg = (f'The seed for {key} ({seed}) does not match that found in '
-                   '{self.config.path}')
+                   f'{self.config.path}')
             if key == 'fuel':
-                self.assertEqual(seed,
-                                 self.config_flat_simple.fuel.chaparral.seed,
-                                 msg=msg)
+                cfg_seed = self.config_flat_simple.terrain.fuel.functional.chaparral.seed
+                self.assertEqual(seed, cfg_seed, msg=msg)
 
     def test_set_seeds(self) -> None:
         '''

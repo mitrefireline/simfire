@@ -30,7 +30,7 @@ class LatLongBox():
     This is used by any DataLayer that needs real coordinates to access data.
     '''
     def __init__(self,
-                 center: Tuple[float] = (32.1, 115.8),
+                 center: Tuple[float, float] = (32.1, 115.8),
                  height: int = 1600,
                  width: int = 1600,
                  resolution: int = 30) -> None:
@@ -70,7 +70,7 @@ class LatLongBox():
         self.center = center
         self.resolution = resolution
 
-        self.convert_area()
+        self.BL, self.TR = self._convert_area()
 
         self.BR = (self.BL[0], self.TR[1])
         self.TL = (self.TR[0], self.BL[1])
@@ -94,7 +94,7 @@ class LatLongBox():
         self.tiles = self._stack_tiles()
         self._update_corners()
 
-    def convert_area(self) -> List[Tuple[float]]:
+    def _convert_area(self) -> Tuple[Tuple[float, float], Tuple[float, float]]:
         '''
         Functionality to use area to create bounding box around the center point
             spanning width x height (meters)
@@ -120,8 +120,10 @@ class LatLongBox():
 
         #  bottom_left = (ℎ+12𝐿,𝑘+12𝐿)
         dec_deg = ((1 / 2 * (math.sqrt(self.area))) / self.resolution) * dec_degree_length
-        self.BL = (self.center[0] - dec_deg, self.center[1] + dec_deg)
-        self.TR = (self.center[0] + dec_deg, self.center[1] - dec_deg)
+        BL = (self.center[0] - dec_deg, self.center[1] + dec_deg)
+        TR = (self.center[0] + dec_deg, self.center[1] - dec_deg)
+
+        return BL, TR
 
     def _get_nearest_tile(self) -> None:
         '''
@@ -183,7 +185,7 @@ class LatLongBox():
         self.five_deg_west_min = min_max
         self.five_deg_west_max = max_min
 
-    def _stack_tiles(self) -> Dict[str, Tuple[Tuple[int]]]:
+    def _stack_tiles(self) -> Dict[str, Tuple[Tuple[float, float], ...]]:
         '''
         Method to stack DEM tiles correctly. TIles can either be stacked
             starting from bottom left corner:
@@ -256,8 +258,20 @@ class LatLongBox():
                             (self.five_deg_north_min, self.five_deg_west_min),
                         )
                     }
+            else:
+                raise ValueError('The tile stacking failed for parameters '
+                                 f'five_deg_north_min: {self.five_deg_north_min}, '
+                                 f'five_deg_north_max: {self.five_deg_north_max}, '
+                                 f'five_deg_west_min: {self.five_deg_west_min}, '
+                                 f'five_deg_west_max: {self.five_deg_west_max}')
+        else:
+            raise ValueError('The tile stacking failed for parameters '
+                             f'five_deg_north_min: {self.five_deg_north_min}, '
+                             f'five_deg_north_max: {self.five_deg_north_max}, '
+                             f'five_deg_west_min: {self.five_deg_west_min}, '
+                             f'five_deg_west_max: {self.five_deg_west_max}')
 
-    def _generate_lat_long(self, corners: List[Tuple[int]]) -> Tuple[int]:
+    def _generate_lat_long(self, corners: List[Tuple[float, float]]) -> None:
         '''
         Use tile name to set bounding box of tile:
 
@@ -332,10 +346,10 @@ class LatLongBox():
         self.bl = (array_center[1] - pixels_move, array_center[0] + pixels_move)
 
     def _get_lat_long_bbox(self,
-                           corners: List[Tuple[int]],
-                           new_corner: Tuple[int],
+                           corners: List[Tuple[float, float]],
+                           new_corner: Tuple[float, float],
                            stack: str,
-                           idx: int = 0) -> List[Tuple[int]]:
+                           idx: int = 0) -> List[Tuple[float, float]]:
         '''
         This method will update the corners of the array
 
@@ -382,8 +396,12 @@ class LatLongBox():
                 return [BL, BR, tr, tl]
             else:
                 return [BL, BR, TR, tl]
+        else:
+            raise ValueError('Invalid values for inputs: '
+                             f'corners: {corners}, new_corner: {new_corner}, '
+                             f'stack: {stack}, idx: {idx}')
 
-    def _update_corners(self) -> np.ndarray:
+    def _update_corners(self) -> None:
         '''
         Method to update corners of total area when 1+ tiles is needed
 
@@ -462,7 +480,7 @@ class DataLayer():
         '''
         This parent class only exists to set a base value for self.data
         '''
-        self.data = None
+        self.data: np.ndarray
 
 
 class TopographyLayer(DataLayer):
@@ -565,7 +583,7 @@ class OperationalTopographyLayer(TopographyLayer):
         data_array = 3.28084 * data_array
         return data_array
 
-    def _get_dems(self) -> List[Path]:
+    def _get_dems(self) -> None:
         '''
         This method will use the outputed tiles and return the correct dem files
 
@@ -743,7 +761,7 @@ class OperationalFuelLayer(FuelLayer):
         data_array = data[tr[0]:bl[0], tr[1]:bl[1]]
         return data_array
 
-    def _get_fuel_dems(self) -> List[Path]:
+    def _get_fuel_dems(self) -> None:
         '''
         This method will use the outputed tiles and return the correct dem files
             for both the RGB fuel model data and the fuel model data

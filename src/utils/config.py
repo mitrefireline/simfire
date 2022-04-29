@@ -143,7 +143,6 @@ class Config:
                 args = self.terrain.perlin
                 noise = PerlinNoise2D(args.amplitude, args.shape, args.resolution,
                                       args.seed)
-                noise.precompute()
                 elevation_layer = FunctionalTopographyLayer(self.area.screen_size,
                                                             self.area.screen_size,
                                                             noise.fn)

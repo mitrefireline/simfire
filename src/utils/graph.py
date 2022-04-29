@@ -1,4 +1,4 @@
-from typing import Sequence, Tuple
+from typing import List, Sequence, Tuple, Union
 
 from matplotlib import lines as mlines
 import matplotlib.pyplot as plt
@@ -32,7 +32,7 @@ class FireSpreadGraph():
         self.nodes = self._create_nodes()
         self.graph.add_nodes_from(self.nodes)
 
-    def _create_nodes(self) -> Tuple[Tuple[int, int]]:
+    def _create_nodes(self) -> Tuple[Tuple[int, int], ...]:
         '''
         Create the nodes for the graph. The nodes are tuples in (x, y) format.
 
@@ -67,18 +67,18 @@ class FireSpreadGraph():
             A numpy array of shape (Y, X), where Y is the largest y-coordinate
             in self.nodes, and X is the largest x-coordinate in self.nodes
         '''
+        heatmap: Union[List[int], List[List[int]]]
         if flat:
             heatmap = [len(nx.descendants(self.graph, node)) for node in self.graph.nodes]
-            heatmap = np.array(heatmap)
         else:
             yrange, xrange = self.screen_size
             heatmap = [[len(nx.descendants(self.graph, (y, x))) for x in range(xrange)]
                        for y in range(yrange)]
-            heatmap = np.array(heatmap)
 
-        return heatmap
+        return np.array(heatmap)
 
-    def add_edges_from_manager(self, x_coords: Sequence[int], y_coords: Sequence[int],
+    def add_edges_from_manager(self, x_coords: Union[int, Sequence[int]],
+                               y_coords: Union[int, Sequence[int]],
                                fire_map: np.ndarray) -> None:
         '''
         Update the graph to include edges to newly burning nodes/pixels in
@@ -96,9 +96,15 @@ class FireSpreadGraph():
         '''
         # Singular numpy arrays called with arr.tolist() are returned as single
         # values. Convert to list for compatibility
-        if isinstance(x_coords, int):
+        if isinstance(x_coords, int) and isinstance(y_coords, int):
             x_coords = [x_coords]
             y_coords = [y_coords]
+        elif isinstance(x_coords, Sequence) and isinstance(y_coords, Sequence):
+            x_coords = list(x_coords)
+            y_coords = list(y_coords)
+        else:
+            raise ValueError('x_coords and y_coords should both be int or Sequence. '
+                             f'Got {type(x_coords)} and {type(y_coords)}, respectively')
         # Check that the x and y coordinates will align
         if (x_len := len(x_coords)) != (y_len := len(y_coords)):
             raise ValueError(f'The length of x_coords ({x_len}) should match '
@@ -184,7 +190,7 @@ class FireSpreadGraph():
             legend_elements.append(longest_path_artist)
         else:
             # 'k' is black for matplotlib
-            edge_color = 'k'
+            edge_color = ['k' for edge in self.graph.edges]
 
         # All nodes with outbound edges will red by default.
         # 'r' is red for matplotlib

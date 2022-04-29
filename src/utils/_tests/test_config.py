@@ -86,7 +86,6 @@ class ConfigTest(unittest.TestCase):
         '''
         x, y = (5, 5)
         pnoise = PerlinNoise2D(500, (9, 9), (1, 1), 1111)
-        pnoise.precompute()
         # This is the only way I could really come up with to make the correct function
         # was assigned - mdoyle
         self.assertEqual(self.cfg.terrain.elevation_function.elevation_fn.__doc__,

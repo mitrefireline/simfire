@@ -15,9 +15,8 @@ def create_logger(name: str) -> logging.Logger:
     log: logging.Logger
         The `Logger` object that will be used to create log statements in the terminal.
     '''
-    if os.environ.get('LOGLEVEL') is not None:
-        log_level = os.environ.get('LOGLEVEL')
-    else:
+    log_level = os.environ.get('LOGLEVEL') is not None
+    if log_level is None:
         log_level = 'INFO'
 
     formatter = logging.Formatter('%(asctime)s : %(levelname)s : '

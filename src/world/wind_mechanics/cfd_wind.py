@@ -2,7 +2,7 @@ import math
 import pygame
 import numpy as np
 
-terrain_features = 0
+terrain_features: np.ndarray
 
 
 class Fluid():

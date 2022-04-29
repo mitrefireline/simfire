@@ -42,17 +42,19 @@ class WindNoise():
         self.octaves: int = octaves
         self.persistence: float = persistence
         self.lacunarity: float = lacunarity
+        self.range_min: float
+        self.range_max: float
 
     def set_noise_parameters(self, seed: int, scale: int, octaves: int,
                              persistence: float, lacunarity: float, range_min: float,
                              range_max: float):
-        self.seed: int = seed
-        self.scale: int = scale
-        self.octaves: int = octaves
-        self.persistence: float = persistence
-        self.lacunarity: float = lacunarity
-        self.range_min: float = range_min
-        self.range_max: float = range_max
+        self.seed = seed
+        self.scale = scale
+        self.octaves = octaves
+        self.persistence = persistence
+        self.lacunarity = lacunarity
+        self.range_min = range_min
+        self.range_max = range_max
 
     def generate_map_array(self, screen_size) -> Sequence[Sequence[float]]:
         map = []

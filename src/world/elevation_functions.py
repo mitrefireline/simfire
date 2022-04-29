@@ -60,16 +60,16 @@ class PerlinNoise2D():
         self.shape = shape
         self.res = res
         self.seed = seed
-        self.terrain_map = None
+        self.terrain_map = self._precompute()
 
-    def precompute(self) -> None:
+    def _precompute(self) -> np.ndarray:
         '''
         Precompute the noise at each (x, y) location for faster use later.
         '''
         def f(t):
             return 6 * t**5 - 15 * t**4 + 10 * t**3
 
-        delta = (self.res[0] / self.shape[0], self.res[1] / self.shape[1])
+        delta = (self.res[0] // self.shape[0], self.res[1] // self.shape[1])
         d = (self.shape[0] // self.res[0], self.shape[1] // self.res[1])
         grid = np.mgrid[0:self.res[0]:delta[0], 0:self.res[1]:delta[1]].transpose(
             1, 2, 0) % 1
@@ -91,9 +91,11 @@ class PerlinNoise2D():
         t = f(grid)
         n0 = n00 * (1 - t[:, :, 0]) + t[:, :, 0] * n10
         n1 = n01 * (1 - t[:, :, 0]) + t[:, :, 0] * n11
-        self.terrain_map = self.amplitude * np.sqrt(2) * (
+        terrain_map = self.amplitude * np.sqrt(2) * (
             (1 - t[:, :, 1]) * n0 + t[:, :, 1] * n1)
-        self.terrain_map = self.terrain_map + np.min(self.terrain_map)
+        terrain_map = terrain_map + np.min(terrain_map)
+
+        return terrain_map
 
     def fn(self, x: int, y: int) -> float:
         '''

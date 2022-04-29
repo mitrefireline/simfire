@@ -500,6 +500,7 @@ class TopographyLayer(DataLayer):
             None
         '''
         super().__init__()
+        self.image: np.ndarray
 
     def _make_contours(self) -> QuadContourSet:
         '''
@@ -665,6 +666,7 @@ class FuelLayer(DataLayer):
             None
         '''
         super().__init__()
+        self.image: np.ndarray
 
     def _make_image(self) -> np.ndarray:
         '''

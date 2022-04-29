@@ -1,3 +1,4 @@
+from typing import List
 import numpy as np
 import pygame
 
@@ -16,8 +17,8 @@ class WindController():
     def __init__(self, screen_size: int = 225) -> None:
         self.speed_layer = WindNoise()
         self.direction_layer = WindNoise()
-        self.map_wind_speed = []
-        self.map_wind_direction = []
+        self.map_wind_speed: List[List[float]] = []
+        self.map_wind_direction: List[List[float]] = []
         self.screen_size = screen_size
 
     def init_wind_speed_generator(self, seed: int, scale: int, octaves: int,
@@ -89,8 +90,8 @@ class WindController2():
                  terrain_features: np.ndarray = None,
                  wind_speed: float = 27,
                  wind_direction: str = 'North') -> None:
-        self.N: int = screen_size
-        self.iterations: int = result_accuracy
+        self.N = screen_size
+        self.iterations = result_accuracy
         self.scale = scale
         self.timestep = timestep
         self.diffusion = diffusion
@@ -112,7 +113,7 @@ class WindController2():
             if self.wind_direction == 'north':
                 self.fvect.addVelocity(v, 1, 0, self.wind_speed)
             elif self.wind_direction == 'east':
-                self.fvect.addVelocity(self.screen_size - 1, v, -1 * self.wind_speed, 0)
+                self.fvect.addVelocity(self.N - 1, v, -1 * self.wind_speed, 0)
             elif self.wind_direction == 'south':
                 self.fvect.addVelocity(1, v, -1 * self.wind_speed, 0)
             elif self.wind_direction == 'west':
@@ -135,5 +136,5 @@ class WindController2():
     def get_wind_scale(self) -> int:
         return self.scale
 
-    def get_screen_size(self) -> None:
+    def get_screen_size(self) -> int:
         return self.N

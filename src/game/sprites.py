@@ -1,5 +1,5 @@
 import tempfile
-from typing import Tuple
+from typing import Any, Optional, Tuple
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -48,37 +48,73 @@ class Terrain(pygame.sprite.Sprite):
         self.elevations = self.topo_layer.data.squeeze()
         self.fuels = self.fuel_layer.data.squeeze()
 
-        if self.headless:
-            self.image = None
-            self.rect = None
-        else:
+        self.image: Optional[pygame.surface.Surface]
+        self.rect: Optional[pygame.Rect]
+
+        if not self.headless:
             # Create the terrain image
             terrain_image = self._make_terrain_image()
             # Convert the terrain image to a PyGame surface for display
             self.image = pygame.surfarray.make_surface(terrain_image.swapaxes(0, 1))
             # The rectangle for this sprite is the entire game
             self.rect = pygame.Rect(0, 0, *self.screen_size)
+        else:
+            self.image = None
+            self.rect = None
 
         # This sprite should always have layer 1 since it will always
         # be behind every other sprite
         self.layer = SpriteLayer.TERRAIN
 
-    def update(self, fire_map: np.ndarray) -> None:
+    def update(self, *args: Any, **kwargs: Any) -> None:
         '''
         Change any burned squares to brown using fire_map, which
         contains pixel-wise values for tile burn status.
+        The parent class update() expects just args and kwargs, so we
 
         Arguments:
-            fire_map: A map containing enumerated values for unburned,
-                      burning, and burned tile status
+            a
+            fire_map: A 2-D numpy array containing enumerated values for unburned,
+                      burning, and burned tile status for the game screen
 
         Returns: None
         '''
+        # Argument checks for compatibility
+        if len(args) == 0 or len(args) > 1:
+            raise ValueError('The input arguments to update() should contain'
+                             'only one value for the fire_map. Instead got: '
+                             f'{args}')
+        if len(kwargs) > 0:
+            raise ValueError('The input keyword arguments to update() should '
+                             f'contain no values. Instead got: {kwargs}')
+        if not isinstance(args[0], np.ndarray):
+            raise TypeError('The input fire_map should be a numpy array. '
+                            f'Instead got: {args[0]}')
+
+        fire_map: np.ndarray = args[0]
+        if fire_map.shape != self.screen_size:
+            raise ValueError(f'The shape of the fire_map {fire_map.shape} does '
+                             f'not match the shape of the screen {self.screen_size}')
         fire_map = fire_map.copy()
+        self._update(fire_map)
+
+    def _update(self, fire_map: np.ndarray) -> None:
+        '''
+        Internal method to update the burned squares to brown. This will update
+        self.image in-place.
+        This is needed because the parent class Sprite.update() only take in
+        args and kwargs, and we want to do input checking on those parameters
+        before updating.
+
+        Arguments:
+            fire_map: A 2-D numpy array containing enumerated values for unburned,
+                      burning, and burned tile status for the game screen
+        '''
         burned_idxs = np.where(fire_map == BurnStatus.BURNED)
         if not self.headless:
             # This method will update self.image in-place with arr
-            arr = pygame.surfarray.pixels3d(self.image)
+            if self.image is not None:
+                arr = pygame.surfarray.pixels3d(self.image)
             arr[burned_idxs[::-1]] = BURNED_RGB_COLOR
 
     def _make_terrain_image(self) -> np.ndarray:
@@ -157,7 +193,7 @@ class Fire(pygame.sprite.Sprite):
             self.image = None
             # Need to use self.rect to track the location of the sprite
             # When running headless, we need this to be a tuple instead of a PyGame Rect
-            self.rect = pos + (size, size)
+            self.rect = pygame.Rect(*(pos + (size, size)))
         else:
             fire_color = np.zeros((self.size, self.size, 3))
             fire_color[:, :, 0] = 255
@@ -168,16 +204,12 @@ class Fire(pygame.sprite.Sprite):
             self.rect = self.image.get_rect()
             self.rect = self.rect.move(self.pos[0], self.pos[1])
 
-        # Initialize groups to None to start with a "clean" sprite
-        self.groups = None
-
         # Layer 3 so that it appears on top of the terrain and line (if applicable)
         self.layer: int = SpriteLayer.FIRE
 
-    def update(self) -> None:
+    def update(self, *args, **kwargs) -> None:
         '''
         Currently unused.
-
         '''
         pass
 
@@ -210,7 +242,7 @@ class FireLine(pygame.sprite.Sprite):
             self.image = None
             # Need to use self.rect to track the location of the sprite
             # When running headless, we need this to be a tuple instead of a PyGame Rect
-            self.rect = pos + (size, size)
+            self.rect = pygame.Rect(*(pos + (size, size)))
         else:
             fireline_color = np.zeros((self.size, self.size, 3))
             fireline_color[:, :, 0] = 155  # R
@@ -224,11 +256,10 @@ class FireLine(pygame.sprite.Sprite):
         # Layer LINE so that it appears on top of the terrain
         self.layer: int = SpriteLayer.LINE
 
-    def update(self) -> None:
+    def update(self, *args, **kwargs) -> None:
         '''
         This doesn't require to be updated right now. May change in the future if we
         learn new things about the physics.
-
         '''
         pass
 
@@ -254,7 +285,7 @@ class ScratchLine(pygame.sprite.Sprite):
             self.image = None
             # Need to use self.rect to track the location of the sprite
             # When running headless, we need this to be a tuple instead of a PyGame Rect
-            self.rect = pos + (size, size)
+            self.rect = pygame.Rect(*(pos + (size, size)))
         else:
             scratchline_color = np.zeros((self.size, self.size, 3))
             scratchline_color[:, :, 0] = 139  # R
@@ -268,7 +299,7 @@ class ScratchLine(pygame.sprite.Sprite):
         # Layer LINE so that it appears on top of the terrain
         self.layer: int = SpriteLayer.LINE
 
-    def update(self) -> None:
+    def update(self, *args, **kwargs) -> None:
         '''
         This doesn't require to be updated right now. May change in the future if we
         learn new things about the physics.
@@ -298,7 +329,7 @@ class WetLine(pygame.sprite.Sprite):
             self.image = None
             # Need to use self.rect to track the location of the sprite
             # When running headless, we need this to be a tuple instead of a PyGame Rect
-            self.rect = pos + (size, size)
+            self.rect = pygame.Rect(*(pos + (size, size)))
         else:
             wetline_color = np.zeros((self.size, self.size, 3))
             wetline_color[:, :, 0] = 212  # R
@@ -312,7 +343,7 @@ class WetLine(pygame.sprite.Sprite):
         # Layer LINE so that it appears on top of the terrain
         self.layer: int = SpriteLayer.LINE
 
-    def update(self) -> None:
+    def update(self, *args, **kwargs) -> None:
         '''
         This doesn't require to be updated right now. May change in the future if we
         learn new things about the physics.

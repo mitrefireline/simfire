@@ -69,10 +69,12 @@ class PerlinNoise2D():
         def f(t):
             return 6 * t**5 - 15 * t**4 + 10 * t**3
 
-        delta = (self.res[0] // self.shape[0], self.res[1] // self.shape[1])
+        delta = (self.res[0] / self.shape[0], self.res[1] / self.shape[1])
         d = (self.shape[0] // self.res[0], self.shape[1] // self.res[1])
-        grid = np.mgrid[0:self.res[0]:delta[0], 0:self.res[1]:delta[1]].transpose(
-            1, 2, 0) % 1
+        # Ignore mypy here becuase it thinks the floats in delta are indexing an array,
+        # but this is the intended functionality of np.mgrid()
+        grid = np.mgrid[0:self.res[0]:delta[0],  # type: ignore
+                        0:self.res[1]:delta[1]].transpose(1, 2, 0) % 1  # type: ignore
         # Gradients
         if isinstance(self.seed, int):
             np.random.seed(self.seed)

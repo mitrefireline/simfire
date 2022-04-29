@@ -18,8 +18,7 @@ from ...utils.graph import FireSpreadGraph
 from ...world.parameters import Environment, FuelParticle
 from ...world.rothermel import compute_rate_of_spread
 
-NewLocsType = Tuple[Tuple[int, int], Tuple[int, int], Tuple[int, int], Tuple[int, int],
-                    Tuple[int, int], Tuple[int, int], Tuple[int, int], Tuple[int, int]]
+NewLocsType = Tuple[Tuple[int, int], ...]
 
 SpriteParamsType = List[Union[List[float], Tuple[float]]]
 
@@ -95,22 +94,33 @@ class FireManager():
         Returns:
             An updated `fire_map` with sprites pruned
         '''
+        # lists_zipped = [[s, d] for s, d in zip(self.sprites, self.durations)]
         lists_zipped = list(zip(self.sprites, self.durations))
         # Get the sprites whose duration exceeds the max allowed duration
-        results = list(filter(lambda x: x[1] >= self.max_fire_duration, lists_zipped))
-        results = list(zip(*results))
-        if len(results) > 0:
-            expired_sprites = results[0]
-            # Use the expired sprites to mark self.fire_map as burned
+        expired_results = list(
+            filter(lambda x: x[1] >= self.max_fire_duration, lists_zipped))
+        expired_results = list(zip(*expired_results))
+        # Use the expired sprites to mark self.fire_map as burned
+        if len(expired_results) > 0:
+            expired_sprites = expired_results[0]
             for sprite in expired_sprites:
                 x, y, _, _ = sprite.rect
                 fire_map[y, x] = BurnStatus.BURNED
 
         # Remove the expired sprites
-        results = list(filter(lambda x: x[1] < self.max_fire_duration, lists_zipped))
+        non_expired_results = list(
+            filter(lambda x: x[1] < self.max_fire_duration, lists_zipped))
 
-        if len(results) > 0:
-            self.sprites, self.durations = list(map(list, zip(*results)))
+        # Re-assign sprites and durations, then slice off excess
+        if len(non_expired_results) > 0:
+            num_results = len(non_expired_results)
+            for i in range(num_results):
+                self.sprites[i] = non_expired_results[i][0]
+                self.durations[i] = non_expired_results[i][1]
+            # Slice off everything else since all the non-expired sprites have
+            # been assigned
+            self.sprites = self.sprites[:num_results]
+            self.durations = self.durations[:num_results]
         else:
             self.sprites = []
             self.durations = []

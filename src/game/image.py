@@ -3,7 +3,7 @@ from PIL import Image
 import pygame
 
 
-def load_image(name: str) -> pygame.Surface:
+def load_image(name: str) -> pygame.surface.Surface:
     '''
     Load an image as a pygame.Surface.
 

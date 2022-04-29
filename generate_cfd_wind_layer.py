@@ -1,14 +1,18 @@
+'''
+Generate CFD Wind Layer
+=======================
+Seperate file to precompute wind layer, currently using wind with a single time slice
+due to processing limitations.
+'''
 import pygame
-# import fluid
 import numpy as np
+
 import time
 from pathlib import Path
+
 from src.utils.config import Config
 
 pygame.init()
-
-# Seperate file to precompute wind layer, currently using wind with a single time slice
-# due to processing limitations
 
 
 def renderD(surface, screen_size, scale, density) -> None:
@@ -99,11 +103,10 @@ def generate_cfd_wind_layer(display: bool = False):
 
     wm_mag = generate_magnitude_array(wm_velocity_x, wm_velocity_y)
     wm_dir = generate_direction_array(wm_velocity_x, wm_velocity_y)
-    np.save('generated_wind_magnitudes', wm_mag)
-    np.save('generated_wind_directions', wm_dir)
+
+    np.save('generated_wind_magnitudes.npy', wm_mag)
+    np.save('generated_wind_directions.npy', wm_dir)
 
 
 if __name__ == '__main__':
-    #  x = np.load('generated_wind_velocity_map_x.npy')
-    #  y = np.load('generated_wind_velocity_map_y.npy')
     generate_cfd_wind_layer(False)

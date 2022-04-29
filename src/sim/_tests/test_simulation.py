@@ -6,7 +6,7 @@ from pathlib import Path
 
 from ...enums import BurnStatus
 from ...game.sprites import Terrain
-from ...utils.config import Config
+from ...utils.config import Config, ConfigError
 from ...sim.simulation import RothermelSimulation
 
 
@@ -200,3 +200,28 @@ class RothermelSimulationTest(unittest.TestCase):
         self.assertFalse(success,
                          msg='The set_seeds method should have returned False '
                          f'with input seeds set to {seeds}')
+
+    def test_get_layer_types(self) -> None:
+        '''
+        Test the getting of the layer types
+        '''
+        layer_types = self.simulation.get_layer_types()
+        self.assertIsInstance(layer_types, Dict)
+        self.assertIn('elevation', layer_types)
+        self.assertIn('fuel', layer_types)
+
+    def test_set_layer_types(self) -> None:
+        '''
+        Test setting the layer types
+        '''
+        layer_types = {'elevation': 'operational', 'fuel': 'operational'}
+        self.simulation.set_layer_types(layer_types)
+        self.assertDictEqual(layer_types, self.simulation.get_layer_types())
+
+        # Test that the layer types are set to the default if the input is not valid
+        layer_types = {'elevation': 'not_valid', 'fuel': 'operational'}
+        self.assertRaises(ConfigError, self.simulation.set_layer_types, layer_types)
+
+        # Test that we output a log warning
+        layer_types = {'asdf': 'functional', 'qwer': 'functional'}
+        self.assertWarns(Warning, self.simulation.set_layer_types, layer_types)

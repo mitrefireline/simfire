@@ -2,6 +2,7 @@ import numpy as np
 
 from abc import ABC, abstractmethod
 from typing import Dict, Union, Tuple, Iterable
+import warnings
 
 from ..utils.config import Config
 from ..game.sprites import Terrain
@@ -490,9 +491,12 @@ class RothermelSimulation(Simulation):
         valid_keys = list(self.get_seeds().keys())
         for key in keys:
             if key not in valid_keys:
-                log.warn('No valid keys in the seeds dictionary were given to the '
-                         'set_seeds method. No seeds will be changed. Valid keys are: '
-                         f'{valid_keys}')
+                message = ('No valid keys in the seeds dictionary were given to the '
+                           'set_seeds method. No seeds will be changed. Valid keys are: '
+                           f'{valid_keys}')
+                log.warning(message)
+                warnings.warn(message)
+                success = False
         return success
 
     def get_layer_types(self) -> Dict[str, str]:
@@ -536,8 +540,10 @@ class RothermelSimulation(Simulation):
         valid_keys = list(self.get_layer_types().keys())
         for key in keys:
             if key not in valid_keys:
-                log.warn('No valid keys in the types dictionary were given to the '
-                         'set_data_types method. No data types will be changed. Valid '
-                         f'keys are: {valid_keys}')
+                message = ('No valid keys in the types dictionary were given to the '
+                           'set_data_types method. No data types will be changed. Valid '
+                           f'keys are: {valid_keys}')
+                log.warning(message)
+                warnings.warn(message)
                 success = False
         return success

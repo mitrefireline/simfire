@@ -88,7 +88,7 @@ class ConfigTest(unittest.TestCase):
         # was assigned - mdoyle
         self.assertEqual(self.cfg.terrain.topography.layer.name,
                          'perlin',
-                         msg='The name for the set config terrain.elevation_function '
+                         msg='The name for the set config terrain.topography.layer.name '
                          f'({self.cfg.terrain.topography.layer.name}) does not match '
                          '"perlin"')
 

@@ -173,7 +173,6 @@ class Config:
                 setattr(self.terrain.topography, 'layer', topo_layer)
             elif elevation == 'gaussian':
                 # Reset the value, if we are resetting the function
-                self.terrain.elevation_function = 'gaussian'
                 args = self.terrain.topography.functional.gaussian
                 noise = gaussian(args.amplitude, args.mu_x, args.mu_y, args.sigma_x,
                                  args.sigma_y)
@@ -236,7 +235,7 @@ class Config:
                 log.error(message)
         elif self.terrain.fuel.type.lower() == 'operational':
             fuel_layer = OperationalFuelLayer(self.lat_long_box)
-            setattr(self.fuel, 'layer', fuel_layer)
+            setattr(self.terrain.fuel, 'layer', fuel_layer)
         else:
             message = ('Unable to load fuel of type '
                        f'{self.terrain.fuel.type}. Please check your config file '
@@ -322,7 +321,7 @@ class Config:
         terrain_map = np.zeros((args.shape[0], args.shape[1]))
         for x in range(0, args.shape[0]):
             for y in range(0, args.shape[1]):
-                terrain_map[x][y] = self.terrain.elevation_function(x, y)
+                terrain_map[x][y] = self.terrain.layer.data[y, x]
         '''
         TODO: Need to optimize cfd to work on 3d space.  For now we get the average
         terrain height and for values slightly greater than that average we will

@@ -202,7 +202,7 @@ class RothermelSimulation(Simulation):
         bounds = {}
         if isinstance(self.terrain.fuel_layer, FunctionalFuelLayer):
             fuel_bounds = {
-                'w0': {
+                'w_0': {
                     'min': FuelConstants.W_0_MIN,
                     'max': FuelConstants.W_0_MAX
                 },

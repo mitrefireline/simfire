@@ -2,6 +2,7 @@ from typing import Tuple
 
 import numpy as np
 
+from ..enums import FuelConstants
 from ..world.parameters import Fuel
 
 
@@ -34,7 +35,7 @@ def w_0_seed(seed: int) -> float:
     '''
     np.random.seed(seed)
     # Update the test for this function if this range is changed in the future
-    w_0 = np.random.uniform(.2, .6)
+    w_0 = np.random.uniform(FuelConstants.W_0_MIN, FuelConstants.W_0_MAX)
     return w_0
 
 
@@ -51,7 +52,10 @@ def chaparral(seed: int = None) -> Fuel:
         A fuel with randomized `w_0`, `delta == 6.0`, `M_x == 0.2`, and `sigma == 1739`.
     '''
     w_0 = w_0_seed(seed)
-    return Fuel(w_0=w_0, delta=6.000, M_x=0.2000, sigma=1739)
+    return Fuel(w_0=w_0,
+                delta=FuelConstants.DELTA,
+                M_x=FuelConstants.M_X,
+                sigma=FuelConstants.SIGMA)
 
 
 def fuel(seed: int = None) -> Tuple[float, float]:
@@ -61,8 +65,9 @@ def fuel(seed: int = None) -> Tuple[float, float]:
 
     Predefine CA latitude / longitude bounds (N, W, S, E)
 
+    Returns:
+        A tuple of latitude and longitude.
     '''
-
     north = 41.81527476
     south = 32.85980972
     east = 113.8035177

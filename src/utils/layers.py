@@ -487,14 +487,13 @@ class OperationalTopographyLayer(TopographyLayer):
     def __init__(self, lat_long_box: LatLongBox) -> None:
         '''
         Initialize the elevation layer by retrieving the correct topograpchic data
-        and computing the area.
+        and computing the area
 
         Arguments:
-            center: The lat/long coordinates of the center point of the screen
-            height: The height of the screen size
-            width: The width of the screen size
-            resolution: The resolution to get data
-
+            center: The lat/long coordinates of the center point of the screen.
+            height: The height of the screen size (meters).
+            width: The width of the screen size (meters).
+            resolution: The resolution to get data (meters).
         '''
         super().__init__()
         self.lat_long_box = lat_long_box
@@ -648,9 +647,9 @@ class OperationalFuelLayer(FuelLayer):
 
         Arguments:
             center: The lat/long coordinates of the center point of the screen
-            height: The height of the screen size
-            width: The width of the screen size
-            resolution: The resolution to get data
+            height: The height of the screen size (meters)
+            width: The width of the screen size (meters)
+            resolution: The resolution to get data (meters)
             type: The type of data you wnt to load: 'display' or 'simulation'
                   display: rgb data for rothermel
                   simulation: fuel model values for RL Harness/Simulation

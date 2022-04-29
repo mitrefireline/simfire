@@ -51,16 +51,15 @@ class Terrain(pygame.sprite.Sprite):
         self.image: Optional[pygame.surface.Surface]
         self.rect: Optional[pygame.Rect]
 
+        self.rect = pygame.Rect(0, 0, *self.screen_size)
         if not self.headless:
             # Create the terrain image
             terrain_image = self._make_terrain_image()
             # Convert the terrain image to a PyGame surface for display
             self.image = pygame.surfarray.make_surface(terrain_image.swapaxes(0, 1))
             # The rectangle for this sprite is the entire game
-            self.rect = pygame.Rect(0, 0, *self.screen_size)
         else:
             self.image = None
-            self.rect = None
 
         # This sprite should always have layer 1 since it will always
         # be behind every other sprite
@@ -188,6 +187,7 @@ class Fire(pygame.sprite.Sprite):
         self.pos = pos
         self.size = size
         self.headless = headless
+        self.rect: pygame.rect.Rect
 
         if self.headless:
             self.image = None

@@ -104,8 +104,11 @@ def generate_cfd_wind_layer(display: bool = False):
     wm_mag = generate_magnitude_array(wm_velocity_x, wm_velocity_y)
     wm_dir = generate_direction_array(wm_velocity_x, wm_velocity_y)
 
-    np.save('generated_wind_magnitudes.npy', wm_mag)
-    np.save('generated_wind_directions.npy', wm_dir)
+    rothsim_path = Path.home() / '.rothsim'
+    wind_path = rothsim_path / 'wind'
+    wind_path.mkdir(parents=True)
+    np.save(wind_path / 'generated_wind_magnitudes.npy', wm_mag)
+    np.save(wind_path / 'generated_wind_directions.npy', wm_dir)
 
 
 if __name__ == '__main__':

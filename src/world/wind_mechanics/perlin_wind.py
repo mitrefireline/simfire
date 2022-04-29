@@ -56,7 +56,7 @@ class WindNoise():
         map = []
         map = [[self._generate_noise_value(x, y) for x in range(screen_size)]
                for y in range(screen_size)]
-        return np.array(map)
+        return np.array(map, dtype=np.float32)
 
     def _denormalize_noise_value(self, noise_value):
         denormalized_value = (((noise_value + 1) *

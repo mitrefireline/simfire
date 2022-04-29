@@ -508,7 +508,7 @@ class OperationalTopographyLayer(TopographyLayer):
     def _make_data(self) -> np.ndarray:
         self._get_dems()
         data = Image.open(self.tif_filenames[0])
-        data = np.asarray(data)
+        data = np.array(data, dtype=np.float32)
         # flip axis because latitude goes up but numpy will read it down
         data = np.flip(data, 0)
         data = np.expand_dims(data, axis=-1)
@@ -523,7 +523,7 @@ class OperationalTopographyLayer(TopographyLayer):
             tmp_array = data
             for idx, dem in enumerate(self.tif_filenames[1:]):
                 tif_data = Image.open(dem)
-                tif_data = np.asarray(tif_data)
+                tif_data = np.array(tif_data, dtype=np.float32)
                 # flip axis because latitude goes up but numpy will read it down
                 tif_data = np.flip(tif_data, 0)
                 tif_data = np.expand_dims(tif_data, axis=-1)
@@ -679,7 +679,7 @@ class OperationalFuelLayer(FuelLayer):
     def _make_data(self, filename: List) -> np.ndarray:
 
         data = np.load(filename[0])
-        data = np.asarray(data)
+        data = np.array(data, dtype=np.float32)
         # flip axis because latitude goes up but numpy will read it down
         data = np.flip(data, 0)
         data = np.expand_dims(data, axis=-1)
@@ -694,7 +694,7 @@ class OperationalFuelLayer(FuelLayer):
             tmp_array = data
             for idx, dem in enumerate(filename[1:]):
                 tif_data = np.load(dem)
-                tif_data = np.asarray(tif_data)
+                tif_data = np.array(tif_data, dtype=np.float32)
                 # flip axis because latitude goes up but numpy will read it down
                 tif_data = np.flip(tif_data, 0)
                 tif_data = np.expand_dims(tif_data, axis=-1)

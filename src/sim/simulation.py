@@ -239,35 +239,38 @@ class RothermelSimulation(Simulation):
         Returns:
             The dictionary of observation data containing NumPy arrays.
         '''
+        w_0 = np.zeros_like(self.terrain.fuels)
+        sigma = np.zeros_like(self.terrain.fuels)
+        delta = np.zeros_like(self.terrain.fuels)
+        M_x = np.zeros_like(self.terrain.fuels)
+        for y in range(self.config.area.screen_size):
+            for x in range(self.config.area.screen_size):
+                fuel = self.terrain.fuels[y][x]
+                w_0[y][x] = fuel.w_0
+                sigma[y][x] = fuel.sigma
+                delta[y][x] = fuel.delta
+                M_x[y][x] = fuel.M_x
+
         return {
-            'w0':
-            np.array([[
-                self.terrain.fuels[i][j].w_0 for j in range(self.config.area.screen_size)
-            ] for i in range(self.config.area.screen_size)]),
-            'sigma':
-            np.array([[
-                self.terrain.fuels[i][j].sigma
-                for j in range(self.config.area.screen_size)
-            ] for i in range(self.config.area.screen_size)]),
-            'delta':
-            np.array([[
-                self.terrain.fuels[i][j].delta
-                for j in range(self.config.area.screen_size)
-            ] for i in range(self.config.area.screen_size)]),
-            'M_x':
-            np.array([[
-                self.terrain.fuels[i][j].M_x for j in range(self.config.area.screen_size)
-            ] for i in range(self.config.area.screen_size)]),
-            'elevation':
-            self.terrain.elevations,
-            'wind_speed':
-            self.config.wind.speed,
-            'wind_direction':
-            self.config.wind.direction
+            'w_0': w_0,
+            'sigma': sigma,
+            'delta': delta,
+            'M_x': M_x,
+            'elevation': self.terrain.elevations,
+            'wind_speed': self.config.wind.speed,
+            'wind_direction': self.config.wind.direction
         }
 
     def _correct_pos(self, position: np.ndarray) -> np.ndarray:
         '''
+        Correct the position to be the same shape as
+        `(self.config.area.screen_size, self.config.area.screen_size)`
+
+        Arguments:
+            position: The position to be corrected.
+
+        Returns:
+            The corrected position.
         '''
         pos = position.flatten()
         current_pos = np.where(pos == 1)[0]

@@ -58,8 +58,7 @@ environment:
 wind:
   function: perlin
   cfd:
-    time_to_train: 1000 # Seconds, longer is better
-    iterations: 1
+    time_to_train: 1000
     scale: 1
     timestep_dt: 1.0
     diffusion: 0.0

@@ -65,9 +65,51 @@ Whether or not to attenuate rate of spread based on the type of line being used.
 
 ---
 
+### Operational Parameters
+These are the operational parameters that will be used for the operational data layers that rely on a location, if those layers' types are set to `operational`.
+#### seed
+(`int`)<br>
+The seed that would pick a random latitude and longitude. Leave empty if using the [latitude](#latitude) and [longitude](#longitude) below.
+
+#### latitude
+(`float`)<br>
+The latitude given in decimal degrees.
+
+#### longitude
+(`float`)<br>
+The longitude given in decimal degrees.
+
+#### height
+(`int`)<br>
+The height of the screen in meters.
+
+#### width
+(`int`)<br>
+The width of the screen in meters.
+
+#### resolution
+(`int`)<br>
+The resolution of each pixel in meters. Data is measured in pixels corresponding to the resolution i.e: resolution = 10m = 1 pixel.
+
+---
+
 ### Terrain Parameters
 
-#### elevation_function
+#### topography
+All configuration settings for the topography in the simulation area.
+
+##### type
+(`str`)<br>
+Can be either `operational` or `functional`.
+
+If `operational`, will use the parameters in the [Operational Parameters](#operational-parameters) section to determine topography in the simulation area.
+
+If `functional`, will use the parameters in [terrain.topography.functional](#functional) to determine topography in the simulation area.
+
+##### functional
+All configuration settings for determining the functional topography data layer.
+
+###### function
 (`str`)<br>
 The function that determines how elevation is distributed throughout the simulation area.
 The available elevation functions are currently:
@@ -76,7 +118,7 @@ The available elevation functions are currently:
   - gaussian
   - flat
 
-#### perlin
+###### perlin
 All arguments that would be passed into the PerlinNoise2D elevation class.
 
 - **amplitude** (`int`):<br>
@@ -91,7 +133,7 @@ All arguments that would be passed into the PerlinNoise2D elevation class.
 - **seed** (`int`):<br>
   The random seed used to determine the terrain elevation so that the user can recreate repeatable terrain.
 
-#### gaussian
+###### gaussian
 All arguments that would be passed into the gaussian function.
 
 - **amplitude** (`int`):<br>
@@ -109,14 +151,28 @@ All arguments that would be passed into the gaussian function.
 - **sigma_x** (`int`):<br>
   The variance of the 2D normal distribution in the `y` direction.
 
-#### fuel_array_function
+#### fuel
+All configuration settings for the fuel in the simulation area.
+
+##### type
+(`str`)<br>
+Can be either `operational` or `functional`.
+
+If `operational`, will use the parameters in the [Operational Parameters](#operational-parameters) section to determine fuel in the simulation area.
+
+If `functional`, will use the parameters in [terrain.fuel.functional](#functional-1) to determine fuel in the simulation area.
+
+##### functional
+All configuration settings for determining the functional topography data layer.
+
+###### function
 (`str`)<br>
 The function that determines how fuel is distributed throughout the simulation area.
 The available fuel functions are currently:
 
   - chaparral
 
-#### chaparral
+###### chaparral
 All arguments that would be passed into the chaparral fuel array function.
 
 - **seed** (`int`):<br>
@@ -149,13 +205,41 @@ Used in Rothermel calculation. Most of Southern California has the default value
 ### Wind Parameters
 Defines wind speed and direction generation.
 
-#### wind_function
+#### function
 (`str`)<br>
 The function that determines how wind is distributed throughout the simulation area.
 The available wind functions are currently:
 
+  - cfd
   - simple
   - perlin
+
+#### cfd
+A function for wind that uses a computational fluid dynamics (CFD) algorithm for wind modeling.
+
+- **time_to_train** (`int`): <br>
+  @ckempis: The time to train the CFD algorithm when preprocessing.
+
+- **iterations** (`int`): <br>
+  @ckempis
+
+- **scale** (`int`): <br>
+  @ckempis
+
+- **timestep_dt** (`int`): <br>
+  @ckempis
+
+- **diffusion** (`int`): <br>
+  @ckempis
+
+- **viscosity** (`int`): <br>
+  @ckempis
+
+- **speed** (`int`): <br>
+  @ckempis
+
+- **direction** (`int`): <br>
+  @ckempis
 
 #### simple
 A function for wind that keeps direction and speed constant throughout the whole simulation area.
@@ -238,6 +322,8 @@ Whether or not to render with post agent and fire in place.
 
 ## Example Config File
 
+Go [here](https://gitlab.mitre.org/fireline/rothermel-modeling/-/blob/master/configs) for more examples.
+
 ```yaml
 area:
   screen_size: 225
@@ -251,37 +337,60 @@ display:
 simulation:
   update_rate: 1
   runtime: 24h
-  headless: true
+  headless: false
 
 mitigation:
   ros_attenuation: true
 
+operational:
+  seed:
+  latitude: 39.67
+  longitude: 119.8
+  height: 4000
+  width: 4000
+  resolution: 30
+
 terrain:
-  elevation_function: perlin
-  perlin:
-    amplitude: 500
-    shape: (225, 225)
-    resolution: (1, 1)
-    seed: 1111
-  gaussian:
-    amplitude: 500
-    mu_x: 50
-    mu_y: 50
-    sigma_x: 50
-    sigma_y: 50
-  fuel_array_function: chaparral
-  chaparral:
-    seed: 1111
+  topography:
+    type: functional
+    functional:
+      function: perlin
+      perlin:
+        amplitude: 500
+        shape: (225, 225)
+        resolution: (1, 1)
+        seed: 1111
+      gaussian:
+        amplitude: 500
+        mu_x: 50
+        mu_y: 50
+        sigma_x: 50
+        sigma_y: 50
+  fuel:
+    type: functional
+    functional:
+      function: chaparral
+      chaparral:
+        seed: 1113
 
 fire:
-  fire_initial_position: (65, 65)
+  fire_initial_position: (16, 16)
   max_fire_duration: 4
 
 environment:
   moisture: 0.03
 
 wind:
-  wind_function: perlin
+  function: perlin
+  cfd:
+    time_to_train: 1000
+    iterations: 1
+    scale: 1
+    timestep_dt: 1.0
+    diffusion: 0.0
+    viscosity: 0.0000001
+    speed: 19
+    direction: north
   simple:
     speed: 7
     direction: 90.0
@@ -302,9 +411,4 @@ wind:
       lacunarity: 1.0
       min: 0.0
       max: 360.0
-
-render:
-  inline: false
-  post_agent: false
-  post_agent_with_fire: true
 ```

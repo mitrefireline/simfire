@@ -2,7 +2,7 @@ image: "python:3.9"
 
 before_script:
   - python --version
-  - pip install -r dev-requirements.txt
+  - if [ -d /nfs/lslab2/fireline/anaconda/roth-dev ]; then echo "Using existing roth-dev env"; else pip install -r dev-requirements.txt; fi
 
 stages:
   - Static Analysis
@@ -39,7 +39,7 @@ unittests:
   tags:
     - lslab2
   script:
-    - SDL_VIDEODRIVER=dummy python -m unittest discover -s src -t .. -p 'test_*.py'
+    - SDL_VIDEODRIVER=dummy /nfs/lslab2/fireline/anaconda/roth-dev/bin/python -m unittest discover -s src -t .. -p 'test_*.py'
   needs: []
   only:
     - merge_requests
@@ -49,7 +49,7 @@ game_rothermel.py:
   tags:
     - lslab2
   script:
-    - SDL_VIDEODRIVER="dummy" python game_rothermel.py
+    - SDL_VIDEODRIVER="dummy" /nfs/lslab2/fireline/anaconda/roth-dev/bin/python game_rothermel.py
   needs: []
   only:
     - merge_requests
@@ -59,10 +59,9 @@ coverage:
   tags:
   - lslab2
   script:
-    - pip install pytest pytest-cov
-    - SDL_VIDEODRIVER=dummy python -m coverage run -m pytest
-    - SDL_VIDEODRIVER=dummy python -m coverage report
-    - SDL_VIDEODRIVER=dummy python -m coverage xml
+    - SDL_VIDEODRIVER=dummy /nfs/lslab2/fireline/anaconda/roth-dev/bin/python -m coverage run -m pytest
+    - SDL_VIDEODRIVER=dummy /nfs/lslab2/fireline/anaconda/roth-dev/bin/python -m coverage report
+    - SDL_VIDEODRIVER=dummy /nfs/lslab2/fireline/anaconda/roth-dev/bin/python -m coverage xml
   artifacts:
     reports:
       cobertura: coverage.xml

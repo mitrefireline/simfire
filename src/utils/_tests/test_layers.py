@@ -229,7 +229,7 @@ class TestFunctionalTopograpyLayer(unittest.TestCase):
         '''
         height = self.screen_size[0]
         width = self.screen_size[1]
-        layer = FunctionalTopographyLayer(height, width, self.fn)
+        layer = FunctionalTopographyLayer(height, width, self.fn, name='test')
         correct_data_shape = self.screen_size + (1, )
         self.assertTupleEqual(correct_data_shape,
                               layer.data.shape,
@@ -314,7 +314,10 @@ class TestFunctionalFuelLayer(unittest.TestCase):
         self.height = 32
         self.width = 32
         self.fuel_fn = chaparral_fn()
-        self.FunctionalFuel = FunctionalFuelLayer(self.height, self.width, self.fuel_fn)
+        self.FunctionalFuel = FunctionalFuelLayer(self.height,
+                                                  self.width,
+                                                  self.fuel_fn,
+                                                  name='test')
 
     def test_data(self) -> None:
         '''

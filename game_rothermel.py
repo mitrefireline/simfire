@@ -25,9 +25,9 @@ def main():
 
     fuel_particle = FuelParticle()
 
-    game = Game(cfg.terrain.elevation_function.data.shape[:2])
+    game = Game((cfg.area.screen_size, cfg.area.screen_size))
 
-    terrain = Terrain(cfg.fuel.fuel_array_function, cfg.terrain.elevation_function,
+    terrain = Terrain(cfg.terrain.fuel.layer, cfg.terrain.topography.layer,
                       game.screen_size)
 
     # Use simple/constant wind speed for now

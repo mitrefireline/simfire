@@ -128,7 +128,13 @@ In order test documentation locally, you'll first have to install all the necess
 pip install sphinx sphinx-autoapi sphinx-rtd-theme myst-parser
 ```
 
-Then, you can build the documentation and view it by opening the `index.html` file located at:
+Then, you can build the documentation:
+
+```shell
+sphinx-build -d docs/build/doctrees docs/source docs/build/html
+```
+
+And view it by opening the `index.html` file located at:
 
 ```
 docs/build/html/index.html

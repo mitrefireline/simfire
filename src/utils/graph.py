@@ -69,12 +69,12 @@ class FireSpreadGraph():
         '''
         if flat:
             heatmap = [len(nx.descendants(self.graph, node)) for node in self.graph.nodes]
-            heatmap = np.array(heatmap)
+            heatmap = np.array(heatmap, dtype=np.int8)
         else:
             yrange, xrange = self.screen_size
             heatmap = [[len(nx.descendants(self.graph, (y, x))) for x in range(xrange)]
                        for y in range(yrange)]
-            heatmap = np.array(heatmap)
+            heatmap = np.array(heatmap, dtype=np.int8)
 
         return heatmap
 

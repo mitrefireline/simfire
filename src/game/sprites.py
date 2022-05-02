@@ -125,7 +125,7 @@ class Terrain(pygame.sprite.Sprite):
             out_img_pil = renderPM.drawToPIL(drawing)
         plt.close(fig)
         # Slice the alpha channel off
-        out_img = np.array(out_img_pil)[..., :3]
+        out_img = np.array(out_img_pil, dtype=np.uint8)[..., :3]
 
         return out_img
 

@@ -111,11 +111,12 @@ class Config:
         If either Fuel or Topography is Operational, use calculated pixel scale and
             screen size.
         '''
-        if self.terrain.topography.type.lower(
-        ) == 'functional' and self.terrain.fuel.type.lower():
+        if self.terrain.topography.type.lower() and self.terrain.fuel.type.lower(
+        ) == 'functional':
             setattr(self.area, 'terrain_scale',
                     self.area.pixel_scale * self.area.terrain_size)
-        elif self.terrain.topography.type.lower() == 'operational':
+        elif self.terrain.topography.type.lower() or self.terrain.fuel.type.lower(
+        ) == 'operational':
             args = self.operational
             center = (args.latitude, args.longitude)
             if args.seed is not None:

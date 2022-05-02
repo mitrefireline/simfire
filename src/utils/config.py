@@ -1,5 +1,6 @@
 from copy import deepcopy
 import dataclasses
+import os
 import numpy as np
 
 import yaml
@@ -7,12 +8,14 @@ from typing import Any, Dict, Optional, Tuple, Union
 from pathlib import Path
 from yaml.parser import ParserError
 
-from ..utils.log import create_logger
-from ..utils.layers import (FuelLayer, FunctionalFuelLayer, LatLongBox,
-                            OperationalTopographyLayer, FunctionalTopographyLayer,
-                            OperationalFuelLayer, TopographyLayer)
+from .log import create_logger
+from .layers import (FuelLayer, FunctionalFuelLayer, LatLongBox,
+                     OperationalTopographyLayer, FunctionalTopographyLayer,
+                     OperationalFuelLayer, TopographyLayer)
+from .units import mph_to_ftpm, scale_ms_to_ftpm, str_to_minutes
 from ..world.elevation_functions import PerlinNoise2D, flat, gaussian
 from ..world.fuel_array_functions import chaparral_fn
+from ..world.wind_mechanics.wind_controller import WindController
 
 log = create_logger(__name__)
 
@@ -47,12 +50,12 @@ class DisplayConfig:
 @dataclasses.dataclass
 class SimulationConfig:
     update_rate: float
-    runtime: str
+    runtime: int
     headless: bool
 
     def __post_init__(self) -> None:
         self.update_rate = float(self.update_rate)
-        self.runtime = str(self.runtime)
+        self.runtime = str_to_minutes(self.runtime)
         self.headless = str(self.headless)
 
 
@@ -66,6 +69,7 @@ class MitigationConfig:
 
 @dataclasses.dataclass
 class OperationalConfig:
+    seed: Optional[int]
     latitude: float
     longitude: float
     height: float
@@ -147,7 +151,9 @@ class Config:
                     log.error(message)
                     raise ConfigError(message)
         except FileNotFoundError:
-            log.error(f'Error opening YAML file at {self.path}. Does it exist?')
+            message = f'Error opening YAML file at {self.path}. Does it exist?'
+            log.error(message)
+            raise ConfigError(message)
         return yaml_data
 
     def _make_lat_long_box(self) -> Union[LatLongBox, None]:
@@ -266,8 +272,8 @@ class Config:
                 new_kwargs['shape'] = (self.yaml_data['area']['screen_size'],
                                        self.yaml_data['area']['screen_size'])
                 # Convert the input from string `(x, y)` to tuple of ints (x, y)
-                if isinstance(nk := new_kwargs['res'], str):
-                    new_kwargs['res'] = tuple(map(int, nk[1:-1].split(',')))
+                if isinstance(nk := new_kwargs['resolution'], str):
+                    new_kwargs['resolution'] = tuple(map(int, nk[1:-1].split(',')))
                 noise = PerlinNoise2D(**new_kwargs)
                 fn = noise.fn
             elif fn_name == 'gaussian':
@@ -275,14 +281,14 @@ class Config:
             elif fn_name == 'flat':
                 fn = flat()
             else:
-                raise ValueError(f'The specified topography function ({fn_name}) '
-                                 'is not valid.')
+                raise ConfigError(f'The specified topography function ({fn_name}) '
+                                  'is not valid.')
             topo_layer = FunctionalTopographyLayer(self.yaml_data['area']['screen_size'],
                                                    self.yaml_data['area']['screen_size'],
-                                                   fn)
+                                                   fn, fn_name)
         else:
-            raise ValueError(f'The specified topography type ({topo_type}) '
-                             'is not supported')
+            raise ConfigError(f'The specified topography type ({topo_type}) '
+                              'is not supported')
 
         return topo_layer
 
@@ -313,13 +319,14 @@ class Config:
             if fn_name == 'chaparral':
                 fn = chaparral_fn(**kwargs)
             else:
-                raise ValueError(f'The specified fuel function ({fn_name}) '
-                                 'is not valid.')
+                raise ConfigError(f'The specified fuel function ({fn_name}) '
+                                  'is not valid.')
             fuel_layer = FunctionalFuelLayer(self.yaml_data['area']['screen_size'],
-                                             self.yaml_data['area']['screen_size'], fn)
+                                             self.yaml_data['area']['screen_size'], fn,
+                                             fn_name)
         else:
-            raise ValueError(f'The specified fuel type ({fuel_type}) '
-                             'is not supported')
+            raise ConfigError(f'The specified fuel type ({fuel_type}) '
+                              'is not supported')
 
         return fuel_layer
 
@@ -360,8 +367,38 @@ class Config:
             direction = self.yaml_data['wind']['simple']['direction']
             speed_arr = np.full(arr_shape, speed)
             direction_arr = np.full(arr_shape, direction)
+        elif fn_name == 'cfd':
+            # Check if wind files have been generated
+            cfd_generated = os.path.isfile('generated_wind_directions.npy') and \
+                os.path.isfile('generated_wind_magnitudes.npy')
+            if cfd_generated is False:
+                log.error('Missing pregenerated cfd npy files, switching to perlin')
+                self.wind_function = 'perlin'
+            else:
+                speed_arr = np.load('generated_wind_magnitudes.npy')
+                direction_arr = np.load('generated_wind_directions.npy')
+                speed_arr = scale_ms_to_ftpm(speed_arr)
+        elif fn_name == 'perlin':
+            wind_map = WindController()
+            speed_kwargs = deepcopy(self.yaml_data['wind']['perlin']['speed'])
+            range_min = mph_to_ftpm(
+                self.yaml_data['wind']['perlin']['speed']['range_min'])
+            range_max = mph_to_ftpm(
+                self.yaml_data['wind']['perlin']['speed']['range_max'])
+            speed_kwargs['range_min'] = range_min
+            speed_kwargs['range_max'] = range_max
+            wind_map.init_wind_speed_generator(**speed_kwargs,
+                                               screen_size=self.yaml_data['area']
+                                               ['screen_size'])
+
+            direction_kwargs = self.yaml_data['wind']['perlin']['direction']
+            wind_map.init_wind_direction_generator(**direction_kwargs,
+                                                   screen_size=self.yaml_data['area']
+                                                   ['screen_size'])
+            speed_arr = wind_map.map_wind_speed
+            direction_arr = wind_map.map_wind_direction
         else:
-            raise ValueError(f'Wind type {fn_name} is not supported')
+            raise ConfigError(f'Wind type {fn_name} is not supported')
 
         return WindConfig(speed_arr, direction_arr)
 

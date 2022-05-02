@@ -17,6 +17,7 @@ mitigation:
   ros_attenuation: true
 
 operational:
+  seed:
   latitude: 39.67
   longitude: 119.8
   height: 400
@@ -31,7 +32,7 @@ terrain:
       perlin:
         amplitude: 500
         shape: (9, 9)
-        res: (1, 1)
+        resolution: (1, 1)
         seed: 1111
       gaussian:
         amplitude: 500
@@ -74,13 +75,13 @@ wind:
       octaves: 3
       persistence: 0.7
       lacunarity: 2.0
-      min: 7
-      max: 47
+      range_min: 7
+      range_max: 47
     direction:
       seed: 650
       scale: 1500
       octaves: 2
       persistence: 0.9
       lacunarity: 1.0
-      min: 0.0
-      max: 360.0
+      range_min: 0.0
+      range_max: 360.0

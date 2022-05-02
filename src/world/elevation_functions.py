@@ -47,7 +47,7 @@ class PerlinNoise2D():
     def __init__(self,
                  amplitude: float,
                  shape: Tuple[int, int],
-                 res: Tuple[int, int],
+                 resolution: Tuple[int, int],
                  seed: int = None) -> None:
         '''
         Create a class to compute perlin noise for given input parameters.
@@ -55,12 +55,12 @@ class PerlinNoise2D():
         Arguments:
             amplitude: The amplitude to scale the noise by.
             shape: The output shape of the data.
-            res: The resolution of the noise.
+            resolution: The resolution of the noise.
             seed: The initialization seed for randomization.
         '''
         self.amplitude = amplitude
         self.shape = shape
-        self.res = res
+        self.resolution = resolution
         self.seed = seed
         self.terrain_map = self._precompute()
 
@@ -71,16 +71,18 @@ class PerlinNoise2D():
         def f(t):
             return 6 * t**5 - 15 * t**4 + 10 * t**3
 
-        delta = (self.res[0] / self.shape[0], self.res[1] / self.shape[1])
-        d = (self.shape[0] // self.res[0], self.shape[1] // self.res[1])
+        delta = (self.resolution[0] / self.shape[0], self.resolution[1] / self.shape[1])
+        d = (self.shape[0] // self.resolution[0], self.shape[1] // self.resolution[1])
         # Ignore mypy here becuase it thinks the floats in delta are indexing an array,
         # but this is the intended functionality of np.mgrid()
-        grid = np.mgrid[0:self.res[0]:delta[0],  # type: ignore
-                        0:self.res[1]:delta[1]].transpose(1, 2, 0) % 1  # type: ignore
+        grid = np.mgrid[0:self.resolution[0]:delta[0],  # type: ignore
+                        0:self.resolution[1]:delta[1]].transpose(  # type: ignore
+                            1, 2, 0) % 1  # type: ignore
         # Gradients
         if isinstance(self.seed, int):
             np.random.seed(self.seed)
-        angles = 2 * np.pi * np.random.rand(self.res[0] + 1, self.res[1] + 1)
+        angles = 2 * np.pi * np.random.rand(self.resolution[0] + 1,
+                                            self.resolution[1] + 1)
         gradients = np.dstack((np.cos(angles), np.sin(angles)))
         g00 = gradients[0:-1, 0:-1].repeat(d[0], 0).repeat(d[1], 1)
         g10 = gradients[1:, 0:-1].repeat(d[0], 0).repeat(d[1], 1)

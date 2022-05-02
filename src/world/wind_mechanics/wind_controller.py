@@ -39,7 +39,7 @@ class WindController():
                         Frequency = lacunarity & (pass number).
                         Higher lacunarity, higher frequency per pass.
             range_min: The minimum speed of the wind in ft/min.
-            range_min: The maximum speed of the wind in ft/min.
+            range_max: The maximum speed of the wind in ft/min.
             screen_size: Size of screen (both heigh and width) MUST BE SQUARE
         '''
         self.speed_layer.set_noise_parameters(seed, scale, octaves, persistence,

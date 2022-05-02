@@ -599,18 +599,17 @@ class FunctionalTopographyLayer(TopographyLayer):
         super().__init__()
         self.height = height
         self.width = width
-        self.elevation_fn = elevation_fn
         self.name = name
 
-        self.data = self._make_data()
+        self.data = self._make_data(elevation_fn)
         self.contours = self._make_contours()
 
-    def _make_data(self) -> np.ndarray:
+    def _make_data(self, elevation_fn: ElevationFn) -> np.ndarray:
         '''
         Use self.elevation_fn to make the elevation data layer.
 
         Arguments:
-            None
+            elevation_fn: The function that maps (x, y) points to elevations
 
         Returns:
             A numpy array containing the elevation data
@@ -618,7 +617,7 @@ class FunctionalTopographyLayer(TopographyLayer):
         x = np.arange(self.width)
         y = np.arange(self.height)
         X, Y = np.meshgrid(x, y)
-        elevation_fn_vect = np.vectorize(self.elevation_fn)
+        elevation_fn_vect = np.vectorize(elevation_fn)
         elevations = elevation_fn_vect(X, Y)
         # Expand third dimension to align with data layers
         elevations = np.expand_dims(elevations, axis=-1)
@@ -796,16 +795,19 @@ class FunctionalFuelLayer(FuelLayer):
         super().__init__()
         self.height = height
         self.width = width
-        self.fuel_fn = fuel_fn
         self.name = name
 
-        self.data = self._make_data()
+        self.data = self._make_data(fuel_fn)
         self.texture = self._load_texture()
         self.image = self._make_image()
 
-    def _make_data(self) -> np.ndarray:
+    def _make_data(self, fuel_fn: FuelArrayFn) -> np.ndarray:
         '''
         Use self.fuel_fn to make the fuel data layer.
+
+        Arguments:
+            fuel_fn: A callable function that converts (x, y) coorindates to
+                     elevations.
 
         Returns:
             A numpy array containing the fuel data
@@ -813,7 +815,7 @@ class FunctionalFuelLayer(FuelLayer):
         x = np.arange(self.width)
         y = np.arange(self.height)
         X, Y = np.meshgrid(x, y)
-        fuel_fn_vect = np.vectorize(self.fuel_fn)
+        fuel_fn_vect = np.vectorize(fuel_fn)
         fuels = fuel_fn_vect(X, Y)
         # Expand third dimension to align with data layers
         fuels = np.expand_dims(fuels, axis=-1)

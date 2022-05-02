@@ -105,10 +105,14 @@ class Config:
 
     def _set_terrain_scale(self) -> None:
         '''
-        Set the attribute `self.area.terrain_scale` defined as
-        `self.area.pixel_scale * self.area.terrain_size`
+        Set the terrain scale and other simulation variables based on type of data layer.
+        If both Fuel and Topography are `functional` data layers, then use screen_size
+            and pixel scale
+        If either Fuel or Topography is Operational, use calculated pixel scale and
+            screen size.
         '''
-        if self.terrain.topography.type.lower() == 'functional':
+        if self.terrain.topography.type.lower(
+        ) == 'functional' and self.terrain.fuel.type.lower():
             setattr(self.area, 'terrain_scale',
                     self.area.pixel_scale * self.area.terrain_size)
         elif self.terrain.topography.type.lower() == 'operational':

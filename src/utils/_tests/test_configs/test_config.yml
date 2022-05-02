@@ -2,7 +2,6 @@
 # https://fireline.pages.mitre.org/rothermel-modeling/config.html
 area:
   screen_size: 9
-  terrain_size: 3
   pixel_scale: 50
 
 display:
@@ -17,26 +16,35 @@ simulation:
 mitigation:
   ros_attenuation: true
 
-terrain:
-  terrain: functional
-  elevation_function: perlin
-  perlin:
-    amplitude: 500
-    shape: (9, 9)
-    resolution: (1, 1)
-    seed: 1111
-  gaussian:
-    amplitude: 500
-    mu_x: 50
-    mu_y: 50
-    sigma_x: 50
-    sigma_y: 50
+operational:
+  latitude: 39.67
+  longitude: 119.8
+  height: 400
+  width: 400
+  resolution: 30
 
-fuel:
-  fuel: functional
-  fuel_array_function: chaparral
-  chaparral:
-    seed: 1113
+terrain:
+  topography:
+    type: functional
+    functional:
+      function: perlin
+      perlin:
+        amplitude: 500
+        shape: (9, 9)
+        res: (1, 1)
+        seed: 1111
+      gaussian:
+        amplitude: 500
+        mu_x: 50
+        mu_y: 50
+        sigma_x: 50
+        sigma_y: 50
+  fuel:
+    type: functional
+    functional:
+      function: chaparral
+      chaparral:
+        seed: 1113
 
 fire:
   fire_initial_position: (5, 3)
@@ -46,7 +54,16 @@ environment:
   moisture: 0.03
 
 wind:
-  wind_function: perlin
+  type: simple
+  cfd:
+    time_to_train: 1000 # Seconds, longer is better
+    iterations: 1
+    scale: 1
+    timestep_dt: 1.0
+    diffusion: 0.0
+    viscosity: 0.0000001
+    speed: 19
+    direction: north
   simple:
     speed: 7
     direction: 90.0
@@ -67,8 +84,3 @@ wind:
       lacunarity: 1.0
       min: 0.0
       max: 360.0
-
-render:
-  inline: false
-  post_agent: false
-  post_agent_with_fire: true

@@ -1,4 +1,4 @@
-from typing import Tuple, Union
+from typing import Optional, Tuple, Union
 
 import numpy as np
 
@@ -54,7 +54,7 @@ def chaparral(seed: Union[int, None] = None) -> Fuel:
     return Fuel(w_0=w_0, delta=6.000, M_x=0.2000, sigma=1739)
 
 
-def fuel(seed: int = None) -> Tuple[float, float]:
+def fuel(seed: Optional[int] = None) -> Tuple[float, float]:
     '''
     Functionailty to use a random seed to define a center point.
     To be used with operational data layers

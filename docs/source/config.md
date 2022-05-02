@@ -241,7 +241,6 @@ Whether or not to render with post agent and fire in place.
 ```yaml
 area:
   screen_size: 225
-  terrain_size: 15
   pixel_scale: 50
 
 display:
@@ -281,7 +280,7 @@ environment:
   moisture: 0.03
 
 wind:
-  wind_function: perlin
+  type: perlin
   simple:
     speed: 7
     direction: 90.0

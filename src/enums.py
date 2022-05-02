@@ -94,35 +94,6 @@ class GameStatus(Enum):
     RUNNING = auto()
 
 
-class FuelModel13(IntEnum):
-    '''
-    The different Fuel Model categories for:
-        13 Anderson Fire Behavior Fuel Models 2020
-
-    '''
-    SHORT_GRASS: 1
-    GRASS_TIMBER_SHRUB_OVERSTORY: 2
-    TALL_GRASS: 3
-    CHAPARRAL: 4
-    YOUNG_BRUSH: 5
-    DORMANT_BRUSH_HARDWOOD_SLASH: 6
-    SOUTHERN_ROUGH: 7
-    CLOSED_SHORT_NEEDLE_TIMBER_LITTER: 8
-    HARDWOOD_LONG_NEEDLE_PINE_TIMBER: 9
-    TIMBER_LITTER_UNDERSTORY: 10
-    LIGHT_LOGGING_SLASH: 11
-    MEDIUM_LOGGING_SLASH: 12
-    HEAVY_LOGGING_SLASH: 13
-    NB_URBAN: 91
-    NB_SNOW_ICE: 92
-    NB_AGRICULTURE: 93
-    NB_WATER: 98
-    NB_BARREN: 99
-    NO_DATA: -32768
-    NO_DATA: -999
-    NO_DATA: 32767
-
-
 FuelModelToFuel = {
     1: ShortGrass,
     2: GrassTimberShrubOverstory,

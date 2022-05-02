@@ -54,7 +54,7 @@ environment:
   moisture: 0.03
 
 wind:
-  type: simple
+  function: simple
   cfd:
     time_to_train: 1000 # Seconds, longer is better
     iterations: 1

@@ -17,6 +17,13 @@ from ..world.fuel_array_functions import chaparral_fn
 log = create_logger(__name__)
 
 
+class ConfigError(Exception):
+    '''
+    Exception class for Config class
+    '''
+    pass
+
+
 @dataclasses.dataclass
 class AreaConfig:
     screen_size: int
@@ -136,7 +143,9 @@ class Config:
                 try:
                     yaml_data = yaml.safe_load(f)
                 except ParserError:
-                    log.error(f'Error parsing YAML file at {self.path}')
+                    message = f'Error parsing YAML file at {self.path}'
+                    log.error(message)
+                    raise ConfigError(message)
         except FileNotFoundError:
             log.error(f'Error opening YAML file at {self.path}. Does it exist?')
         return yaml_data
@@ -343,7 +352,7 @@ class Config:
         '''
         # Only support simple for now
         # TODO: Figure out how Perlin and CFD create wind
-        fn_name = self.yaml_data['wind']['type']
+        fn_name = self.yaml_data['wind']['function']
         if fn_name == 'simple':
             arr_shape = (self.yaml_data['area']['screen_size'],
                          self.yaml_data['area']['screen_size'])

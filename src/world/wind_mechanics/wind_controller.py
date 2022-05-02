@@ -102,7 +102,7 @@ class WindController2():
         if terrain_features is None:
             self.terrain_features = np.zeros((self.N, self.N))
         else:
-            self.terrain_features = np.array(terrain_features)
+            self.terrain_features = np.array(terrain_features, dtype=np.float32)
         # TODO Load terrain setup here
 
         self.fvect = Fluid(self.N, self.iterations, self.scale, self.timestep,

@@ -10,7 +10,7 @@ from rothsim import game
 from rothsim.game import managers
 from rothsim import utils
 from rothsim import world
-from rothsim import rl_env
+from rothsim import sim
 
 import sys
 import traceback
@@ -26,7 +26,7 @@ sub_modules += [
 ]
 sub_modules += ['rothsim.utils.' + m for m in finder.find_all_submodules(utils)]
 sub_modules += ['rothsim.world.' + m for m in finder.find_all_submodules(world)]
-sub_modules += ['rothsim.rl_env.' + m for m in finder.find_all_submodules(rl_env)]
+sub_modules += ['rothsim.sim.' + m for m in finder.find_all_submodules(sim)]
 
 # Import all of the found submodules
 for module in sub_modules:
@@ -35,7 +35,7 @@ for module in sub_modules:
     except ModuleNotFoundError:
         traceback.print_exc()
         print('\nERROR: "src" was likely used as an import. Ensure your imports are '
-              'relative in all modules.')
+              'relative in all modules and packages.')
         sys.exit(1)
 
 print('\nSuccessfully imported modules!')

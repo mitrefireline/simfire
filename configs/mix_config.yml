@@ -55,7 +55,7 @@ environment:
   moisture: 0.03
 
 wind:
-  type: perlin
+  function: perlin
   cfd:
     time_to_train: 1000
     scale: 1

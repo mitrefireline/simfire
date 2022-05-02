@@ -15,12 +15,32 @@ from ..world.parameters import Fuel
 
 
 # Developing a function to round to a multiple
-def round_up_to_multiple(number, multiple):
+def round_up_to_multiple(number: float, multiple: int) -> int:
+    '''
+    Round up to the nearest multiple of `multiple`
+
+    Arguments:
+        number: The number to round up.
+        multiple: The multiple to round up to.
+
+    Returns:
+        The rounded up number.
+    '''
     return multiple * math.ceil(number / multiple)
 
 
 # Developing a function to round to a multiple
-def round_down_to_multiple(num, divisor):
+def round_down_to_multiple(num: float, divisor: int) -> int:
+    '''
+    Round down to the nearest multiple of `divisor`
+
+    Arguments:
+        num: The number to round down.
+        divisor: The divisor to round down to.
+
+    Returns:
+        The rounded down number.
+    '''
     return divisor * math.floor(num / divisor)
 
 
@@ -36,7 +56,7 @@ class LatLongBox():
                  resolution: int = 30) -> None:
         '''
         This class of methods will get initialized with the config using the lat/long
-            bounding box.
+        bounding box.
 
         Real-world is measured in meters
         Data is measured in pixels corresponding to the resolution
@@ -58,9 +78,6 @@ class LatLongBox():
             height: The height of one side of the screen (meters)
             width: The width of one side of the screen (meters)
             resolution: The resolution to get data (meters)
-
-        Return:
-            None
 
         TODO: This method only creates a square, needs re-tooling to create a rectangle
         '''
@@ -97,16 +114,11 @@ class LatLongBox():
     def _convert_area(self) -> Tuple[Tuple[float, float], Tuple[float, float]]:
         '''
         Functionality to use area to create bounding box around the center point
-            spanning width x height (meters)
+        spanning width x height (meters)
 
         This function will always make a square.
 
-        Values are found from USGS website for arc-seconds to decimal degrees
-
-        Arguments:
-            None
-        Return:
-            None
+        Values are found from USGS website for arc-seconds to decimal degrees    None
         '''
         if self.resolution == 10:
             # convert 5 x 5 degree, 90m resolution into pixel difference
@@ -128,8 +140,8 @@ class LatLongBox():
     def _get_nearest_tile(self) -> None:
         '''
         This method will take the lat/long tuples and retrieve the nearest dem.
-            Always want the lowest (closest to equator and furthest from center divide)
-            bound:
+
+        Always want the lowest (closest to equator and furthest from center divide) bound:
 
         MERIT DEMs are 5 x 5 degrees:
             n30w120 --> N30-N35, W120-W115
@@ -140,14 +152,7 @@ class LatLongBox():
             (N33 - N34, W116 - W117.00) -> (N32.999-N34.000, W117.000-W115.999)
 
         For simplicity, assume we are in upper hemisphere (N) and left of center
-            divide (W)
-
-        Arguments:
-            None
-
-        Returns:
-            None
-
+        divide (W)
         '''
         # round up on latitdue
         five_deg_north_min = self.BL[0]
@@ -188,21 +193,18 @@ class LatLongBox():
     def _stack_tiles(self) -> Dict[str, Tuple[Tuple[float, float], ...]]:
         '''
         Method to stack DEM tiles correctly. TIles can either be stacked
-            starting from bottom left corner:
-                Vertically (northernly)
-                Horizontally (easternly)
-                Square (Mix of easternly and northernly)
+        starting from bottom left corner:
+            Vertically (northernly)
+            Horizontally (easternly)
+            Square (Mix of easternly and northernly)
 
-            Stacking always follows the standard order:
-                bottom left -> bottom right -> top right -> top left
-
-        Arguments:
-            None
+        Stacking always follows the standard order:
+            bottom left -> bottom right -> top right -> top left
 
         Returns:
             A dictionary containing the order to stack the tiles (str)
-                and a tuple of tuples of the lat/long (n/w) coordinates of DEM
-                tiles (first indice is always bottom left corner).
+            and a tuple of tuples of the lat/long (n/w) coordinates of DEM
+            tiles (first indice is always bottom left corner).
         '''
 
         if self.five_deg_north_min == self.five_deg_north_max and \
@@ -276,14 +278,13 @@ class LatLongBox():
         Use tile name to set bounding box of tile:
 
         NOTE: We have to manually calculate this because an ArcGIS Pro License is
-                required to convert the *.flt Raster files to correct format.
+              required to convert the *.flt Raster files to correct format.
 
         Resolution: 3-arcseconds = ~0.0008333*3 = 5 deg / 6000 pixels
         Resolution: 1/3-arcseconds = ~0.0008333/3 = 1 deg / 10812 pixels
 
-
+        ```
             n30w120     n30w115
-
         (35, 120)-----------------(35, 110)
             |------------|------------|
             |-----x------|----x2y2----|
@@ -292,15 +293,11 @@ class LatLongBox():
             |------------|------------|
             |----x1y1----|------x-----|
         (30, 120)-----------------(30, 110)
+        ```
 
         Arguments:
-            corners: A list of the lat/long tuple for each corner in the standard
-                     order: [bottom left, bottom right, top right, top left]
-
-
-        Return:
-            None
-
+            corners: A list of the lat/long tuple for each corner in the standard order:
+                     [bottom left, bottom right, top right, top left]
         '''
         from scipy import spatial
 
@@ -354,16 +351,13 @@ class LatLongBox():
         This method will update the corners of the array
 
         Arguments:
-            corners: The current corners of the array
-
-            new_corner: A new index to compare the current corners against
-
+            corners: The current corners of the array.
+            new_corner: A new index to compare the current corners against.
             stack: The order in which to stack the tiles and therefore update the
-                    corner
-
+                   corner.
             idx: Only used for the 'square' case, to keep track of which tile we are on
-                    Tiles are stacked according to standard order:
-                    [bottom left, bottom right, top right, top left]
+                 tiles are stacked according to standard order:
+                 [bottom left, bottom right, top right, top left]
 
         Returns:
             The indices/bbox of the corners according to standard order:
@@ -404,11 +398,6 @@ class LatLongBox():
     def _update_corners(self) -> None:
         '''
         Method to update corners of total area when 1+ tiles is needed
-
-        Arguments:
-            None
-        Returns:
-            None
         '''
 
         for key, val in self.tiles.items():
@@ -438,17 +427,13 @@ class LatLongBox():
 
     def _save_contour_map(self, data_array: np.ndarray, type: str) -> None:
         '''
-
         Helper function to generate a contour map of the region
-            specified or of the DEM file and save as `<lat_long>.png`
+        specified or of the DEM file and save as `<lat_long>.png`
 
         Elevation in (m)
 
         Arguments:
-            None
-
-        Returns
-            None
+            data_array: The array to be saved as a contour map PNG.
         '''
         import matplotlib.pyplot as plt
 
@@ -521,14 +506,13 @@ class OperationalTopographyLayer(TopographyLayer):
     def __init__(self, lat_long_box: LatLongBox) -> None:
         '''
         Initialize the elevation layer by retrieving the correct topograpchic data
-            and computing the area.
+        and computing the area
 
         Arguments:
-            center: The lat/long coordinates of the center point of the screen
-            height: The height of the screen size
-            width: The width of the screen size
-            resolution: The resolution to get data
-
+            center: The lat/long coordinates of the center point of the screen.
+            height: The height of the screen size (meters).
+            width: The width of the screen size (meters).
+            resolution: The resolution to get data (meters).
         '''
         super().__init__()
         self.lat_long_box = lat_long_box
@@ -542,7 +526,7 @@ class OperationalTopographyLayer(TopographyLayer):
     def _make_data(self) -> np.ndarray:
         self._get_dems()
         data = Image.open(self.tif_filenames[0])
-        data = np.asarray(data)
+        data = np.array(data, dtype=np.float32)
         # flip axis because latitude goes up but numpy will read it down
         data = np.flip(data, 0)
         data = np.expand_dims(data, axis=-1)
@@ -557,7 +541,7 @@ class OperationalTopographyLayer(TopographyLayer):
             tmp_array = data
             for idx, dem in enumerate(self.tif_filenames[1:]):
                 tif_data = Image.open(dem)
-                tif_data = np.asarray(tif_data)
+                tif_data = np.array(tif_data, dtype=np.float32)
                 # flip axis because latitude goes up but numpy will read it down
                 tif_data = np.flip(tif_data, 0)
                 tif_data = np.expand_dims(tif_data, axis=-1)
@@ -586,16 +570,8 @@ class OperationalTopographyLayer(TopographyLayer):
 
     def _get_dems(self) -> None:
         '''
-        This method will use the outputed tiles and return the correct dem files
-
-        Arguments:
-            None
-
-        Return:
-            None
-
+        Uses the outputed tiles and sets `self.tif_filenames`
         '''
-
         self.tif_filenames = []
 
         for _, ranges in self.lat_long_box.tiles.items():
@@ -610,7 +586,7 @@ class FunctionalTopographyLayer(TopographyLayer):
     '''
     Layer that stores elevation data computed from a function.
     '''
-    def __init__(self, height, width, elevation_fn: ElevationFn) -> None:
+    def __init__(self, height, width, elevation_fn: ElevationFn, name: str) -> None:
         '''
         Initialize the elvation layer by computing the elevations and contours.
 
@@ -624,6 +600,7 @@ class FunctionalTopographyLayer(TopographyLayer):
         self.height = height
         self.width = width
         self.elevation_fn = elevation_fn
+        self.name = name
 
         self.data = self._make_data()
         self.contours = self._make_contours()
@@ -686,18 +663,16 @@ class OperationalFuelLayer(FuelLayer):
     def __init__(self, lat_long_box: LatLongBox, type: str = '13') -> None:
         '''
         Initialize the elevation layer by retrieving the correct topograpchic data
-            and computing the area.
+        and computing the area.
 
         Arguments:
             center: The lat/long coordinates of the center point of the screen
-            height: The height of the screen size
-            width: The width of the screen size
-            resolution: The resolution to get data
-
+            height: The height of the screen size (meters)
+            width: The width of the screen size (meters)
+            resolution: The resolution to get data (meters)
             type: The type of data you wnt to load: 'display' or 'simulation'
-                    display: rgb data for rothermel
-                    simulation: fuel model values for RL Harness/Simulation
-
+                  display: rgb data for rothermel
+                  simulation: fuel model values for RL Harness/Simulation
         '''
         self.lat_long_box = lat_long_box
         self.type = type
@@ -723,7 +698,7 @@ class OperationalFuelLayer(FuelLayer):
     def _make_data(self, filename: List) -> np.ndarray:
 
         data = np.load(filename[0])
-        data = np.asarray(data)
+        data = np.array(data, dtype=np.float32)
         # flip axis because latitude goes up but numpy will read it down
         data = np.flip(data, 0)
         data = np.expand_dims(data, axis=-1)
@@ -738,7 +713,7 @@ class OperationalFuelLayer(FuelLayer):
             tmp_array = data
             for idx, dem in enumerate(filename[1:]):
                 tif_data = np.load(dem)
-                tif_data = np.asarray(tif_data)
+                tif_data = np.array(tif_data, dtype=np.float32)
                 # flip axis because latitude goes up but numpy will read it down
                 tif_data = np.flip(tif_data, 0)
                 tif_data = np.expand_dims(tif_data, axis=-1)
@@ -766,16 +741,8 @@ class OperationalFuelLayer(FuelLayer):
     def _get_fuel_dems(self) -> None:
         '''
         This method will use the outputed tiles and return the correct dem files
-            for both the RGB fuel model data and the fuel model data
-
-        Arguments:
-            None
-
-        Return:
-            None
-
+        for both the RGB fuel model data and the fuel model data.
         '''
-
         self.tif_filenames = []
         self.fuel_model_filenames = []
         fuel_model = f'LF2020_FBFM{self.type}_200_CONUS'
@@ -815,7 +782,7 @@ class FunctionalFuelLayer(FuelLayer):
     '''
     Layer that stores fuel data computed from a function.
     '''
-    def __init__(self, height, width, fuel_fn: FuelArrayFn) -> None:
+    def __init__(self, height, width, fuel_fn: FuelArrayFn, name: str) -> None:
         '''
         Initialize the fuel layer by computing the fuels.
 
@@ -824,11 +791,13 @@ class FunctionalFuelLayer(FuelLayer):
             width: The width of the data layer
             fuel_fn: A callable function that converts (x, y) coorindates to
                      elevations.
+            name: The name of the fuel layer (e.g.: 'chaparral')
         '''
         super().__init__()
         self.height = height
         self.width = width
         self.fuel_fn = fuel_fn
+        self.name = name
 
         self.data = self._make_data()
         self.texture = self._load_texture()
@@ -837,9 +806,6 @@ class FunctionalFuelLayer(FuelLayer):
     def _make_data(self) -> np.ndarray:
         '''
         Use self.fuel_fn to make the fuel data layer.
-
-        Arguments:
-            None
 
         Returns:
             A numpy array containing the fuel data
@@ -857,6 +823,9 @@ class FunctionalFuelLayer(FuelLayer):
     def _make_image(self) -> np.ndarray:
         '''
         Use the fuel data in self.data to make an RGB background image.
+
+        Returns:
+            A NumPy array containing the RGB of the fuel data.
         '''
         image = np.zeros((self.width, self.height) + (3, ))
 
@@ -902,7 +871,7 @@ class FunctionalFuelLayer(FuelLayer):
     def _load_texture(self) -> np.ndarray:
         '''
         Load the terrain tile texture, resize it to the correct
-        shape, and convert to numpy
+        shape, and convert to NumPy array
 
         Returns:
             The returned numpy array of the texture.

@@ -1,8 +1,6 @@
 import numpy as np
 from noise import snoise2
 
-from typing import List
-
 
 class WindNoise():
     '''
@@ -56,11 +54,11 @@ class WindNoise():
         self.range_min = range_min
         self.range_max = range_max
 
-    def generate_map_array(self, screen_size) -> List[List[float]]:
+    def generate_map_array(self, screen_size) -> np.ndarray:
         map = []
         map = [[self._generate_noise_value(x, y) for x in range(screen_size)]
                for y in range(screen_size)]
-        return map
+        return np.array(map, dtype=np.float32)
 
     def _denormalize_noise_value(self, noise_value) -> float:
         denormalized_value = (((noise_value + 1) *

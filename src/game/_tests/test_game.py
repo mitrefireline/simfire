@@ -1,9 +1,7 @@
 import numpy as np
-import pygame
 
 import os
 import unittest
-from unittest import mock
 from multiprocessing import get_context
 
 from . import DummyFuelLayer, DummyTopographyLayer
@@ -16,8 +14,12 @@ from ..managers.fire import RothermelFireManager
 from ..managers.mitigation import FireLineManager
 from ...world.parameters import Environment, FuelParticle
 
+# unittest.mock.patch.dict isn't working anymore
+# Can't run rests without setting display at the top of the file
+os.environ['SDL_VIDEODRIVER'] = 'dummy'
+import pygame  # noqa: E402
 
-@mock.patch.dict(os.environ, {'SDL_VIDEODRIVER': 'dummy'})
+
 class TestGame(unittest.TestCase):
     def setUp(self) -> None:
         self.config = Config('configs/functional_config.yml')
@@ -212,7 +214,6 @@ class TestGame(unittest.TestCase):
                               f'should be {GameStatus.RUNNING}'))
 
 
-@mock.patch.dict(os.environ, {'SDL_VIDEODRIVER': 'dummy'})
 class TestHeadlessGame(unittest.TestCase):
     def setUp(self) -> None:
         self.config = Config('configs/functional_config.yml')
@@ -263,7 +264,6 @@ class TestHeadlessGame(unittest.TestCase):
                               f'should be {GameStatus.RUNNING}'))
 
 
-@mock.patch.dict(os.environ, {'SDL_VIDEODRIVER': 'dummy'})
 class TestMultiprocessGame(unittest.TestCase):
     def setUp(self) -> None:
         self.config = Config('configs/functional_config.yml')

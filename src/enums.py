@@ -94,6 +94,43 @@ class GameStatus(Enum):
     RUNNING = auto()
 
 
+@dataclass
+class FuelConstants:
+    '''
+    Constants to be used in the file and can be imported for reference.
+
+    Parameters:
+        W_0_MIN: Oven-dry Fuel Load (lb/ft^2) minimum.
+        W_0_MAX: Oven-dry Fuel Load (lb/ft^2) maximum.
+        DELTA: Fuel bed depth (ft) min and max.
+        M_X: Dead fuel moisture of extinction min and max.
+        SIGMA: Surface-area-to-volume ratio (ft^2/ft^3) min and max.
+    '''
+    W_0_MIN: float = 0.2
+    W_0_MAX: float = 0.6
+    DELTA: float = 6.000
+    M_X: float = 0.2000
+    SIGMA: int = 1739
+
+
+@dataclass
+class ElevationConstants:
+    '''
+    Constants to be used in the file and can be imported for reference.
+
+    Paremeters:
+        MIN_ELEVATION: Minimum elevation (ft). Based on the elevation of Death Valley,
+                       the lowest point in California and the US in general.
+        MAX_ELEVATION: Maximum elevation (ft). Based on the elevation of the treeline in
+                       California.
+        MEAN_ELEVATION: Mean elevation (ft). Based on the average elevation of California.
+                        From [NRC.gov](https://www.nrc.gov/docs/ML1408/ML14086A640.pdf).
+    '''
+    MIN_ELEVATION: int = -282
+    MAX_ELEVATION: int = 11_000
+    MEAN_ELEVATION: int = 2_500
+
+
 class FuelModel13(IntEnum):
     '''
     The different Fuel Model categories for:

@@ -226,7 +226,7 @@ class RothermelFireManager(FireManager):
                  init_pos: Tuple[int, int],
                  fire_size: int,
                  max_fire_duration: int,
-                 pixel_scale: int,
+                 pixel_scale: float,
                  update_rate: float,
                  fuel_particle: FuelParticle,
                  terrain: Terrain,

@@ -643,6 +643,7 @@ class FuelLayer(DataLayer):
             None
         '''
         super().__init__()
+        self.data: np.ndarray
         self.image: np.ndarray
 
     def _make_image(self) -> np.ndarray:

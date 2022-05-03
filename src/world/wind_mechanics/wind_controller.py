@@ -1,4 +1,4 @@
-from typing import List
+from typing import Optional
 import numpy as np
 import pygame
 
@@ -17,8 +17,8 @@ class WindController():
     def __init__(self, screen_size: int = 225) -> None:
         self.speed_layer = WindNoise()
         self.direction_layer = WindNoise()
-        self.map_wind_speed: List[List[float]] = []
-        self.map_wind_direction: List[List[float]] = []
+        self.map_wind_speed: Optional[np.ndarray] = None
+        self.map_wind_direction: Optional[np.ndarray] = None
         self.screen_size = screen_size
 
     def init_wind_speed_generator(self, seed: int, scale: int, octaves: int,

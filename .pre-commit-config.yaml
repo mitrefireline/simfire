@@ -22,14 +22,14 @@ repos:
         entry: yapf
         args: [-i, -vv]
         types: [python]
-      # - id: mypy
-      #   name: mypy
-      #   exclude: /_tests/
-      #   language: python
-      #   entry: "mypy"
-      #   args: [--config-file, .mypy.ini]
-      #   # use your preferred Python version
-      #   types: [python]
+      - id: mypy
+        name: mypy
+        exclude: /_tests/
+        language: python
+        entry: "mypy"
+        args: [--config-file, .mypy.ini]
+        # use your preferred Python version
+        types: [python]
   - repo: https://gitlab.com/PyCQA/flake8
     rev: 3.8.3
     hooks:

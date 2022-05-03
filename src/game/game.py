@@ -196,7 +196,7 @@ class Game():
         return floorColorRGB
 
     def _get_wind_mag_surf(self, wind_magnitude_map: Sequence[Sequence[float]]) -> \
-            pygame.Surface:
+            pygame.surface.Surface:
         '''
         Compute the wind magnitude surface for display.
 

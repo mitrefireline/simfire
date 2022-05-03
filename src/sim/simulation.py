@@ -1,7 +1,7 @@
 import numpy as np
 
 from abc import ABC, abstractmethod
-from typing import Dict, Union, Tuple, Iterable
+from typing import Dict, List, Optional, Union, Tuple, Iterable
 import warnings
 
 from ..utils.config import Config
@@ -36,9 +36,17 @@ class Simulation(ABC):
         self.config = config
 
     @abstractmethod
-    def run(self) -> np.ndarray:
+    def run(self, time: Union[str, int]) -> np.ndarray:
         '''
-        Runs the simulation
+        Runs the simulation.
+
+        Arguments:
+            time: Either how many updates to run the simulation, based on the config
+                  value, `config.simulation.update_rate`, or a length of time expressed
+                  as a string (e.g. `120m`, `2h`, `2hour`, `2hours`, `1h 60m`, etc.)
+        Returns:
+            The Burned/Unburned/ControlLine pixel map (`self.fire_map`).
+            Values range from [0, 6] (see src/enums.py:BurnStatus).
         '''
         pass
 
@@ -63,7 +71,7 @@ class Simulation(ABC):
         pass
 
     @abstractmethod
-    def get_attribute_bounds(self) -> Dict[str, np.ndarray]:
+    def get_attribute_bounds(self) -> Dict[str, object]:
         '''
         Initialize and return the observation space bounds for the simulation.
 
@@ -73,7 +81,7 @@ class Simulation(ABC):
         pass
 
     @abstractmethod
-    def get_seeds(self) -> Dict[str, int]:
+    def get_seeds(self) -> Dict[str, Optional[int]]:
         '''
         Returns the available randomization seeds for the simulation.
 
@@ -107,6 +115,7 @@ class RothermelSimulation(Simulation):
         super().__init__(config)
         self.game_status = GameStatus.RUNNING
         self.fire_status = GameStatus.RUNNING
+        self.fire_map: np.ndarray
         self.reset()
 
     def reset(self) -> None:
@@ -192,7 +201,7 @@ class RothermelSimulation(Simulation):
             'wetline': BurnStatus.WETLINE
         }
 
-    def get_attribute_bounds(self) -> Dict[str, np.ndarray]:
+    def get_attribute_bounds(self) -> Dict[str, object]:
         '''
         Return the observation space bounds for the Rothermel simulation
 
@@ -363,7 +372,7 @@ class RothermelSimulation(Simulation):
             (self.config.area.screen_size, self.config.area.screen_size),
             BurnStatus.UNBURNED)
 
-    def get_seeds(self) -> Dict[str, int]:
+    def get_seeds(self) -> Dict[str, Optional[int]]:
         '''
         Returns the available randomization seeds for the simulation.
 
@@ -378,7 +387,7 @@ class RothermelSimulation(Simulation):
         }
         # Make sure to delete all the seeds that are None, so the user knows not to try
         # and set them
-        del_keys = []
+        del_keys: List[str] = []
         for key, seed in seeds.items():
             if seed is None:
                 del_keys.append(key)
@@ -387,7 +396,7 @@ class RothermelSimulation(Simulation):
 
         return seeds
 
-    def _get_topography_seed(self) -> int:
+    def _get_topography_seed(self) -> Optional[int]:
         '''
         Returns the seed for the current elevation function.
 
@@ -397,17 +406,23 @@ class RothermelSimulation(Simulation):
             The seed for the currently configured elevation function.
         '''
         if self.config.terrain.topography_type == 'functional':
-            if self.config.terrain.topography_function.name == 'perlin':
-                return self.config.terrain.topography_function.kwargs['seed']
+            if self.config.terrain.topography_function is not None:
+                if self.config.terrain.topography_function.name == 'perlin':
+                    return self.config.terrain.topography_function.kwargs['seed']
+                else:
+                    raise RuntimeError(f'The topography function name '
+                                       f'{self.config.terrain.topography_function.name} '
+                                       'is not valid')
             else:
-                return None
+                raise RuntimeError('The topography type is set as functional, but '
+                                   'self.config.terrain.topography_function is not set')
         elif self.config.terrain.topography_type == 'operational':
-            if self.config.operational.seed is not None:
-                return self.config.operational.seed
-            else:
-                return None
+            return self.config.operational.seed
+        else:
+            raise RuntimeError(f'The value of {self.config.terrain.topography_type} '
+                               'for self.config.terrain.topography_type is not valid')
 
-    def _get_fuel_seed(self) -> int:
+    def _get_fuel_seed(self) -> Optional[int]:
         '''
         Returns the seed for the current fuel array function.
 
@@ -418,17 +433,23 @@ class RothermelSimulation(Simulation):
             The seed for the currently configured fuel array function.
         '''
         if self.config.terrain.fuel_type == 'functional':
-            if self.config.terrain.fuel_function.name == 'chaparral':
-                return self.config.terrain.fuel_function.kwargs['seed']
+            if self.config.terrain.fuel_function is not None:
+                if self.config.terrain.fuel_function.name == 'chaparral':
+                    return self.config.terrain.fuel_function.kwargs['seed']
+                else:
+                    raise RuntimeError('The fuel function name '
+                                       f'{self.config.terrain.fuel_function.name} is '
+                                       'not valid')
             else:
-                return None
+                raise RuntimeError('The fuel type is set as functional, but '
+                                   'self.config.terrain.fuel_function is not set')
         elif self.config.terrain.fuel_type == 'operational':
-            if self.config.operational.seed is not None:
-                return self.config.operational.seed
-            else:
-                return None
+            return self.config.operational.seed
+        else:
+            raise RuntimeError(f'The value of {self.config.terrain.fuel_type} '
+                               'for self.config.terrain.fuel_type is not valid')
 
-    def _get_wind_speed_seed(self) -> int:
+    def _get_wind_speed_seed(self) -> Optional[int]:
         '''
         Returns the seed for the current wind speed function.
 
@@ -437,12 +458,15 @@ class RothermelSimulation(Simulation):
         Returns:
             The seed for the currently configured wind speed function.
         '''
-        if self.config.wind.speed_function.name == 'perlin':
-            return self.config.wind.speed_function.kwargs['seed']
+        if self.config.wind.speed_function is not None:
+            if self.config.wind.speed_function.name == 'perlin':
+                return self.config.wind.speed_function.kwargs['seed']
+            else:
+                return None
         else:
             return None
 
-    def _get_wind_direction_seed(self) -> int:
+    def _get_wind_direction_seed(self) -> Optional[int]:
         '''
         Returns the seed for the current wind direction function.
 
@@ -451,8 +475,11 @@ class RothermelSimulation(Simulation):
         Returns:
             The seed for the currently configured wind direction function.
         '''
-        if self.config.wind.speed_function.name == 'perlin':
-            return self.config.wind.direction_function.kwargs['seed']
+        if self.config.wind.direction_function is not None:
+            if self.config.wind.direction_function.name == 'perlin':
+                return self.config.wind.direction_function.kwargs['seed']
+            else:
+                return None
         else:
             return None
 

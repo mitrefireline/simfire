@@ -5,7 +5,7 @@ import numpy as np
 
 from ..enums import ElevationConstants
 
-ElevationFn = Callable[[float, float], float]
+ElevationFn = Callable[[int, int], float]
 
 
 def gaussian(amplitude: int, mu_x: int, mu_y: int, sigma_x: int,
@@ -24,7 +24,7 @@ def gaussian(amplitude: int, mu_x: int, mu_y: int, sigma_x: int,
     Returns:
         A callabe that computes z values for (x, y) inputs
     '''
-    def fn(x: float, y: float) -> float:
+    def fn(x: int, y: int) -> float:
         '''
         Return the gaussian function value at the specified point.
 
@@ -124,22 +124,28 @@ class PerlinNoise2D():
         elevation_map[elevation_map > max_elevation] = max_elevation
         return elevation_map
 
-    def fn(self, x: int, y: int) -> float:
+    def get_fn(self) -> ElevationFn:
         '''
-        Wrapper function to retrieve the perlin noise values at input (x, y) coordinates.
-
-        Arguments:
-            x: The x coordinate to retrieve
-            y: The y coordinate to retrieve
-
+        Get the the elevation function based on the noise.
         Returns:
-            The perlin noise value at the (x, y) coordinates
+            The function that maps (x, y) points in the terrain to
+            elevations.
         '''
-        if not isinstance(x, int):
-            x = int(x)
-        if not isinstance(y, int):
-            y = int(y)
-        return self.terrain_map[x, y]
+        def fn(x: int, y: int) -> float:
+            '''
+            Wrapper function to retrieve the perlin noise values at input (x, y)
+            coordinates.
+
+            Arguments:
+                x: The x coordinate to retrieve
+                y: The y coordinate to retrieve
+
+            Returns:
+                The perlin noise value at the (x, y) coordinates
+            '''
+            return self.terrain_map[x, y]
+
+        return fn
 
 
 def flat() -> ElevationFn:
@@ -149,7 +155,7 @@ def flat() -> ElevationFn:
     Returns:
         A callable that computes z values for (x, y) inputs
     '''
-    def fn(x: float, y: float) -> float:
+    def fn(x: int, y: int) -> float:
         '''
         Return a constant, flat elevation value at every x and y point
 

@@ -1,4 +1,4 @@
-from typing import List, Optional, Tuple, Type, Union
+from typing import List, Optional, Sequence, Tuple, Type, Union
 
 import numpy as np
 import pygame
@@ -7,7 +7,7 @@ from ...enums import BurnStatus
 from ..sprites import FireLine, ScratchLine, WetLine, Terrain
 
 PointType = Tuple[int, int]
-PointsType = Tuple[PointType, ...]
+PointsType = Sequence[PointType]
 
 
 class ControlLineManager():
@@ -20,7 +20,7 @@ class ControlLineManager():
     '''
     def __init__(self,
                  size: int,
-                 pixel_scale: int,
+                 pixel_scale: float,
                  terrain: Terrain,
                  headless: bool = False) -> None:
         '''
@@ -85,7 +85,7 @@ class FireLineManager(ControlLineManager):
     '''
     def __init__(self,
                  size: int,
-                 pixel_scale: int,
+                 pixel_scale: float,
                  terrain: Terrain,
                  headless: bool = False) -> None:
         '''
@@ -122,7 +122,7 @@ class ScratchLineManager(ControlLineManager):
     '''
     def __init__(self,
                  size: int,
-                 pixel_scale: int,
+                 pixel_scale: float,
                  terrain: Terrain,
                  headless: bool = False) -> None:
         '''
@@ -159,7 +159,7 @@ class WetLineManager(ControlLineManager):
     '''
     def __init__(self,
                  size: int,
-                 pixel_scale: int,
+                 pixel_scale: float,
                  terrain: Terrain,
                  headless: bool = False) -> None:
         '''

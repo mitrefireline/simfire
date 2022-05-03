@@ -126,8 +126,8 @@ class RothermelSimulation(Simulation):
         self.fuel_particle = FuelParticle()
 
         self.terrain = Terrain(
-            self.config.terrain.fuel.layer,
-            self.config.terrain.topography.layer,
+            self.config.terrain.fuel_layer,
+            self.config.terrain.topography_layer,
             (self.config.area.screen_size, self.config.area.screen_size),
             headless=self.config.simulation.headless)
 
@@ -396,12 +396,12 @@ class RothermelSimulation(Simulation):
         Returns:
             The seed for the currently configured elevation function.
         '''
-        if self.config.terrain.topography.type.lower() == 'functional':
-            if self.config.terrain.topography.layer.name == 'perlin':
-                return self.config.terrain.topography.functional.perlin.seed
+        if self.config.terrain.topography_type == 'functional':
+            if self.config.terrain.topography_function.name == 'perlin':
+                return self.config.terrain.topography_function.kwargs['seed']
             else:
                 return None
-        elif self.config.terrain.topography.type.lower() == 'operational':
+        elif self.config.terrain.topography_type == 'operational':
             if self.config.operational.seed is not None:
                 return self.config.operational.seed
             else:
@@ -417,12 +417,12 @@ class RothermelSimulation(Simulation):
         Returns:
             The seed for the currently configured fuel array function.
         '''
-        if self.config.terrain.fuel.type.lower() == 'functional':
-            if self.config.terrain.fuel.layer.name == 'chaparral':
-                return self.config.terrain.fuel.functional.chaparral.seed
+        if self.config.terrain.fuel_type == 'functional':
+            if self.config.terrain.fuel_function.name == 'chaparral':
+                return self.config.terrain.fuel_function.kwargs['seed']
             else:
                 return None
-        elif self.config.terrain.fuel.type.lower() == 'operational':
+        elif self.config.terrain.fuel_type == 'operational':
             if self.config.operational.seed is not None:
                 return self.config.operational.seed
             else:
@@ -437,8 +437,8 @@ class RothermelSimulation(Simulation):
         Returns:
             The seed for the currently configured wind speed function.
         '''
-        if 'perlin' in str(self.config.wind.function).lower():
-            return self.config.wind.perlin.speed.seed
+        if self.config.wind.speed_function.name == 'perlin':
+            return self.config.wind.speed_function.kwargs['seed']
         else:
             return None
 
@@ -451,8 +451,8 @@ class RothermelSimulation(Simulation):
         Returns:
             The seed for the currently configured wind direction function.
         '''
-        if 'perlin' in str(self.config.wind.function).lower():
-            return self.config.wind.perlin.direction.seed
+        if self.config.wind.speed_function.name == 'perlin':
+            return self.config.wind.direction_function.kwargs['seed']
         else:
             return None
 
@@ -472,20 +472,20 @@ class RothermelSimulation(Simulation):
         success = False
         keys = list(seeds.keys())
         if 'elevation' in keys:
-            self.config.reset_topography_layer(seed=seeds['elevation'])
+            self.config.reset_terrain(topography_seed=seeds['elevation'])
             success = True
         if 'fuel' in keys:
-            self.config.reset_fuel_layer(seed=seeds['fuel'])
+            self.config.reset_terrain(fuel_seed=seeds['fuel'])
             success = True
         if 'wind_speed' in keys and 'wind_direction' in keys:
-            self.config.reset_wind_function(speed_seed=seeds['wind_speed'],
-                                            direction_seed=seeds['wind_direction'])
+            self.config.reset_wind(speed_seed=seeds['wind_speed'],
+                                   direction_seed=seeds['wind_direction'])
             success = True
         if 'wind_speed' in keys and 'wind_direction' not in keys:
-            self.config.reset_wind_function(speed_seed=seeds['wind_speed'])
+            self.config.reset_wind(speed_seed=seeds['wind_speed'])
             success = True
         if 'wind_speed' not in keys and 'wind_direction' in keys:
-            self.config.reset_wind_function(direction_seed=seeds['wind_direction'])
+            self.config.reset_wind(direction_seed=seeds['wind_direction'])
             success = True
 
         valid_keys = list(self.get_seeds().keys())
@@ -507,8 +507,8 @@ class RothermelSimulation(Simulation):
             A dictionary of the current layer type.
         '''
         types = {
-            'elevation': self.config.terrain.topography.type,
-            'fuel': self.config.terrain.fuel.type
+            'elevation': self.config.terrain.topography_type,
+            'fuel': self.config.terrain.fuel_type
         }
 
         return types
@@ -529,12 +529,10 @@ class RothermelSimulation(Simulation):
         success = False
         keys = list(types.keys())
         if 'elevation' in keys:
-            self.config.terrain.topography.type = types['elevation']
-            self.config.reset_topography_layer()
+            self.config.reset_terrain(topography_type=types['elevation'])
             success = True
         if 'fuel' in keys:
-            self.config.terrain.fuel.type = types['fuel']
-            self.config.reset_fuel_layer()
+            self.config.reset_terrain(fuel_type=types['fuel'])
             success = True
 
         valid_keys = list(self.get_layer_types().keys())

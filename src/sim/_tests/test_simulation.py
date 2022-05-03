@@ -21,8 +21,8 @@ class RothermelSimulationTest(unittest.TestCase):
         self.simulation = RothermelSimulation(self.config)
         self.simulation_flat = RothermelSimulation(self.config_flat_simple)
 
-        topo_layer = self.config.terrain.topography.layer
-        fuel_layer = self.config.terrain.fuel.layer
+        topo_layer = self.config.terrain.topography_layer
+        fuel_layer = self.config.terrain.fuel_layer
         self.terrain = Terrain(fuel_layer, topo_layer, self.screen_size)
 
     def test__create_terrain(self) -> None:
@@ -119,16 +119,20 @@ class RothermelSimulationTest(unittest.TestCase):
                    '{self.config.path}')
             if key == 'elevation':
                 self.assertEqual(seed,
-                                 self.config.terrain.topography.functional.perlin.seed,
+                                 self.config.terrain.topography_function.kwargs['seed'],
                                  msg=msg)
             if key == 'fuel':
                 self.assertEqual(seed,
-                                 self.config.terrain.fuel.functional.chaparral.seed,
+                                 self.config.terrain.fuel_function.kwargs['seed'],
                                  msg=msg)
             if key == 'wind_speed':
-                self.assertEqual(seed, self.config.wind.perlin.speed.seed, msg=msg)
+                self.assertEqual(seed,
+                                 self.config.wind.speed_function.kwargs['seed'],
+                                 msg=msg)
             if key == 'wind_direction':
-                self.assertEqual(seed, self.config.wind.perlin.direction.seed, msg=msg)
+                self.assertEqual(seed,
+                                 self.config.wind.direction_function.kwargs['seed'],
+                                 msg=msg)
 
         # Test for different use-cases where not all functions have seeds
         self.assertNotIn('elevation', flat_seeds)
@@ -139,7 +143,7 @@ class RothermelSimulationTest(unittest.TestCase):
             msg = (f'The seed for {key} ({seed}) does not match that found in '
                    f'{self.config.path}')
             if key == 'fuel':
-                cfg_seed = self.config_flat_simple.terrain.fuel.functional.chaparral.seed
+                cfg_seed = self.config_flat_simple.terrain.fuel_function.kwargs['seed']
                 self.assertEqual(seed, cfg_seed, msg=msg)
 
     def test_set_seeds(self) -> None:

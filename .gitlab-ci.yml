@@ -38,7 +38,7 @@ mypy:
   script:
     - mypy --config-file .mypy.ini .
   only:
-    - merge_requests 
+    - merge_requests
 
 #########
 # Tests #

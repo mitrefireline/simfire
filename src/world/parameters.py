@@ -52,6 +52,9 @@ class Environment:
     '''
     These parameters relate to the environment of the tile. For now we'll
     assume these values are constant over a small area.
+    The wind speed and direction can be a constant value, nested sequences,
+    or numpy arrays. The FireManager will convert the constant values and
+    nested sequences to numpy arrays internally.
 
     Parameters:
         M_f: Fuel moisture (amount of water in fuel/vegetation). 1-3% for SoCal, usually

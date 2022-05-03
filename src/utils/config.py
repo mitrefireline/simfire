@@ -198,6 +198,12 @@ class Config:
             The YAML data converted to an AreaConfig dataclass
         '''
         # No processing needed for the AreaConfig
+        if self.lat_long_box is not None:
+            # Overwite the screen_size since operational data will determine
+            # its own screen_size based on lat/long input
+            # Height and width are the same since we assume square input
+            height = self.lat_long_box.tr[0][0] - self.lat_long_box.bl[0][0]
+            self.yaml_data['area']['screen_size'] = height
         return AreaConfig(**self.yaml_data['area'])
 
     def _load_display(self) -> DisplayConfig:
@@ -248,6 +254,11 @@ class Config:
             The YAML data converted to a TerrainConfig dataclass
         '''
         topo_type = self.yaml_data['terrain']['topography']['type']
+        fuel_type = self.yaml_data['terrain']['fuel']['type']
+
+        if topo_type != fuel_type:
+            raise ConfigError(f'The topography type {topo_type} != the fuel '
+                              f'type {fuel_type}')
         topo_type, topo_layer, topo_name, topo_kwargs = self._create_topography_layer(
             init=True)
         if topo_name is not None and topo_kwargs is not None:
@@ -255,7 +266,6 @@ class Config:
         else:
             topo_fn = None
 
-        fuel_type = self.yaml_data['terrain']['fuel']['type']
         fuel_type, fuel_layer, fuel_name, fuel_kwargs = self._create_fuel_layer(init=True)
         if fuel_name is not None and fuel_kwargs is not None:
             fuel_fn = FunctionalConfig(fuel_name, fuel_kwargs)
@@ -516,6 +526,8 @@ class Config:
             if self.terrain.topography_type == 'functional' and \
                     topography_type == 'operational':
                 self.lat_long_box = self._make_lat_long_box()
+                # Update the area since the LatLongBox changed
+                self.area = self._load_area()
 
         # Can only reset functional fuel seeds, since operational is updated
         # via the `location` argument
@@ -530,6 +542,8 @@ class Config:
             # Need to create the LatLongBox if switching to operational
             if self.terrain.fuel_type == 'functional' and fuel_type == 'operational':
                 self.lat_long_box = self._make_lat_long_box()
+                # Update the area since the LatLongBox changed
+                self.area = self._load_area()
 
         self.terrain = self._load_terrain()
 

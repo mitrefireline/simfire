@@ -140,6 +140,7 @@ class TestDataLayer(unittest.TestCase):
         '''
         Test that the data is set to None.
         '''
+        print(self.layer.data)
         self.assertIsNone(self.layer.data,
                           msg='The initialized data should be None, '
                           f'but is {self.layer.data}')

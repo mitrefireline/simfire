@@ -21,7 +21,9 @@ class ConfigTest(unittest.TestCase):
         new_topo_seed = 1234
         new_fuel_seed = 4321
         new_loc = (39.65, 119.75)
-        self.cfg.reset_terrain(new_topo_seed, new_fuel_seed, new_loc)
+        self.cfg.reset_terrain(topography_seed=new_topo_seed,
+                               fuel_seed=new_fuel_seed,
+                               location=new_loc)
 
         # The seeds should be updated after calling the reset method
         yaml_data = self.cfg.yaml_data

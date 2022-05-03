@@ -1,6 +1,6 @@
 import math
 from pathlib import Path
-from typing import Tuple, List, Dict
+from typing import Optional, Tuple, List, Dict
 
 from matplotlib.contour import QuadContourSet
 import matplotlib.pyplot as plt
@@ -465,7 +465,7 @@ class DataLayer():
         '''
         This parent class only exists to set a base value for self.data
         '''
-        self.data: np.ndarray
+        self.data: Optional[np.ndarray] = None
 
 
 class TopographyLayer(DataLayer):
@@ -485,6 +485,7 @@ class TopographyLayer(DataLayer):
             None
         '''
         super().__init__()
+        self.data: np.ndarray
         self.image: np.ndarray
 
     def _make_contours(self) -> QuadContourSet:

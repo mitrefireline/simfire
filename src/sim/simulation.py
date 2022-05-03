@@ -409,6 +409,8 @@ class RothermelSimulation(Simulation):
             if self.config.terrain.topography_function is not None:
                 if self.config.terrain.topography_function.name == 'perlin':
                     return self.config.terrain.topography_function.kwargs['seed']
+                elif self.config.terrain.topography_function.name == 'flat':
+                    return None
                 else:
                     raise RuntimeError(f'The topography function name '
                                        f'{self.config.terrain.topography_function.name} '

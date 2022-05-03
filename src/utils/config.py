@@ -3,7 +3,7 @@ import numpy as np
 import yaml
 import os.path
 from pathlib import Path
-from typing import Any, Tuple
+from typing import Any, Tuple, Dict
 from yaml.parser import ParserError
 
 from ..utils.log import create_logger
@@ -111,12 +111,12 @@ class Config:
         If either Fuel or Topography is Operational, use calculated pixel scale and
             screen size.
         '''
-        if self.terrain.topography.type.lower() and self.terrain.fuel.type.lower(
-        ) == 'functional':
+        if self.terrain.topography.type.lower(
+        ) == 'functional' and self.terrain.fuel.type.lower() == 'functional':
             setattr(self.area, 'terrain_scale',
                     self.area.pixel_scale * self.area.terrain_size)
-        elif self.terrain.topography.type.lower() or self.terrain.fuel.type.lower(
-        ) == 'operational':
+        elif self.terrain.topography.type.lower(
+        ) == 'operational' or self.terrain.fuel.type.lower() == 'operational':
             args = self.operational
             center = (args.latitude, args.longitude)
             if args.seed is not None:
@@ -142,6 +142,11 @@ class Config:
 
             setattr(self.area, 'screen_size', self.width)
             setattr(self.area, 'pixel_scale', self.pixel_scale)
+
+            # set the perlin shape - this may not get used, but if it does it needs to be
+            #    the correct/calculated shape
+            setattr(self.terrain.topography.functional.perlin, 'shape',
+                    (self.screen_size, self.screen_size))
         else:
             message = ('Unable to load topography of type '
                        f'{self.terrain.topography.type}. Please check your config file '
@@ -352,9 +357,7 @@ class Config:
                                    wind_speed=source_speed)
         return wind_map
 
-    def reset_topography_layer(self,
-                               seed: int = None,
-                               location: Tuple[float, float] = None) -> None:
+    def reset_topography_layer(self, seed: int = None) -> None:
         '''
         Reset the topography layer with a different seed or a different location
 
@@ -374,15 +377,7 @@ class Config:
             # reflected in the saved config.yml
             self.data['terrain']['topography']['functional']['perlin']['seed'] = seed
 
-        # Also set the seed for the operational topography layer
-        self._reset_operational_variables(seed, location)
-
-        self._set_terrain_scale()
-        self._set_topography_layer()
-
-    def reset_fuel_layer(self,
-                         seed: int = None,
-                         location: Tuple[float, float] = None) -> None:
+    def reset_fuel_layer(self, seed: int = None) -> None:
         '''
         Reset the fuel layer with a different seed or a different location
 
@@ -400,10 +395,38 @@ class Config:
             # reflected in the saved config.yml
             self.data['terrain']['fuel']['functional']['chaparral']['seed'] = seed
 
-        # Also set the seed for the operational topography layer
-        self._reset_operational_variables(seed, location)
+    def _reset_layers(self,
+                      seed: int = None,
+                      location: Tuple[float, float] = None,
+                      reset_types: Dict = None) -> None:
+        '''
+        Reset both the fuel layer and topography layer with a different seed or a
+            different location.
+        These are combined to share functionality with _set_terrain_scale()
+            which is computationally expensive, and should only occur once
+            if needed.
 
+        Arguments:
+            seed: The input used in generating the random fuel array function.
+            location: Operational lat/long location
+            reset_types: The values for fuel and topography (operational / functional)
+
+        Returns:
+            Whether or not the method successfully set a data type.
+
+        '''
+
+        if reset_types is not None:
+            keys = list(reset_types.keys())
+
+            if 'elevation' in keys:
+                self.reset_topography_layer(seed)
+            if 'fuel' in keys:
+                self.reset_fuel_layer(seed)
+
+        self._reset_operational_variables(seed, location)
         self._set_terrain_scale()
+        self._set_topography_layer()
         self._set_fuel_layer()
 
     def _reset_operational_variables(self, seed: int, location: Tuple[float,

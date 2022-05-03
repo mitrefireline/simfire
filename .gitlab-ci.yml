@@ -31,6 +31,15 @@ yapf:
   only:
     - merge_requests
 
+mypy:
+  stage: Static Analysis
+  tags:
+    - docker
+  script:
+    - mypy --config-file .mypy.ini .
+  only:
+    - merge_requests 
+
 #########
 # Tests #
 #########

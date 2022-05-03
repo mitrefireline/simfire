@@ -42,7 +42,7 @@ terrain:
         sigma_x: 50
         sigma_y: 50
   fuel:
-    type: functional
+    type: operational
     functional:
       function: chaparral
       chaparral:

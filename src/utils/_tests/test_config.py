@@ -167,7 +167,8 @@ class ConfigTest(unittest.TestCase):
         seed = 1234
         x, y = (5, 5)
         old_elevation = self.cfg.terrain.topography.layer.data[y, x]
-        self.cfg.reset_topography_layer(seed=seed)
+        types = {'elevation': 'functional'}
+        self.cfg._reset_layers(seed=seed, reset_types=types)
         new_elevation = self.cfg.terrain.topography.layer.data[y, x]
 
         # The seeds should be updated after calling the reset method
@@ -193,7 +194,8 @@ class ConfigTest(unittest.TestCase):
         seed = 1234
         x, y = (5, 5)
         old_fuel = self.cfg.terrain.fuel.layer.data[y, x]
-        self.cfg.reset_fuel_layer(seed=seed)
+        types = {'fuel': 'functional'}
+        self.cfg._reset_layers(seed=seed, reset_types=types)
         new_fuel = self.cfg.terrain.fuel.layer.data[y, x]
 
         # The seeds should be updated after calling the reset method

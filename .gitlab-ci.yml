@@ -2,7 +2,7 @@ image: "python:3.9"
 
 before_script:
   - python --version
-  - if [ -d /nfs/lslab2/fireline/anaconda/roth-dev ]; then echo "Using existing roth-dev env" && export PYTHON_ROOT="/nfs/lslab2/fireline/ananconda/roth-dev/bin/"; else pip install -r dev-requirements.txt && export PYTHON_ROOT=""; fi
+  - if [ -d /nfs/lslab2/fireline/anaconda/roth-dev ]; then echo "Using existing roth-dev env" && export PYTHON_ROOT="/nfs/lslab2/fireline/anaconda/roth-dev/bin/"; else pip install -r dev-requirements.txt && export PYTHON_ROOT=""; fi
 
 stages:
   - Static Analysis

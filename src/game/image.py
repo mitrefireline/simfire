@@ -1,6 +1,6 @@
 import numpy as np
-from PIL import Image
 import pygame
+from PIL import Image
 
 
 def load_image(name: str) -> pygame.surface.Surface:

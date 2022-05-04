@@ -1,13 +1,13 @@
-import numpy as np
-
 import unittest
-from typing import Dict
 from pathlib import Path
+from typing import Dict
+
+import numpy as np
 
 from ...enums import BurnStatus
 from ...game.sprites import Terrain
-from ...utils.config import Config, ConfigError
 from ...sim.simulation import RothermelSimulation
+from ...utils.config import Config, ConfigError
 
 
 class RothermelSimulationTest(unittest.TestCase):

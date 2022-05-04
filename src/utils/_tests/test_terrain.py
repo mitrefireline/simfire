@@ -1,9 +1,10 @@
 import unittest
+
 import numpy as np
 
+from ...world.parameters import Fuel
 from ..config import Config
 from ..terrain import chaparral, random_seed_list, w_0_seed
-from ...world.parameters import Fuel
 
 
 class TerrainTest(unittest.TestCase):

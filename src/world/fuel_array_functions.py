@@ -1,7 +1,7 @@
 from typing import Callable
 
-from .parameters import Fuel
 from ..utils.terrain import chaparral
+from .parameters import Fuel
 
 FuelArrayFn = Callable[[float, float], Fuel]
 

@@ -4,7 +4,7 @@ import numpy as np
 import pygame
 
 from ...enums import BurnStatus
-from ..sprites import FireLine, ScratchLine, WetLine, Terrain
+from ..sprites import FireLine, ScratchLine, Terrain, WetLine
 
 PointType = Tuple[int, int]
 PointsType = Sequence[PointType]

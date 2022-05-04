@@ -1,6 +1,7 @@
 import math
-import pygame
+
 import numpy as np
+import pygame
 
 terrain_features: np.ndarray
 

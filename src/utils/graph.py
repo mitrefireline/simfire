@@ -1,9 +1,9 @@
 from typing import List, Sequence, Tuple, Union
 
-from matplotlib import lines as mlines
 import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
+from matplotlib import lines as mlines
 
 from ..enums import BurnStatus
 

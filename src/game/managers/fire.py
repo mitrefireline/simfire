@@ -13,11 +13,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pygame
 
-from ..sprites import Fire, Terrain
-from ...enums import BurnStatus, RoSAttenuation, GameStatus
+from ...enums import BurnStatus, GameStatus, RoSAttenuation
 from ...utils.graph import FireSpreadGraph
 from ...world.parameters import Environment, FuelParticle
 from ...world.rothermel import compute_rate_of_spread
+from ..sprites import Fire, Terrain
 
 NewLocsType = Tuple[Tuple[int, int], ...]
 

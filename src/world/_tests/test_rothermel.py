@@ -2,10 +2,10 @@ import unittest
 
 import numpy as np
 
+from ...world.elevation_functions import flat
 from ..parameters import FuelParticle
 from ..presets import Chaparral, TallGrass
 from ..rothermel import compute_rate_of_spread
-from ...world.elevation_functions import flat
 
 KNOWN_ROTHERMEL_OUTPUT = [
     1087.6328125, 1087.6328125, 1087.6328125, 1087.6328125, 391.637451171875,

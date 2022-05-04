@@ -1,21 +1,21 @@
-from copy import deepcopy
 import dataclasses
 import os
-import numpy as np
-
-import yaml  # type: ignore
-from typing import Any, Dict, Optional, Tuple, Union
+from copy import deepcopy
 from pathlib import Path
+from typing import Any, Dict, Optional, Tuple, Union
+
+import numpy as np
+import yaml  # type: ignore
 from yaml.parser import ParserError  # type: ignore
 
-from .log import create_logger
-from .layers import (FuelLayer, FunctionalFuelLayer, LatLongBox,
-                     OperationalTopographyLayer, FunctionalTopographyLayer,
-                     OperationalFuelLayer, TopographyLayer)
-from .units import mph_to_ftpm, scale_ms_to_ftpm, str_to_minutes
 from ..world.elevation_functions import PerlinNoise2D, flat, gaussian
 from ..world.fuel_array_functions import chaparral_fn
 from ..world.wind_mechanics.wind_controller import WindController
+from .layers import (FuelLayer, FunctionalFuelLayer, FunctionalTopographyLayer,
+                     LatLongBox, OperationalFuelLayer,
+                     OperationalTopographyLayer, TopographyLayer)
+from .log import create_logger
+from .units import mph_to_ftpm, scale_ms_to_ftpm, str_to_minutes
 
 log = create_logger(__name__)
 

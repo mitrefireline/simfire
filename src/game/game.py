@@ -1,13 +1,13 @@
+import math
 from importlib import resources
 from typing import Optional, Sequence, Tuple
 
-import math
-import pygame
 import numpy as np
+import pygame
 
-from .image import load_image
-from ..utils.units import mph_to_ftpm
 from ..enums import BurnStatus, GameStatus
+from ..utils.units import mph_to_ftpm
+from .image import load_image
 from .sprites import Fire, FireLine, Terrain
 
 

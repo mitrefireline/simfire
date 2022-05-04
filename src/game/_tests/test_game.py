@@ -1,14 +1,14 @@
-from multiprocessing import get_context
 import os
 import unittest
+from multiprocessing import get_context
 
-from ..game import Game
-from ..sprites import Terrain
 from ...enums import GameStatus
 from ...utils.config import Config
+from ...world.parameters import Environment, FuelParticle
+from ..game import Game
 from ..managers.fire import RothermelFireManager
 from ..managers.mitigation import FireLineManager
-from ...world.parameters import Environment, FuelParticle
+from ..sprites import Terrain
 
 # unittest.mock.patch.dict isn't working anymore
 # Can't run rests without setting display at the top of the file

@@ -7,7 +7,7 @@ import pygame
 from reportlab.graphics import renderPM
 from svglib.svglib import svg2rlg
 
-from ..enums import (BurnStatus, SpriteLayer, BURNED_RGB_COLOR)
+from ..enums import BURNED_RGB_COLOR, BurnStatus, SpriteLayer
 from ..utils.layers import FuelLayer, TopographyLayer
 
 

@@ -1,5 +1,5 @@
-from typing import Sequence, Union
 from dataclasses import dataclass
+from typing import Sequence, Union
 
 import numpy as np
 

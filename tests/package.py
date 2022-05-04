@@ -5,17 +5,14 @@ This will be used in CI to make sure that we can import all of the packages/modu
 installed package. If it fails, there is likely a `src` imported somewhere instead of a
 relative import.
 '''
-import rothsim
-from rothsim import game
-from rothsim.game import managers
-from rothsim import utils
-from rothsim import world
-from rothsim import sim
-
 import sys
 import traceback
 from importlib import import_module
 from modulefinder import ModuleFinder
+
+import rothsim
+from rothsim import game, sim, utils, world
+from rothsim.game import managers
 
 # Find all of the submodules
 finder = ModuleFinder()

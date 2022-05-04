@@ -3,10 +3,10 @@ import unittest
 import numpy as np
 import pygame
 
-from . import DummyFuelLayer, DummyTopographyLayer
-from ..sprites import Fire, Terrain
-from ...utils.config import Config
 from ...enums import BURNED_RGB_COLOR, BurnStatus, SpriteLayer
+from ...utils.config import Config
+from ..sprites import Fire, Terrain
+from . import DummyFuelLayer, DummyTopographyLayer
 
 
 class TestTerrain(unittest.TestCase):

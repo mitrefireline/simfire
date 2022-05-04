@@ -1,9 +1,10 @@
 from typing import Optional
+
 import numpy as np
 import pygame
 
-from .perlin_wind import WindNoise
 from .cfd_wind import Fluid
+from .perlin_wind import WindNoise
 
 pygame.init()
 

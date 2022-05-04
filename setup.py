@@ -1,5 +1,6 @@
-import os
 import fnmatch
+import os
+
 import setuptools
 from setuptools.command.build_py import build_py as build_py_orig
 

@@ -6,12 +6,11 @@ Contains many enumeration classes for use throughout `rothermel_model` that depi
 burn status, the ordering of sprite layers, how much to attenuate the rate of spread on
 different types of control lines, and the current game status.
 '''
-from typing import Tuple
 from dataclasses import dataclass
-from pathlib import Path
+from enum import Enum, IntEnum, auto
 from importlib import resources
-
-from enum import auto, Enum, IntEnum
+from pathlib import Path
+from typing import Tuple
 
 import numpy as np
 from PIL import Image
@@ -19,12 +18,14 @@ from PIL import Image
 with resources.path('assets.textures', 'terrain.jpg') as path:
     TERRAIN_TEXTURE_PATH: Path = path
 
-from .world.presets import (ShortGrass, GrassTimberShrubOverstory, TallGrass, Chaparral,
-                            Brush, DormantBrushHardwoodSlash, SouthernRough,
-                            ClosedShortNeedleTimberLitter, HardwoodLongNeedlePineTimber,
-                            TimberLitterUnderstory, LightLoggingSlash, MediumLoggingSlash,
-                            HeavyLoggingSlash, NBUrban, NBSnowIce, NBAgriculture,
-                            NBBarren, NBWater, NBNoData)
+from .world.presets import (Brush, Chaparral, ClosedShortNeedleTimberLitter,
+                            DormantBrushHardwoodSlash,
+                            GrassTimberShrubOverstory,
+                            HardwoodLongNeedlePineTimber, HeavyLoggingSlash,
+                            LightLoggingSlash, MediumLoggingSlash,
+                            NBAgriculture, NBBarren, NBNoData, NBSnowIce,
+                            NBUrban, NBWater, ShortGrass, SouthernRough,
+                            TallGrass, TimberLitterUnderstory)
 
 DRY_TERRAIN_BROWN_IMG: Image.Image = Image.fromarray(
     np.full((10, 10, 3), (205, 133, 63), dtype=np.uint8))

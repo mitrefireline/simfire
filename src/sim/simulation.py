@@ -1,19 +1,19 @@
+import warnings
+from abc import ABC, abstractmethod
+from typing import Dict, Iterable, List, Optional, Tuple, Union
+
 import numpy as np
 
-from abc import ABC, abstractmethod
-from typing import Dict, List, Optional, Union, Tuple, Iterable
-import warnings
-
-from ..utils.config import Config
-from ..game.sprites import Terrain
-from ..utils.log import create_logger
-from ..utils.units import str_to_minutes
-from ..enums import ElevationConstants, GameStatus, BurnStatus, FuelConstants
+from ..enums import BurnStatus, ElevationConstants, FuelConstants, GameStatus
 from ..game.managers.fire import RothermelFireManager
-from ..world.parameters import Environment, FuelParticle
-from ..utils.layers import FunctionalFuelLayer
 from ..game.managers.mitigation import (FireLineManager, ScratchLineManager,
                                         WetLineManager)
+from ..game.sprites import Terrain
+from ..utils.config import Config
+from ..utils.layers import FunctionalFuelLayer
+from ..utils.log import create_logger
+from ..utils.units import str_to_minutes
+from ..world.parameters import Environment, FuelParticle
 
 log = create_logger(__name__)
 

@@ -8,7 +8,7 @@ from ....enums import BurnStatus
 from ....game._tests import DummyFuelLayer, DummyTopographyLayer
 from ....game.game import Game
 from ....utils.config import Config
-from ...sprites import FireLine, ScratchLine, WetLine, Terrain
+from ...sprites import FireLine, ScratchLine, Terrain, WetLine
 from ..mitigation import FireLineManager, ScratchLineManager, WetLineManager
 
 # unittest.mock.patch.dict isn't working anymore

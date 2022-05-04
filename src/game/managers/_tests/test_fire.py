@@ -5,9 +5,9 @@ import numpy as np
 from ....enums import BurnStatus, GameStatus
 from ....game._tests import DummyFuelLayer, DummyTopographyLayer
 from ....game.managers.mitigation import FireLineManager
-from ...sprites import Fire, Terrain
 from ....utils.config import Config
 from ....world.parameters import Environment, FuelParticle
+from ...sprites import Fire, Terrain
 from ..fire import ConstantSpreadFireManager, FireManager, RothermelFireManager
 
 

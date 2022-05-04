@@ -77,6 +77,7 @@ coverage:
   tags:
   - lslab2
   script:
+    - pip install pytest pytest-cov
     - SDL_VIDEODRIVER=dummy python -m coverage run -m pytest
     - SDL_VIDEODRIVER=dummy python -m coverage report
     - SDL_VIDEODRIVER=dummy python -m coverage xml

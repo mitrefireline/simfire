@@ -8,7 +8,7 @@ from ....enums import BurnStatus
 from ....game._tests import DummyFuelLayer, DummyTopographyLayer
 from ....game.game import Game
 from ....utils.config import Config
-from ...sprites import FireLine, ScratchLine, WetLine, Terrain
+from ...sprites import FireLine, ScratchLine, Terrain, WetLine
 from ..mitigation import FireLineManager, ScratchLineManager, WetLineManager
 
 # unittest.mock.patch.dict isn't working anymore
@@ -22,9 +22,8 @@ class TestControlLineManager(unittest.TestCase):
     using the `FireLineManager` as a proxy.
     '''
     def setUp(self) -> None:
-        self.config = Config('configs/functional_config.yml')
-        self.screen_size = (32, 32)
-        self.pixel_scale = 50  # Just an arbitrary number
+        self.config = Config('./src/utils/_tests/test_configs/test_config.yml')
+        self.screen_size = (self.config.area.screen_size, self.config.area.screen_size)
         points = line(self.screen_size[0] // 4, 0, 0, self.screen_size[1] // 4)
         y = points[0].tolist()
         x = points[1].tolist()
@@ -40,7 +39,7 @@ class TestControlLineManager(unittest.TestCase):
         Test that a point is added to the self.sprites list correctly.
         '''
         manager = self.manager(size=self.config.display.control_line_size,
-                               pixel_scale=self.pixel_scale,
+                               pixel_scale=self.config.area.pixel_scale,
                                terrain=self.terrain)
 
         manager._add_point(self.points[0])
@@ -64,7 +63,7 @@ class TestControlLineManager(unittest.TestCase):
                            BurnStatus.UNBURNED)
 
         manager = self.manager(size=self.config.display.control_line_size,
-                               pixel_scale=self.pixel_scale,
+                               pixel_scale=self.config.area.pixel_scale,
                                terrain=self.terrain)
         fire_map = self.game.fire_map
         fire_map = manager.update(fire_map, self.points)
@@ -90,9 +89,8 @@ class TestFireLineManager(unittest.TestCase):
     present in FireLines, but right now assumes that they stop the fire in its tracks.
     '''
     def setUp(self) -> None:
-        self.config = Config('configs/functional_config.yml')
-        self.screen_size = (32, 32)
-        self.pixel_scale = 50  # Just an arbitrary number
+        self.config = Config('./src/utils/_tests/test_configs/test_config.yml')
+        self.screen_size = (self.config.area.screen_size, self.config.area.screen_size)
         points = line(self.screen_size[0] // 4, 0, 0, self.screen_size[1] // 4)
         y = points[0].tolist()
         x = points[1].tolist()
@@ -108,7 +106,7 @@ class TestFireLineManager(unittest.TestCase):
         Test to make sure that `self.sprite_type` and `self.line_type` are set correctly
         '''
         manager = self.manager(size=self.config.display.control_line_size,
-                               pixel_scale=self.pixel_scale,
+                               pixel_scale=self.config.area.pixel_scale,
                                terrain=self.terrain)
 
         # Make sure line_type is the same
@@ -129,9 +127,8 @@ class TestScratchLineManager(unittest.TestCase):
     physics present in ScratchLines.
     '''
     def setUp(self) -> None:
-        self.config = Config('configs/functional_config.yml')
-        self.screen_size = (32, 32)
-        self.pixel_scale = 50  # Just an arbitrary number
+        self.config = Config('./src/utils/_tests/test_configs/test_config.yml')
+        self.screen_size = (self.config.area.screen_size, self.config.area.screen_size)
         points = line(self.screen_size[0] // 4, 0, 0, self.screen_size[1] // 4)
         y = points[0].tolist()
         x = points[1].tolist()
@@ -147,7 +144,7 @@ class TestScratchLineManager(unittest.TestCase):
         Test to make sure that `self.sprite_type` and `self.line_type` are set correctly
         '''
         manager = self.manager(size=self.config.display.control_line_size,
-                               pixel_scale=self.pixel_scale,
+                               pixel_scale=self.config.area.pixel_scale,
                                terrain=self.terrain)
 
         # Make sure line_type is the same
@@ -168,9 +165,8 @@ class TestWetLineManager(unittest.TestCase):
     present in WetLines.
     '''
     def setUp(self) -> None:
-        self.config = Config('configs/functional_config.yml')
-        self.screen_size = (32, 32)
-        self.pixel_scale = 50  # Just an arbitrary number
+        self.config = Config('./src/utils/_tests/test_configs/test_config.yml')
+        self.screen_size = (self.config.area.screen_size, self.config.area.screen_size)
         points = line(self.screen_size[0] // 4, 0, 0, self.screen_size[1] // 4)
         y = points[0].tolist()
         x = points[1].tolist()
@@ -186,7 +182,7 @@ class TestWetLineManager(unittest.TestCase):
         Test to make sure that `self.sprite_type` and `self.line_type` are set correctly
         '''
         manager = self.manager(size=self.config.display.control_line_size,
-                               pixel_scale=self.pixel_scale,
+                               pixel_scale=self.config.area.pixel_scale,
                                terrain=self.terrain)
 
         # Make sure line_type is the same

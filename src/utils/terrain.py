@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Optional, Tuple, Union
 
 import numpy as np
 
@@ -6,7 +6,7 @@ from ..enums import FuelConstants
 from ..world.parameters import Fuel
 
 
-def random_seed_list(length: int, seed: int = None) -> Tuple[Tuple[int]]:
+def random_seed_list(length: int, seed: int = None) -> Tuple[Tuple[int, ...], ...]:
     '''
     Create a tuple of tuples  of random integers (to be used as seeds) based on `length`
     and initial input `seed`
@@ -23,7 +23,7 @@ def random_seed_list(length: int, seed: int = None) -> Tuple[Tuple[int]]:
         tuple(np.random.randint(0, 99_999) for _ in range(length)) for _ in range(length))
 
 
-def w_0_seed(seed: int) -> float:
+def w_0_seed(seed: Union[int, None]) -> float:
     '''
     Create a `w_0` between `0.2` and `0.6` based on an initial `seed` parameter
 
@@ -39,7 +39,7 @@ def w_0_seed(seed: int) -> float:
     return w_0
 
 
-def chaparral(seed: int = None) -> Fuel:
+def chaparral(seed: Union[int, None] = None) -> Fuel:
     '''
     Create a chaparral fuel object using an optional input seed
 
@@ -58,7 +58,7 @@ def chaparral(seed: int = None) -> Fuel:
                 sigma=FuelConstants.SIGMA)
 
 
-def fuel(seed: int = None) -> Tuple[float, float]:
+def fuel(seed: Optional[int] = None) -> Tuple[float, float]:
     '''
     Functionailty to use a random seed to define a center point.
     To be used with operational data layers

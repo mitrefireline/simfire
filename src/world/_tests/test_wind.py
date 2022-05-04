@@ -1,4 +1,5 @@
 import unittest
+
 from ..wind_mechanics.perlin_wind import WindNoise
 
 

@@ -1,6 +1,6 @@
 import unittest
 
-from ..units import mph_to_ftpm, ftpm_to_mph, str_to_minutes
+from ..units import ftpm_to_mph, mph_to_ftpm, str_to_minutes
 
 
 class TestUnits(unittest.TestCase):

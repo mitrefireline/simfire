@@ -1,12 +1,13 @@
-from typing import Tuple
+from typing import List, Optional, Sequence, Tuple, Type, Union
 
 import numpy as np
+import pygame
 
 from ...enums import BurnStatus
-from ..sprites import FireLine, ScratchLine, WetLine, Terrain
+from ..sprites import FireLine, ScratchLine, Terrain, WetLine
 
 PointType = Tuple[int, int]
-PointsType = Tuple[PointType, ...]
+PointsType = Sequence[PointType]
 
 
 class ControlLineManager():
@@ -19,7 +20,7 @@ class ControlLineManager():
     '''
     def __init__(self,
                  size: int,
-                 pixel_scale: int,
+                 pixel_scale: float,
                  terrain: Terrain,
                  headless: bool = False) -> None:
         '''
@@ -40,18 +41,21 @@ class ControlLineManager():
         self.size = size
         self.pixel_scale = pixel_scale
         self.terrain = terrain
-        self.line_type = None
-        self.sprite_type = None
-        self.sprites = []
+        self.line_type: BurnStatus
+        self.sprite_type: Union[Type[FireLine], Type[ScratchLine], Type[WetLine]]
+        self.sprites: List[pygame.sprite.Sprite] = []
         self.headless = headless
 
     def _add_point(self, point: PointType) -> None:
         '''
         Updates self.sprites to add a new point to the control line
         '''
-        self.sprites.append(self.sprite_type(point, self.size, self.headless))
+        new_sprite = self.sprite_type(point, self.size, self.headless)
+        self.sprites.append(new_sprite)
 
-    def update(self, fire_map: np.ndarray, points: PointsType = []) -> np.ndarray:
+    def update(self,
+               fire_map: np.ndarray,
+               points: Optional[PointsType] = None) -> np.ndarray:
         '''
         Updates the passed in `fire_map` with new `ControlLine` `points`.
 
@@ -61,10 +65,13 @@ class ControlLineManager():
         Returns:
             fire_map: The upadated fire map with the control lines added.
         '''
-        for point in points:
-            x, y = point
-            fire_map[y, x] = self.line_type
-            self._add_point(point)
+        if points is None:
+            pass
+        else:
+            for point in points:
+                x, y = point
+                fire_map[y, x] = self.line_type
+                self._add_point(point)
 
         return fire_map
 
@@ -78,7 +85,7 @@ class FireLineManager(ControlLineManager):
     '''
     def __init__(self,
                  size: int,
-                 pixel_scale: int,
+                 pixel_scale: float,
                  terrain: Terrain,
                  headless: bool = False) -> None:
         '''
@@ -115,7 +122,7 @@ class ScratchLineManager(ControlLineManager):
     '''
     def __init__(self,
                  size: int,
-                 pixel_scale: int,
+                 pixel_scale: float,
                  terrain: Terrain,
                  headless: bool = False) -> None:
         '''
@@ -152,7 +159,7 @@ class WetLineManager(ControlLineManager):
     '''
     def __init__(self,
                  size: int,
-                 pixel_scale: int,
+                 pixel_scale: float,
                  terrain: Terrain,
                  headless: bool = False) -> None:
         '''

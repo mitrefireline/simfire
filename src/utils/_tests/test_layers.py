@@ -2,12 +2,19 @@ import os
 import shutil
 import unittest
 
-from ..layers import DataLayer, FunctionalTopographyLayer, LatLongBox, TopographyLayer
-from ..layers import FunctionalFuelLayer, OperationalFuelLayer, OperationalTopographyLayer
-from ...world.fuel_array_functions import chaparral_fn
-
 import matplotlib as mpl
 import numpy as np
+
+from ...world.fuel_array_functions import chaparral_fn
+from ..layers import (
+    DataLayer,
+    FunctionalFuelLayer,
+    FunctionalTopographyLayer,
+    LatLongBox,
+    OperationalFuelLayer,
+    OperationalTopographyLayer,
+    TopographyLayer,
+)
 
 
 class TestLatLongBox(unittest.TestCase):
@@ -140,6 +147,7 @@ class TestDataLayer(unittest.TestCase):
         '''
         Test that the data is set to None.
         '''
+        print(self.layer.data)
         self.assertIsNone(self.layer.data,
                           msg='The initialized data should be None, '
                           f'but is {self.layer.data}')

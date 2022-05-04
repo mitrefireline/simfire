@@ -327,7 +327,6 @@ Go [here](https://gitlab.mitre.org/fireline/rothermel-modeling/-/blob/master/con
 ```yaml
 area:
   screen_size: 225
-  terrain_size: 15
   pixel_scale: 50
 
 display:
@@ -401,14 +400,14 @@ wind:
       octaves: 3
       persistence: 0.7
       lacunarity: 2.0
-      min: 7
-      max: 47
+      range_min: 7
+      range_max: 47
     direction:
       seed: 650
       scale: 1500
       octaves: 2
       persistence: 0.9
       lacunarity: 1.0
-      min: 0.0
-      max: 360.0
+      range_min: 0.0
+      range_max: 360.0
 ```

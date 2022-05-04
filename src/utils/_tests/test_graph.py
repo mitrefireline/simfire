@@ -4,8 +4,8 @@ from typing import Tuple
 import matplotlib.pyplot as plt
 import numpy as np
 
-from ..graph import FireSpreadGraph
 from ...enums import BurnStatus
+from ..graph import FireSpreadGraph
 
 
 def _create_map_and_coords(screen_size: Tuple[int, int]) -> \

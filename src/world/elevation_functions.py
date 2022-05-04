@@ -5,7 +5,7 @@ import numpy as np
 
 from ..enums import ElevationConstants
 
-ElevationFn = Callable[[float, float], float]
+ElevationFn = Callable[[int, int], float]
 
 
 def gaussian(amplitude: int, mu_x: int, mu_y: int, sigma_x: int,
@@ -24,7 +24,7 @@ def gaussian(amplitude: int, mu_x: int, mu_y: int, sigma_x: int,
     Returns:
         A callabe that computes z values for (x, y) inputs
     '''
-    def fn(x: float, y: float) -> float:
+    def fn(x: int, y: int) -> float:
         '''
         Return the gaussian function value at the specified point.
 
@@ -47,7 +47,7 @@ class PerlinNoise2D():
     def __init__(self,
                  amplitude: float,
                  shape: Tuple[int, int],
-                 res: Tuple[int, int],
+                 resolution: Tuple[int, int],
                  seed: int = None) -> None:
         '''
         Create a class to compute perlin noise for given input parameters.
@@ -55,30 +55,34 @@ class PerlinNoise2D():
         Arguments:
             amplitude: The amplitude to scale the noise by.
             shape: The output shape of the data.
-            res: The resolution of the noise.
+            resolution: The resolution of the noise.
             seed: The initialization seed for randomization.
         '''
         self.amplitude = amplitude
         self.shape = shape
-        self.res = res
+        self.resolution = resolution
         self.seed = seed
-        self.terrain_map = None
+        self.terrain_map = self._precompute()
 
-    def precompute(self) -> None:
+    def _precompute(self) -> np.ndarray:
         '''
         Precompute the noise at each (x, y) location for faster use later.
         '''
         def f(t):
             return 6 * t**5 - 15 * t**4 + 10 * t**3
 
-        delta = (self.res[0] / self.shape[0], self.res[1] / self.shape[1])
-        d = (self.shape[0] // self.res[0], self.shape[1] // self.res[1])
-        grid = np.mgrid[0:self.res[0]:delta[0], 0:self.res[1]:delta[1]].transpose(
-            1, 2, 0) % 1
+        delta = (self.resolution[0] / self.shape[0], self.resolution[1] / self.shape[1])
+        d = (self.shape[0] // self.resolution[0], self.shape[1] // self.resolution[1])
+        # Ignore mypy here becuase it thinks the floats in delta are indexing an array,
+        # but this is the intended functionality of np.mgrid()
+        grid = np.mgrid[0:self.resolution[0]:delta[0],  # type: ignore
+                        0:self.resolution[1]:delta[1]].transpose(  # type: ignore
+                            1, 2, 0) % 1  # type: ignore
         # Gradients
         if isinstance(self.seed, int):
             np.random.seed(self.seed)
-        angles = 2 * np.pi * np.random.rand(self.res[0] + 1, self.res[1] + 1)
+        angles = 2 * np.pi * np.random.rand(self.resolution[0] + 1,
+                                            self.resolution[1] + 1)
         gradients = np.dstack((np.cos(angles), np.sin(angles)))
         g00 = gradients[0:-1, 0:-1].repeat(d[0], 0).repeat(d[1], 1)
         g10 = gradients[1:, 0:-1].repeat(d[0], 0).repeat(d[1], 1)
@@ -93,14 +97,16 @@ class PerlinNoise2D():
         t = f(grid)
         n0 = n00 * (1 - t[:, :, 0]) + t[:, :, 0] * n10
         n1 = n01 * (1 - t[:, :, 0]) + t[:, :, 0] * n11
-        self.terrain_map = self.amplitude * np.sqrt(2) * (
+        terrain_map = self.amplitude * np.sqrt(2) * (
             (1 - t[:, :, 1]) * n0 + t[:, :, 1] * n1)
-        self.terrain_map = self.terrain_map + np.min(self.terrain_map)
+        terrain_map = terrain_map + np.min(terrain_map)
         # Add the mean elevation of CA to the map
-        self.terrain_map = self.terrain_map + ElevationConstants.MEAN_ELEVATION
+        terrain_map = terrain_map + ElevationConstants.MEAN_ELEVATION
         # Apply bounds to the map to prevent elevation values from being greater or less
         # than what is possible for the state
-        self.terrain_map = self._apply_elevation_bounds(self.terrain_map)
+        terrain_map = self._apply_elevation_bounds(terrain_map)
+
+        return terrain_map
 
     def _apply_elevation_bounds(self, elevation_map: np.ndarray) -> np.ndarray:
         '''
@@ -118,22 +124,28 @@ class PerlinNoise2D():
         elevation_map[elevation_map > max_elevation] = max_elevation
         return elevation_map
 
-    def fn(self, x: int, y: int) -> float:
+    def get_fn(self) -> ElevationFn:
         '''
-        Wrapper function to retrieve the perlin noise values at input (x, y) coordinates.
-
-        Arguments:
-            x: The x coordinate to retrieve
-            y: The y coordinate to retrieve
-
+        Get the the elevation function based on the noise.
         Returns:
-            The perlin noise value at the (x, y) coordinates
+            The function that maps (x, y) points in the terrain to
+            elevations.
         '''
-        if not isinstance(x, int):
-            x = int(x)
-        if not isinstance(y, int):
-            y = int(y)
-        return self.terrain_map[x, y]
+        def fn(x: int, y: int) -> float:
+            '''
+            Wrapper function to retrieve the perlin noise values at input (x, y)
+            coordinates.
+
+            Arguments:
+                x: The x coordinate to retrieve
+                y: The y coordinate to retrieve
+
+            Returns:
+                The perlin noise value at the (x, y) coordinates
+            '''
+            return self.terrain_map[x, y]
+
+        return fn
 
 
 def flat() -> ElevationFn:
@@ -143,7 +155,7 @@ def flat() -> ElevationFn:
     Returns:
         A callable that computes z values for (x, y) inputs
     '''
-    def fn(x: float, y: float) -> float:
+    def fn(x: int, y: int) -> float:
         '''
         Return a constant, flat elevation value at every x and y point
 

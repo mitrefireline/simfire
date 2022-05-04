@@ -3,7 +3,9 @@ flake8==4.0.1
 gputil==1.4.0
 gym==0.23.1
 importlib-metadata==4.11.3
+isort==5.10.1
 matplotlib==3.5.1
+mypy==0.950
 noise==1.2.2
 numba==0.55.1
 pre-commit==2.18.1

@@ -1,8 +1,10 @@
+from typing import Optional
+
 import numpy as np
 import pygame
 
-from .perlin_wind import WindNoise
 from .cfd_wind import Fluid
+from .perlin_wind import WindNoise
 
 pygame.init()
 
@@ -16,8 +18,8 @@ class WindController():
     def __init__(self, screen_size: int = 225) -> None:
         self.speed_layer = WindNoise()
         self.direction_layer = WindNoise()
-        self.map_wind_speed = []
-        self.map_wind_direction = []
+        self.map_wind_speed: Optional[np.ndarray] = None
+        self.map_wind_direction: Optional[np.ndarray] = None
         self.screen_size = screen_size
 
     def init_wind_speed_generator(self, seed: int, scale: int, octaves: int,
@@ -38,7 +40,7 @@ class WindController():
                         Frequency = lacunarity & (pass number).
                         Higher lacunarity, higher frequency per pass.
             range_min: The minimum speed of the wind in ft/min.
-            range_min: The maximum speed of the wind in ft/min.
+            range_max: The maximum speed of the wind in ft/min.
             screen_size: Size of screen (both heigh and width) MUST BE SQUARE
         '''
         self.speed_layer.set_noise_parameters(seed, scale, octaves, persistence,
@@ -89,8 +91,8 @@ class WindController2():
                  terrain_features: np.ndarray = None,
                  wind_speed: float = 27,
                  wind_direction: str = 'North') -> None:
-        self.N: int = screen_size
-        self.iterations: int = result_accuracy
+        self.N = screen_size
+        self.iterations = result_accuracy
         self.scale = scale
         self.timestep = timestep
         self.diffusion = diffusion
@@ -112,7 +114,7 @@ class WindController2():
             if self.wind_direction == 'north':
                 self.fvect.addVelocity(v, 1, 0, self.wind_speed)
             elif self.wind_direction == 'east':
-                self.fvect.addVelocity(self.screen_size - 1, v, -1 * self.wind_speed, 0)
+                self.fvect.addVelocity(self.N - 1, v, -1 * self.wind_speed, 0)
             elif self.wind_direction == 'south':
                 self.fvect.addVelocity(1, v, -1 * self.wind_speed, 0)
             elif self.wind_direction == 'west':
@@ -135,5 +137,5 @@ class WindController2():
     def get_wind_scale(self) -> int:
         return self.scale
 
-    def get_screen_size(self) -> None:
+    def get_screen_size(self) -> int:
         return self.N

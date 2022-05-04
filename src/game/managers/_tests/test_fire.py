@@ -5,16 +5,15 @@ import numpy as np
 from ....enums import BurnStatus, GameStatus
 from ....game._tests import DummyFuelLayer, DummyTopographyLayer
 from ....game.managers.mitigation import FireLineManager
-from ...sprites import Fire, Terrain
 from ....utils.config import Config
-from ....utils.units import mph_to_ftpm
 from ....world.parameters import Environment, FuelParticle
+from ...sprites import Fire, Terrain
 from ..fire import ConstantSpreadFireManager, FireManager, RothermelFireManager
 
 
 class TestFireManager(unittest.TestCase):
     def setUp(self) -> None:
-        self.config = Config('configs/functional_config.yml')
+        self.config = Config('./src/utils/_tests/test_configs/test_config.yml')
         self.init_pos = (self.config.area.screen_size // 2,
                          self.config.area.screen_size // 2)
         self.fire_size = self.config.display.fire_size
@@ -90,15 +89,15 @@ class TestFireManager(unittest.TestCase):
                            BurnStatus.UNBURNED)
         rate_of_spread = np.zeros_like(fire_map)
 
-        fireline_y_coords = [100, 100]
-        fireline_x_coords = [100, 101]
-        scratchline_y_coords = [100, 100]
-        scratchline_x_coords = [102, 103]
-        wetline_y_coords = [100, 100]
-        wetline_x_coords = [104, 105]
+        fireline_y_coords = [0, 0]
+        fireline_x_coords = [0, 1]
+        scratchline_y_coords = [0, 0]
+        scratchline_x_coords = [2, 3]
+        wetline_y_coords = [0, 0]
+        wetline_x_coords = [4, 5]
 
-        y_coords = [100, 100, 100, 100, 100, 100]
-        x_coords = [100, 101, 102, 103, 104, 105]
+        y_coords = [0, 0, 0, 0, 0, 0]
+        x_coords = [0, 1, 2, 3, 4, 5]
 
         fire_map[fireline_y_coords, fireline_x_coords] = BurnStatus.FIRELINE
         fire_map[scratchline_y_coords, scratchline_x_coords] = BurnStatus.SCRATCHLINE
@@ -121,32 +120,37 @@ class TestFireManager(unittest.TestCase):
 
 class TestRothermelFireManager(unittest.TestCase):
     def setUp(self) -> None:
-        self.config = Config('configs/functional_config.yml')
-        self.screen_size = (32, 32)
-        fuel_particle = FuelParticle()
+        self.config = Config(
+            './src/utils/_tests/test_configs/test_config_rothermel_manager.yml')
+        self.screen_size = (self.config.area.screen_size, self.config.area.screen_size)
+        self.headless = False
+
+        self.fuel_particle = FuelParticle()
         topo_layer = DummyTopographyLayer(self.screen_size)
         fuel_layer = DummyFuelLayer(self.screen_size)
-        pixel_scale = 50  # Just an arbitrary number
-        self.terrain = Terrain(fuel_layer, topo_layer, self.screen_size)
+        self.terrain = Terrain(fuel_layer,
+                               topo_layer,
+                               self.screen_size,
+                               headless=self.headless)
         # Use simple/constant wind speed
-        self.wind_speed = mph_to_ftpm(1)
-        wind_speed_arr = np.full(self.screen_size, self.wind_speed)
-        environment = Environment(self.config.environment.moisture, wind_speed_arr,
-                                  self.config.wind.simple.direction)
+        self.environment = Environment(self.config.environment.moisture,
+                                       self.config.wind.speed, self.config.wind.direction)
         self.fireline_manager = FireLineManager(
             size=self.config.display.control_line_size,
-            pixel_scale=pixel_scale,
-            terrain=self.terrain)
+            pixel_scale=self.config.area.pixel_scale,
+            terrain=self.terrain,
+            headless=self.headless)
         self.fire_init_pos = (self.screen_size[0] // 2, self.screen_size[1] // 2)
         self.fire_manager = RothermelFireManager(self.fire_init_pos,
                                                  self.config.display.fire_size,
                                                  self.config.fire.max_fire_duration,
-                                                 pixel_scale,
+                                                 self.config.area.pixel_scale,
                                                  self.config.simulation.update_rate,
-                                                 fuel_particle,
+                                                 self.fuel_particle,
                                                  self.terrain,
-                                                 environment,
-                                                 max_time=self.config.simulation.runtime)
+                                                 self.environment,
+                                                 max_time=self.config.simulation.runtime,
+                                                 headless=self.headless)
 
     def test_update(self) -> None:
         '''
@@ -209,7 +213,7 @@ class TestRothermelFireManager(unittest.TestCase):
 
 class TestConstantSpreadFireManager(unittest.TestCase):
     def setUp(self) -> None:
-        self.config = Config('configs/functional_config.yml')
+        self.config = Config('./src/utils/_tests/test_configs/test_config.yml')
         self.init_pos = (self.config.area.screen_size // 5,
                          self.config.area.screen_size // 7)
         self.fire_size = self.config.display.fire_size

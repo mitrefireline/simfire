@@ -10,7 +10,6 @@ from src.game.managers.fire import RothermelFireManager
 from src.game.managers.mitigation import FireLineManager
 from src.game.sprites import Terrain
 from src.utils.config import Config
-from src.utils.units import mph_to_ftpm
 from src.world.parameters import Environment, FuelParticle
 
 
@@ -27,14 +26,11 @@ def main():
 
     game = Game((cfg.area.screen_size, cfg.area.screen_size))
 
-    terrain = Terrain(cfg.terrain.fuel.layer, cfg.terrain.topography.layer,
+    terrain = Terrain(cfg.terrain.fuel_layer, cfg.terrain.topography_layer,
                       game.screen_size)
 
-    # Use simple/constant wind speed for now
-    wind_speed = mph_to_ftpm(cfg.wind.simple.speed)
-    wind_speed_arr = np.full(game.screen_size, wind_speed)
-    environment = Environment(cfg.environment.moisture, wind_speed_arr,
-                              cfg.wind.simple.direction)
+    environment = Environment(cfg.environment.moisture, cfg.wind.speed,
+                              cfg.wind.direction)
 
     # Need to create two lines to "double up" since the fire can spread
     # to 8-connected squares

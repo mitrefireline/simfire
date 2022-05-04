@@ -1,19 +1,27 @@
-import numpy as np
-
-import yaml
-import os.path
+import dataclasses
+import os
+from copy import deepcopy
 from pathlib import Path
-from typing import Any, Tuple, Dict
-from yaml.parser import ParserError
+from typing import Any, Dict, Optional, Tuple, Union
 
-from ..utils.log import create_logger
-from ..utils.layers import (FunctionalFuelLayer, LatLongBox, OperationalTopographyLayer,
-                            FunctionalTopographyLayer, OperationalFuelLayer)
-from ..world.wind_mechanics.wind_controller import WindController, WindController2
-from ..utils.units import str_to_minutes, mph_to_ftpm, mph_to_ms, scale_ms_to_ftpm
+import numpy as np
+import yaml  # type: ignore
+from yaml.parser import ParserError  # type: ignore
+
 from ..world.elevation_functions import PerlinNoise2D, flat, gaussian
 from ..world.fuel_array_functions import chaparral_fn
-from ..utils.terrain import fuel
+from ..world.wind_mechanics.wind_controller import WindController
+from .layers import (
+    FuelLayer,
+    FunctionalFuelLayer,
+    FunctionalTopographyLayer,
+    LatLongBox,
+    OperationalFuelLayer,
+    OperationalTopographyLayer,
+    TopographyLayer,
+)
+from .log import create_logger
+from .units import mph_to_ftpm, scale_ms_to_ftpm, str_to_minutes
 
 log = create_logger(__name__)
 
@@ -25,66 +33,142 @@ class ConfigError(Exception):
     pass
 
 
-class ConfigType:
+@dataclasses.dataclass
+class AreaConfig:
+    screen_size: int
+    pixel_scale: float
+
+    def __post_init__(self) -> None:
+        self.screen_size = int(self.screen_size)
+        self.pixel_scale = float(self.pixel_scale)
+
+
+@dataclasses.dataclass
+class DisplayConfig:
+    fire_size: int
+    control_line_size: int
+
+    def __post_init__(self) -> None:
+        self.fire_size = int(self.fire_size)
+        self.control_line_size = int(self.control_line_size)
+
+
+@dataclasses.dataclass
+class SimulationConfig:
+    def __init__(self, update_rate: str, runtime: str, headless: bool) -> None:
+        self.update_rate = float(update_rate)
+        self.runtime = str_to_minutes(runtime)
+        self.headless = headless
+
+
+@dataclasses.dataclass
+class MitigationConfig:
+    ros_attenuation: bool
+
+    def __post_init__(self) -> None:
+        self.ros_attenuation = bool(self.ros_attenuation)
+
+
+@dataclasses.dataclass
+class OperationalConfig:
+    seed: Optional[int]
+    latitude: float
+    longitude: float
+    height: float
+    width: float
+    resolution: float  # TODO: Make enum for resolution?
+
+    def __post_init__(self) -> None:
+        self.latitude = float(self.latitude)
+        self.longitude = float(self.longitude)
+        self.height = float(self.height)
+        self.width = float(self.width)
+        self.resolution = float(self.resolution)
+
+
+@dataclasses.dataclass
+class FunctionalConfig:
     '''
-    An object-relational mapper (ORM) type class used in `config.Config` to create nested
-    object attributes. For more information on Python ORMs, go
-    [here](https://www.fullstackpython.com/object-relational-mappers-orms.html).
+    Class that tracks functional layer names and keyword arguments.
     '''
-    def __init__(self, **kwargs) -> None:
-        '''
-        All `kwargs` passed in will be nested into attributes if the `kwargs` consist of
-        nested dictionaries.
-        '''
-        self.__dict__ = kwargs
-        for key, value in kwargs.items():
-            if isinstance(value, dict):
-                value = ConfigType(**value)
-            setattr(self, key, self._type(value))
-
-    def _type(self, obj: Any) -> Any:
-        '''
-        Type strings into tuples when setting attributes.
-        '''
-        if isinstance(obj, str):
-            if '(' in obj:
-                obj = tuple(map(int, obj[1:-1].split(', ')))
-        return obj
+    name: str
+    kwargs: Dict[str, Any]
 
 
+@dataclasses.dataclass
+class TerrainConfig:
+    '''
+    Class that tracks the terrain topography and fuel layers.
+    The fuel and terrain function fields are optional. They are used for
+    functional layers and ignored for operational layers.
+    '''
+    topography_type: str
+    topography_layer: TopographyLayer
+    fuel_type: str
+    fuel_layer: FuelLayer
+    topography_function: Optional[FunctionalConfig] = None
+    fuel_function: Optional[FunctionalConfig] = None
+
+
+@dataclasses.dataclass
+class FireConfig:
+    def __init__(self, fire_initial_position: str, max_fire_duration: str):
+        fire_pos = fire_initial_position[1:-1].split(',')
+        self.fire_initial_position = (int(fire_pos[0]), int(fire_pos[1]))
+        self.max_fire_duration = int(max_fire_duration)
+
+
+@dataclasses.dataclass
+class EnvironmentConfig:
+    moisture: float
+
+    def __post_init__(self) -> None:
+        self.moisture = float(self.moisture)
+
+
+@dataclasses.dataclass
+class WindConfig:
+    speed: np.ndarray
+    direction: np.ndarray
+    speed_function: Optional[FunctionalConfig] = None
+    direction_function: Optional[FunctionalConfig] = None
+
+
+@dataclasses.dataclass
 class Config:
-    '''
-    Reads in a YAML file and assigns nested attributes to itself based on structure of
-    YAML
-    '''
-    def __init__(self, path: Path, cfd_precompute: bool = False) -> None:
-        '''
-        Arguments:
-            path: The path to the `config.yml` file. This file can have any name, but
-                  needs to be a valid YAML.
-        '''
+    def __init__(self, path: Union[str, Path], cfd_precompute: bool = False) -> None:
+        if isinstance(path, str):
+            path = Path(path)
         self.path = path
-        self._possible_layers = ('operational', 'functional')
-        self._possible_functional_topography = ('perlin', 'gaussian', 'flat')
-        self._possible_wind = ('perlin', 'simple')
-        self._possible_functional_fuel = ('chaparral')
-        self._load()
-        self._set_attributes()
-        self._set_runtime()
-        self._set_terrain_scale()
-        self._set_topography_layer()
-        self._set_fuel_layer()
-        if cfd_precompute is False:
-            self._set_wind_function()
+        self.yaml_data = self._load_yaml()
 
-    def _load(self) -> None:
+        # Save the original screen size in case the simulation changes from
+        # operational to functional
+        self.original_screen_size = self.yaml_data['area']['screen_size']
+
+        self.lat_long_box = self._make_lat_long_box()
+
+        self.area = self._load_area()
+        self.display = self._load_display()
+        self.simulation = self._load_simulation()
+        self.mitigation = self._load_mitigation()
+        self.operational = self._load_operational()
+        self.terrain = self._load_terrain()
+        self.fire = self._load_fire()
+        self.environment = self._load_environment()
+        self.wind = self._load_wind()
+
+    def _load_yaml(self) -> Dict[str, Any]:
         '''
-        Loads the YAML file and assigns to `self.data`
+        Loads the YAML file specified in self.path and returns the data as a dictionary.
+
+        Returns:
+            The YAML data as a dictionary
         '''
         try:
             with open(self.path, 'r') as f:
                 try:
-                    self.data = yaml.safe_load(f)
+                    yaml_data = yaml.safe_load(f)
                 except ParserError:
                     message = f'Error parsing YAML file at {self.path}'
                     log.error(message)
@@ -93,400 +177,430 @@ class Config:
             message = f'Error opening YAML file at {self.path}. Does it exist?'
             log.error(message)
             raise ConfigError(message)
+        return yaml_data
 
-    def _set_attributes(self) -> None:
+    def _make_lat_long_box(self) -> Union[LatLongBox, None]:
         '''
-        Set all nested attributes using the `config.ConfigType` class
-        '''
-        for key, value in self.data.items():
-            if isinstance(value, dict):
-                value = ConfigType(**value)
-            setattr(self, key, value)
+        Optionally create the LatLongBox used by the data layers if any
+        of the data layers are of type `operational`.
 
-    def _set_terrain_scale(self) -> None:
+        Returns:
+            None if none of the data layers are `operational`
+            LatLongBox with the config coordinates and shape if any of
+            the data layers are `operational`
         '''
-        Set the terrain scale and other simulation variables based on type of data layer.
-        If both Fuel and Topography are `functional` data layers, then use screen_size
-            and pixel scale
-        If either Fuel or Topography is Operational, use calculated pixel scale and
-            screen size.
-        '''
-        if self.terrain.topography.type.lower(
-        ) == 'functional' and self.terrain.fuel.type.lower() == 'functional':
-            setattr(self.area, 'terrain_scale',
-                    self.area.pixel_scale * self.area.terrain_size)
-        elif self.terrain.topography.type.lower(
-        ) == 'operational' or self.terrain.fuel.type.lower() == 'operational':
-            args = self.operational
-            center = (args.latitude, args.longitude)
-            if args.seed is not None:
-                center = fuel(args.seed)
-                try:
-                    # TODO: center point may not include any data in CA, check
-                    # and/or re-try a new point
-                    self.lat_long_box = LatLongBox(center, args.height, args.width,
-                                                   args.resolution)
-                except ValueError:
-                    message = ('Latitude and longitude are not contained in center point '
-                               f'{center} in the database, retrying.')
-                    log.error(message)
-                    raise ConfigError(message)
-            else:
-                self.lat_long_box = LatLongBox(center, args.height, args.width,
-                                               args.resolution)
-            self.height = self.lat_long_box.tr[0] - self.lat_long_box.bl[0]
-            self.width = self.height[0]
-            self.screen_size = self.width
-            # Convert to feet for use with rothermel
-            self.pixel_scale = 3.28084 * args.resolution
-
-            setattr(self.area, 'screen_size', self.width)
-            setattr(self.area, 'pixel_scale', self.pixel_scale)
-
-            # set the perlin shape - this may not get used, but if it does it needs to be
-            #    the correct/calculated shape
-            setattr(self.terrain.topography.functional.perlin, 'shape',
-                    (self.screen_size, self.screen_size))
+        if self.yaml_data['terrain']['topography']['type'] == 'operational' \
+           or self.yaml_data['terrain']['fuel']['type'] == 'operational':
+            lat = self.yaml_data['operational']['latitude']
+            lon = self.yaml_data['operational']['longitude']
+            height = self.yaml_data['operational']['height']
+            width = self.yaml_data['operational']['width']
+            resolution = self.yaml_data['operational']['resolution']
+            return LatLongBox((lat, lon), height, width, resolution)
         else:
-            message = ('Unable to load topography of type '
-                       f'{self.terrain.topography.type}. Please check your config file '
-                       f'and select from the following: {self._possible_layers}')
-            log.error(message)
-            raise ConfigError(message)
+            return None
 
-    def _set_topography_layer(self) -> None:
+    def _load_area(self) -> AreaConfig:
         '''
-        Sets the `config.terrain.topography.layer` as either a `functional` or
-        `operational` type
+        Load the AreaConfig from the YAML data.
 
-        The `config.terrain.topography.layer` value will be set to
-        `FunctionalTopographyLayer` or a `OperationalTopographyLayer`, depending on the
-        how the `config.terrain.topography.type` is set.
-
-        If the `config.terrain.topography.type` is set to `functional`, the function is
-        chosen by `config.terrain.topography.functional.function` and the arguments are
-        used from their respective sections.
+        returns:
+            The YAML data converted to an AreaConfig dataclass
         '''
-        if self.terrain.topography.type.lower() == 'functional':
-            elevation = self.terrain.topography.functional.function.lower()
-            # Now we can set the function again
-            if elevation == 'perlin':
-                # Reset the value, if we are resetting the function
-                args = self.terrain.topography.functional.perlin
-                noise = PerlinNoise2D(args.amplitude, args.shape, args.resolution,
-                                      args.seed)
-                noise.precompute()
-                topo_layer = FunctionalTopographyLayer(self.area.screen_size,
-                                                       self.area.screen_size,
-                                                       noise.fn,
-                                                       name='perlin')
-                setattr(self.terrain.topography, 'layer', topo_layer)
-            elif elevation == 'gaussian':
-                # Reset the value, if we are resetting the function
-                args = self.terrain.topography.functional.gaussian
-                noise = gaussian(args.amplitude, args.mu_x, args.mu_y, args.sigma_x,
-                                 args.sigma_y)
-                topo_layer = FunctionalTopographyLayer(self.area.screen_size,
-                                                       self.area.screen_size,
-                                                       noise,
-                                                       name='gaussian')
-                setattr(self.terrain.topography, 'layer', topo_layer)
-            elif elevation == 'flat':
-                # Reset the value, if we are resetting the function
-                topo_layer = FunctionalTopographyLayer(self.area.screen_size,
-                                                       self.area.screen_size,
-                                                       flat(),
-                                                       name='flat')
-                setattr(self.terrain.topography, 'layer', topo_layer)
-            else:
-                message = ('The user-defined topography is set to '
-                           f'{self.terrain.topography.functional.function} when it can '
-                           'only be one of these values: '
-                           f'{self._possible_functional_topography}')
-                log.error(message)
-                raise ConfigError(message)
-        elif self.terrain.topography.type.lower() == 'operational':
-            topo_layer = OperationalTopographyLayer(self.lat_long_box)
-            setattr(self.terrain.topography, 'layer', topo_layer)
+        # No processing needed for the AreaConfig
+        if self.lat_long_box is not None:
+            # Overwite the screen_size since operational data will determine
+            # its own screen_size based on lat/long input
+            # Height and width are the same since we assume square input
+            height = self.lat_long_box.tr[0][0] - self.lat_long_box.bl[0][0]
+            self.yaml_data['area']['screen_size'] = height
+        return AreaConfig(**self.yaml_data['area'])
+
+    def _load_display(self) -> DisplayConfig:
+        '''
+        Load the DisplayConfig from the YAML data.
+
+        returns:
+            The YAML data converted to a DisplayConfig dataclass
+        '''
+        # No processing needed for the DisplayConfig
+        return DisplayConfig(**self.yaml_data['display'])
+
+    def _load_simulation(self) -> SimulationConfig:
+        '''
+        Load the SimulationConfig from the YAML data.
+
+        returns:
+            The YAML data converted to a SimulationConfig dataclass
+        '''
+        # No processing needed for the SimulationConfig
+        return SimulationConfig(**self.yaml_data['simulation'])
+
+    def _load_mitigation(self) -> MitigationConfig:
+        '''
+        Load the MitigationConfig from the YAML data.
+
+        returns:
+            The YAML data converted to a MitigationConfig dataclass
+        '''
+        # No processing needed for the MitigationConfig
+        return MitigationConfig(**self.yaml_data['mitigation'])
+
+    def _load_operational(self) -> OperationalConfig:
+        '''
+        Load the OperationalConfig from the YAML data.
+
+        returns:
+            The YAML data converted to an OperationalConfig dataclass
+        '''
+        # No processing needed for the OperationalConfig
+        return OperationalConfig(**self.yaml_data['operational'])
+
+    def _load_terrain(self) -> TerrainConfig:
+        '''
+        Load the TerrainConfig from the YAML data.
+
+        returns:
+            The YAML data converted to a TerrainConfig dataclass
+        '''
+        topo_type = self.yaml_data['terrain']['topography']['type']
+        fuel_type = self.yaml_data['terrain']['fuel']['type']
+
+        topo_type, topo_layer, topo_name, topo_kwargs = self._create_topography_layer(
+            init=True)
+        if topo_name is not None and topo_kwargs is not None:
+            topo_fn = FunctionalConfig(topo_name, topo_kwargs)
         else:
-            message = ('Unable to load topography of type '
-                       f'{self.terrain.topography.type}. Please check your config file '
-                       f'and select from the following: {self._possible_layers}')
-            log.error(message)
-            raise ConfigError(message)
+            topo_fn = None
 
-    def _set_fuel_layer(self) -> None:
-        '''
-        Sets the `config.terrain.fuel.layer` as either a `functional` or `operational`
-        type
-
-        The `config.terrain.fuel.layer` value will be set to `FunctionalFuelLayer`
-        or a `OperationalFuelLayer`, depending on the how the
-        `config.terrain.fuel.type` is set.
-
-        If the `config.terrain.fuel.type` is set to `functional`, the function is
-        chosen by `config.terrain.fuel.functional.function` and the arguments are
-        used from their respective sections.
-        '''
-        if self.terrain.fuel.type.lower() == 'functional':
-            fuel = self.terrain.fuel.functional.function.lower()
-            if fuel == 'chaparral':
-                args = self.terrain.fuel.functional.chaparral
-                fn = chaparral_fn(args.seed)
-                fuel_layer = FunctionalFuelLayer(self.area.screen_size,
-                                                 self.area.screen_size,
-                                                 fn,
-                                                 name='chaparral')
-                setattr(self.terrain.fuel, 'layer', fuel_layer)
-            else:
-                message = ('The user-defined fuel array function is set to '
-                           f'{self.terrain.fuel.type}, when it can only be one of '
-                           f'these values: {self._possible_functional_fuel}')
-                log.error(message)
-        elif self.terrain.fuel.type.lower() == 'operational':
-            fuel_layer = OperationalFuelLayer(self.lat_long_box)
-            setattr(self.terrain.fuel, 'layer', fuel_layer)
+        fuel_type, fuel_layer, fuel_name, fuel_kwargs = self._create_fuel_layer(init=True)
+        if fuel_name is not None and fuel_kwargs is not None:
+            fuel_fn = FunctionalConfig(fuel_name, fuel_kwargs)
         else:
-            message = ('Unable to load fuel of type '
-                       f'{self.terrain.fuel.type}. Please check your config file '
-                       f'and select from the following: {self._possible_layers}')
-            log.error(message)
-            raise ConfigError(message)
+            fuel_fn = None
 
-    def _set_wind_function(self) -> None:
+        return TerrainConfig(topo_type, topo_layer, fuel_type, fuel_layer, topo_fn,
+                             fuel_fn)
+
+    def _create_topography_layer(
+        self,
+        init: bool = False,
+        seed: Optional[int] = None
+    ) -> Tuple[str, TopographyLayer, Optional[str], Optional[Dict[str, Any]]]:
         '''
-        Reset the attributes `self.wind.speed` and `self.wind.direction` based on the
-        wind function assigned in the config
+        Create a TopographyLayer given the config parameters.
+        This is used for initalization and after resetting the layer seeds.
 
-        Before, as read in from the YAML, the wind function was just a string. After
-        calling this, it sets the `self.wind.speed` and `self.wind.direction` to the
-        values generated by the wind function or to constant values.
+        Arguments:
+            seed: A randomization seed used by
 
-        All subsequent wind functions should be instantiated here and set
-        `self.wind.speed` and `self.wind.direction` to arrays of size
-        (`self.area.screen_size`, `self.area.screen_size`) with wind values at each pixel.
+        Returns:
+            A tuple containing:
+                A string representing the `type` of the layer (`operational`,
+                    `functional`, etc.)
+                A FunctionalTopographyLayer that utilizes the fuction specified by
+                    fn_name and the keyword arguments in kwargs
+                The function name if a functional layer is used. Otherwise None
+                The keyword arguments for the function if a functinoal layer is used.
+                    Otherwise None
         '''
-        if self.wind.function.lower() == 'cfd':
+        topo_layer: TopographyLayer
+        topo_type = self.yaml_data['terrain']['topography']['type']
+        if topo_type == 'operational':
+            if self.lat_long_box is not None:
+                topo_layer = OperationalTopographyLayer(self.lat_long_box)
+            else:
+                raise ConfigError('The topography layer type is `operational`, '
+                                  'but self.lat_long_box is None')
+            fn_name = None
+            kwargs = None
+        elif topo_type == 'functional':
+            fn_name = self.yaml_data['terrain']['topography']['functional']['function']
+            try:
+                kwargs = self.yaml_data['terrain']['topography']['functional'][fn_name]
+            # No kwargs found (flat is an example of this)
+            except KeyError:
+                kwargs = {}
+            # Reset the seed if this isn't the inital creation
+            if 'seed' in kwargs and not init:
+                kwargs['seed'] = seed
+            if fn_name == 'perlin':
+                new_kwargs = deepcopy(kwargs)
+                new_kwargs['shape'] = (self.yaml_data['area']['screen_size'],
+                                       self.yaml_data['area']['screen_size'])
+                # Convert the input from string `(x, y)` to tuple of ints (x, y)
+                if isinstance(nk := new_kwargs['resolution'], str):
+                    new_kwargs['resolution'] = tuple(map(int, nk[1:-1].split(',')))
+                noise = PerlinNoise2D(**new_kwargs)
+                fn = noise.get_fn()
+            elif fn_name == 'gaussian':
+                fn = gaussian(**kwargs)
+            elif fn_name == 'flat':
+                fn = flat()
+            else:
+                raise ConfigError(f'The specified topography function ({fn_name}) '
+                                  'is not valid.')
+            topo_layer = FunctionalTopographyLayer(self.yaml_data['area']['screen_size'],
+                                                   self.yaml_data['area']['screen_size'],
+                                                   fn, fn_name)
+        else:
+            raise ConfigError(f'The specified topography type ({topo_type}) '
+                              'is not supported')
+
+        return topo_type, topo_layer, fn_name, kwargs
+
+    def _create_fuel_layer(
+        self,
+        init: bool = False,
+        seed: Optional[int] = None
+    ) -> Tuple[str, FuelLayer, Optional[str], Optional[Dict[str, Any]]]:
+        '''
+        Create a FuelLayer given the config parameters.
+        This is used for initalization and after resetting the layer seeds.
+
+        Returns:
+            A FunctionalFuelLayer that utilizes the fuction specified by
+            fn_name and the keyword arguments in kwargs
+        '''
+        fuel_layer: FuelLayer
+        fuel_type = self.yaml_data['terrain']['fuel']['type']
+        if fuel_type == 'operational':
+            if self.lat_long_box is not None:
+                fuel_layer = OperationalFuelLayer(self.lat_long_box)
+            else:
+                raise ConfigError('The topography layer type is `operational`, '
+                                  'but self.lat_long_box is None')
+            fn_name = None
+            kwargs = None
+        elif fuel_type == 'functional':
+            fn_name = self.yaml_data['terrain']['fuel']['functional']['function']
+            try:
+                kwargs = self.yaml_data['terrain']['fuel']['functional'][fn_name]
+            # No kwargs found (some functions don't need input arguments)
+            except KeyError:
+                kwargs = {}
+            # Reset the seed if this isn't the inital creation
+            if 'seed' in kwargs and not init:
+                kwargs['seed'] = seed
+            if fn_name == 'chaparral':
+                fn = chaparral_fn(**kwargs)
+            else:
+                raise ConfigError(f'The specified fuel function ({fn_name}) '
+                                  'is not valid.')
+            fuel_layer = FunctionalFuelLayer(self.yaml_data['area']['screen_size'],
+                                             self.yaml_data['area']['screen_size'], fn,
+                                             fn_name)
+        else:
+            raise ConfigError(f'The specified fuel type ({fuel_type}) '
+                              'is not supported')
+
+        return fuel_type, fuel_layer, fn_name, kwargs
+
+    def _load_fire(self) -> FireConfig:
+        '''
+        Load the FireConfig from the YAML data.
+
+        Returns:
+            The YAML data converted to a FireConfig dataclass
+        '''
+        # No processing needed for the FireConfig
+        return FireConfig(**self.yaml_data['fire'])
+
+    def _load_environment(self) -> EnvironmentConfig:
+        '''
+        Load the EnvironmentConfig from the YAML data.
+
+        Returns:
+            The YAML data converted to a EnvironmentConfig dataclass
+        '''
+        # No processing needed for the EnvironmentConfig
+        return EnvironmentConfig(**self.yaml_data['environment'])
+
+    def _load_wind(self) -> WindConfig:
+        '''
+        Load the WindConfig from the YAML data.
+
+        Returns:
+            The YAML data converted to a WindConfig dataclass
+        '''
+        # Only support simple for now
+        # TODO: Figure out how Perlin and CFD create wind
+        fn_name = self.yaml_data['wind']['function']
+        if fn_name == 'simple':
+            arr_shape = (self.yaml_data['area']['screen_size'],
+                         self.yaml_data['area']['screen_size'])
+            speed = self.yaml_data['wind']['simple']['speed']
+            direction = self.yaml_data['wind']['simple']['direction']
+            speed_arr = np.full(arr_shape, speed)
+            direction_arr = np.full(arr_shape, direction)
+            speed_kwargs = None
+            dir_kwargs = None
+        elif fn_name == 'cfd':
             # Check if wind files have been generated
-            cfd_generated = os.path.isfile(
-                'generated_wind_directions.npy') and os.path.isfile(
-                    'generated_wind_magnitudes.npy')
+            cfd_generated = os.path.isfile('generated_wind_directions.npy') and \
+                os.path.isfile('generated_wind_magnitudes.npy')
             if cfd_generated is False:
                 log.error('Missing pregenerated cfd npy files, switching to perlin')
                 self.wind_function = 'perlin'
             else:
-                map_wind_speed = np.load('generated_wind_magnitudes.npy')
-                map_wind_direction = np.load('generated_wind_directions.npy')
-                map_wind_speed = scale_ms_to_ftpm(map_wind_speed)
-                setattr(self.wind, 'speed', map_wind_speed)
-                setattr(self.wind, 'direction', np.rint(map_wind_direction))
-        elif self.wind.function.lower() == 'perlin':
-            speed_min = mph_to_ftpm(self.wind.perlin.speed.min)
-            speed_max = mph_to_ftpm(self.wind.perlin.speed.max)
+                speed_arr = np.load('generated_wind_magnitudes.npy')
+                direction_arr = np.load('generated_wind_directions.npy')
+                speed_arr = scale_ms_to_ftpm(speed_arr)
+            speed_kwargs = self.yaml_data['wind']['cfd']
+            dir_kwargs = self.yaml_data['wind']['cfd']
+        elif fn_name == 'perlin':
             wind_map = WindController()
-            wind_map.init_wind_speed_generator(
-                self.wind.perlin.speed.seed, self.wind.perlin.speed.scale,
-                self.wind.perlin.speed.octaves, self.wind.perlin.speed.persistence,
-                self.wind.perlin.speed.lacunarity, speed_min, speed_max,
-                self.area.screen_size)
-            wind_map.init_wind_direction_generator(
-                self.wind.perlin.direction.seed, self.wind.perlin.direction.scale,
-                self.wind.perlin.direction.octaves,
-                self.wind.perlin.direction.persistence,
-                self.wind.perlin.direction.lacunarity, self.wind.perlin.direction.min,
-                self.wind.perlin.direction.max, self.area.screen_size)
-            setattr(self.wind, 'speed', wind_map.map_wind_speed)
-            setattr(self.wind, 'direction', wind_map.map_wind_direction)
-        elif self.wind.function.lower() == 'simple':
-            # Convert wind speed to ft/min
-            wind_speed = mph_to_ftpm(self.wind.simple.speed)
-            speed = np.full((self.area.screen_size, self.area.screen_size),
-                            wind_speed,
-                            dtype=np.float32)
-            direction = np.full((self.area.screen_size, self.area.screen_size),
-                                self.wind.simple.direction,
-                                dtype=np.float32)
-            setattr(self.wind, 'speed', speed)
-            setattr(self.wind, 'direction', direction)
+            speed_kwargs = deepcopy(self.yaml_data['wind']['perlin']['speed'])
+            range_min = mph_to_ftpm(
+                self.yaml_data['wind']['perlin']['speed']['range_min'])
+            range_max = mph_to_ftpm(
+                self.yaml_data['wind']['perlin']['speed']['range_max'])
+            speed_kwargs['range_min'] = range_min
+            speed_kwargs['range_max'] = range_max
+            wind_map.init_wind_speed_generator(**speed_kwargs,
+                                               screen_size=self.yaml_data['area']
+                                               ['screen_size'])
+
+            direction_kwargs = self.yaml_data['wind']['perlin']['direction']
+            wind_map.init_wind_direction_generator(**direction_kwargs,
+                                                   screen_size=self.yaml_data['area']
+                                                   ['screen_size'])
+            if wind_map.map_wind_speed is not None:
+                speed_arr = wind_map.map_wind_speed
+            else:
+                raise ConfigError('The Perlin WindController is specified in the config, '
+                                  'but returned None for the wind speed')
+            if wind_map.map_wind_direction is not None:
+                direction_arr = wind_map.map_wind_direction
+            else:
+                raise ConfigError('The Perlin WindController is specified in the config, '
+                                  'but returned None for the wind direction')
+            direction_arr = wind_map.map_wind_direction
+            speed_kwargs = self.yaml_data['wind']['perlin']['speed']
+            dir_kwargs = self.yaml_data['wind']['perlin']['direction']
         else:
-            message = ('The user-defined wind function is set to '
-                       f'{self.wind.function} when it can only be one of '
-                       f'these values: {self._possible_wind}')
-            log.error(message)
-            raise ConfigError(message)
+            raise ConfigError(f'Wind type {fn_name} is not supported')
 
-    def _set_runtime(self) -> None:
-        '''
-        Set the `simulation.runtime` variable to a set number of minutes based on a
-        string
-        '''
-        if isinstance(self.simulation.runtime, int):
-            runtime = f'{self.simulation.runtime}m'
+        if fn_name is not None and speed_kwargs is not None:
+            speed_fn = FunctionalConfig(fn_name, speed_kwargs)
         else:
-            runtime = self.simulation.runtime
-        setattr(self.simulation, 'runtime', str_to_minutes(runtime))
-
-    def get_cfd_wind_map(self) -> WindController2:
-        args = self.terrain.perlin
-        terrain_map = np.zeros((args.shape[0], args.shape[1]))
-        for x in range(0, args.shape[0]):
-            for y in range(0, args.shape[1]):
-                terrain_map[x][y] = self.terrain.layer.data[y, x]
-        '''
-        TODO: Need to optimize cfd to work on 3d space.  For now we get the average
-        terrain height and for values slightly greater than that average we will
-        count as terrain features for cfd
-        '''
-        terrain_space = np.average(terrain_map) + (
-            (np.max(terrain_map) - np.average(terrain_map)) / 4)
-
-        def create_cfd_terrain(e):
-            if e < terrain_space:
-                return 0
-            return 1
-
-        cfd_func = np.vectorize(create_cfd_terrain)
-
-        terrain_map = cfd_func(terrain_map)
-
-        # Assumption: CFD Algorithm uses m/s
-        source_speed = mph_to_ms(self.wind.cfd.speed)
-        source_direction = self.wind.cfd.direction
-        wind_map = WindController2(terrain_features=terrain_map,
-                                   wind_direction=source_direction,
-                                   wind_speed=source_speed)
-        return wind_map
-
-    def reset_topography_layer(self, seed: int = None) -> None:
-        '''
-        Reset the topography layer with a different seed or a different location
-
-        Arguments:
-            seed: The input used in generating the random elevation function.
-            type: The type of topography layer to use.
-            location: The location of the topography layer i.e. (latitude, longitude)
-        '''
-        # Assume functional type
-        if seed is None:
-            message = 'No seed provided for topography layer'
-            log.warning(message)
+            speed_fn = None
+        if fn_name is not None and dir_kwargs is not None:
+            direction_fn = FunctionalConfig(fn_name, dir_kwargs)
         else:
-            # Set the seed class attribute so that the function uses it correctly
-            self.terrain.topography.functional.perlin.seed = seed
-            # Set the seed dictionary value so that if the config is later saved, it is
-            # reflected in the saved config.yml
-            self.data['terrain']['topography']['functional']['perlin']['seed'] = seed
+            direction_fn = None
 
-    def reset_fuel_layer(self, seed: int = None) -> None:
+        return WindConfig(speed_arr, direction_arr, speed_fn, direction_fn)
+
+    def reset_terrain(self,
+                      topography_seed: Optional[int] = None,
+                      topography_type: Optional[str] = None,
+                      fuel_seed: Optional[int] = None,
+                      fuel_type: Optional[str] = None,
+                      location: Optional[Tuple[float, float]] = None) -> None:
         '''
-        Reset the fuel layer with a different seed or a different location
+        Reset the terrain functional generation seeds if using functional data,
+        or reset the terrain lat/long location if using operational data.
 
         Arguments:
-            seed: The input used in generating the random fuel array function.
+            topography_seed: The seed used to randomize functional topography generation
+            fuel_seed: The seed used to randomize functional fuel generation
+            location: A new center-point for the operational topography and fuel data
         '''
-        # Assume functional type
-        if seed is None:
-            message = 'No seed provided for functional topography layer'
-            log.warning(message)
-        else:
-            # Set the seed class attribute so that the function uses it correctly
-            self.terrain.fuel.functional.chaparral.seed = seed
-            # Set the seed dictionary value so that if the config is later saved, it is
-            # reflected in the saved config.yml
-            self.data['terrain']['fuel']['functional']['chaparral']['seed'] = seed
+        # We want to update the YAML terrain data so that the call to _load_terrain()
+        # re-create the layers with the updated parameters
 
-    def _reset_layers(self,
-                      seed: int = None,
-                      location: Tuple[float, float] = None,
-                      reset_types: Dict = None) -> None:
+        # Do the location first, as the creation of the LatLongBox depends on it
+        if location is not None:
+            # Since all operational layers use the LatLongBox, we can update
+            # the yaml data and the LatLongBox at the class level
+            lat, long = location
+            self.yaml_data['operational']['latitude'] = lat
+            self.yaml_data['operational']['longitude'] = long
+            self.lat_long_box = self._make_lat_long_box()
+
+        # Can only reset functional topography seeds, since operational is updated
+        # via the `location` argument
+        if topography_seed is not None:
+            # Working with functional data
+            if self.terrain.topography_function is not None:
+                topo_fn_name = self.terrain.topography_function.name
+                self.yaml_data['terrain']['topography']['functional'][topo_fn_name][
+                    'seed'] = topography_seed
+        # Can only reset functional fuel seeds, since operational is updated
+        # via the `location` argument
+        if fuel_seed is not None:
+            # Working with functional data
+            if self.terrain.fuel_function is not None:
+                fuel_fn_name = self.terrain.fuel_function.name
+                self.yaml_data['terrain']['fuel']['functional'][fuel_fn_name][
+                    'seed'] = fuel_seed
+
+        # Need to check if any data layer types are changing, since the
+        # screen_size could be affected
+        if topography_type is not None and fuel_type is not None:
+            # Special case when going from all operational to all functional, so
+            # we need to revert back to the original screen_size from the config file
+            if topography_type == 'operational' and fuel_type == 'operational':
+                if self.terrain.topography_type == 'functional' and \
+                        self.terrain.fuel_type == 'functional':
+                    self.yaml_data['screen_size'] = self.original_screen_size
+        if topography_type is not None:
+            # Update the yaml data
+            self.yaml_data['terrain']['topography']['type'] = topography_type
+        if fuel_type is not None:
+            # Update the yaml data
+            self.yaml_data['terrain']['fuel']['type'] = fuel_type
+
+        # Remake the LatLongBox
+        self.lat_long_box = self._make_lat_long_box()
+        # Remake the AreaConfig since operational/functional could have changed
+        self.area = self._load_area()
+        # Remake the terrain
+        self.terrain = self._load_terrain()
+
+    def reset_wind(self,
+                   speed_seed: Optional[int] = None,
+                   direction_seed: Optional[int] = None) -> None:
         '''
-        Reset both the fuel layer and topography layer with a different seed or a
-            different location.
-        These are combined to share functionality with _set_terrain_scale()
-            which is computationally expensive, and should only occur once
-            if needed.
+        Reset the wind speed and direction seeds.
 
         Arguments:
-            seed: The input used in generating the random fuel array function.
-            location: Operational lat/long location
-            reset_types: The values for fuel and topography (operational / functional)
-
-        Returns:
-            Whether or not the method successfully set a data type.
-
+            speed_seed: The seed used to randomize wind speed generation
+            direction_seed: The seed used to randomize wind direction generation
         '''
-
-        if reset_types is not None:
-            keys = list(reset_types.keys())
-
-            if 'elevation' in keys:
-                self.reset_topography_layer(seed)
-            if 'fuel' in keys:
-                self.reset_fuel_layer(seed)
-
-        self._reset_operational_variables(seed, location)
-        self._set_terrain_scale()
-        self._set_topography_layer()
-        self._set_fuel_layer()
-
-    def _reset_operational_variables(self, seed: int, location: Tuple[float,
-                                                                      float]) -> None:
-        '''
-        Reset the operational variables for the topography and fuel layers and handle
-        error logging and messaging
-
-        Arguments:
-            seed: The input used in generating the random topography or fuel function or
-                  location.
-            location: The location of the topography or fuel layer
-                      i.e. (latitude, longitude)
-        '''
-        if seed is not None and location is not None:
-            message = ('Cannot set seed and location for operational topography '
-                       'layer at the same time')
-            log.error(message)
-            raise ValueError(message)
-        elif seed is not None:
-            self.operational.seed = seed
-        elif location is not None:
-            self.operational.latitude = int(location[0])
-            self.operational.longitude = int(location[1])
-
-    def reset_wind_function(self,
-                            speed_seed: int = None,
-                            direction_seed: int = None) -> None:
-        '''
-        Reset the wind function with a different seed.
-
-        Arguments:
-            speed_seed: The input used in generating the random wind speed function.
-            direction_seed: The input used in generating the random wind direction
-                            function.
-        '''
-        # Set the seed class attribute so that the function uses it correctly
-        # Only set each seed if it has been passed into the function to be changed
+        # We want to update the YAML wind data so that the call to _load_wind()
+        # re-create the WindConfig with the updated parameters
         if speed_seed is not None:
-            self.wind.perlin.speed.seed = speed_seed
-            # Set the seed dictionary value so that if the config is later saved, it is
-            # reflected in the saved config.yml
-            self.data['wind']['perlin']['speed']['seed'] = speed_seed
+            # Working with functional data
+            if self.wind.speed_function is not None:
+                speed_fn_name = self.wind.speed_function.name
+                if 'seed' in self.yaml_data['wind'][speed_fn_name]['speed']:
+                    self.yaml_data['wind'][speed_fn_name]['speed']['seed'] = speed_seed
+                else:
+                    log.warn(
+                        'Attempted to reset speed seed for wind fucntion '
+                        f'{speed_fn_name}, but no seed parameter exists in the config')
 
         if direction_seed is not None:
-            self.wind.perlin.direction.seed = direction_seed
-            # Set the seed dictionary value so that if the config is later saved, it is
-            # reflected in the saved config.yml
-            self.data['wind']['perlin']['direction']['seed'] = direction_seed
+            if self.wind.direction_function is not None:
+                direction_fn_name = self.wind.direction_function.name
+                if 'seed' in self.yaml_data['wind'][direction_fn_name]['direction']:
+                    self.yaml_data['wind'][direction_fn_name]['direction'][
+                        'seed'] = direction_seed
+                else:
+                    log.warn('Attempted to reset direction seed for wind fucntion '
+                             f'{direction_fn_name}, but no seed parameter exists in the '
+                             'config')
 
-        # No reason to run _set_wind_function if it doesn't change
-        if speed_seed is not None and direction_seed is not None:
-            self._set_wind_function()
+        self.wind = self._load_wind()
 
-    def save(self, path: Path) -> None:
+    def save(self, path: Union[str, Path]) -> None:
         '''
-        Save the current config to the specified `path`
+        Save the current config to the specified path.
 
         Arguments:
-            path: The path and filename of the output YAML file.
+            path: The path and filename of the output YAML file
         '''
         with open(path, 'w') as f:
-            yaml.dump(self.data, f)
+            yaml.dump(self.yaml_data, f)

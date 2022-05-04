@@ -1,13 +1,13 @@
-from importlib import resources
-from typing import Sequence, Tuple
-
 import math
-import pygame
-import numpy as np
+from importlib import resources
+from typing import Optional, Sequence, Tuple
 
-from .image import load_image
-from ..utils.units import mph_to_ftpm
+import numpy as np
+import pygame
+
 from ..enums import BurnStatus, GameStatus
+from ..utils.units import mph_to_ftpm
+from .image import load_image
 from .sprites import Fire, FireLine, Terrain
 
 
@@ -42,21 +42,21 @@ class Game():
 
         self.headless = headless
 
+        self.background: Optional[pygame.surface.Surface]
+
         if not self.headless:
             pygame.init()
             self.screen = pygame.display.set_mode(screen_size)
             pygame.display.set_caption('Rothermel 2D Simulator')
             with resources.path('assets.icons', 'fireline_logo.png') as path:
                 fireline_logo_path = path
-            pygame.display.set_icon(load_image(fireline_logo_path))
+            pygame.display.set_icon(load_image(str(fireline_logo_path)))
 
-        # Create the background so it doesn't have to be recreated every update
-        if self.headless:
-            self.background = None
-        else:
             self.background = pygame.Surface(self.screen.get_size())
             self.background = self.background.convert()
             self.background.fill((0, 0, 0))
+        else:
+            self.background = None
 
         # Map to track which pixels are on fire or have burned
         self.fire_map = np.full(screen_size, BurnStatus.UNBURNED)
@@ -196,7 +196,7 @@ class Game():
         return floorColorRGB
 
     def _get_wind_mag_surf(self, wind_magnitude_map: Sequence[Sequence[float]]) -> \
-            pygame.Surface:
+            pygame.surface.Surface:
         '''
         Compute the wind magnitude surface for display.
 
@@ -207,16 +207,21 @@ class Game():
         Returns:
             The PyGame Surface for the wind magnitude
         '''
-        wind_mag_surf = pygame.Surface(self.screen.get_size())
         w_max = np.amax(wind_magnitude_map)
         w_min = np.amin(wind_magnitude_map)
         wind_speed_range = (w_max - w_min)
-        for y_idx, y in enumerate(wind_magnitude_map):
-            for x_idx, x in enumerate(y):
-                w_mag = x
-                gradient = (255 - 0)
-                color_mag = int((((w_mag - w_min) * gradient) / wind_speed_range) + 0)
-                wind_mag_surf.set_at((x_idx, y_idx), pygame.Color(0, color_mag, 0))
+        # Constant value wind at all locations. Set everything to middle value
+        if wind_speed_range == 0:
+            color_arr = np.full(self.screen.get_size(), 127, dtype=np.uint8)
+            wind_mag_surf = pygame.surfarray.make_surface(color_arr.swapaxes(0, 1))
+        else:
+            wind_mag_surf = pygame.Surface(self.screen.get_size())
+            for y_idx, y in enumerate(wind_magnitude_map):
+                for x_idx, x in enumerate(y):
+                    w_mag = x
+                    gradient = (255 - 0)
+                    color_mag = int(((w_mag - w_min) * gradient) / (wind_speed_range) + 0)
+                    wind_mag_surf.set_at((x_idx, y_idx), pygame.Color(0, color_mag, 0))
         return wind_mag_surf
 
     def _get_wind_dir_surf(self, wind_direction_map: Sequence[Sequence[float]]) -> \
@@ -236,7 +241,7 @@ class Game():
             for x_idx, x in enumerate(y):
                 w_dir = x
                 color = self._get_wind_direction_color(w_dir)
-                pyColor = pygame.Color(color[0], color[1], color[2], a=0.75)
+                pyColor = pygame.Color(color[0], color[1], color[2], a=191)
                 wind_dir_surf.set_at((x_idx, y_idx), pyColor)
 
         return wind_dir_surf
@@ -244,7 +249,7 @@ class Game():
     def update(self, terrain: Terrain, fire_sprites: Sequence[Fire],
                fireline_sprites: Sequence[FireLine],
                wind_magnitude_map: Sequence[Sequence[float]],
-               wind_direction_map: Sequence[Sequence[float]]) -> bool:
+               wind_direction_map: Sequence[Sequence[float]]) -> GameStatus:
         '''
         Update the game display using the provided terrain, sprites, and
         environment data. Most of the logic for the game is handled within
@@ -260,6 +265,12 @@ class Game():
                                 location
         '''
         status = GameStatus.RUNNING
+
+        # Convert the sequences to list for list addition later
+        if not isinstance(fire_sprites, list):
+            fire_sprites = list(fire_sprites)
+        if not isinstance(fireline_sprites, list):
+            fireline_sprites = list(fireline_sprites)
 
         if not self.headless:
             for event in pygame.event.get():
@@ -277,29 +288,29 @@ class Game():
                         self._toggle_wind_direction_display()
 
         # Create a layered group so that the fire appears on top
-        fire_sprites_group = pygame.sprite.LayeredUpdates(fire_sprites, fireline_sprites)
-        all_sprites = pygame.sprite.LayeredUpdates(fire_sprites_group, terrain)
+        fire_sprites_group = pygame.sprite.LayeredUpdates(*(fire_sprites +
+                                                            fireline_sprites))
+        all_sprites = pygame.sprite.LayeredUpdates(*fire_sprites_group, terrain)
 
         # Update and draw the sprites
         if not self.headless:
-            for sprite in all_sprites.sprites():
-                self.screen.blit(self.background, sprite.rect, sprite.rect)
-                # self.screen.blit(self.background, (0, 0))
+            if self.background is not None:
+                for sprite in all_sprites.sprites():
+                    if sprite.rect is not None:
+                        self.screen.blit(self.background, sprite.rect, sprite.rect)
 
-        fire_sprites_group.update()
-        terrain.update(self.fire_map)
-        if not self.headless:
-            all_sprites.draw(self.screen)
+                fire_sprites_group.update()
+                terrain.update(self.fire_map)
+                all_sprites.draw(self.screen)
 
-            if self.show_wind_magnitude is True:
-                wind_mag_surf = self._get_wind_mag_surf(wind_magnitude_map)
-                self.screen.blit(wind_mag_surf, (0, 0))
+                if self.show_wind_magnitude is True:
+                    wind_mag_surf = self._get_wind_mag_surf(wind_magnitude_map)
+                    self.screen.blit(wind_mag_surf, (0, 0))
 
-            if self.show_wind_direction is True:
-                wind_dir_surf = self._get_wind_dir_surf(wind_direction_map)
-                self.screen.blit(wind_dir_surf, (0, 0))
+                if self.show_wind_direction is True:
+                    wind_dir_surf = self._get_wind_dir_surf(wind_direction_map)
+                    self.screen.blit(wind_dir_surf, (0, 0))
 
-        if not self.headless:
-            pygame.display.update()
+                pygame.display.update()
 
         return status

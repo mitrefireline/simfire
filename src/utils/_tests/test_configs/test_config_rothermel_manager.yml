@@ -1,7 +1,7 @@
 # For a description of config parameters, go to
 # https://fireline.pages.mitre.org/rothermel-modeling/config.html
 area:
-  screen_size: 9
+  screen_size: 225
   pixel_scale: 50
 
 display:
@@ -11,7 +11,7 @@ display:
 simulation:
   update_rate: 1
   runtime: 24h
-  headless: true
+  headless: false
 
 mitigation:
   ros_attenuation: true
@@ -20,8 +20,8 @@ operational:
   seed:
   latitude: 39.67
   longitude: 119.8
-  height: 400
-  width: 400
+  height: 4000
+  width: 4000
   resolution: 30
 
 terrain:
@@ -31,7 +31,7 @@ terrain:
       function: perlin
       perlin:
         amplitude: 500
-        shape: (9, 9)
+        shape: (225, 225)
         resolution: (1, 1)
         seed: 1111
       gaussian:
@@ -48,17 +48,16 @@ terrain:
         seed: 1113
 
 fire:
-  fire_initial_position: (5, 3)
+  fire_initial_position: (16, 16)
   max_fire_duration: 4
 
 environment:
   moisture: 0.03
 
 wind:
-  # This should stay as perlin for use with testing
-  function: perlin
+  function: simple
   cfd:
-    time_to_train: 1000 # Seconds, longer is better
+    time_to_train: 1000
     iterations: 1
     scale: 1
     timestep_dt: 1.0
@@ -67,7 +66,7 @@ wind:
     speed: 19
     direction: north
   simple:
-    speed: 7
+    speed: 1
     direction: 90.0
   perlin:
     speed:

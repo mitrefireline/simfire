@@ -1,7 +1,8 @@
 import re
-import numpy as np
-from typing import Union
 from datetime import timedelta
+from typing import Union
+
+import numpy as np
 
 from .log import create_logger
 

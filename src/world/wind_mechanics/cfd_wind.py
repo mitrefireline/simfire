@@ -1,8 +1,9 @@
 import math
-import pygame
-import numpy as np
 
-terrain_features = 0
+import numpy as np
+import pygame
+
+terrain_features: np.ndarray
 
 
 class Fluid():

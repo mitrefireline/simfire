@@ -18,7 +18,7 @@ flake8:
   tags:
     - docker
   script:
-    - "{$PYTHON_ROOT}flake8" .
+    - "{$PYTHON_ROOT}flake8 ."
   only:
     - merge_requests
 
@@ -36,7 +36,7 @@ mypy:
   tags:
     - docker
   script:
-    - "{$PYTHON_ROOT}mypy" --config-file .mypy.ini .
+    - "{$PYTHON_ROOT}mypy --config-file .mypy.ini ."
   only:
     - merge_requests
 
@@ -45,7 +45,7 @@ isort:
   tags:
     - docker
   script:
-    - "{$PYTHON_ROOT}isort" --check .
+    - "{$PYTHON_ROOT}isort --check ."
   only:
     - merge_requests
 
@@ -67,7 +67,7 @@ game_rothermel.py:
   tags:
     - lslab2
   script:
-    - SDL_VIDEODRIVER="dummy" "${PYTHON_ROOT}python" game_rothermel.py
+    - SDL_VIDEODRIVER="dummy" "${PYTHON_ROOT}python game_rothermel.py"
   needs: []
   only:
     - merge_requests

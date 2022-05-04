@@ -40,6 +40,15 @@ mypy:
   only:
     - merge_requests
 
+isort:
+  stage: Static Analysis
+  tags:
+    - docker
+  script:
+    - isort --check .
+  only:
+    - merge_requests
+
 #########
 # Tests #
 #########

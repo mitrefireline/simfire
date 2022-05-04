@@ -15,6 +15,7 @@ stages:
 ###################
 flake8:
   stage: Static Analysis
+  tags:
     - docker
   script:
     - flake8 .

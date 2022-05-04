@@ -26,9 +26,14 @@ repos:
         name: mypy
         exclude: /_tests/
         language: python
-        entry: "mypy"
+        entry: mypy
         args: [--config-file, .mypy.ini]
         # use your preferred Python version
+        types: [python]
+      - id: isort
+        name: isort
+        language: python
+        entry: isort
         types: [python]
   - repo: https://gitlab.com/PyCQA/flake8
     rev: 3.8.3

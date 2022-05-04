@@ -2,7 +2,7 @@ image: "python:3.9"
 
 before_script:
   - python --version
-  - pip install -r dev-requirements.txt
+  - if [ -d /nfs/lslab2/fireline/anaconda/envs/roth-dev ]; then echo "Using existing roth-dev env" && export PYTHON_ROOT="/nfs/lslab2/fireline/anaconda/envs/roth-dev/bin/"; else pip install -r dev-requirements.txt && export PYTHON_ROOT=""; fi
 
 stages:
   - Static Analysis
@@ -18,7 +18,7 @@ flake8:
   tags:
     - docker
   script:
-    - $PYTHON_ROOT/flake8 .
+    - "{$PYTHON_ROOT}flake8" .
   only:
     - merge_requests
 
@@ -27,7 +27,7 @@ yapf:
   tags:
     - docker
   script:
-    - if [ `$PYTHON_ROOT/yapf -r ./ -d | wc -l` -gt 0 ] ; then false ; else true ;fi
+    - if [ `"{$PYTHON_ROOT}yapf" -r ./ -d | wc -l` -gt 0 ] ; then false ; else true ;fi
   only:
     - merge_requests
 
@@ -36,7 +36,7 @@ mypy:
   tags:
     - docker
   script:
-    - $PYTHON_ROOT/mypy --config-file .mypy.ini .
+    - "{$PYTHON_ROOT}mypy" --config-file .mypy.ini .
   only:
     - merge_requests
 
@@ -45,7 +45,7 @@ isort:
   tags:
     - docker
   script:
-    - $PYTHON_ROOT/isort --check .
+    - "{$PYTHON_ROOT}isort" --check .
   only:
     - merge_requests
 
@@ -57,7 +57,7 @@ unittests:
   tags:
     - lslab2
   script:
-    - SDL_VIDEODRIVER=dummy /nfs/lslab2/fireline/anaconda/roth-dev/bin/python -m unittest discover -s src -t .. -p 'test_*.py'
+    - SDL_VIDEODRIVER=dummy "${PYTHON_ROOT}python" -m unittest discover -s src -t .. -p 'test_*.py'
   needs: []
   only:
     - merge_requests
@@ -67,7 +67,7 @@ game_rothermel.py:
   tags:
     - lslab2
   script:
-    - SDL_VIDEODRIVER="dummy" /nfs/lslab2/fireline/anaconda/roth-dev/bin/python game_rothermel.py
+    - SDL_VIDEODRIVER="dummy" "${PYTHON_ROOT}python" game_rothermel.py
   needs: []
   only:
     - merge_requests
@@ -77,9 +77,9 @@ coverage:
   tags:
   - lslab2
   script:
-    - SDL_VIDEODRIVER=dummy /nfs/lslab2/fireline/anaconda/roth-dev/bin/python -m coverage run -m pytest
-    - SDL_VIDEODRIVER=dummy /nfs/lslab2/fireline/anaconda/roth-dev/bin/python -m coverage report
-    - SDL_VIDEODRIVER=dummy /nfs/lslab2/fireline/anaconda/roth-dev/bin/python -m coverage xml
+    - SDL_VIDEODRIVER=dummy "${PYTHON_ROOT}python" -m coverage run -m pytest
+    - SDL_VIDEODRIVER=dummy "${PYTHON_ROOT}python" -m coverage report
+    - SDL_VIDEODRIVER=dummy "${PYTHON_ROOT}python" -m coverage xml
   artifacts:
     reports:
       cobertura: coverage.xml

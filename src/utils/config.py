@@ -136,6 +136,10 @@ class Config:
         self.path = path
         self.yaml_data = self._load_yaml()
 
+        # Save the original screen size in case the simulation changes from
+        # operational to functional
+        self.original_screen_size = self.yaml_data['area']['screen_size']
+
         self.lat_long_box = self._make_lat_long_box()
 
         self.area = self._load_area()
@@ -256,9 +260,6 @@ class Config:
         topo_type = self.yaml_data['terrain']['topography']['type']
         fuel_type = self.yaml_data['terrain']['fuel']['type']
 
-        if topo_type != fuel_type:
-            raise ConfigError(f'The topography type {topo_type} != the fuel '
-                              f'type {fuel_type}')
         topo_type, topo_layer, topo_name, topo_kwargs = self._create_topography_layer(
             init=True)
         if topo_name is not None and topo_kwargs is not None:
@@ -520,15 +521,6 @@ class Config:
                 topo_fn_name = self.terrain.topography_function.name
                 self.yaml_data['terrain']['topography']['functional'][topo_fn_name][
                     'seed'] = topography_seed
-        if topography_type is not None:
-            self.yaml_data['terrain']['topography']['type'] = topography_type
-            # Need to create the LatLongBox if switching to operational
-            if self.terrain.topography_type == 'functional' and \
-                    topography_type == 'operational':
-                self.lat_long_box = self._make_lat_long_box()
-                # Update the area since the LatLongBox changed
-                self.area = self._load_area()
-
         # Can only reset functional fuel seeds, since operational is updated
         # via the `location` argument
         if fuel_seed is not None:
@@ -537,14 +529,28 @@ class Config:
                 fuel_fn_name = self.terrain.fuel_function.name
                 self.yaml_data['terrain']['fuel']['functional'][fuel_fn_name][
                     'seed'] = fuel_seed
-        if fuel_type is not None:
-            self.yaml_data['terrain']['fuel']['type'] = fuel_type
-            # Need to create the LatLongBox if switching to operational
-            if self.terrain.fuel_type == 'functional' and fuel_type == 'operational':
-                self.lat_long_box = self._make_lat_long_box()
-                # Update the area since the LatLongBox changed
-                self.area = self._load_area()
 
+        # Need to check if any data layer types are changing, since the
+        # screen_size could be affected
+        if topography_type is not None and fuel_type is not None:
+            # Special case when going from all operational to all functional, so
+            # we need to revert back to the original screen_size from the config file
+            if topography_type == 'operational' and fuel_type == 'operational':
+                if self.terrain.topography_type == 'functional' and \
+                        self.terrain.fuel_type == 'functional':
+                    self.yaml_data['screen_size'] = self.original_screen_size
+        if topography_type is not None:
+            # Update the yaml data
+            self.yaml_data['terrain']['topography']['type'] = topography_type
+        if fuel_type is not None:
+            # Update the yaml data
+            self.yaml_data['terrain']['fuel']['type'] = fuel_type
+
+        # Remake the LatLongBox
+        self.lat_long_box = self._make_lat_long_box()
+        # Remake the AreaConfig since operational/functional could have changed
+        self.area = self._load_area()
+        # Remake the terrain
         self.terrain = self._load_terrain()
 
     def reset_wind(self,

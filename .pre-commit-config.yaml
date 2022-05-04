@@ -34,6 +34,7 @@ repos:
         name: isort
         language: python
         entry: isort
+        args: [--trailing-comma, -m=3]
         types: [python]
   - repo: https://gitlab.com/PyCQA/flake8
     rev: 3.8.3

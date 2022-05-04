@@ -45,7 +45,7 @@ isort:
   tags:
     - docker
   script:
-    - isort --check .
+    - isort --check --trailing-comma -m=3 .
   only:
     - merge_requests
 

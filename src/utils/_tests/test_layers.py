@@ -6,10 +6,15 @@ import matplotlib as mpl
 import numpy as np
 
 from ...world.fuel_array_functions import chaparral_fn
-from ..layers import (DataLayer, FunctionalFuelLayer,
-                      FunctionalTopographyLayer, LatLongBox,
-                      OperationalFuelLayer, OperationalTopographyLayer,
-                      TopographyLayer)
+from ..layers import (
+    DataLayer,
+    FunctionalFuelLayer,
+    FunctionalTopographyLayer,
+    LatLongBox,
+    OperationalFuelLayer,
+    OperationalTopographyLayer,
+    TopographyLayer,
+)
 
 
 class TestLatLongBox(unittest.TestCase):

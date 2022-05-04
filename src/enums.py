@@ -18,14 +18,27 @@ from PIL import Image
 with resources.path('assets.textures', 'terrain.jpg') as path:
     TERRAIN_TEXTURE_PATH: Path = path
 
-from .world.presets import (Brush, Chaparral, ClosedShortNeedleTimberLitter,
-                            DormantBrushHardwoodSlash,
-                            GrassTimberShrubOverstory,
-                            HardwoodLongNeedlePineTimber, HeavyLoggingSlash,
-                            LightLoggingSlash, MediumLoggingSlash,
-                            NBAgriculture, NBBarren, NBNoData, NBSnowIce,
-                            NBUrban, NBWater, ShortGrass, SouthernRough,
-                            TallGrass, TimberLitterUnderstory)
+from .world.presets import (
+    Brush,
+    Chaparral,
+    ClosedShortNeedleTimberLitter,
+    DormantBrushHardwoodSlash,
+    GrassTimberShrubOverstory,
+    HardwoodLongNeedlePineTimber,
+    HeavyLoggingSlash,
+    LightLoggingSlash,
+    MediumLoggingSlash,
+    NBAgriculture,
+    NBBarren,
+    NBNoData,
+    NBSnowIce,
+    NBUrban,
+    NBWater,
+    ShortGrass,
+    SouthernRough,
+    TallGrass,
+    TimberLitterUnderstory,
+)
 
 DRY_TERRAIN_BROWN_IMG: Image.Image = Image.fromarray(
     np.full((10, 10, 3), (205, 133, 63), dtype=np.uint8))

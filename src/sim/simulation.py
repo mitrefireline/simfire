@@ -6,8 +6,11 @@ import numpy as np
 
 from ..enums import BurnStatus, ElevationConstants, FuelConstants, GameStatus
 from ..game.managers.fire import RothermelFireManager
-from ..game.managers.mitigation import (FireLineManager, ScratchLineManager,
-                                        WetLineManager)
+from ..game.managers.mitigation import (
+    FireLineManager,
+    ScratchLineManager,
+    WetLineManager,
+)
 from ..game.sprites import Terrain
 from ..utils.config import Config
 from ..utils.layers import FunctionalFuelLayer

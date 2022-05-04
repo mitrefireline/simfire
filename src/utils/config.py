@@ -11,9 +11,15 @@ from yaml.parser import ParserError  # type: ignore
 from ..world.elevation_functions import PerlinNoise2D, flat, gaussian
 from ..world.fuel_array_functions import chaparral_fn
 from ..world.wind_mechanics.wind_controller import WindController
-from .layers import (FuelLayer, FunctionalFuelLayer, FunctionalTopographyLayer,
-                     LatLongBox, OperationalFuelLayer,
-                     OperationalTopographyLayer, TopographyLayer)
+from .layers import (
+    FuelLayer,
+    FunctionalFuelLayer,
+    FunctionalTopographyLayer,
+    LatLongBox,
+    OperationalFuelLayer,
+    OperationalTopographyLayer,
+    TopographyLayer,
+)
 from .log import create_logger
 from .units import mph_to_ftpm, scale_ms_to_ftpm, str_to_minutes
 

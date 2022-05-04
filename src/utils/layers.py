@@ -7,8 +7,11 @@ import numpy as np
 from matplotlib.contour import QuadContourSet
 from PIL import Image
 
-from ..enums import (DRY_TERRAIN_BROWN_IMG, TERRAIN_TEXTURE_PATH,
-                     FuelModelToFuel)
+from ..enums import (
+    DRY_TERRAIN_BROWN_IMG,
+    TERRAIN_TEXTURE_PATH,
+    FuelModelToFuel,
+)
 from ..world.elevation_functions import ElevationFn
 from ..world.fuel_array_functions import FuelArrayFn
 from ..world.parameters import Fuel

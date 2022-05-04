@@ -555,7 +555,6 @@ class RothermelSimulation(Simulation):
         Returns:
             Whether or not the method successfully set a data type.
         '''
-        success = False
         keys = list(types.keys())
         if 'elevation' in keys:
             self.config.reset_terrain(topography_type=types['elevation'])
@@ -573,4 +572,10 @@ class RothermelSimulation(Simulation):
                 log.warning(message)
                 warnings.warn(message)
                 success = False
+
+        if success:
+            # all keys are valid
+            self.config.reset_terrain(topography_type=types['elevation'],
+                                      fuel_type=types['fuel'])
+
         return success

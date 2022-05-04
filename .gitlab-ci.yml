@@ -2,7 +2,7 @@ image: "python:3.9"
 
 before_script:
   - python --version
-  - if [ -d /nfs/lslab2/fireline/anaconda/roth-dev ]; then echo "Using existing roth-dev env"; else pip install -r dev-requirements.txt; fi
+  - if [ -d /nfs/lslab2/fireline/anaconda/roth-dev ]; then echo "Using existing roth-dev env" && export PYTHON_ROOT="/nfs/lslab2/fireline/ananconda/roth-dev/bin/"; else pip install -r dev-requirements.txt && export PYTHON_ROOT=""; fi
 
 stages:
   - Static Analysis
@@ -18,7 +18,7 @@ flake8:
   tags:
     - docker
   script:
-    - flake8 .
+    - $PYTHON_ROOT/flake8 .
   only:
     - merge_requests
 
@@ -27,7 +27,7 @@ yapf:
   tags:
     - docker
   script:
-    - if [ `yapf -r ./ -d | wc -l` -gt 0 ] ; then false ; else true ;fi
+    - if [ `$PYTHON_ROOT/yapf -r ./ -d | wc -l` -gt 0 ] ; then false ; else true ;fi
   only:
     - merge_requests
 
@@ -36,7 +36,7 @@ mypy:
   tags:
     - docker
   script:
-    - mypy --config-file .mypy.ini .
+    - $PYTHON_ROOT/mypy --config-file .mypy.ini .
   only:
     - merge_requests
 
@@ -45,7 +45,7 @@ isort:
   tags:
     - docker
   script:
-    - isort --check .
+    - $PYTHON_ROOT/isort --check .
   only:
     - merge_requests
 

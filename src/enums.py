@@ -1,11 +1,11 @@
-'''
+"""
 Enums
 =====
 
 Contains many enumeration classes for use throughout `rothermel_model` that depict pixel
 burn status, the ordering of sprite layers, how much to attenuate the rate of spread on
 different types of control lines, and the current game status.
-'''
+"""
 from dataclasses import dataclass
 from enum import Enum, IntEnum, auto
 from importlib import resources
@@ -15,7 +15,7 @@ from typing import Tuple
 import numpy as np
 from PIL import Image
 
-with resources.path('assets.textures', 'terrain.jpg') as path:
+with resources.path("assets.textures", "terrain.jpg") as path:
     TERRAIN_TEXTURE_PATH: Path = path
 
 from .world.presets import (
@@ -41,13 +41,14 @@ from .world.presets import (
 )
 
 DRY_TERRAIN_BROWN_IMG: Image.Image = Image.fromarray(
-    np.full((10, 10, 3), (205, 133, 63), dtype=np.uint8))
+    np.full((10, 10, 3), (205, 133, 63), dtype=np.uint8)
+)
 
 BURNED_RGB_COLOR: Tuple[int, int, int] = (139, 69, 19)
 
 
 class BurnStatus(IntEnum):
-    '''The status of each pixel in a `fire_map`
+    """The status of each pixel in a `fire_map`
 
     Current statuses are:
         - UNBURNED
@@ -56,7 +57,8 @@ class BurnStatus(IntEnum):
         - FIRELINE
         - SCRATCHLINE
         - WETLINE
-    '''
+    """
+
     UNBURNED = 0
     BURNING = auto()
     BURNED = auto()
@@ -67,21 +69,22 @@ class BurnStatus(IntEnum):
 
 @dataclass
 class RoSAttenuation:
-    '''The factor by which to attenuate the rate of spread (RoS), based on control line
+    """The factor by which to attenuate the rate of spread (RoS), based on control line
     type
 
     The only classes that are attenuated are the different control lines:
         - FIRELINE
         - SCRATCHLINE
         - WETLINE
-    '''
+    """
+
     FIRELINE: float = 980
     SCRATCHLINE: float = 490
     WETLINE: float = 245
 
 
 class SpriteLayer(IntEnum):
-    '''The types of layers for sprites
+    """The types of layers for sprites
 
     This determines the order with which sprites are layered and displayed on top of each
     other. The higher the number, the closer to the top of the layer stack. From bottom
@@ -90,7 +93,8 @@ class SpriteLayer(IntEnum):
         - FIRE
         - LINE
         - RESOURCE
-    '''
+    """
+
     TERRAIN = 1
     FIRE = 2
     LINE = 3
@@ -98,19 +102,20 @@ class SpriteLayer(IntEnum):
 
 
 class GameStatus(Enum):
-    '''The different statuses that the game can be in
+    """The different statuses that the game can be in
 
     Currently it can only be in the following modes:
         - QUIT
         - RUNNING
-    '''
+    """
+
     QUIT = auto()
     RUNNING = auto()
 
 
 @dataclass
 class FuelConstants:
-    '''
+    """
     Constants to be used in the file and can be imported for reference.
 
     Parameters:
@@ -119,7 +124,8 @@ class FuelConstants:
         DELTA: Fuel bed depth (ft) min and max.
         M_X: Dead fuel moisture of extinction min and max.
         SIGMA: Surface-area-to-volume ratio (ft^2/ft^3) min and max.
-    '''
+    """
+
     W_0_MIN: float = 0.2
     W_0_MAX: float = 0.6
     DELTA: float = 6.000
@@ -129,7 +135,7 @@ class FuelConstants:
 
 @dataclass
 class ElevationConstants:
-    '''
+    """
     Constants to be used in the file and can be imported for reference.
 
     Paremeters:
@@ -139,7 +145,8 @@ class ElevationConstants:
                        California.
         MEAN_ELEVATION: Mean elevation (ft). Based on the average elevation of California.
                         From [NRC.gov](https://www.nrc.gov/docs/ML1408/ML14086A640.pdf).
-    '''
+    """
+
     MIN_ELEVATION: int = -282
     MAX_ELEVATION: int = 11_000
     MEAN_ELEVATION: int = 2_500
@@ -166,7 +173,7 @@ FuelModelToFuel = {
     99: NBBarren,
     -32768: NBNoData,
     -9999: NBNoData,
-    32767: NBNoData
+    32767: NBNoData,
 }
 
 FuelModelRGB13 = {
@@ -190,5 +197,5 @@ FuelModelRGB13 = {
     99: [0.74902, 0.74902, 0.74902],
     -32768: [1.0, 1.0, 1.0],
     -9999: [1.0, 1.0, 1.0],
-    32767: [1.0, 1.0, 1.0]
+    32767: [1.0, 1.0, 1.0],
 }

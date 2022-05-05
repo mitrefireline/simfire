@@ -7,7 +7,7 @@ FuelArrayFn = Callable[[float, float], Fuel]
 
 
 def chaparral_fn(seed: int = None) -> FuelArrayFn:
-    '''
+    """
     Return a callable that accepts (x, y) coordinates and returns a Fuel with
     Chaparral characterisitics at that coordinate
 
@@ -19,9 +19,10 @@ def chaparral_fn(seed: int = None) -> FuelArrayFn:
 
     Returns:
         A FuelFn callable that accepts (x,y) coordinates and returns a Fuel
-    '''
+    """
+
     def fn(x: float, y: float) -> Fuel:
-        '''
+        """
         Use the input coordinates to generate a Fuel for the environment at that
         coordinate.
 
@@ -31,7 +32,7 @@ def chaparral_fn(seed: int = None) -> FuelArrayFn:
 
         Returns:
             A Fuel
-        '''
+        """
         fuel = chaparral(seed)
 
         return fuel

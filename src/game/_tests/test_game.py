@@ -2,6 +2,8 @@ import os
 import unittest
 from multiprocessing import get_context
 
+import numpy as np
+
 from ...enums import GameStatus
 from ...utils.config import Config
 from ...world.parameters import Environment, FuelParticle
@@ -268,3 +270,62 @@ class TestMultiprocessGame(unittest.TestCase):
                               valid_status,
                               msg=(f'The returned status of the games is {status}, but '
                                    f'should be {valid_status}'))
+
+
+class TestRecordingGame(unittest.TestCase):
+    def setUp(self) -> None:
+        self.config = Config('./src/utils/_tests/test_configs/test_config.yml')
+        self.screen_size = (self.config.area.screen_size, self.config.area.screen_size)
+        self.headless = False
+        self.game = Game(self.screen_size, headless=self.headless, record=True)
+        return super().setUp()
+
+    def test_record(self) -> None:
+        '''
+        Test that the game will record all frames
+        '''
+        fuel_particle = FuelParticle()
+        terrain = Terrain(self.config.terrain.fuel_layer,
+                          self.config.terrain.topography_layer,
+                          self.screen_size,
+                          headless=self.headless)
+        # Use simple/constant wind speed
+        environment = Environment(self.config.environment.moisture,
+                                  self.config.wind.speed, self.config.wind.direction)
+        fireline_manager = FireLineManager(size=self.config.display.control_line_size,
+                                           pixel_scale=self.config.area.pixel_scale,
+                                           terrain=terrain,
+                                           headless=self.headless)
+        fire_init_pos = (self.screen_size[0] // 2, self.screen_size[1] // 2)
+        fire_manager = RothermelFireManager(fire_init_pos,
+                                            self.config.display.fire_size,
+                                            self.config.fire.max_fire_duration,
+                                            self.config.area.pixel_scale,
+                                            self.config.simulation.update_rate,
+                                            fuel_particle,
+                                            terrain,
+                                            environment,
+                                            max_time=self.config.simulation.runtime,
+                                            headless=self.headless)
+        status = self.game.update(terrain, fire_manager.sprites, fireline_manager.sprites,
+                                  self.config.wind.speed, self.config.wind.direction)
+
+        self.assertEqual(status,
+                         GameStatus.RUNNING,
+                         msg=(f'The returned status of the game is {status}, but it '
+                              f'should be {GameStatus.RUNNING}'))
+
+        frames = self.game.frames
+        self.assertEqual(len(frames),
+                         1,
+                         msg=f'There should be 1 frame recorded, but got {len(frames)}')
+        self.assertIsInstance(frames[0],
+                              np.ndarray,
+                              msg='The returned frame should be a numpy array, '
+                              f'but got {type(frames[0])}')
+        frame_shape = frames[0].shape
+        valid_shape = self.screen_size + (3, )
+        self.assertEqual(frame_shape,
+                         valid_shape,
+                         msg=f'The returned frame should have shape {valid_shape}, '
+                         f'but has shape {frame_shape}')

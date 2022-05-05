@@ -8,6 +8,7 @@ matplotlib==3.5.1
 mypy==0.950
 noise==1.2.2
 numba==0.55.1
+opencv-python==4.5.5.64
 pre-commit==2.18.1
 pygame==2.1.2
 scikit-image==0.19.2

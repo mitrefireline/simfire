@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 
+import cv2
 import numpy as np
 from skimage.draw import line
 
@@ -24,7 +25,8 @@ def main():
 
     fuel_particle = FuelParticle()
 
-    game = Game((cfg.area.screen_size, cfg.area.screen_size))
+    game = Game((cfg.area.screen_size, cfg.area.screen_size),
+                record=cfg.simulation.record)
 
     terrain = Terrain(cfg.terrain.fuel_layer, cfg.terrain.topography_layer,
                       game.screen_size)
@@ -76,6 +78,16 @@ def main():
         fire_map = fireline_manager.update(fire_map)
         fire_map, fire_status = fire_manager.update(fire_map)
         game.fire_map = fire_map
+
+    if cfg.simulation.record:
+        out_path = os.curdir + '/recording.mp4'
+        frame_size = game.frames[0].shape
+        fourcc = cv2.VideoWriter_fourcc(*'MP4V')
+        writer = cv2.VideoWriter(out_path, fourcc, 30, frame_size[:2])
+        for frame in game.frames:
+            # Index with [...,::-1] to convert from RGB to BGR for OpenCV
+            writer.write(frame[..., ::-1])
+        writer.release()
 
     fig = fire_manager.draw_spread_graph(game.screen)
     if cfg.simulation.headless:

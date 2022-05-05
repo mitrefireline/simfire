@@ -10,11 +10,12 @@ pygame.init()
 
 
 # For Perlin Implementations
-class WindController():
-    '''
+class WindController:
+    """
     Generates and tracks objects that dictate wind magnitude and wind direction for map
     given size of the screen
-    '''
+    """
+
     def __init__(self, screen_size: int = 225) -> None:
         self.speed_layer = WindNoise()
         self.direction_layer = WindNoise()
@@ -22,10 +23,18 @@ class WindController():
         self.map_wind_direction: Optional[np.ndarray] = None
         self.screen_size = screen_size
 
-    def init_wind_speed_generator(self, seed: int, scale: int, octaves: int,
-                                  persistence: float, lacunarity: float, range_min: float,
-                                  range_max: float, screen_size: int) -> None:
-        '''
+    def init_wind_speed_generator(
+        self,
+        seed: int,
+        scale: int,
+        octaves: int,
+        persistence: float,
+        lacunarity: float,
+        range_min: float,
+        range_max: float,
+        screen_size: int,
+    ) -> None:
+        """
         Set simplex noise values for wind speeds
 
         Arguments:
@@ -42,17 +51,25 @@ class WindController():
             range_min: The minimum speed of the wind in ft/min.
             range_max: The maximum speed of the wind in ft/min.
             screen_size: Size of screen (both heigh and width) MUST BE SQUARE
-        '''
-        self.speed_layer.set_noise_parameters(seed, scale, octaves, persistence,
-                                              lacunarity, range_min, range_max)
+        """
+        self.speed_layer.set_noise_parameters(
+            seed, scale, octaves, persistence, lacunarity, range_min, range_max
+        )
 
         self.map_wind_speed = self.speed_layer.generate_map_array(screen_size)
 
-    def init_wind_direction_generator(self, seed: int, scale: int, octaves: int,
-                                      persistence: float, lacunarity: float,
-                                      range_min: float, range_max: float,
-                                      screen_size: int) -> None:
-        '''
+    def init_wind_direction_generator(
+        self,
+        seed: int,
+        scale: int,
+        octaves: int,
+        persistence: float,
+        lacunarity: float,
+        range_min: float,
+        range_max: float,
+        screen_size: int,
+    ) -> None:
+        """
         Set simplex noise values for wind directions
         Arguments:
             seed: The value to seed the noise generator
@@ -68,29 +85,33 @@ class WindController():
             range_min: The minimum angle of wind in degrees clockwise.
             range_min: The maximum angle of wind in degrees clockwise.
             screen_size: Size of screen (both heigh and width) MUST BE SQUARE
-        '''
-        self.direction_layer.set_noise_parameters(seed, scale, octaves, persistence,
-                                                  lacunarity, range_min, range_max)
+        """
+        self.direction_layer.set_noise_parameters(
+            seed, scale, octaves, persistence, lacunarity, range_min, range_max
+        )
 
         self.map_wind_direction = self.direction_layer.generate_map_array(screen_size)
 
 
 # For CFD Implementations
-class WindController2():
-    '''
+class WindController2:
+    """
     This is a PRECOMPUTE wind controller.  It generates and tracks objects that dictate
     wind magnitude and wind direction for map given size of the screen.
-    '''
-    def __init__(self,
-                 screen_size: int = 225,
-                 result_accuracy: int = 1,
-                 scale: int = 1,
-                 timestep: float = 1.0,
-                 diffusion: float = 0.0,
-                 viscosity: float = 0.0000001,
-                 terrain_features: np.ndarray = None,
-                 wind_speed: float = 27,
-                 wind_direction: str = 'North') -> None:
+    """
+
+    def __init__(
+        self,
+        screen_size: int = 225,
+        result_accuracy: int = 1,
+        scale: int = 1,
+        timestep: float = 1.0,
+        diffusion: float = 0.0,
+        viscosity: float = 0.0000001,
+        terrain_features: np.ndarray = None,
+        wind_speed: float = 27,
+        wind_direction: str = "North",
+    ) -> None:
         self.N = screen_size
         self.iterations = result_accuracy
         self.scale = scale
@@ -106,21 +127,28 @@ class WindController2():
             self.terrain_features = np.array(terrain_features, dtype=np.float32)
         # TODO Load terrain setup here
 
-        self.fvect = Fluid(self.N, self.iterations, self.scale, self.timestep,
-                           self.diffusion, self.viscosity, self.terrain_features)
+        self.fvect = Fluid(
+            self.N,
+            self.iterations,
+            self.scale,
+            self.timestep,
+            self.diffusion,
+            self.viscosity,
+            self.terrain_features,
+        )
 
     def iterate_wind_step(self) -> None:
         for v in range(0, self.N):
-            if self.wind_direction == 'north':
+            if self.wind_direction == "north":
                 self.fvect.addVelocity(v, 1, 0, self.wind_speed)
-            elif self.wind_direction == 'east':
+            elif self.wind_direction == "east":
                 self.fvect.addVelocity(self.N - 1, v, -1 * self.wind_speed, 0)
-            elif self.wind_direction == 'south':
+            elif self.wind_direction == "south":
                 self.fvect.addVelocity(1, v, -1 * self.wind_speed, 0)
-            elif self.wind_direction == 'west':
+            elif self.wind_direction == "west":
                 self.fvect.addVelocity(1, v, self.wind_speed, 0)
             else:
-                print('Bad source direction input')
+                print("Bad source direction input")
 
         self.fvect.step()
         return

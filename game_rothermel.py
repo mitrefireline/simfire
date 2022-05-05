@@ -14,23 +14,25 @@ from src.world.parameters import Environment, FuelParticle
 
 
 def main():
-    '''
+    """
     Initialize the layers.
     Create the Game, Terrain, and Environment
     Create the Managers
-    '''
-    cfg_path = Path('configs/operational_config.yml')
+    """
+    cfg_path = Path("configs/operational_config.yml")
     cfg = Config(cfg_path)
 
     fuel_particle = FuelParticle()
 
     game = Game((cfg.area.screen_size, cfg.area.screen_size))
 
-    terrain = Terrain(cfg.terrain.fuel_layer, cfg.terrain.topography_layer,
-                      game.screen_size)
+    terrain = Terrain(
+        cfg.terrain.fuel_layer, cfg.terrain.topography_layer, game.screen_size
+    )
 
-    environment = Environment(cfg.environment.moisture, cfg.wind.speed,
-                              cfg.wind.direction)
+    environment = Environment(
+        cfg.environment.moisture, cfg.wind.speed, cfg.wind.direction
+    )
 
     # Need to create two lines to "double up" since the fire can spread
     # to 8-connected squares
@@ -46,32 +48,37 @@ def main():
     x = points[1].tolist()
     points = list(zip(x, y))
 
-    fireline_manager = FireLineManager(size=cfg.display.control_line_size,
-                                       pixel_scale=cfg.area.pixel_scale,
-                                       terrain=terrain)
+    fireline_manager = FireLineManager(
+        size=cfg.display.control_line_size,
+        pixel_scale=cfg.area.pixel_scale,
+        terrain=terrain,
+    )
 
     fire_map = game.fire_map
     fire_map[cfg.fire.fire_initial_position] = BurnStatus.BURNING
     fire_map = fireline_manager.update(fire_map, points)
     game.fire_map = fire_map
 
-    fire_manager = RothermelFireManager(cfg.fire.fire_initial_position,
-                                        cfg.display.fire_size,
-                                        cfg.fire.max_fire_duration,
-                                        cfg.area.pixel_scale,
-                                        cfg.simulation.update_rate,
-                                        fuel_particle,
-                                        terrain,
-                                        environment,
-                                        max_time=cfg.simulation.runtime)
+    fire_manager = RothermelFireManager(
+        cfg.fire.fire_initial_position,
+        cfg.display.fire_size,
+        cfg.fire.max_fire_duration,
+        cfg.area.pixel_scale,
+        cfg.simulation.update_rate,
+        fuel_particle,
+        terrain,
+        environment,
+        max_time=cfg.simulation.runtime,
+    )
 
     game_status = GameStatus.RUNNING
     fire_status = GameStatus.RUNNING
     while game_status == GameStatus.RUNNING and fire_status == GameStatus.RUNNING:
         fire_sprites = fire_manager.sprites
         fireline_sprites = fireline_manager.sprites
-        game_status = game.update(terrain, fire_sprites, fireline_sprites, cfg.wind.speed,
-                                  cfg.wind.direction)
+        game_status = game.update(
+            terrain, fire_sprites, fireline_sprites, cfg.wind.speed, cfg.wind.direction
+        )
         fire_map = game.fire_map
         fire_map = fireline_manager.update(fire_map)
         fire_map, fire_status = fire_manager.update(fire_map)
@@ -79,19 +86,24 @@ def main():
 
     fig = fire_manager.draw_spread_graph(game.screen)
     if cfg.simulation.headless:
-        save_path = os.curdir + 'fire_spread_graph.png'
-        print('Game is running in a headless state. Saving fire spread '
-              f'graph to {save_path}')
+        save_path = os.curdir + "fire_spread_graph.png"
+        print(
+            "Game is running in a headless state. Saving fire spread "
+            f"graph to {save_path}"
+        )
         fig.savefig(save_path)
     else:
-        if 'DISPLAY' in os.environ:
-            print('Game is running in a non-headless state. Displaying fire spread '
-                  f'graph on DISPLAY {os.environ["DISPLAY"]}')
+        if "DISPLAY" in os.environ:
+            print(
+                "Game is running in a non-headless state. Displaying fire spread "
+                f'graph on DISPLAY {os.environ["DISPLAY"]}'
+            )
             import matplotlib.pyplot as plt
+
             plt.show()
-            while (plt.fignum_exists(fig.number)):
+            while plt.fignum_exists(fig.number):
                 continue
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

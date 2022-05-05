@@ -28,7 +28,7 @@ black:
   tags:
     - docker
   script:
-    - black --check
+    - black --check ./
   needs: []
   only:
     - merge_requests

@@ -527,25 +527,6 @@ class RothermelFireManager(FireManager):
             if self.update_rate > self.max_time or self.elapsed_time > self.max_time:
                 return fire_map, GameStatus.QUIT
 
-        # Initialize all the vectorized variables
-        # loc_x: List[int] = []
-        # loc_y: List[int] = []
-        # new_loc_x: List[int] = []
-        # new_loc_y: List[int] = []
-        # w_0: List[float] = []
-        # delta: List[float] = []
-        # M_x: List[float] = []
-        # sigma: List[float] = []
-        # h: List[float] = []
-        # S_T: List[float] = []
-        # S_e: List[float] = []
-        # p_p: List[float] = []
-        # M_f: List[float] = []
-        # U: List[float] = []
-        # U_dir: List[float] = []
-        # slope_mag: List[float] = []
-        # slope_dir: List[float] = []
-
         sprite_idxs = list(range(num_sprites))
 
         all_params = [self._accrue_sprites(idx, fire_map) for idx in sprite_idxs]

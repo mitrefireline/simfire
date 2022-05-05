@@ -490,6 +490,10 @@ class Config:
         else:
             direction_fn = None
 
+        # Convert to float to get correct type
+        speed_arr = speed_arr.astype(np.float64)
+        direction_arr = direction_arr.astype(np.float64)
+
         return WindConfig(speed_arr, direction_arr, speed_fn, direction_fn)
 
     def reset_terrain(self,

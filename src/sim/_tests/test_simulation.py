@@ -236,9 +236,10 @@ class RothermelSimulationTest(unittest.TestCase):
         new_map = np.zeros((9, 9))
         new_map[0][0] = 10
 
-        self.assertWarns(Warning, self.simulation.load_mitigation(new_map), new_map)
-        self.assertEqual(old_map, self.simulation.fire_map)
+        self.assertWarns(Warning, self.simulation.load_mitigation, new_map)
+        self.assertTrue(np.array_equal(old_map, self.simulation.fire_map))
 
         new_map[0][0] = 3
+        self.simulation.load_mitigation(new_map)
 
-        self.assertEqual(new_map, self.simulation.fire_map)
+        self.assertTrue(np.array_equal(new_map, self.simulation.fire_map))

@@ -326,12 +326,14 @@ class RothermelSimulation(Simulation):
         category_values = [status.value for status in BurnStatus]
 
         if np.isin(mitigation_map, category_values).all():
-            log.warning('You are overwriting the current fire map with the given '
-                        'mitigation map - the current fire map data will be erased.')
+            message = 'You are overwriting the current fire map with the given '\
+                'mitigation map - the current fire map data will be erased.'
             self.fire_map = mitigation_map
         else:
-            log.warning(f'Invalid values in {mitigation_map} - values need to be '
-                        f'within {category_values}... Skipping')
+            message = f'Invalid values in {mitigation_map} - values need to be '\
+                f'within {category_values}... Skipping'
+
+        warnings.warn(message)
 
     def update_mitigation(self, points: Iterable[Tuple[int, int, int]]) -> None:
         '''

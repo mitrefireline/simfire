@@ -109,6 +109,16 @@ class Simulation(ABC):
         '''
         pass
 
+    @abstractmethod
+    def get_disaster_categories(self) -> Dict[str, int]:
+        '''
+        Returns all possible categories that a location in the map can be in.
+
+        Returns:
+            A dictionary of enum name to enum value.
+        '''
+        pass
+
 
 class RothermelSimulation(Simulation):
     def __init__(self, config: Config) -> None:
@@ -203,6 +213,15 @@ class RothermelSimulation(Simulation):
             'scratchline': BurnStatus.SCRATCHLINE,
             'wetline': BurnStatus.WETLINE
         }
+
+    def get_disaster_categories(self) -> Dict[str, int]:
+        '''
+        Returns all possible categories that a location in the map can be in.
+
+        Returns:
+             A dictionary of enum name to enum value.
+        '''
+        return {i.name: i.value for i in BurnStatus}
 
     def get_attribute_bounds(self) -> Dict[str, object]:
         '''

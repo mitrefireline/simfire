@@ -229,3 +229,16 @@ class RothermelSimulationTest(unittest.TestCase):
         # Test that we output a log warning
         layer_types = {'asdf': 'functional', 'qwer': 'functional'}
         self.assertWarns(Warning, self.simulation.set_layer_types, layer_types)
+
+    def test_load_mitigation(self) -> None:
+        old_map = np.copy(self.simulation.fire_map)
+
+        new_map = np.zeros((9, 9))
+        new_map[0][0] = 10
+
+        self.assertWarns(Warning, self.simulation.load_mitigation(new_map), new_map)
+        self.assertEqual(old_map, self.simulation.fire_map)
+
+        new_map[0][0] = 3
+
+        self.assertEqual(new_map, self.simulation.fire_map)

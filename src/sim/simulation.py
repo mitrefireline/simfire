@@ -109,6 +109,27 @@ class Simulation(ABC):
         '''
         pass
 
+    @abstractmethod
+    def update_mitigation(self, points: Iterable[Tuple[int, int, int]]) -> None:
+        '''
+        Update the `self.fire_map` with new mitigation points
+
+        Arguments:
+            points: A list of `(x, y, mitigation)` tuples. These will be added to
+                   `self.fire_map`.
+        '''
+        pass
+
+    @abstractmethod
+    def load_mitigation(self, mitigation_map: np.ndarray) -> None:
+        '''
+        Set the 'self.fire_map' to the new mitigation map
+
+        Arguments:
+            mitigation_map: A numpy array of mitigations to be set as 'self.fire_map'
+        '''
+        pass
+
 
 class RothermelSimulation(Simulation):
     def __init__(self, config: Config) -> None:
@@ -294,6 +315,23 @@ class RothermelSimulation(Simulation):
             pos, (self.config.area.screen_size, self.config.area.screen_size))
 
         return position
+
+    def load_mitigation(self, mitigation_map: np.ndarray) -> None:
+        '''
+        Set the 'self.fire_map' to the new mitigation map
+
+        Arguments:
+            mitigation_map: A numpy array of mitigations to be set as 'self.fire_map'
+        '''
+        category_values = [status.value for status in BurnStatus]
+
+        if np.isin(mitigation_map, category_values).all():
+            log.warning('You are overwriting the current fire map with the given '
+                        'mitigation map - the current fire map data will be erased.')
+            self.fire_map = mitigation_map
+        else:
+            log.warning(f'Invalid values in {mitigation_map} - values need to be '
+                        f'within {category_values}... Skipping')
 
     def update_mitigation(self, points: Iterable[Tuple[int, int, int]]) -> None:
         '''

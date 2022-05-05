@@ -368,12 +368,15 @@ class RothermelSimulation(Simulation):
 
     def _create_fire_map(self) -> None:
         '''
-        Resets the `self.fire_map` attribute to entirely `BurnStatus.UNBURNED` and
-        reinstantiates the `FireManager`
+        Resets the `self.fire_map` attribute to entirely `BurnStatus.UNBURNED`,
+        except for self.config.fire.fire_initial_position, which is set to
+        `BurnStatus.BURNING`.
         '''
         self.fire_map = np.full(
             (self.config.area.screen_size, self.config.area.screen_size),
             BurnStatus.UNBURNED)
+        x, y = self.config.fire.fire_initial_position
+        self.fire_map[y, x] = BurnStatus.BURNING
 
     def get_seeds(self) -> Dict[str, Optional[int]]:
         '''

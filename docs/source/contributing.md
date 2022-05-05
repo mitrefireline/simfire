@@ -56,7 +56,7 @@ pre-commit run --all-files
 There are also unit tests that need to be passed, and to make sure you are passing those locally (before pushing to your remote branch and running the pipeline) you can run the following command in the root directory:
 
 ```shell
-python -m unittests discover -s src -t .. -p "test_*.py"
+python -m unittest discover -s src -t .. -p "test_*.py"
 ```
 
 This will search for all `test_*.py` files and run the tests held in those files.

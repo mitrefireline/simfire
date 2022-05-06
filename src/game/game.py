@@ -1,9 +1,10 @@
 import math
 from importlib import resources
-from typing import Optional, Sequence, Tuple
+from typing import List, Optional, Sequence, Tuple
 
 import numpy as np
 import pygame
+from PIL import Image
 
 from ..enums import BurnStatus, GameStatus
 from ..utils.units import mph_to_ftpm
@@ -21,6 +22,7 @@ class Game:
         self,
         screen_size: Tuple[int, int],
         headless: bool = False,
+        record: bool = False,
         show_wind_magnitude: bool = False,
         show_wind_direction: bool = False,
         mw_speed_min: float = 0.0,
@@ -34,19 +36,26 @@ class Game:
         Arguments:
             screen_size: The (n,n) size of the game screen/display in pixels.
             headless: Flag to run in a headless state.
+            record: Flag to save a recording of the simulation game screen
         """
+        if record and headless:
+            raise ValueError(
+                "The game cannot be recorded with headless=True. "
+                "Got record=True and headless=True"
+            )
         self.screen_size = screen_size
+        self.headless = headless
+        self.record = record
         self.show_wind_magnitude = show_wind_magnitude
         self.show_wind_direction = show_wind_direction
         self.mw_speed_min = mw_speed_min
         self.mw_speed_max = mw_speed_max
         self.dw_deg_min = dw_deg_min
         self.dw_deg_max = dw_deg_max
+        # Map to track which pixels are on fire or have burned
+        self.fire_map = np.full(screen_size, BurnStatus.UNBURNED)
 
-        self.headless = headless
-
-        self.background: Optional[pygame.surface.Surface]
-
+        self.background: Optional[pygame.surface.Surface] = None
         if not self.headless:
             pygame.init()
             self.screen = pygame.display.set_mode(screen_size)
@@ -58,11 +67,10 @@ class Game:
             self.background = pygame.Surface(self.screen.get_size())
             self.background = self.background.convert()
             self.background.fill((0, 0, 0))
-        else:
-            self.background = None
 
-        # Map to track which pixels are on fire or have burned
-        self.fire_map = np.full(screen_size, BurnStatus.UNBURNED)
+        self.frames: Optional[List[Image.Image]] = None
+        if self.record:
+            self.frames = []
 
     def _toggle_wind_magnitude_display(self):
         """
@@ -312,6 +320,11 @@ class Game:
                 fire_sprites_group.update()
                 terrain.update(self.fire_map)
                 all_sprites.draw(self.screen)
+
+                if self.record and self.frames is not None:
+                    screen_bytes = pygame.image.tostring(self.screen, "RGB")
+                    screen_im = Image.frombuffer("RGB", self.screen_size, screen_bytes)
+                    self.frames.append(screen_im)
 
                 if self.show_wind_magnitude is True:
                     wind_mag_surf = self._get_wind_mag_surf(wind_magnitude_map)

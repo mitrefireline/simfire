@@ -336,6 +336,7 @@ class RothermelSimulation(Simulation):
                 f"within {category_values}... Skipping"
             )
 
+        warnings.warn(message)
         log.warning(message)
 
     def update_mitigation(self, points: Iterable[Tuple[int, int, int]]) -> None:

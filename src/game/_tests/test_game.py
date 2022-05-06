@@ -323,9 +323,9 @@ class TestRecordingGame(unittest.TestCase):
                               np.ndarray,
                               msg='The returned frame should be a numpy array, '
                               f'but got {type(frames[0])}')
-        frame_shape = frames[0].shape
-        valid_shape = self.screen_size + (3, )
-        self.assertEqual(frame_shape,
+        frame_size = frames[0].size
+        valid_shape = self.screen_size
+        self.assertEqual(frame_size,
                          valid_shape,
                          msg=f'The returned frame should have shape {valid_shape}, '
-                         f'but has shape {frame_shape}')
+                         f'but has shape {frame_size}')

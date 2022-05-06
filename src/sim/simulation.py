@@ -112,12 +112,12 @@ class Simulation(ABC):
 
     @abstractmethod
     def get_disaster_categories(self) -> Dict[str, int]:
-        '''
+        """
         Returns all possible categories that a location in the map can be in.
 
         Returns:
             A dictionary of enum name to enum value.
-        '''
+        """
         pass
 
 
@@ -225,12 +225,12 @@ class RothermelSimulation(Simulation):
         }
 
     def get_disaster_categories(self) -> Dict[str, int]:
-        '''
+        """
         Returns all possible categories that a location in the map can be in.
 
         Returns:
              A dictionary of enum name to enum value.
-        '''
+        """
         return {i.name: i.value for i in BurnStatus}
 
     def get_attribute_bounds(self) -> Dict[str, object]:

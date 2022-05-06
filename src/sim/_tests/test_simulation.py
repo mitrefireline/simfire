@@ -246,9 +246,9 @@ class RothermelSimulationTest(unittest.TestCase):
         self.assertWarns(Warning, self.simulation.set_layer_types, layer_types)
 
     def test_get_disaster_categories(self) -> None:
-        '''
+        """
         Test getting all possible categories a pixel can be
-        '''
+        """
         categories = self.simulation.get_disaster_categories()
         self.assertEqual(list(categories.keys()), list(BurnStatus.__members__))
         self.assertEqual(list(categories.values()), [e.value for e in BurnStatus])

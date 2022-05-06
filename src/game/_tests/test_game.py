@@ -2,7 +2,7 @@ import os
 import unittest
 from multiprocessing import get_context
 
-import numpy as np
+from PIL import Image
 
 from ...enums import GameStatus
 from ...utils.config import Config
@@ -320,7 +320,7 @@ class TestRecordingGame(unittest.TestCase):
                          1,
                          msg=f'There should be 1 frame recorded, but got {len(frames)}')
         self.assertIsInstance(frames[0],
-                              np.ndarray,
+                              Image.Image,
                               msg='The returned frame should be a numpy array, '
                               f'but got {type(frames[0])}')
         frame_size = frames[0].size

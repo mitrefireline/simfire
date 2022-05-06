@@ -8,8 +8,14 @@ from ..presets import Chaparral, TallGrass
 from ..rothermel import compute_rate_of_spread
 
 KNOWN_ROTHERMEL_OUTPUT = [
-    1087.6328125, 1087.6328125, 1087.6328125, 1087.6328125, 391.637451171875,
-    391.637451171875, 391.637451171875, 391.637451171875
+    1087.6328125,
+    1087.6328125,
+    1087.6328125,
+    1087.6328125,
+    391.637451171875,
+    391.637451171875,
+    391.637451171875,
+    391.637451171875,
 ]
 
 
@@ -46,7 +52,7 @@ class TestRothermel(unittest.TestCase):
         elevations = el_fn(X, Y).astype(np.float32)
 
         grad_x, grad_y = np.gradient(elevations)
-        slope_mag = (grad_x**2 + grad_y**2)**0.5
+        slope_mag = (grad_x**2 + grad_y**2) ** 0.5
         slope_mag = slope_mag[new_loc_y, new_loc_x]
         slope_dir = np.tan(grad_y / (grad_x + 1e-6))
         slope_dir = slope_dir[new_loc_y, new_loc_x]
@@ -71,7 +77,23 @@ class TestRothermel(unittest.TestCase):
         U = np.array(U, dtype=np.float32)
         U_dir = np.array(U_dir, dtype=np.float32)
 
-        R = compute_rate_of_spread(loc_x, loc_y, new_loc_x, new_loc_y, w_0, delta, M_x,
-                                   sigma, h, S_T, S_e, p_p, M_f, U, U_dir, slope_mag,
-                                   slope_dir)
+        R = compute_rate_of_spread(
+            loc_x,
+            loc_y,
+            new_loc_x,
+            new_loc_y,
+            w_0,
+            delta,
+            M_x,
+            sigma,
+            h,
+            S_T,
+            S_e,
+            p_p,
+            M_f,
+            U,
+            U_dir,
+            slope_mag,
+            slope_dir,
+        )
         self.assertListEqual(R.tolist(), KNOWN_ROTHERMEL_OUTPUT)

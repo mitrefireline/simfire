@@ -6,7 +6,7 @@ import numpy as np
 
 @dataclass
 class FuelParticle:
-    '''
+    """
     Set default values here since the paper assumes they're constant. These
     could be changed, but for now it's easier to assume they're constant.
 
@@ -15,7 +15,8 @@ class FuelParticle:
         S_T: Total mineral conetent.
         S_e: Effective mineral content.
         p_p: Oven-dry particle density (lb/fg^3)
-    '''
+    """
+
     # Low Heat Content (BTU/lb)
     h: float = 8000
     # Total Mineral Content
@@ -28,7 +29,7 @@ class FuelParticle:
 
 @dataclass
 class Fuel:
-    '''
+    """
     Class that describes the parameters of a fuel type
 
     Parameters:
@@ -36,7 +37,8 @@ class Fuel:
         delta: Fuel bed depth (ft).
         M_x: Dead fuel moisture of extinction.
         sigma: Surface-area-to-volume ratio (ft^2/ft^3).
-    '''
+    """
+
     # Oven-dry Fuel Load (lb/ft^2)
     w_0: float
     # Fuel bed depth (ft)
@@ -49,7 +51,7 @@ class Fuel:
 
 @dataclass
 class Environment:
-    '''
+    """
     These parameters relate to the environment of the tile. For now we'll
     assume these values are constant over a small area.
     The wind speed and direction can be a constant value, nested sequences,
@@ -62,7 +64,8 @@ class Environment:
         U: Wind speed at midflame height (ft/min).
         U_dir: Wind direction at midflame height (degrees). 0 is North, 90 is East, 180
                is South, 270 is West.
-    '''
+    """
+
     # Fuel Moisture (amount of water in fuel/vegetation)
     # 1-3% for SoCal, usually never more than 8% for SoCal
     M_f: float

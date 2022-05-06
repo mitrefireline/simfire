@@ -19,15 +19,17 @@ flake8:
     - docker
   script:
     - flake8 .
+  needs: []
   only:
     - merge_requests
 
-yapf:
+black:
   stage: Static Analysis
   tags:
     - docker
   script:
-    - if [ `yapf -r ./ -d | wc -l` -gt 0 ] ; then false ; else true ;fi
+    - black --check ./
+  needs: []
   only:
     - merge_requests
 
@@ -37,6 +39,7 @@ mypy:
     - docker
   script:
     - mypy --config-file .mypy.ini .
+  needs: []
   only:
     - merge_requests
 
@@ -46,6 +49,7 @@ isort:
     - docker
   script:
     - isort --check --trailing-comma -m=3 .
+  needs: []
   only:
     - merge_requests
 

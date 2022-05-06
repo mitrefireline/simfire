@@ -1,7 +1,0 @@
-- id: yapf
-  name: yapf
-  description: "A formatter for Python files."
-  entry: yapf
-  args: [-i] #inplace
-  language: python
-  types: [python]

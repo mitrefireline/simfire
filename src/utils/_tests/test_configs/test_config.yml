@@ -12,6 +12,7 @@ simulation:
   update_rate: 1
   runtime: 24h
   headless: true
+  record: false
 
 mitigation:
   ros_attenuation: true

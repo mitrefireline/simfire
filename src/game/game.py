@@ -12,32 +12,37 @@ from .image import load_image
 from .sprites import Fire, FireLine, Terrain
 
 
-class Game():
-    '''
+class Game:
+    """
     Class that controls the game. This class will initalize the game and allow for
     terrain, fire, and other sprites to be rendered and interact.
-    '''
-    def __init__(self,
-                 screen_size: Tuple[int, int],
-                 headless: bool = False,
-                 record: bool = False,
-                 show_wind_magnitude: bool = False,
-                 show_wind_direction: bool = False,
-                 mw_speed_min: float = 0.0,
-                 mw_speed_max: float = mph_to_ftpm(150.0),
-                 dw_deg_min: float = 0.0,
-                 dw_deg_max: float = 360.0) -> None:
-        '''
+    """
+
+    def __init__(
+        self,
+        screen_size: Tuple[int, int],
+        headless: bool = False,
+        record: bool = False,
+        show_wind_magnitude: bool = False,
+        show_wind_direction: bool = False,
+        mw_speed_min: float = 0.0,
+        mw_speed_max: float = mph_to_ftpm(150.0),
+        dw_deg_min: float = 0.0,
+        dw_deg_max: float = 360.0,
+    ) -> None:
+        """
         Initalize the class by creating the game display and background.
 
         Arguments:
             screen_size: The (n,n) size of the game screen/display in pixels.
             headless: Flag to run in a headless state.
             record: Flag to save a recording of the simulation game screen
-        '''
+        """
         if record and headless:
-            raise ValueError('The game cannot be recorded with headless=True. '
-                             'Got record=True and headless=True')
+            raise ValueError(
+                "The game cannot be recorded with headless=True. "
+                "Got record=True and headless=True"
+            )
         self.screen_size = screen_size
         self.headless = headless
         self.record = record
@@ -54,8 +59,8 @@ class Game():
         if not self.headless:
             pygame.init()
             self.screen = pygame.display.set_mode(screen_size)
-            pygame.display.set_caption('Rothermel 2D Simulator')
-            with resources.path('assets.icons', 'fireline_logo.png') as path:
+            pygame.display.set_caption("Rothermel 2D Simulator")
+            with resources.path("assets.icons", "fireline_logo.png") as path:
                 fireline_logo_path = path
             pygame.display.set_icon(load_image(str(fireline_logo_path)))
 
@@ -68,41 +73,41 @@ class Game():
             self.frames = []
 
     def _toggle_wind_magnitude_display(self):
-        '''
+        """
         Toggle display of wind MAGNITUDE over the main screen.
-        '''
+        """
         self.show_wind_magnitude = not self.show_wind_magnitude
         if self.show_wind_magnitude is False:
-            print('Wind Magnitude OFF')
+            print("Wind Magnitude OFF")
         else:
-            print('Wind Magnitude ON')
+            print("Wind Magnitude ON")
         return
 
     def _toggle_wind_direction_display(self):
-        '''
+        """
         Toggle display of wind DIRECTION over the main screen.
-        '''
+        """
         self.show_wind_direction = not self.show_wind_direction
         if self.show_wind_direction is False:
-            print('Wind Direction OFF')
+            print("Wind Direction OFF")
         else:
-            print('Wind Direction ON')
+            print("Wind Direction ON")
         return
 
     def _disable_wind_magnitude_display(self):
-        '''
+        """
         Toggle display of wind DIRECTION over the main screen.
-        '''
+        """
         self.show_wind_magnitude = False
 
     def _disable_wind_direction_display(self):
-        '''
+        """
         Toggle display of wind DIRECTION over the main screen.
-        '''
+        """
         self.show_wind_direction = False
 
     def _get_wind_direction_color(self, direction: float) -> Tuple[int, int, int]:
-        '''
+        """
         Get the color and intensity representing direction based on wind direction.
 
         0/360: Black, 90: Red, 180: White, Blue: 270
@@ -113,7 +118,7 @@ class Game():
             direction: Float value of the angle 0-360.
             ws_min: Minimum wind speed.
             ws_max: Maximum wind speed.
-        '''
+        """
         north_min = 0.0
         north_max = 360.0
         east = 90.0
@@ -124,72 +129,72 @@ class Game():
 
         # North to East, Red to Green
         if direction >= north_min and direction < east:
-            angleRange = (east - north_min)
+            angleRange = east - north_min
 
             # Red
             redMin = 255.0
             redMax = 128.0
-            redRange = (redMax - redMin)  # 255 - 128 red range from north to east
+            redRange = redMax - redMin  # 255 - 128 red range from north to east
             red = (((direction - north_min) * redRange) / angleRange) + redMin
 
             # Green
             greenMin = 0.0
             greenMax = 255.0
-            greenRange = (greenMax - greenMin)  # 0 - 255 red range from north to east
+            greenRange = greenMax - greenMin  # 0 - 255 red range from north to east
             green = (((direction - north_min) * greenRange) / angleRange) + greenMin
 
             colorRGB = (red, green, 0.0)
 
         # East to South, Green to Teal
         if direction >= east and direction < south:
-            angleRange = (south - east)
+            angleRange = south - east
 
             # Red
             redMin = 128.0
             redMax = 0.0
-            redRange = (redMax - redMin)  # 128 - 0 red range from east to south
+            redRange = redMax - redMin  # 128 - 0 red range from east to south
             red = (((direction - east) * redRange) / angleRange) + redMin
 
             # Blue
             blueMin = 0
             blueMax = 255
-            blueRange = (blueMax - blueMin)  # 0 - 255 blue range from east to south
+            blueRange = blueMax - blueMin  # 0 - 255 blue range from east to south
             blue = (((direction - east) * blueRange) / angleRange) + blueMin
 
             colorRGB = (red, 255, blue)
 
         # South to West, Teal to Purple
         if direction >= south and direction < west:
-            angleRange = (west - south)
+            angleRange = west - south
 
             # Red
             redMin = 0
             redMax = 128
-            redRange = (redMax - redMin)  # 0 - 128 red range from south to west
+            redRange = redMax - redMin  # 0 - 128 red range from south to west
             red = (((direction - south) * redRange) / angleRange) + redMin
 
             # Green
             greenMin = 255
             greenMax = 0
-            greenRange = (greenMax - greenMin)  # 0 - 255 green range from south to west
+            greenRange = greenMax - greenMin  # 0 - 255 green range from south to west
             green = (((direction - south) * greenRange) / angleRange) + greenMin
 
             colorRGB = (red, green, 255)
 
         # West to North, Purple to Red
         if direction <= north_max and direction >= west:
-            angleRange = (north_max - west)
+            angleRange = north_max - west
 
             # Red
             redMin = 128.0
             redMax = 255.0
-            redRange = (redMax - redMin)  # 128 - 255 red range from east to south
+            redRange = redMax - redMin  # 128 - 255 red range from east to south
             red = (((direction - west) * redRange) / angleRange) + redMin
 
             # Blue
             blueMin = 0
             blueMax = 255
-            blueRange = (blueMax - blueMin)  # 0 - 255 blue range from east to south
+            blueRange = blueMax - blueMin  # 0 - 255 blue range from east to south
             blue = (((direction - west) * blueRange) / angleRange) + blueMin
 
             colorRGB = (red, 0, blue)
@@ -201,9 +206,10 @@ class Game():
         )
         return floorColorRGB
 
-    def _get_wind_mag_surf(self, wind_magnitude_map: Sequence[Sequence[float]]) -> \
-            pygame.surface.Surface:
-        '''
+    def _get_wind_mag_surf(
+        self, wind_magnitude_map: Sequence[Sequence[float]]
+    ) -> pygame.surface.Surface:
+        """
         Compute the wind magnitude surface for display.
 
         Arguments:
@@ -212,10 +218,10 @@ class Game():
 
         Returns:
             The PyGame Surface for the wind magnitude
-        '''
+        """
         w_max = np.amax(wind_magnitude_map)
         w_min = np.amin(wind_magnitude_map)
-        wind_speed_range = (w_max - w_min)
+        wind_speed_range = w_max - w_min
         # Constant value wind at all locations. Set everything to middle value
         if wind_speed_range == 0:
             color_arr = np.full(self.screen.get_size(), 127, dtype=np.uint8)
@@ -225,14 +231,15 @@ class Game():
             for y_idx, y in enumerate(wind_magnitude_map):
                 for x_idx, x in enumerate(y):
                     w_mag = x
-                    gradient = (255 - 0)
+                    gradient = 255 - 0
                     color_mag = int(((w_mag - w_min) * gradient) / (wind_speed_range) + 0)
                     wind_mag_surf.set_at((x_idx, y_idx), pygame.Color(0, color_mag, 0))
         return wind_mag_surf
 
-    def _get_wind_dir_surf(self, wind_direction_map: Sequence[Sequence[float]]) -> \
-            pygame.Surface:
-        '''
+    def _get_wind_dir_surf(
+        self, wind_direction_map: Sequence[Sequence[float]]
+    ) -> pygame.Surface:
+        """
         Compute the wind direction surface for display.
 
         Arguments:
@@ -241,7 +248,7 @@ class Game():
 
         Returns:
             The PyGame Surface for the wind direction
-        '''
+        """
         wind_dir_surf = pygame.Surface(self.screen.get_size())
         for y_idx, y in enumerate(wind_direction_map):
             for x_idx, x in enumerate(y):
@@ -252,11 +259,15 @@ class Game():
 
         return wind_dir_surf
 
-    def update(self, terrain: Terrain, fire_sprites: Sequence[Fire],
-               fireline_sprites: Sequence[FireLine],
-               wind_magnitude_map: Sequence[Sequence[float]],
-               wind_direction_map: Sequence[Sequence[float]]) -> GameStatus:
-        '''
+    def update(
+        self,
+        terrain: Terrain,
+        fire_sprites: Sequence[Fire],
+        fireline_sprites: Sequence[FireLine],
+        wind_magnitude_map: Sequence[Sequence[float]],
+        wind_direction_map: Sequence[Sequence[float]],
+    ) -> GameStatus:
+        """
         Update the game display using the provided terrain, sprites, and
         environment data. Most of the logic for the game is handled within
         each sprite/manager, so this is mostly just calls to update everything.
@@ -269,7 +280,7 @@ class Game():
                                 location
             wind_direction_map: The map/array containing wind directions at each pixel
                                 location
-        '''
+        """
         status = GameStatus.RUNNING
 
         # Convert the sequences to list for list addition later
@@ -294,8 +305,9 @@ class Game():
                         self._toggle_wind_direction_display()
 
         # Create a layered group so that the fire appears on top
-        fire_sprites_group = pygame.sprite.LayeredUpdates(*(fire_sprites +
-                                                            fireline_sprites))
+        fire_sprites_group = pygame.sprite.LayeredUpdates(
+            *(fire_sprites + fireline_sprites)
+        )
         all_sprites = pygame.sprite.LayeredUpdates(*fire_sprites_group, terrain)
 
         # Update and draw the sprites
@@ -310,8 +322,8 @@ class Game():
                 all_sprites.draw(self.screen)
 
                 if self.record and self.frames is not None:
-                    screen_bytes = pygame.image.tostring(self.screen, 'RGB')
-                    screen_im = Image.frombuffer('RGB', self.screen_size, screen_bytes)
+                    screen_bytes = pygame.image.tostring(self.screen, "RGB")
+                    screen_im = Image.frombuffer("RGB", self.screen_size, screen_bytes)
                     self.frames.append(screen_im)
 
                 if self.show_wind_magnitude is True:

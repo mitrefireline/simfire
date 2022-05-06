@@ -8,7 +8,7 @@ import numpy as np
 import yaml  # type: ignore
 from yaml.parser import ParserError  # type: ignore
 
-from ..world.elevation_functions import PerlinNoise2D, flat, gaussian
+from ..world.elevation_functions import flat, gaussian, perlin
 from ..world.fuel_array_functions import chaparral_fn
 from ..world.wind_mechanics.wind_controller import WindController
 from .layers import (
@@ -335,16 +335,7 @@ class Config:
             if "seed" in kwargs and not init:
                 kwargs["seed"] = seed
             if fn_name == "perlin":
-                new_kwargs = deepcopy(kwargs)
-                new_kwargs["shape"] = (
-                    self.yaml_data["area"]["screen_size"],
-                    self.yaml_data["area"]["screen_size"],
-                )
-                # Convert the input from string `(x, y)` to tuple of ints (x, y)
-                if isinstance(nk := new_kwargs["resolution"], str):
-                    new_kwargs["resolution"] = tuple(map(int, nk[1:-1].split(",")))
-                noise = PerlinNoise2D(**new_kwargs)
-                fn = noise.get_fn()
+                fn = perlin(**kwargs)
             elif fn_name == "gaussian":
                 fn = gaussian(**kwargs)
             elif fn_name == "flat":

@@ -1,7 +1,6 @@
 import os
 from pathlib import Path
 
-import cv2
 import numpy as np
 from skimage.draw import line
 
@@ -80,14 +79,8 @@ def main():
         game.fire_map = fire_map
 
     if cfg.simulation.record:
-        out_path = os.curdir + '/recording.mp4'
-        frame_size = game.frames[0].shape
-        fourcc = cv2.VideoWriter_fourcc(*'MP4V')
-        writer = cv2.VideoWriter(out_path, fourcc, 30, frame_size[:2])
-        for frame in game.frames:
-            # Index with [...,::-1] to convert from RGB to BGR for OpenCV
-            writer.write(frame[..., ::-1])
-        writer.release()
+        out_path = os.curdir + '/simulation.gif'
+        game.frames[0].save(out_path, save_all=True, duration=100, loop=0)
 
     fig = fire_manager.draw_spread_graph(game.screen)
     if cfg.simulation.headless:

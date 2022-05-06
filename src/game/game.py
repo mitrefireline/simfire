@@ -4,6 +4,7 @@ from typing import List, Optional, Sequence, Tuple
 
 import numpy as np
 import pygame
+from PIL import Image
 
 from ..enums import BurnStatus, GameStatus
 from ..utils.units import mph_to_ftpm
@@ -62,7 +63,7 @@ class Game():
             self.background = self.background.convert()
             self.background.fill((0, 0, 0))
 
-        self.frames: Optional[List[np.ndarray]] = None
+        self.frames: Optional[List[Image.Image]] = None
         if self.record:
             self.frames = []
 
@@ -310,9 +311,8 @@ class Game():
 
                 if self.record and self.frames is not None:
                     screen_bytes = pygame.image.tostring(self.screen, 'RGB')
-                    screen_arr = np.frombuffer(screen_bytes, dtype=np.uint8)
-                    screen_arr = screen_arr.reshape(self.screen_size + (3, ))
-                    self.frames.append(screen_arr)
+                    screen_im = Image.frombuffer('RGB', self.screen_size, screen_bytes)
+                    self.frames.append(screen_im)
 
                 if self.show_wind_magnitude is True:
                     wind_mag_surf = self._get_wind_mag_surf(wind_magnitude_map)

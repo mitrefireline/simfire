@@ -5,7 +5,7 @@ Contributing to the Rothermel Fire Modeling codebase ([GitLab](https://gitlab.mi
 **Some guidlines**:
   1. Nobody can commit directly to `master`.
   2. You must create a merge request in order to publish changes to `master`.
-  3. Before merging, all stages of the GitLab CI pipeline must pass. This includes linting with [`flake8`](https://flake8.pycqa.org/en/latest/) ([config](https://gitlab.mitre.org/fireline/rothermel-modeling/-/blob/master/.flake8)), code-formatting with [`yapf`](https://github.com/google/yapf) ([config](https://gitlab.mitre.org/fireline/rothermel-modeling/-/blob/master/.style.yapf)), passing the Python unit tests, and creating the documentation.
+  3. Before merging, all stages of the GitLab CI pipeline must pass. This includes linting with [`flake8`](https://flake8.pycqa.org/en/latest/) ([config](https://gitlab.mitre.org/fireline/rothermel-modeling/-/blob/master/.flake8)), code-formatting with [`black`](https://github.com/psf/black) ([config](https://gitlab.mitre.org/fireline/rothermel-modeling/-/blob/master/pyproject.toml)), passing the Python unit tests, and creating the documentation.
   4. Once all pipeline stages have passed, then the branch can be merged into master.
   5. These pipeline stages can be tested locally to ensure that they are passed on the remote side (explained in [Using Pre-commit](#using-pre-commit))
 
@@ -43,7 +43,7 @@ pip install pre-commit
 pre-commit install
 ```
 
-Now, every time you try to commit, your code that you have staged will be linted by `flake8` and auto-formatted by `yapf`. If the linting doesn’t pass pre-commit, it will tell you, and you’ll have to make those changes before committing those files. If `yapf` autoformats your code during pre-commit, you can view those changes and then you’ll have to stage them. Then you can commit and push.
+Now, every time you try to commit, your code that you have staged will be linted by `flake8` and auto-formatted by `black`. If the linting doesn’t pass pre-commit, it will tell you, and you’ll have to make those changes before committing those files. If `black` autoformats your code during pre-commit, you can view those changes and then you’ll have to stage them. Then you can commit and push.
 
 Pre-commit can also be run manually on all files without having to commit.
 
@@ -56,7 +56,7 @@ pre-commit run --all-files
 There are also unit tests that need to be passed, and to make sure you are passing those locally (before pushing to your remote branch and running the pipeline) you can run the following command in the root directory:
 
 ```shell
-python -m unittests discover -s src -t .. -p "test_*.py"
+python -m unittest discover -s src -t .. -p "test_*.py"
 ```
 
 This will search for all `test_*.py` files and run the tests held in those files.

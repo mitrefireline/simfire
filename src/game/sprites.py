@@ -12,18 +12,21 @@ from ..utils.layers import FuelLayer, TopographyLayer
 
 
 class Terrain(pygame.sprite.Sprite):
-    '''
+    """
     Use a TopographyLayer and a FuelLayer to make terrain. This sprite is just the
     entire background that the fire appears on. This sprite changes the color of each
     terrain pixel based on its "dryness/flammability" if it is unburned, or based on
     whether the pixel is a fireline or burned.
-    '''
-    def __init__(self,
-                 fuel_layer: FuelLayer,
-                 topo_layer: TopographyLayer,
-                 screen_size: Tuple[int, int],
-                 headless: bool = False) -> None:
-        '''
+    """
+
+    def __init__(
+        self,
+        fuel_layer: FuelLayer,
+        topo_layer: TopographyLayer,
+        screen_size: Tuple[int, int],
+        headless: bool = False,
+    ) -> None:
+        """
         Initialize the class by loading the tile textures and stitching
         together the whole terrain image.
 
@@ -36,7 +39,7 @@ class Terrain(pygame.sprite.Sprite):
             headless: Flag to run in a headless state. This will allow PyGame objects to
                       not be initialized.
 
-        '''
+        """
         super().__init__()
 
         self.fuel_layer = fuel_layer
@@ -66,7 +69,7 @@ class Terrain(pygame.sprite.Sprite):
         self.layer = SpriteLayer.TERRAIN
 
     def update(self, *args: Any, **kwargs: Any) -> None:
-        '''
+        """
         Change any burned squares to brown using fire_map, which
         contains pixel-wise values for tile burn status.
         The parent class update() expects just args and kwargs, so we
@@ -77,28 +80,35 @@ class Terrain(pygame.sprite.Sprite):
                       burning, and burned tile status for the game screen
 
         Returns: None
-        '''
+        """
         # Argument checks for compatibility
         if len(args) == 0 or len(args) > 1:
-            raise ValueError('The input arguments to update() should contain'
-                             'only one value for the fire_map. Instead got: '
-                             f'{args}')
+            raise ValueError(
+                "The input arguments to update() should contain"
+                "only one value for the fire_map. Instead got: "
+                f"{args}"
+            )
         if len(kwargs) > 0:
-            raise ValueError('The input keyword arguments to update() should '
-                             f'contain no values. Instead got: {kwargs}')
+            raise ValueError(
+                "The input keyword arguments to update() should "
+                f"contain no values. Instead got: {kwargs}"
+            )
         if not isinstance(args[0], np.ndarray):
-            raise TypeError('The input fire_map should be a numpy array. '
-                            f'Instead got: {args[0]}')
+            raise TypeError(
+                "The input fire_map should be a numpy array. " f"Instead got: {args[0]}"
+            )
 
         fire_map: np.ndarray = args[0]
         if fire_map.shape != self.screen_size:
-            raise ValueError(f'The shape of the fire_map {fire_map.shape} does '
-                             f'not match the shape of the screen {self.screen_size}')
+            raise ValueError(
+                f"The shape of the fire_map {fire_map.shape} does "
+                f"not match the shape of the screen {self.screen_size}"
+            )
         fire_map = fire_map.copy()
         self._update(fire_map)
 
     def _update(self, fire_map: np.ndarray) -> None:
-        '''
+        """
         Internal method to update the burned squares to brown. This will update
         self.image in-place.
         This is needed because the parent class Sprite.update() only take in
@@ -108,7 +118,7 @@ class Terrain(pygame.sprite.Sprite):
         Arguments:
             fire_map: A 2-D numpy array containing enumerated values for unburned,
                       burning, and burned tile status for the game screen
-        '''
+        """
         burned_idxs = np.where(fire_map == BurnStatus.BURNED)
         if not self.headless:
             # This method will update self.image in-place with arr
@@ -117,7 +127,7 @@ class Terrain(pygame.sprite.Sprite):
             arr[burned_idxs[::-1]] = BURNED_RGB_COLOR
 
     def _make_terrain_image(self) -> np.ndarray:
-        '''
+        """
         Use the FuelLayer image and TopographyLayer contours to create the
         terrain background image. This will show the FuelLayer as the landscape/overhead
         view, with the contour lines overlaid on top.
@@ -127,28 +137,30 @@ class Terrain(pygame.sprite.Sprite):
 
         Returns:
             out_image: The input image with the contour lines drawn on it
-        '''
+        """
         image = self.fuel_layer.image.squeeze()
         # Create a figure with axes
         fig, ax = plt.subplots()
         # The fmt argument will display the levels as whole numbers (otherwise
         # the decimal points look messy)
-        contours = ax.contour(self.topo_layer.data.squeeze(),
-                              origin='upper',
-                              colors='black')
-        ax.clabel(contours,
-                  contours.levels,
-                  inline=True,
-                  fmt=lambda x: f'{x:.0f}',
-                  fontsize='large')
+        contours = ax.contour(
+            self.topo_layer.data.squeeze(), origin="upper", colors="black"
+        )
+        ax.clabel(
+            contours,
+            contours.levels,
+            inline=True,
+            fmt=lambda x: f"{x:.0f}",
+            fontsize="large",
+        )
         ax.imshow(image.astype(np.uint8))
-        plt.axis('off')
+        plt.axis("off")
 
         # Save the figure as a vector graphic to get just the image (no axes,
         # ticks, figure edges, etc.)
         # Then load it, resize, and convert to numpy
-        with tempfile.NamedTemporaryFile(suffix='.svg') as out_img_path:
-            fig.savefig(out_img_path.name, bbox_inches='tight', pad_inches=0)
+        with tempfile.NamedTemporaryFile(suffix=".svg") as out_img_path:
+            fig.savefig(out_img_path.name, bbox_inches="tight", pad_inches=0)
             drawing = svg2rlg(out_img_path.name)
             # Resize the SVG drawing
             scale_x = image.shape[1] / drawing.width
@@ -166,13 +178,14 @@ class Terrain(pygame.sprite.Sprite):
 
 
 class Fire(pygame.sprite.Sprite):
-    '''
+    """
     This sprite represents a fire burning on one pixel of the terrain. Its
     image is generally kept very small to make rendering easier. All fire
     spreading is handled by the FireManager it is attached to.
-    '''
+    """
+
     def __init__(self, pos: Tuple[int, int], size: int, headless: bool = False) -> None:
-        '''
+        """
         Initialize the class by recording the position and size of the sprite
         and creating a solid color texture.
 
@@ -181,7 +194,7 @@ class Fire(pygame.sprite.Sprite):
             size: The pixel size of the sprite
             headless: Flag to run in a headless state. This will allow PyGame objects to
                       not be initialized.
-        '''
+        """
         super().__init__()
 
         self.pos = pos
@@ -208,20 +221,21 @@ class Fire(pygame.sprite.Sprite):
         self.layer: int = SpriteLayer.FIRE
 
     def update(self, *args, **kwargs) -> None:
-        '''
+        """
         Currently unused.
-        '''
+        """
         pass
 
 
 class FireLine(pygame.sprite.Sprite):
-    '''
+    """
     This sprite represents a fireline on one pixel of the terrain. Its image is generally
     kept very small to make rendering easier. All fireline placement spreading is handled
     by the FireLineManager it is attached to.
-    '''
+    """
+
     def __init__(self, pos: Tuple[int, int], size: int, headless: bool = False) -> None:
-        '''
+        """
         Initialize the class by recording the position and size of the sprite
         and creating a solid color texture.
 
@@ -231,7 +245,7 @@ class FireLine(pygame.sprite.Sprite):
             headless: Flag to run in a headless state. This will allow PyGame objects to
                       not be initialized.
 
-        '''
+        """
         super().__init__()
 
         self.pos = pos
@@ -257,24 +271,25 @@ class FireLine(pygame.sprite.Sprite):
         self.layer: int = SpriteLayer.LINE
 
     def update(self, *args, **kwargs) -> None:
-        '''
+        """
         This doesn't require to be updated right now. May change in the future if we
         learn new things about the physics.
-        '''
+        """
         pass
 
 
 class ScratchLine(pygame.sprite.Sprite):
-    '''
+    """
     This sprite represents a scratch line on one pixel of the terrain. Its image is
     generally kept very small to make rendering easier. All scratch line placement
     spreading is handled by the ScratchLineManager it is attached to.
-    '''
+    """
+
     def __init__(self, pos: Tuple[int, int], size: int, headless: bool = False) -> None:
-        '''
+        """
         Initialize the class by recording the position and size of the sprite
         and creating a solid color texture.
-        '''
+        """
         super().__init__()
 
         self.pos = pos
@@ -300,25 +315,26 @@ class ScratchLine(pygame.sprite.Sprite):
         self.layer: int = SpriteLayer.LINE
 
     def update(self, *args, **kwargs) -> None:
-        '''
+        """
         This doesn't require to be updated right now. May change in the future if we
         learn new things about the physics.
 
-        '''
+        """
         pass
 
 
 class WetLine(pygame.sprite.Sprite):
-    '''
+    """
     This sprite represents a wet line on one pixel of the terrain. Its image is
     generally kept very small to make rendering easier. All wet line placement
     spreading is handled by the WaterLineManager it is attached to.
-    '''
+    """
+
     def __init__(self, pos: Tuple[int, int], size: int, headless: bool = False) -> None:
-        '''
+        """
         Initialize the class by recording the position and size of the sprite
         and creating a color texture.
-        '''
+        """
         super().__init__()
 
         self.pos = pos
@@ -344,9 +360,9 @@ class WetLine(pygame.sprite.Sprite):
         self.layer: int = SpriteLayer.LINE
 
     def update(self, *args, **kwargs) -> None:
-        '''
+        """
         This doesn't require to be updated right now. May change in the future if we
         learn new things about the physics.
 
-        '''
+        """
         pass

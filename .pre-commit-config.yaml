@@ -11,16 +11,14 @@ repos:
       - id: debug-statements
       - id: requirements-txt-fixer
       - id: check-merge-conflict
-      - id: double-quote-string-fixer
       - id: end-of-file-fixer
       - id: sort-simple-yaml
   - repo: local
     hooks:
-      - id: yapf
-        name: yapf
+      - id: black
+        name: black
+        entry: black
         language: python
-        entry: yapf
-        args: [-i, -vv]
         types: [python]
       - id: mypy
         name: mypy

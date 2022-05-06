@@ -31,10 +31,12 @@ terrain:
     functional:
       function: perlin
       perlin:
-        amplitude: 500
-        shape: (225, 225)
-        resolution: (1, 1)
-        seed: 1111
+        octaves: 3
+        persistence: 0.7
+        lacunarity: 2.0
+        seed: 827
+        range_min: 100.0
+        range_max: 300.0
       gaussian:
         amplitude: 500
         mu_x: 50

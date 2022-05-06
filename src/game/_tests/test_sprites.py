@@ -5,7 +5,7 @@ import pygame
 
 from ...enums import BURNED_RGB_COLOR, BurnStatus, SpriteLayer
 from ...utils.config import Config
-from ..sprites import Fire, Terrain
+from ..sprites import Fire, FireLine, ScratchLine, Terrain, WetLine
 from . import DummyFuelLayer, DummyTopographyLayer
 
 
@@ -152,4 +152,154 @@ class TestFire(unittest.TestCase):
                 f"The terrain should have layer={SpriteLayer.FIRE}, "
                 f"but has layer={self.fire.layer}"
             ),
+        )
+
+
+class TestFireLine(unittest.TestCase):
+    def setUp(self) -> None:
+        self.pos = (0, 0)
+        self.size = 1
+        return super().setUp()
+
+    def test_headless(self) -> None:
+        """Test that the FireLine sprite runs in a headless state"""
+        headless = True
+        sprite = FireLine(self.pos, self.size, headless)
+        self.assertIsNone(
+            sprite.image, msg="The sprite image should be None when headless==True"
+        )
+
+    def test_non_headless(self) -> None:
+        """Test that the FireLine sprite runs in a non-headless state"""
+        headless = False
+        sprite = FireLine(self.pos, self.size, headless)
+        self.assertIsInstance(
+            sprite.image,
+            pygame.Surface,
+            msg="The sprite image should a pygame.Surface, but got"
+            f"{type(sprite.image)}",
+        )
+
+        valid_size = (self.size, self.size)
+        self.assertEqual(
+            sprite.image.get_size(),
+            valid_size,
+            msg=f"The sprite image size should be {valid_size}, but got "
+            f"{sprite.image.get_size()}",
+        )
+
+        rgba = sprite.image.get_at((0, 0))
+        valid_rgba = (155, 118, 83, 255)
+        self.assertEqual(
+            rgba,
+            valid_rgba,
+            msg="The valid RGBA value for the sprite is {valid_rgba}, but " "got {rgba}",
+        )
+
+    def test_update(self) -> None:
+        """Test that the FireLine.update() call returns None"""
+        headless = True
+        sprite = FireLine(self.pos, self.size, headless)
+        self.assertIsNone(
+            sprite.update(), msg="The sprite update step should return None"
+        )
+
+
+class TestScratchLine(unittest.TestCase):
+    def setUp(self) -> None:
+        self.pos = (0, 0)
+        self.size = 1
+        return super().setUp()
+
+    def test_headless(self) -> None:
+        """Test that the ScratchLine sprite runs in a headless state"""
+        headless = True
+        sprite = ScratchLine(self.pos, self.size, headless)
+        self.assertIsNone(
+            sprite.image, msg="The sprite image should be None when headless==True"
+        )
+
+    def test_non_headless(self) -> None:
+        """Test that the ScratchLine sprite runs in a non-headless state"""
+        headless = False
+        sprite = ScratchLine(self.pos, self.size, headless)
+        self.assertIsInstance(
+            sprite.image,
+            pygame.Surface,
+            msg="The sprite image should a pygame.Surface, but got"
+            f"{type(sprite.image)}",
+        )
+
+        valid_size = (self.size, self.size)
+        self.assertEqual(
+            sprite.image.get_size(),
+            valid_size,
+            msg=f"The sprite image size should be {valid_size}, but got "
+            f"{sprite.image.get_size()}",
+        )
+
+        rgba = sprite.image.get_at((0, 0))
+        valid_rgba = (139, 125, 58, 255)
+        self.assertEqual(
+            rgba,
+            valid_rgba,
+            msg="The valid RGBA value for the sprite is {valid_rgba}, but " "got {rgba}",
+        )
+
+    def test_update(self) -> None:
+        """Test that the ScratchLine.update() call returns None"""
+        headless = True
+        sprite = FireLine(self.pos, self.size, headless)
+        self.assertIsNone(
+            sprite.update(), msg="The sprite update step should return None"
+        )
+
+
+class WetFireLine(unittest.TestCase):
+    def setUp(self) -> None:
+        self.pos = (0, 0)
+        self.size = 1
+        return super().setUp()
+
+    def test_headless(self) -> None:
+        """Test that the WetLine sprite runs in a headless state"""
+        headless = True
+        sprite = WetLine(self.pos, self.size, headless)
+        self.assertIsNone(
+            sprite.image, msg="The sprite image should be None when headless==True"
+        )
+
+    def test_non_headless(self) -> None:
+        """Test that the WetLine sprite runs in a non-headless state"""
+        headless = False
+        sprite = WetLine(self.pos, self.size, headless)
+        self.assertIsInstance(
+            sprite.image,
+            pygame.Surface,
+            msg="The sprite image should a pygame.Surface, but got"
+            f"{type(sprite.image)}",
+        )
+
+        valid_size = (self.size, self.size)
+        self.assertEqual(
+            sprite.image.get_size(),
+            valid_size,
+            msg=f"The sprite image size should be {valid_size}, but got "
+            f"{sprite.image.get_size()}",
+        )
+
+        rgba = sprite.image.get_at((0, 0))
+        valid_rgba = (212, 241, 249, 255)
+        self.assertEqual(
+            rgba,
+            valid_rgba,
+            msg="The valid RGBA value for the sprite is {valid_rgba}, but " "got {rgba}",
+        )
+
+    def test_update(self) -> None:
+        """Test that the WetLine.update() call returns None"""
+        headless = True
+        sprite = WetLine(self.pos, self.size, headless)
+        self.assertIsNone(
+            sprite.update(), msg="The sprite update step should return None"
         )

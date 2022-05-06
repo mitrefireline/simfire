@@ -25,6 +25,13 @@ class TestFireManager(unittest.TestCase):
             self.init_pos, self.fire_size, self.max_fire_duration
         )
 
+    def test_update(self) -> None:
+        """Test that the call to update() just passes"""
+        self.assertIsNone(
+            self.fire_manager.update(np.array([[1]])),
+            msg="The FireManager.update() method should return None",
+        )
+
     def test_prune_sprites(self) -> None:
         """
         Test that the sprites are pruned correctly.
@@ -191,6 +198,127 @@ class TestRothermelFireManager(unittest.TestCase):
             max_time=self.config.simulation.runtime,
             headless=self.headless,
         )
+
+    def test_wind_conversion(self) -> None:
+        """
+        Test that wind speed/directions of type float, nested sequence and numpy array
+        are correctly converted to a numpy array.
+        """
+        # Test for all possible input types
+        u_float = 7.0
+        u_dir_float = 90.0
+        u_seq = [
+            [7.0 for x in range(self.screen_size[1])] for y in range(self.screen_size[0])
+        ]
+        u_dir_seq = [
+            [90.0 for x in range(self.screen_size[1])] for y in range(self.screen_size[0])
+        ]
+        u_arr = np.full(self.screen_size, 7.0)
+        u_dir_arr = np.full(self.screen_size, 90.0)
+        U = [u_float, u_seq, u_arr]
+        U_dir = [u_dir_float, u_dir_seq, u_dir_arr]
+        types = ["float", "nested sequence", "numpy array"]
+        for u, u_dir, t in zip(U, U_dir, types):
+            with self.subTest(f"Checking for wind type {t}"):
+                environment = Environment(self.config.environment.moisture, u, u_dir)
+                fire_manager = RothermelFireManager(
+                    self.fire_init_pos,
+                    self.config.display.fire_size,
+                    self.config.fire.max_fire_duration,
+                    self.config.area.pixel_scale,
+                    self.config.simulation.update_rate,
+                    self.fuel_particle,
+                    self.terrain,
+                    environment,
+                    max_time=self.config.simulation.runtime,
+                    headless=self.headless,
+                )
+                self.assertIsInstance(
+                    fire_manager.U,
+                    np.ndarray,
+                    msg="The wind speed in the fire manager should be "
+                    "a numpy array, but got "
+                    f"{type(fire_manager.U)}",
+                )
+                self.assertIsInstance(
+                    fire_manager.U_dir,
+                    np.ndarray,
+                    msg="The wind direction in the fire manager should "
+                    "be a numpy array, but got "
+                    f"{type(fire_manager.U)}",
+                )
+                arr_shape = fire_manager.U.shape
+                self.assertTupleEqual(
+                    arr_shape,
+                    self.screen_size,
+                    msg="The wind speed array should have shape "
+                    f"{self.screen_size}, but got {arr_shape}",
+                )
+                arr_shape = fire_manager.U_dir.shape
+                self.assertTupleEqual(
+                    arr_shape,
+                    self.screen_size,
+                    msg="The wind direction array should have shape "
+                    f"{self.screen_size}, but got {arr_shape}",
+                )
+
+        # Test for exceptions
+        with self.assertRaises(
+            ValueError, msg="Numpy arr with wrong shape raises ValueError"
+        ):
+            wrong_shape = (self.screen_size[0] + 1, self.screen_size[1] + 1)
+            u_arr = np.full(wrong_shape, 7.0)
+            u_dir_arr = np.full(wrong_shape, 90.0)
+            environment = Environment(self.config.environment.moisture, u_arr, u_dir_arr)
+            fire_manager = RothermelFireManager(
+                self.fire_init_pos,
+                self.config.display.fire_size,
+                self.config.fire.max_fire_duration,
+                self.config.area.pixel_scale,
+                self.config.simulation.update_rate,
+                self.fuel_particle,
+                self.terrain,
+                environment,
+                max_time=self.config.simulation.runtime,
+                headless=self.headless,
+            )
+        with self.assertRaises(
+            ValueError, msg="Nested sequence with wrong shape raises ValueError"
+        ):
+            wrong_shape = (self.screen_size[0] + 1, self.screen_size[1] + 1)
+            u_seq = [[7.0 for x in range(wrong_shape[1])] for y in range(wrong_shape[0])]
+            u_dir_seq = [
+                [90.0 for x in range(wrong_shape[1])] for y in range(wrong_shape[0])
+            ]
+            environment = Environment(self.config.environment.moisture, u_seq, u_dir_seq)
+            fire_manager = RothermelFireManager(
+                self.fire_init_pos,
+                self.config.display.fire_size,
+                self.config.fire.max_fire_duration,
+                self.config.area.pixel_scale,
+                self.config.simulation.update_rate,
+                self.fuel_particle,
+                self.terrain,
+                environment,
+                max_time=self.config.simulation.runtime,
+                headless=self.headless,
+            )
+        with self.assertRaises(ValueError, msg="Non-nested sequence raises ValueError"):
+            u_seq = [7.0 for x in range(wrong_shape[1])]
+            u_dir_seq = [90.0 for x in range(wrong_shape[1])]
+            environment = Environment(self.config.environment.moisture, u_seq, u_dir_seq)
+            fire_manager = RothermelFireManager(
+                self.fire_init_pos,
+                self.config.display.fire_size,
+                self.config.fire.max_fire_duration,
+                self.config.area.pixel_scale,
+                self.config.simulation.update_rate,
+                self.fuel_particle,
+                self.terrain,
+                environment,
+                max_time=self.config.simulation.runtime,
+                headless=self.headless,
+            )
 
     def test_update(self) -> None:
         """

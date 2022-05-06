@@ -244,3 +244,28 @@ class RothermelSimulationTest(unittest.TestCase):
         # Test that we output a log warning
         layer_types = {"asdf": "functional", "qwer": "functional"}
         self.assertWarns(Warning, self.simulation.set_layer_types, layer_types)
+
+    def test_load_mitigation(self) -> None:
+        """
+        Test loading a mitigation map
+        """
+        old_map = np.copy(self.simulation.fire_map)
+
+        new_map = np.zeros((9, 9))
+        new_map[0][0] = 10
+
+        self.assertWarns(Warning, self.simulation.load_mitigation, new_map)
+        self.assertTrue(np.array_equal(old_map, self.simulation.fire_map))
+
+        new_map[0][0] = 3
+        self.simulation.load_mitigation(new_map)
+
+        self.assertTrue(np.array_equal(new_map, self.simulation.fire_map))
+
+    def test_get_disaster_categories(self) -> None:
+        """
+        Test getting all possible categories a pixel can be
+        """
+        categories = self.simulation.get_disaster_categories()
+        self.assertEqual(list(categories.keys()), list(BurnStatus.__members__))
+        self.assertEqual(list(categories.values()), [e.value for e in BurnStatus])

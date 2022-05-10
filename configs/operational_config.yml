@@ -19,11 +19,18 @@ mitigation:
 
 operational:
   seed:
-  latitude: 39.67
-  longitude: 119.8
-  height: 4000
-  width: 4000
+  latitude: 36.095
+  longitude: 120.52
+  height: 20000
+  width: 20000
   resolution: 30
+
+historical:
+  use: true
+  fire_init_pos_lat: 36.095
+  fire_init_pos_long: -120.522
+  name: Mineral
+  year: '2020'
 
 terrain:
   topography:

@@ -12,9 +12,11 @@ from ..world.elevation_functions import flat, gaussian, perlin
 from ..world.fuel_array_functions import chaparral_fn
 from ..world.wind_mechanics.wind_controller import WindController
 from .layers import (
+    DataLayer,
     FuelLayer,
     FunctionalFuelLayer,
     FunctionalTopographyLayer,
+    HistoricalLayer,
     LatLongBox,
     OperationalFuelLayer,
     OperationalTopographyLayer,
@@ -88,6 +90,20 @@ class OperationalConfig:
         self.height = float(self.height)
         self.width = float(self.width)
         self.resolution = float(self.resolution)
+
+
+@dataclasses.dataclass
+class HistoricalConfig:
+    """
+    Class that tracks historical layer.
+    """
+
+    use: bool
+    fire_init_pos_lat: float
+    fire_init_pos_long: float
+    name: str
+    year: str
+    historical_layer = DataLayer
 
 
 @dataclasses.dataclass
@@ -195,18 +211,34 @@ class Config:
             LatLongBox with the config coordinates and shape if any of
             the data layers are `operational`
         """
-        if (
-            self.yaml_data["terrain"]["topography"]["type"] == "operational"
-            or self.yaml_data["terrain"]["fuel"]["type"] == "operational"
-        ):
-            lat = self.yaml_data["operational"]["latitude"]
-            lon = self.yaml_data["operational"]["longitude"]
-            height = self.yaml_data["operational"]["height"]
-            width = self.yaml_data["operational"]["width"]
-            resolution = self.yaml_data["operational"]["resolution"]
-            return LatLongBox((lat, lon), height, width, resolution)
+
+        if self.yaml_data["historical"]["use"]:
+            self.historical_layer = self._create_historical_layer()
+            if (
+                self.yaml_data["terrain"]["topography"]["type"] == "operational"
+                or self.yaml_data["terrain"]["fuel"]["type"] == "operational"
+            ):
+                lat = self.historical_layer.centroid[0]
+                lon = self.historical_layer.centroid[1]
+                height = self.historical_layer.actual_dist_w
+                width = self.historical_layer.actual_dist_w
+                resolution = self.yaml_data["operational"]["resolution"]
+                return LatLongBox((lat, lon), height, width, resolution)
+            else:
+                return None
         else:
-            return None
+            if (
+                self.yaml_data["terrain"]["topography"]["type"] == "operational"
+                or self.yaml_data["terrain"]["fuel"]["type"] == "operational"
+            ):
+                lat = self.yaml_data["operational"]["latitude"]
+                lon = self.yaml_data["operational"]["longitude"]
+                height = self.yaml_data["operational"]["height"]
+                width = self.yaml_data["operational"]["width"]
+                resolution = self.yaml_data["operational"]["resolution"]
+                return LatLongBox((lat, lon), height, width, resolution)
+            else:
+                return None
 
     def _load_area(self) -> AreaConfig:
         """
@@ -263,6 +295,15 @@ class Config:
         """
         # No processing needed for the OperationalConfig
         return OperationalConfig(**self.yaml_data["operational"])
+
+    def _load_historical(self) -> HistoricalConfig:
+        """
+        Load the HistoricalConfig from the YAML data.
+
+        returns:
+            The YAML data converted to an HistoricalConfig dataclass
+        """
+        return HistoricalConfig(**self.yaml_data["historical"])
 
     def _load_terrain(self) -> TerrainConfig:
         """
@@ -408,6 +449,25 @@ class Config:
             )
 
         return fuel_type, fuel_layer, fn_name, kwargs
+
+    def _create_historical_layer(self):
+        """
+        Create a HistoricalLayer given the config parameters.
+        This is an optional dataclass.
+
+        Returns:
+            A HIstoricalLayer that sets the screen size, area, and fire start location.
+        """
+        HistoricalConfig = self._load_historical()
+        historical_layer = HistoricalLayer(
+            (
+                HistoricalConfig.fire_init_pos_lat,
+                abs(HistoricalConfig.fire_init_pos_long),
+            ),
+            HistoricalConfig.name,
+            HistoricalConfig.year,
+        )
+        return historical_layer
 
     def _load_fire(self) -> FireConfig:
         """

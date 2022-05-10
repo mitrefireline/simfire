@@ -8,7 +8,7 @@ from reportlab.graphics import renderPM
 from svglib.svglib import svg2rlg
 
 from ..enums import BURNED_RGB_COLOR, BurnStatus, SpriteLayer
-from ..utils.layers import FuelLayer, TopographyLayer
+from ..utils.layers import FuelLayer, HistoricalLayer, TopographyLayer
 
 
 class Terrain(pygame.sprite.Sprite):
@@ -25,21 +25,9 @@ class Terrain(pygame.sprite.Sprite):
         topo_layer: TopographyLayer,
         screen_size: Tuple[int, int],
         headless: bool = False,
+        hist_layer: HistoricalLayer = None,
     ) -> None:
-        """
-        Initialize the class by loading the tile textures and stitching
-        together the whole terrain image.
 
-        Arguments:
-            fuel_layer: A FuelLayer containing a `data` parameter that is a numpy array
-                        containing a Fuel objects
-            topo_layer: A TopographyLayer that describes the topography (elevation) of the
-                        terrain as a numpy array in it `data` parameter
-            screen_size: The game's screen size in pixels
-            headless: Flag to run in a headless state. This will allow PyGame objects to
-                      not be initialized.
-
-        """
         super().__init__()
 
         self.fuel_layer = fuel_layer
@@ -47,6 +35,8 @@ class Terrain(pygame.sprite.Sprite):
 
         self.screen_size = screen_size
         self.headless = headless
+
+        self.hist_layer = hist_layer
 
         self.elevations = self.topo_layer.data.squeeze()
         self.fuels = self.fuel_layer.data.squeeze()
@@ -143,17 +133,28 @@ class Terrain(pygame.sprite.Sprite):
         fig, ax = plt.subplots()
         # The fmt argument will display the levels as whole numbers (otherwise
         # the decimal points look messy)
+        ax.imshow(image.astype(np.uint8))
+        plt.axis("off")
+        if self.hist_layer is not None:
+            plt.contour(self.hist_layer.image.squeeze(), colors="darkred")
+            # ax.clabel(hist_contours,
+            #           self.hist_layer.date_time_array[0],
+            #           inline=True,
+            #           fmt=lambda x: f'{x:.0f}',
+            #           fontsize='medium')
+
         contours = ax.contour(
             self.topo_layer.data.squeeze(), origin="upper", colors="black"
         )
+
         ax.clabel(
             contours,
             contours.levels,
             inline=True,
             fmt=lambda x: f"{x:.0f}",
-            fontsize="large",
+            fontsize="small",
         )
-        ax.imshow(image.astype(np.uint8))
+        plt.imshow(image.astype(np.uint8))
         plt.axis("off")
 
         # Save the figure as a vector graphic to get just the image (no axes,
@@ -170,7 +171,7 @@ class Terrain(pygame.sprite.Sprite):
             drawing.scale(scale_x, scale_y)
             # Convert to Pillow
             out_img_pil = renderPM.drawToPIL(drawing)
-        plt.close(fig)
+        plt.close()
         # Slice the alpha channel off
         out_img = np.array(out_img_pil, dtype=np.uint8)[..., :3]
 

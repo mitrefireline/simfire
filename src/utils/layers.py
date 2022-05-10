@@ -161,40 +161,40 @@ class LatLongBox:
         divide (W)
         """
         # round up on latitdue
-        five_deg_north_min = self.BL[0]
-        five_deg_north_min_min = round_up_to_multiple(five_deg_north_min, self.degrees)
-        if round(five_deg_north_min_min - five_deg_north_min, 2) <= 0.0001:
-            min_max = round_up_to_multiple(five_deg_north_min, self.degrees)
+        deg_north_min = self.BL[0]
+        deg_north_min_min = round_up_to_multiple(deg_north_min, self.degrees)
+        if round(deg_north_min_min - deg_north_min, 2) <= 0.0001:
+            min_max = round_up_to_multiple(deg_north_min, self.degrees)
         else:
-            min_max = round_down_to_multiple(five_deg_north_min, self.degrees)
+            min_max = round_down_to_multiple(deg_north_min, self.degrees)
 
-        five_deg_north_max = self.TR[0]
-        five_deg_north_max_min = round_down_to_multiple(five_deg_north_max, self.degrees)
-        if round(five_deg_north_max - five_deg_north_max_min, 2) <= 0.0001:
-            max_min = round_up_to_multiple(five_deg_north_max, self.degrees)
+        deg_north_max = self.TR[0]
+        deg_north_max_min = round_down_to_multiple(deg_north_max, self.degrees)
+        if round(deg_north_max - deg_north_max_min, 2) <= 0.0001:
+            max_min = round_up_to_multiple(deg_north_max, self.degrees)
         else:
-            max_min = round_down_to_multiple(five_deg_north_max, self.degrees)
+            max_min = round_down_to_multiple(deg_north_max, self.degrees)
 
-        self.five_deg_north_min = min_max
-        self.five_deg_north_max = max_min
+        self.deg_north_min = min_max
+        self.deg_north_max = max_min
 
         # round down on longitude (w is negative)
-        five_deg_west_max = abs(self.BL[1])
-        five_deg_west_max_min = round_down_to_multiple(five_deg_west_max, self.degrees)
-        if round(five_deg_west_max - five_deg_west_max_min, 2) <= 0.0001:
-            max_min = round_down_to_multiple(five_deg_west_max, self.degrees)
+        deg_west_max = abs(self.BL[1])
+        deg_west_max_min = round_down_to_multiple(deg_west_max, self.degrees)
+        if round(deg_west_max - deg_west_max_min, 2) <= 0.0001:
+            max_min = round_down_to_multiple(deg_west_max, self.degrees)
         else:
-            max_min = round_up_to_multiple(five_deg_west_max, self.degrees)
+            max_min = round_up_to_multiple(deg_west_max, self.degrees)
 
-        five_deg_west_min = abs(self.TR[1])
-        five_deg_west_min_max = round_up_to_multiple(five_deg_west_min, self.degrees)
-        if round(five_deg_west_min_max - five_deg_west_min, 2) <= 0.0001:
-            min_max = round_down_to_multiple(five_deg_west_min, self.degrees)
+        deg_west_min = abs(self.TR[1])
+        deg_west_min_max = round_up_to_multiple(deg_west_min, self.degrees)
+        if round(deg_west_min_max - deg_west_min, 2) <= 0.0001:
+            min_max = round_down_to_multiple(deg_west_min, self.degrees)
         else:
-            min_max = round_up_to_multiple(five_deg_west_min, self.degrees)
+            min_max = round_up_to_multiple(deg_west_min, self.degrees)
 
-        self.five_deg_west_min = min_max
-        self.five_deg_west_max = max_min
+        self.deg_west_min = min_max
+        self.deg_west_max = max_min
 
     def _stack_tiles(self) -> Dict[str, Tuple[Tuple[float, float], ...]]:
         """
@@ -214,77 +214,77 @@ class LatLongBox:
         """
 
         if (
-            self.five_deg_north_min == self.five_deg_north_max
-            and self.five_deg_west_max == self.five_deg_west_min
+            self.deg_north_min == self.deg_north_max
+            and self.deg_west_max == self.deg_west_min
         ):
             # 1 Tile (Simple)
-            return {"single": ((self.five_deg_north_min, self.five_deg_west_max),)}
+            return {"single": ((self.deg_north_min, self.deg_west_max),)}
 
-        elif self.five_deg_north_max > self.five_deg_north_min:
-            if self.five_deg_north_max - self.five_deg_north_min > self.degrees * 3:
+        elif self.deg_north_max > self.deg_north_min:
+            if self.deg_north_max - self.deg_north_min > self.degrees * 3:
                 # 3 Tiles northernly
                 return {
                     "north": (
-                        (self.five_deg_north_min, self.five_deg_west_max),
-                        (self.five_deg_north_max - self.degrees, self.five_deg_west_max),
-                        (self.five_deg_north_max, self.five_deg_west_max),
+                        (self.deg_north_min, self.deg_west_max),
+                        (self.deg_north_max - self.degrees, self.deg_west_max),
+                        (self.deg_north_max, self.deg_west_max),
                     )
                 }
-            elif self.five_deg_west_max > self.five_deg_west_min:
+            elif self.deg_west_max > self.deg_west_min:
                 # 4 Tiles
                 return {
                     "square": (
-                        (self.five_deg_north_min, self.five_deg_west_max),
-                        (self.five_deg_north_min, self.five_deg_west_min),
-                        (self.five_deg_north_max, self.five_deg_west_min),
-                        (self.five_deg_north_max, self.five_deg_west_max),
+                        (self.deg_north_min, self.deg_west_max),
+                        (self.deg_north_min, self.deg_west_min),
+                        (self.deg_north_max, self.deg_west_min),
+                        (self.deg_north_max, self.deg_west_max),
                     )
                 }
             else:
                 # 2 Tiles northernly
                 return {
                     "north": (
-                        (self.five_deg_north_min, self.five_deg_west_max),
-                        (self.five_deg_north_max, self.five_deg_west_max),
+                        (self.deg_north_min, self.deg_west_max),
+                        (self.deg_north_max, self.deg_west_max),
                     )
                 }
-        elif self.five_deg_north_min == self.five_deg_north_max:
-            if self.five_deg_west_max > self.five_deg_west_min:
-                if self.five_deg_west_max - self.five_deg_west_min > self.degrees:
+        elif self.deg_north_min == self.deg_north_max:
+            if self.deg_west_max > self.deg_west_min:
+                if self.deg_west_max - self.deg_west_min > self.degrees:
                     # 3 Tiles easternly
                     return {
                         "east": (
-                            (self.five_deg_north_min, self.five_deg_west_max),
+                            (self.deg_north_min, self.deg_west_max),
                             (
-                                self.five_deg_north_min,
-                                self.five_deg_west_max - self.degrees,
+                                self.deg_north_min,
+                                self.deg_west_max - self.degrees,
                             ),
-                            (self.five_deg_north_min, self.five_deg_west_min),
+                            (self.deg_north_min, self.deg_west_min),
                         )
                     }
                 else:
                     # 2 Tiles easternly
                     return {
                         "east": (
-                            (self.five_deg_north_min, self.five_deg_west_max),
-                            (self.five_deg_north_min, self.five_deg_west_min),
+                            (self.deg_north_min, self.deg_west_max),
+                            (self.deg_north_min, self.deg_west_min),
                         )
                     }
             else:
                 raise ValueError(
                     "The tile stacking failed for parameters "
-                    f"five_deg_north_min: {self.five_deg_north_min}, "
-                    f"five_deg_north_max: {self.five_deg_north_max}, "
-                    f"five_deg_west_min: {self.five_deg_west_min}, "
-                    f"five_deg_west_max: {self.five_deg_west_max}"
+                    f"five_deg_north_min: {self.deg_north_min}, "
+                    f"five_deg_north_max: {self.deg_north_max}, "
+                    f"five_deg_west_min: {self.deg_west_min}, "
+                    f"five_deg_west_max: {self.deg_west_max}"
                 )
         else:
             raise ValueError(
                 "The tile stacking failed for parameters "
-                f"five_deg_north_min: {self.five_deg_north_min}, "
-                f"five_deg_north_max: {self.five_deg_north_max}, "
-                f"five_deg_west_min: {self.five_deg_west_min}, "
-                f"five_deg_west_max: {self.five_deg_west_max}"
+                f"five_deg_north_min: {self.deg_north_min}, "
+                f"five_deg_north_max: {self.deg_north_max}, "
+                f"five_deg_west_min: {self.deg_west_min}, "
+                f"five_deg_west_max: {self.deg_west_max}"
             )
 
     def _generate_lat_long(self, corners: List[Tuple[float, float]]) -> None:
@@ -730,8 +730,6 @@ class OperationalFuelLayer(FuelLayer):
 
         data = np.load(filename[0])
         data = np.array(data, dtype=np.float32)
-        # flip axis because latitude goes up but numpy will read it down
-        data = np.flip(data, 0)
         data = np.expand_dims(data, axis=-1)
 
         for key, _ in self.lat_long_box.tiles.items():
@@ -745,8 +743,6 @@ class OperationalFuelLayer(FuelLayer):
             for idx, dem in enumerate(filename[1:]):
                 tif_data = np.load(dem)
                 tif_data = np.array(tif_data, dtype=np.float32)
-                # flip axis because latitude goes up but numpy will read it down
-                tif_data = np.flip(tif_data, 0)
                 tif_data = np.expand_dims(tif_data, axis=-1)
 
                 if key == "north":
@@ -784,11 +780,11 @@ class OperationalFuelLayer(FuelLayer):
                 (five_deg_n, five_deg_w) = range
 
                 int_data_region = Path(
-                    f"n{five_deg_n}w{five_deg_w}/{fuel_model}/{fuel_data_fm}"
+                    f"n{five_deg_n+1}w{five_deg_w}/{fuel_model}/{fuel_data_fm}"
                 )
 
                 rgb_data_region = Path(
-                    f"n{five_deg_n}w{five_deg_w}/{fuel_model}/{fuel_data_rgb}"
+                    f"n{five_deg_n+1}w{five_deg_w}/{fuel_model}/{fuel_data_rgb}"
                 )
 
                 int_npy_file = self.datapath / int_data_region
@@ -917,3 +913,189 @@ class FunctionalFuelLayer(FuelLayer):
         texture = np.array(texture)
 
         return texture
+
+
+class HistoricalLayer(DataLayer):
+    """
+    Base class for use with operational and procedurally generated
+    fuel data. This class implements the code needed to
+    create the terrain image to use with the display.
+    """
+
+    def __init__(
+        self,
+        fire_init_pos: Tuple[float, float],
+        fire_name: str = "Mineral",
+        year: str = "2020",
+    ) -> None:
+        """
+        Simple call to the parent DataLayer class.
+
+        Arguments:
+            None
+
+        Returns:
+            None
+        """
+        import geopandas
+
+        base_path = Path(f"/nfs/lslab2/fireline/data/perimeters/{year}/ValidationGIS/")
+        # shapefile = Path('USAshapefile')
+        op_data_archive = Path(f"WFIGSOp_{year}")
+        # fire_perim_hist = Path('IAFPH')
+
+        # conus_path = base_path / shapefile
+        op_path = base_path / op_data_archive
+        # fire_perim_path = base_path / fire_perim_hist
+
+        # conus_data = geopandas.read_file(str(conus_path))
+        op_data = geopandas.read_file(str(op_path))
+        # fire_perim_data = geopandas.read_file(str(fire_perim_path))
+
+        try:
+            self.time_loc_data = op_data.loc[op_data["IncidentNa"].isin([fire_name])]
+        except ValueError:
+            print(f"{fire_name} not found in the database.")
+
+        self._get_centroid()
+        self.actual_dist_w = int(self._calc_distance())
+        self._get_width_height()
+        self._get_date_timestamps()
+        self._get_perimeters()
+        self.image = self._make_image()
+
+        start_long, start_lat = self._convert_lat_long_ratio(fire_init_pos)
+        self.fire_init_pos = (start_long, start_lat)
+
+    def _get_width_height(self) -> None:
+        """
+        Calculate the final width and height of the screen.
+        Assume 30m resolution to match with other DataLayers
+
+        NOTE: width and height must be square
+
+        """
+        # for 30m
+        dec_degree_length = 0.00027777777803598015
+        resolution = 30
+        dec_deg = (1 / 2 * (self.actual_dist_w) / resolution) * dec_degree_length
+        BL = (self.centroid[0] - dec_deg, self.centroid[1] + dec_deg)
+        TR = (self.centroid[0] + dec_deg, self.centroid[1] - dec_deg)
+
+        self.height = int((TR[0] - BL[0]) / dec_degree_length)
+        self.width = int((BL[1] - TR[1]) / dec_degree_length)
+
+        self.max_n = TR[0]
+        self.min_n = BL[0]
+        self.max_w = BL[1]
+        self.min_w = TR[1]
+
+    def _get_date_timestamps(self):
+        """
+        Get all available dates and timestamps
+
+        """
+
+        self.date_time_array = self.time_loc_data.CreateDate.values
+        self.start_time = self.date_time_array[0]
+        self.end_time = self.date_time_array[-1]
+
+        self._calc_time_elapsed()
+
+    def _calc_time_elapsed(self) -> None:
+        """
+        Calculate the time between each timestamp with format:
+            YYYY/MM/DD HRS:MIN:SEC.0000
+        """
+        from datetime import datetime
+
+        datetimeFormat = "%Y/%m/%d %H:%M:%S.%f"
+
+        self.durations = []
+        if len(self.date_time_array) > 1:
+
+            # start at second timestamp
+            for i in range(1, len(self.date_time_array)):
+                time_dif = datetime.strptime(
+                    self.date_time_array[1], datetimeFormat
+                ) - datetime.strptime(self.date_time_array[i - 1], datetimeFormat)
+                self.durations.append(time_dif)
+
+    def _get_perimeters(self):
+        """
+        This will get both the bounding perimeters of the fire perimeters and the start
+            location of the fire
+
+        Assume notation is: yyNxxW
+
+        """
+
+        self.points_array = np.zeros((self.width, self.height))
+        available_perimeters = self.time_loc_data.boundary
+        for idx, perimeter in enumerate(available_perimeters[:-3]):
+            abs_west = [abs(perimeter.xy[0][i]) for i in range(len(perimeter.xy[0]))]
+            points_list = tuple(zip(perimeter.xy[1], abs_west))
+            self._convert_lat_long(points_list, idx)
+
+    def _convert_lat_long(self, lat_long_list: List[Tuple[float, float]], idx: int):
+        """
+        Create a np.ndarray of perimeter points from lat/long points
+
+        """
+        idx = idx + 1
+
+        for point in lat_long_list:
+            lat, long = self._convert_lat_long_ratio(point)
+            self.points_array[long, lat] = idx
+
+    def _convert_lat_long_ratio(self, point: Tuple[float, float]):
+        """
+        convert ratio of lat/long to pixel space
+        """
+        lat_pos = int((self.max_n - point[0]) / 0.00027777777803598015)
+        long_pos = int((self.max_w - point[1]) / 0.00027777777803598015)
+        return lat_pos, long_pos
+
+    def _make_image(self) -> np.ndarray:
+        """
+        Make the PyGame sprite image of the historical perimeters.
+        Stack perimeter arrays together
+
+        """
+
+        image = np.asarray(self.points_array).astype(np.uint8)
+        return image
+
+    def _get_centroid(self):
+        """
+        Get the center of the screen. Each perimeter has a centroid, only get
+            the final (largest) perimeter
+
+        Assume 30m resolution
+
+        """
+        self.max_w = abs(self.time_loc_data.bounds.iloc[-1].maxx)
+        self.min_w = abs(self.time_loc_data.bounds.iloc[-1].minx)
+        self.max_n = self.time_loc_data.bounds.iloc[-1].maxy
+        self.min_n = self.time_loc_data.bounds.iloc[-1].miny
+
+        self.centroid = ((self.max_n + self.min_n) / 2, (self.min_w + self.max_w) / 2)
+
+    def _calc_distance(self):
+        """
+        Calculate the great circle distance between two points
+        on the earth (specified in decimal degrees)
+        """
+        from math import asin, cos, radians, sin, sqrt
+
+        # convert decimal degrees to radians
+        lon1, lat1, lon2, lat2 = map(
+            radians, [-abs(self.min_w), self.min_n, -abs(self.max_w), self.max_n]
+        )
+        # haversine formula
+        dlon = lon2 - lon1
+        dlat = lat2 - lat1
+        a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
+        c = 2 * asin(sqrt(a))
+        m = 6371 * c * 1000
+        return m

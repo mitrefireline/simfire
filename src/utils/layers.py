@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.contour import QuadContourSet
 from PIL import Image
+from scipy import ndimage
 
 from ..enums import (
     DRY_TERRAIN_BROWN_IMG,
@@ -1062,9 +1063,35 @@ class HistoricalLayer(DataLayer):
         Stack perimeter arrays together
 
         """
-
+        # Create a list of length 256 with repeating/cycled colors
+        # 0 maps to black, every other index maps to a color
+        colors = [
+            [0, 0, 0],
+            [198, 64, 29],
+            [98, 65, 197],
+            [247, 144, 30],
+            [191, 210, 40],
+            [0, 91, 148],
+            [255, 246, 1],
+            [126, 130, 132],
+        ] + [
+            [135, 222, 255],
+            [198, 64, 29],
+            [98, 65, 197],
+            [247, 144, 30],
+            [191, 210, 40],
+            [0, 91, 148],
+            [255, 246, 1],
+            [126, 130, 132],
+        ] * 31
         image = np.asarray(self.points_array).astype(np.uint8)
-        return image
+        dilation_amts = tuple(s // 100 for s in image.shape[:2])
+        # Dilate the image to get more visible lines
+        image = ndimage.grey_dilation(image, dilation_amts)
+        out_image = np.zeros((*image.shape, 3), dtype=np.uint8)
+        # Map the colors to each index in the fireline points
+        np.take(colors, image, axis=0, out=out_image)
+        return out_image
 
     def _get_centroid(self):
         """

@@ -128,25 +128,21 @@ class Terrain(pygame.sprite.Sprite):
         Returns:
             out_image: The input image with the contour lines drawn on it
         """
-        image = self.fuel_layer.image.squeeze()
         # Create a figure with axes
         fig, ax = plt.subplots()
-        # The fmt argument will display the levels as whole numbers (otherwise
-        # the decimal points look messy)
-        ax.imshow(image.astype(np.uint8))
-        plt.axis("off")
+        image = self.fuel_layer.image.squeeze().astype(np.uint8)
         if self.hist_layer is not None:
-            plt.contour(self.hist_layer.image.squeeze(), colors="darkred")
-            # ax.clabel(hist_contours,
-            #           self.hist_layer.date_time_array[0],
-            #           inline=True,
-            #           fmt=lambda x: f'{x:.0f}',
-            #           fontsize='medium')
+            hist_image = self.hist_layer.image
+            hist_mask = np.all(hist_image != (0, 0, 0), axis=-1)
+            hist_mask = np.stack((hist_mask,) * 3, axis=-1)
+            image = hist_mask * hist_image + (1 - hist_mask) * image
 
         contours = ax.contour(
             self.topo_layer.data.squeeze(), origin="upper", colors="black"
         )
 
+        # The fmt argument will display the levels as whole numbers (otherwise
+        # the decimal points look messy)
         ax.clabel(
             contours,
             contours.levels,
@@ -154,7 +150,7 @@ class Terrain(pygame.sprite.Sprite):
             fmt=lambda x: f"{x:.0f}",
             fontsize="small",
         )
-        plt.imshow(image.astype(np.uint8))
+        ax.imshow(image.astype(np.uint8))
         plt.axis("off")
 
         # Save the figure as a vector graphic to get just the image (no axes,

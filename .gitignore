@@ -7,5 +7,6 @@ dist
 **/*.egg-info
 docs/build
 *.png
+simulation.gif
 .coverage
 coverage.xml

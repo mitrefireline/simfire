@@ -40,7 +40,7 @@ class Simulation(ABC):
         self.config = config
 
     @abstractmethod
-    def run(self, time: Union[str, int]) -> np.ndarray:
+    def run(self, time: Union[str, int]) -> Tuple[np.ndarray, bool]:
         """
         Runs the simulation.
 
@@ -49,8 +49,10 @@ class Simulation(ABC):
                   value, `config.simulation.update_rate`, or a length of time expressed
                   as a string (e.g. `120m`, `2h`, `2hour`, `2hours`, `1h 60m`, etc.)
         Returns:
-            The Burned/Unburned/ControlLine pixel map (`self.fire_map`).
-            Values range from [0, 6] (see src/enums.py:BurnStatus).
+            A tuple of the following:
+                - The Burned/Unburned/ControlLine pixel map (`self.fire_map`). Values
+                  range from [0, 6] (see src/enums.py:BurnStatus).
+                - A boolean indicating whether the simulation has reached the end.
         """
         pass
 
@@ -389,7 +391,7 @@ class RothermelSimulation(Simulation):
         self.fire_map = self.scratchline_manager.update(self.fire_map, scratchlines)
         self.fire_map = self.wetline_manager.update(self.fire_map, wetlines)
 
-    def run(self, time: Union[str, int]) -> np.ndarray:
+    def run(self, time: Union[str, int]) -> Tuple[np.ndarray, bool]:
         """
         Runs the simulation with or without mitigation lines.
 
@@ -405,8 +407,10 @@ class RothermelSimulation(Simulation):
                   as a string (e.g. `120m`, `2h`, `2hour`, `2hours`, `1h 60m`, etc.)
 
         Returns:
-            The Burned/Unburned/ControlLine pixel map (`self.fire_map`).
-            Values range from [0, 6].
+            A tuple of the following:
+                - The Burned/Unburned/ControlLine pixel map (`self.fire_map`). Values
+                  range from [0, 6] (see src/enums.py:BurnStatus).
+                - A boolean indicating whether the simulation has reached the end.
         """
         # reset the fire status to running
         self.fire_status = GameStatus.RUNNING
@@ -429,7 +433,9 @@ class RothermelSimulation(Simulation):
             # elapsed_time is in minutes
             self.elapsed_time = self.fire_manager.elapsed_time
 
-        return self.fire_map
+        self.active = True if self.fire_status == GameStatus.RUNNING else False
+
+        return self.fire_map, self.active
 
     def _create_fire_map(self) -> None:
         """

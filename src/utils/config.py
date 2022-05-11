@@ -168,7 +168,7 @@ class Config:
         # operational to functional
         self.original_screen_size = self.yaml_data["area"]["screen_size"]
 
-        self.lat_long_box = self._make_lat_long_box()
+        self.lat_long_box, self.historical_layer = self._make_lat_long_box()
 
         self.area = self._load_area()
         self.display = self._load_display()
@@ -201,7 +201,9 @@ class Config:
             raise ConfigError(message)
         return yaml_data
 
-    def _make_lat_long_box(self) -> Union[LatLongBox, None]:
+    def _make_lat_long_box(
+        self,
+    ) -> Tuple[Optional[LatLongBox], Optional[HistoricalLayer]]:
         """
         Optionally create the LatLongBox used by the data layers if any
         of the data layers are of type `operational`.
@@ -213,19 +215,25 @@ class Config:
         """
 
         if self.yaml_data["historical"]["use"]:
-            self.historical_layer = self._create_historical_layer()
+            historical_layer = self._create_historical_layer()
             if (
                 self.yaml_data["terrain"]["topography"]["type"] == "operational"
                 or self.yaml_data["terrain"]["fuel"]["type"] == "operational"
             ):
-                lat = self.historical_layer.centroid[0]
-                lon = self.historical_layer.centroid[1]
-                height = self.historical_layer.actual_dist_w
-                width = self.historical_layer.actual_dist_w
+                lat = historical_layer.centroid[0]
+                lon = historical_layer.centroid[1]
+                height = historical_layer.actual_dist_w
+                width = historical_layer.actual_dist_w
                 resolution = self.yaml_data["operational"]["resolution"]
-                return LatLongBox((lat, lon), height, width, resolution)
+                return (
+                    LatLongBox((lat, lon), height, width, resolution),
+                    historical_layer,
+                )
             else:
-                return None
+                raise ConfigError(
+                    "Cannot use historical data when topography and fuel "
+                    "types are set to 'functional'"
+                )
         else:
             if (
                 self.yaml_data["terrain"]["topography"]["type"] == "operational"
@@ -236,9 +244,9 @@ class Config:
                 height = self.yaml_data["operational"]["height"]
                 width = self.yaml_data["operational"]["width"]
                 resolution = self.yaml_data["operational"]["resolution"]
-                return LatLongBox((lat, lon), height, width, resolution)
+                return LatLongBox((lat, lon), height, width, resolution), None
             else:
-                return None
+                return None, None
 
     def _load_area(self) -> AreaConfig:
         """
@@ -605,7 +613,7 @@ class Config:
             lat, long = location
             self.yaml_data["operational"]["latitude"] = lat
             self.yaml_data["operational"]["longitude"] = long
-            self.lat_long_box = self._make_lat_long_box()
+            self.lat_long_box, self.historical_layer = self._make_lat_long_box()
 
         # Can only reset functional topography seeds, since operational is updated
         # via the `location` argument
@@ -645,7 +653,7 @@ class Config:
             self.yaml_data["terrain"]["fuel"]["type"] = fuel_type
 
         # Remake the LatLongBox
-        self.lat_long_box = self._make_lat_long_box()
+        self.lat_long_box, self.historical_layer = self._make_lat_long_box()
         # Remake the AreaConfig since operational/functional could have changed
         self.area = self._load_area()
         # Remake the terrain

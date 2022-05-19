@@ -456,6 +456,97 @@ class DataLayer():
         '''
         self.data = None
 
+class BurnProbabilityLayer(DataLayer):
+    def __init__(self, lat_long_box: LatLongBox) -> None:
+        '''
+        Initialize the elevation layer by retrieving the correct topograpchic data
+            and computing the area.
+
+        Arguments:
+            center: The lat/long coordinates of the center point of the screen
+            height: The height of the screen size
+            width: The width of the screen size
+            resolution: The resolution to get data
+
+        '''
+        self.lat_long_box = lat_long_box
+        self.path = Path('/nfs/lslab2/fireline/data/risk/')
+        res = str(self.lat_long_box.resolution) + 'm'
+
+        #TODO: Add check here if resolution isnt available
+
+        self.datapath = self.path / res
+        self.data = self._make_contour_and_data()
+
+    def _make_contour_and_data(self) -> np.ndarray:
+        self._get_dems()
+        data = Image.open(self.tif_filenames[0])
+        data = np.asarray(data)
+        # flip axis because latitude goes up but numpy will read it down
+        data = np.flip(data, 0)
+        data = np.expand_dims(data, axis=-1)
+
+        for key, _ in self.lat_long_box.tiles.items():
+
+            if key == 'single':
+                # simple case
+                tr = (self.lat_long_box.bl[0][0], self.lat_long_box.tr[1][0])
+                bl = (self.lat_long_box.tr[0][0], self.lat_long_box.bl[1][0])
+                # TODO: Temporary solution until data source is added
+                h = bl[0] - tr[0]
+                w = bl[1] - tr[1]
+                return np.full((h, w, 1), Chaparral)
+                # return data[tr[0]:bl[0], tr[1]:bl[1]]
+            tmp_array = data
+            for idx, dem in enumerate(self.tif_filenames[1:]):
+                tif_data = Image.open(dem)
+                tif_data = np.asarray(tif_data)
+                # flip axis because latitude goes up but numpy will read it down
+                tif_data = np.flip(tif_data, 0)
+                tif_data = np.expand_dims(tif_data, axis=-1)
+
+                if key == 'north':
+                    # stack tiles along axis = 0 -> leftmost: bottom, rightmost: top
+                    data = np.concatenate((data, tif_data), axis=0)
+                elif key == 'east':
+                    # stack tiles along axis = 2 -> leftmost, rightmost
+                    data = np.concatenate((data, tif_data), axis=1)
+                elif key == 'square':
+                    if idx + 1 == 1:
+                        data = np.concatenate((data, tif_data), axis=1)
+                    elif idx + 1 == 2:
+                        tmp_array = tif_data
+                    elif idx + 1 == 3:
+                        tmp_array = np.concatenate((tif_data, tmp_array), axis=1)
+                        data = np.concatenate((data, tmp_array), axis=0)
+
+        tr = (self.lat_long_box.bl[0][0], self.lat_long_box.tr[1][0])
+        bl = (self.lat_long_box.tr[0][0], self.lat_long_box.bl[1][0])
+        data_array = data[tr[0]:bl[0], tr[1]:bl[1]]
+        return data_array
+
+    def _get_dems(self) -> List[Path]:
+        '''
+        This method will use the outputed tiles and return the correct dem files
+
+        Arguments:
+            None
+
+        Return:
+            None
+
+        '''
+
+        self.tif_filenames = []
+
+        for _, ranges in self.lat_long_box.tiles.items():
+            for range in ranges:
+                (five_deg_n, five_deg_w) = range
+                tif_data_region = Path(f'n{five_deg_n}w{five_deg_w}.tif')
+                tif_file = self.datapath / tif_data_region
+                self.tif_filenames.append(tif_file)
+
+
 
 class TopographyLayer(DataLayer):
     def __init__(self, lat_long_box: LatLongBox) -> None:

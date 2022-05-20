@@ -54,5 +54,5 @@ setuptools.setup(
     cmdclass={"build_py": build_py},
     package_data={"assets": ["../assets/**/*"]},
     author="The MITRE Corporation",
-    author_email="twelsh@mitre.org",
+    author_email="fireline@mitre.org",
 )

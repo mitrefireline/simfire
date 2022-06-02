@@ -1,5 +1,5 @@
 import unittest
-from ..layers import FunctionalElevationLayer, LatLongBox, TopographyLayer
+from ..layers import FunctionalElevationLayer, LatLongBox, TopographyLayer, BurnProbabilityLayer
 
 
 class TestLatLongBox(unittest.TestCase):
@@ -159,6 +159,57 @@ class TestTopographyLayer(unittest.TestCase):
         height, width = 3200, 3200
         lat_long_box = LatLongBox(center, height, width, resolution)
         topographyGen = TopographyLayer(lat_long_box)
+        self.assertEqual(4, len(topographyGen.tif_filenames))
+
+
+class TestBurnProbabilityLayer(unittest.TestCase):
+    def setUp(self) -> None:
+        '''
+
+        '''
+
+    def test__make_contour_and_data(self) -> None:
+        '''
+        Test that the call to _generate_contours() runs propoerly.
+        This method returns the data array containing the elevations within the
+            specified bounding box region of the given latitudes and longitudes.
+
+        NOTE: This method should always return a square
+        '''
+        resolution = 30
+        # 2 Tiles (easternly)
+        center = (33.4, 115.04)
+        height, width = 3200, 3200
+        lat_long_box = LatLongBox(center, height, width, resolution)
+        topographyGen = BurnProbabilityLayer(lat_long_box)
+        self.assertEqual(topographyGen.data.shape[0], topographyGen.data.shape[1])
+
+    def test__get_dems(self) -> None:
+        '''
+        Test that the call to _get_dems() runs properly.
+        This method will generate a list of the DEMs in the fireline /nfs/
+        '''
+
+        resolution = 30
+        # Single Tile
+        center = (35.2, 115.6)
+        height, width = 1600, 1600
+        lat_long_box = LatLongBox(center, height, width, resolution)
+        topographyGen = BurnProbabilityLayer(lat_long_box)
+        self.assertEqual(1, len(topographyGen.tif_filenames))
+
+        # 2 Tiles
+        center = (38.4, 115.0)
+        height, width = 1600, 1600
+        lat_long_box = LatLongBox(center, height, width, resolution)
+        topographyGen = BurnProbabilityLayer(lat_long_box)
+        self.assertEqual(2, len(topographyGen.tif_filenames))
+
+        # 4 Tiles
+        center = (34.001, 116.008)
+        height, width = 3200, 3200
+        lat_long_box = LatLongBox(center, height, width, resolution)
+        topographyGen = BurnProbabilityLayer(lat_long_box)
         self.assertEqual(4, len(topographyGen.tif_filenames))
 
 

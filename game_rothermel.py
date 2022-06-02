@@ -10,7 +10,7 @@ from src.game.managers.fire import RothermelFireManager
 from src.game.managers.mitigation import FireLineManager
 from src.game.sprites import Terrain
 from src.utils.config import Config
-from src.utils.layers import FuelLayer, LatLongBox, TopographyLayer
+from src.utils.layers import FuelLayer, LatLongBox, TopographyLayer, BurnProbabilityLayer
 from src.utils.units import mph_to_ftpm
 from src.world.parameters import Environment, FuelParticle
 
@@ -32,6 +32,7 @@ def main():
     lat_long_box = LatLongBox(center, height, width, resolution)
     topo_layer = TopographyLayer(lat_long_box)
     fuel_layer = FuelLayer(lat_long_box)
+    burn_prob_layer = BurnProbabilityLayer(lat_long_box)
 
     # Compute how many meters each pixel represents (should be close to resolution)
     pixel_scale = height / topo_layer.data.shape[0]

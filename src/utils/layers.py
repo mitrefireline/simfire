@@ -456,6 +456,7 @@ class DataLayer():
         '''
         self.data = None
 
+
 class BurnProbabilityLayer(DataLayer):
     def __init__(self, lat_long_box: LatLongBox) -> None:
         '''
@@ -545,7 +546,6 @@ class BurnProbabilityLayer(DataLayer):
                 tif_data_region = Path(f'n{five_deg_n}w{five_deg_w}.tif')
                 tif_file = self.datapath / tif_data_region
                 self.tif_filenames.append(tif_file)
-
 
 
 class TopographyLayer(DataLayer):

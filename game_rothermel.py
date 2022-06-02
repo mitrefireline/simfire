@@ -10,44 +10,31 @@ from src.game.managers.fire import RothermelFireManager
 from src.game.managers.mitigation import FireLineManager
 from src.game.sprites import Terrain
 from src.utils.config import Config
-from src.utils.layers import FuelLayer, LatLongBox, TopographyLayer, BurnProbabilityLayer
-from src.utils.units import mph_to_ftpm
 from src.world.parameters import Environment, FuelParticle
 
 
 def main():
-    '''
+    """
     Initialize the layers.
     Create the Game, Terrain, and Environment
     Create the Managers
-    '''
-    cfg_path = Path('./config.yml')
+    """
+    cfg_path = Path("configs/operational_config.yml")
     cfg = Config(cfg_path)
 
     fuel_particle = FuelParticle()
 
-    center = (33.5, 116.8)
-    height, width = 1000, 1000
-    resolution = 30
-    lat_long_box = LatLongBox(center, height, width, resolution)
-    topo_layer = TopographyLayer(lat_long_box)
-    fuel_layer = FuelLayer(lat_long_box)
-    burn_prob_layer = BurnProbabilityLayer(lat_long_box)
+    game = Game(
+        (cfg.area.screen_size, cfg.area.screen_size), record=cfg.simulation.record
+    )
 
-    # Compute how many meters each pixel represents (should be close to resolution)
-    pixel_scale = height / topo_layer.data.shape[0]
-    # Convert to feet for use with rothermel
-    pixel_scale = 3.28084 * pixel_scale
+    terrain = Terrain(
+        cfg.terrain.fuel_layer, cfg.terrain.topography_layer, game.screen_size
+    )
 
-    game = Game(topo_layer.data.shape[:2])
-
-    terrain = Terrain(fuel_layer, topo_layer, game.screen_size)
-
-    # Use simple/constant wind speed for now
-    wind_speed = mph_to_ftpm(cfg.wind.simple.speed)
-    wind_speed_arr = np.full(game.screen_size, wind_speed)
-    environment = Environment(cfg.environment.moisture, wind_speed_arr,
-                              cfg.wind.simple.direction)
+    environment = Environment(
+        cfg.environment.moisture, cfg.wind.speed, cfg.wind.direction
+    )
 
     # Need to create two lines to "double up" since the fire can spread
     # to 8-connected squares
@@ -63,52 +50,66 @@ def main():
     x = points[1].tolist()
     points = list(zip(x, y))
 
-    fireline_manager = FireLineManager(size=cfg.display.control_line_size,
-                                       pixel_scale=pixel_scale,
-                                       terrain=terrain)
+    fireline_manager = FireLineManager(
+        size=cfg.display.control_line_size,
+        pixel_scale=cfg.area.pixel_scale,
+        terrain=terrain,
+    )
 
     fire_map = game.fire_map
     fire_map[cfg.fire.fire_initial_position] = BurnStatus.BURNING
     fire_map = fireline_manager.update(fire_map, points)
     game.fire_map = fire_map
 
-    fire_manager = RothermelFireManager(cfg.fire.fire_initial_position,
-                                        cfg.display.fire_size,
-                                        cfg.fire.max_fire_duration,
-                                        pixel_scale,
-                                        cfg.simulation.update_rate,
-                                        fuel_particle,
-                                        terrain,
-                                        environment,
-                                        max_time=cfg.simulation.runtime)
+    fire_manager = RothermelFireManager(
+        cfg.fire.fire_initial_position,
+        cfg.display.fire_size,
+        cfg.fire.max_fire_duration,
+        cfg.area.pixel_scale,
+        cfg.simulation.update_rate,
+        fuel_particle,
+        terrain,
+        environment,
+        max_time=cfg.simulation.runtime,
+    )
 
     game_status = GameStatus.RUNNING
     fire_status = GameStatus.RUNNING
     while game_status == GameStatus.RUNNING and fire_status == GameStatus.RUNNING:
         fire_sprites = fire_manager.sprites
         fireline_sprites = fireline_manager.sprites
-        game_status = game.update(terrain, fire_sprites, fireline_sprites, cfg.wind.speed,
-                                  cfg.wind.direction)
+        game_status = game.update(
+            terrain, fire_sprites, fireline_sprites, cfg.wind.speed, cfg.wind.direction
+        )
         fire_map = game.fire_map
         fire_map = fireline_manager.update(fire_map)
         fire_map, fire_status = fire_manager.update(fire_map)
         game.fire_map = fire_map
 
+    if cfg.simulation.record:
+        out_path = os.curdir + "/simulation.gif"
+        game.frames[0].save(out_path, save_all=True, duration=100, loop=0)
+
     fig = fire_manager.draw_spread_graph(game.screen)
     if cfg.simulation.headless:
-        save_path = os.curdir + 'fire_spread_graph.png'
-        print('Game is running in a headless state. Saving fire spread '
-              f'graph to {save_path}')
+        save_path = os.curdir + "fire_spread_graph.png"
+        print(
+            "Game is running in a headless state. Saving fire spread "
+            f"graph to {save_path}"
+        )
         fig.savefig(save_path)
     else:
-        if 'DISPLAY' in os.environ:
-            print('Game is running in a non-headless state. Displaying fire spread '
-                  f'graph on DISPLAY {os.environ["DISPLAY"]}')
+        if "DISPLAY" in os.environ:
+            print(
+                "Game is running in a non-headless state. Displaying fire spread "
+                f'graph on DISPLAY {os.environ["DISPLAY"]}'
+            )
             import matplotlib.pyplot as plt
+
             plt.show()
-            while (plt.fignum_exists(fig.number)):
+            while plt.fignum_exists(fig.number):
                 continue
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -1,28 +1,28 @@
-from typing import Tuple
+from typing import List, Optional, Sequence, Tuple, Type, Union
 
 import numpy as np
+import pygame
 
 from ...enums import BurnStatus
-from ..sprites import FireLine, ScratchLine, WetLine, Terrain
+from ..sprites import FireLine, ScratchLine, Terrain, WetLine
 
 PointType = Tuple[int, int]
-PointsType = Tuple[PointType, ...]
+PointsType = Sequence[PointType]
 
 
-class ControlLineManager():
-    '''
+class ControlLineManager:
+    """
     Base class to create and manage control lines and allow for the creation of more
     control lines while the game is running. Child classes will change the `line_type`,
     `sprite_type`, and add the initial points with `
 
     Call `update()` to add points.
-    '''
-    def __init__(self,
-                 size: int,
-                 pixel_scale: int,
-                 terrain: Terrain,
-                 headless: bool = False) -> None:
-        '''
+    """
+
+    def __init__(
+        self, size: int, pixel_scale: float, terrain: Terrain, headless: bool = False
+    ) -> None:
+        """
         Initialize the class with the display size of each `ControlLine` sprite,
         the `pixel_scale`, and the `Terrain` that the `ControlLine`s will be placed.
 
@@ -36,23 +36,26 @@ class ControlLineManager():
             terrain: The Terrain that describes the simulation/game
             headless: Flag to run in a headless state. This will allow PyGame objects to
                       not be initialized.
-        '''
+        """
         self.size = size
         self.pixel_scale = pixel_scale
         self.terrain = terrain
-        self.line_type = None
-        self.sprite_type = None
-        self.sprites = []
+        self.line_type: BurnStatus
+        self.sprite_type: Union[Type[FireLine], Type[ScratchLine], Type[WetLine]]
+        self.sprites: List[pygame.sprite.Sprite] = []
         self.headless = headless
 
     def _add_point(self, point: PointType) -> None:
-        '''
+        """
         Updates self.sprites to add a new point to the control line
-        '''
-        self.sprites.append(self.sprite_type(point, self.size, self.headless))
+        """
+        new_sprite = self.sprite_type(point, self.size, self.headless)
+        self.sprites.append(new_sprite)
 
-    def update(self, fire_map: np.ndarray, points: PointsType = []) -> np.ndarray:
-        '''
+    def update(
+        self, fire_map: np.ndarray, points: Optional[PointsType] = None
+    ) -> np.ndarray:
+        """
         Updates the passed in `fire_map` with new `ControlLine` `points`.
 
         Arguments:
@@ -60,28 +63,30 @@ class ControlLineManager():
 
         Returns:
             fire_map: The upadated fire map with the control lines added.
-        '''
-        for point in points:
-            x, y = point
-            fire_map[y, x] = self.line_type
-            self._add_point(point)
+        """
+        if points is None:
+            pass
+        else:
+            for point in points:
+                x, y = point
+                fire_map[y, x] = self.line_type
+                self._add_point(point)
 
         return fire_map
 
 
 class FireLineManager(ControlLineManager):
-    '''
+    """
     Manages the placement of `FireLines` and `FireLine` sprites. Should have varying
     physical characteristics from `ScratchLines` and `WetLines`.
 
     Call `update()` to add points.
-    '''
-    def __init__(self,
-                 size: int,
-                 pixel_scale: int,
-                 terrain: Terrain,
-                 headless: bool = False) -> None:
-        '''
+    """
+
+    def __init__(
+        self, size: int, pixel_scale: float, terrain: Terrain, headless: bool = False
+    ) -> None:
+        """
         Initialize the class with the display size of each `FireLine` sprite,
         the `pixel_scale`, and the `Terrain` that the `FireLine`s will be placed.
 
@@ -97,28 +102,26 @@ class FireLineManager(ControlLineManager):
             terrain: The Terrain that describes the simulation/game
             headless: Flag to run in a headless state. This will allow PyGame objects to
                       not be initialized.
-        '''
-        super().__init__(size=size,
-                         pixel_scale=pixel_scale,
-                         terrain=terrain,
-                         headless=headless)
+        """
+        super().__init__(
+            size=size, pixel_scale=pixel_scale, terrain=terrain, headless=headless
+        )
         self.line_type = BurnStatus.FIRELINE
         self.sprite_type = FireLine
 
 
 class ScratchLineManager(ControlLineManager):
-    '''
+    """
     Manages the placement of `FireLines` and `ScratchLine` sprites. Should have varying
     physical characteristics from `FireLines` and `WetLines`.
 
     Call `update()` to add points.
-    '''
-    def __init__(self,
-                 size: int,
-                 pixel_scale: int,
-                 terrain: Terrain,
-                 headless: bool = False) -> None:
-        '''
+    """
+
+    def __init__(
+        self, size: int, pixel_scale: float, terrain: Terrain, headless: bool = False
+    ) -> None:
+        """
         Initialize the class with the display size of each `ScratchLine` sprite,
         the `pixel_scale`, and the `Terrain` that the `ScratchLine`s will be placed.
 
@@ -134,28 +137,26 @@ class ScratchLineManager(ControlLineManager):
             terrain: The Terrain that describes the simulation/game
             points: The list of all ((x1, y1), (x2, y2)) pairs of pairs that designate
                     between which two points control lines will be drawn.
-        '''
-        super().__init__(size=size,
-                         pixel_scale=pixel_scale,
-                         terrain=terrain,
-                         headless=headless)
+        """
+        super().__init__(
+            size=size, pixel_scale=pixel_scale, terrain=terrain, headless=headless
+        )
         self.line_type = BurnStatus.SCRATCHLINE
         self.sprite_type = ScratchLine
 
 
 class WetLineManager(ControlLineManager):
-    '''
+    """
     Manages the placement of `WetLines` and `WetLine` sprites. Should have varying
     physical characteristics from `ScratchLines` and `FireLines`.
 
     Call `update()` to add points.
-    '''
-    def __init__(self,
-                 size: int,
-                 pixel_scale: int,
-                 terrain: Terrain,
-                 headless: bool = False) -> None:
-        '''
+    """
+
+    def __init__(
+        self, size: int, pixel_scale: float, terrain: Terrain, headless: bool = False
+    ) -> None:
+        """
         Initialize the class with the display size of each `WetLine` sprite,
         the `pixel_scale`, and the `Terrain` that the `WetLine`s will be placed.
 
@@ -171,10 +172,9 @@ class WetLineManager(ControlLineManager):
             terrain: The Terrain that describes the simulation/game
             points: The list of all ((x1, y1), (x2, y2)) pairs of pairs that designate
                     between which two points control lines will be drawn.
-        '''
-        super().__init__(size=size,
-                         pixel_scale=pixel_scale,
-                         terrain=terrain,
-                         headless=headless)
+        """
+        super().__init__(
+            size=size, pixel_scale=pixel_scale, terrain=terrain, headless=headless
+        )
         self.line_type = BurnStatus.WETLINE
         self.sprite_type = WetLine

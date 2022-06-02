@@ -11,16 +11,28 @@ repos:
       - id: debug-statements
       - id: requirements-txt-fixer
       - id: check-merge-conflict
-      - id: double-quote-string-fixer
       - id: end-of-file-fixer
       - id: sort-simple-yaml
   - repo: local
     hooks:
-      - id: yapf
-        name: yapf
+      - id: black
+        name: black
+        entry: black
         language: python
-        entry: yapf
-        args: [-i, -vv]
+        types: [python]
+      - id: mypy
+        name: mypy
+        exclude: /_tests/
+        language: python
+        entry: mypy
+        args: [--config-file, .mypy.ini]
+        # use your preferred Python version
+        types: [python]
+      - id: isort
+        name: isort
+        language: python
+        entry: isort
+        args: [--trailing-comma, -m=3]
         types: [python]
   - repo: https://gitlab.com/PyCQA/flake8
     rev: 3.8.3

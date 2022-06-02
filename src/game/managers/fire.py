@@ -1,42 +1,63 @@
-'''
+"""
 Fire
 ====
 
 Defines the different `FireManager`s (`ConstantSpreadFireManager` and
 `RothermelFireManager`) that determine how a fire moves about a `fire_map`.
-'''
+"""
+import collections
 from dataclasses import astuple
-from typing import List, Tuple, Union
+from typing import Any, List, Sequence, Tuple, Union
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pygame
 
-from ..sprites import Fire, Terrain
-from ...enums import BurnStatus, RoSAttenuation, GameStatus
+from ...enums import BurnStatus, GameStatus, RoSAttenuation
 from ...utils.graph import FireSpreadGraph
 from ...world.parameters import Environment, FuelParticle
 from ...world.rothermel import compute_rate_of_spread
+from ..sprites import Fire, Terrain
 
-NewLocsType = Tuple[Tuple[int, int], Tuple[int, int], Tuple[int, int], Tuple[int, int],
-                    Tuple[int, int], Tuple[int, int], Tuple[int, int], Tuple[int, int]]
+NewLocsType = Tuple[Tuple[int, int], ...]
 
-SpriteParamsType = List[Union[List[float], Tuple[float]]]
+SpriteParamsType = Tuple[
+    List[int],
+    List[int],
+    List[int],
+    List[int],
+    List[float],
+    List[float],
+    List[float],
+    List[float],
+    List[float],
+    List[float],
+    List[float],
+    List[float],
+    List[float],
+    List[float],
+    List[float],
+    List[float],
+    List[float],
+]
 
 
-class FireManager():
-    '''
+class FireManager:
+    """
     Base class to manage the spread of the fire as well as the map of which
     pixels have already burned. Child classes should create their own update()
     method to describe how the fire spreads.
-    '''
-    def __init__(self,
-                 init_pos: Tuple[int, int],
-                 fire_size: int,
-                 max_fire_duration: int,
-                 attenuate_line_ros: bool = True,
-                 headless: bool = False) -> None:
-        '''
+    """
+
+    def __init__(
+        self,
+        init_pos: Tuple[int, int],
+        fire_size: int,
+        max_fire_duration: int,
+        attenuate_line_ros: bool = True,
+        headless: bool = False,
+    ) -> None:
+        """
         Initialize the class by recording the initial fire location and size.
 
         Create the fire sprite and fire_map and mark the location of the
@@ -61,7 +82,7 @@ class FireManager():
                       not be initialized.
         Returns:
             None
-        '''
+        """
         self.init_pos = init_pos
         self.fire_size = fire_size
         self.max_fire_duration = max_fire_duration
@@ -72,19 +93,19 @@ class FireManager():
         self.sprites: List[Fire] = [init_fire]
         self.durations: List[int] = [0]
 
-    def update(self, fire_map: np.ndarray) -> None:
-        '''
+    def update(self, fire_map: np.ndarray) -> Any:
+        """
         Method that describes how the fires in `self.sprites`should spread.
 
         Should be updated in child classes.
 
         Arguments:
             fire_map: All possible fire conditions at each pixel location
-        '''
+        """
         pass
 
     def _prune_sprites(self, fire_map: np.ndarray) -> np.ndarray:
-        '''
+        """
         Internal method to remove any Fire sprites whose durations have
         exceded the maximum allowed duration and mark `self.fire_map` as
         BURNED.
@@ -94,23 +115,36 @@ class FireManager():
 
         Returns:
             An updated `fire_map` with sprites pruned
-        '''
+        """
+        # lists_zipped = [[s, d] for s, d in zip(self.sprites, self.durations)]
         lists_zipped = list(zip(self.sprites, self.durations))
         # Get the sprites whose duration exceeds the max allowed duration
-        results = list(filter(lambda x: x[1] >= self.max_fire_duration, lists_zipped))
-        results = list(zip(*results))
-        if len(results) > 0:
-            expired_sprites = results[0]
-            # Use the expired sprites to mark self.fire_map as burned
+        expired_results = list(
+            filter(lambda x: x[1] >= self.max_fire_duration, lists_zipped)
+        )
+        expired_results = list(zip(*expired_results))
+        # Use the expired sprites to mark self.fire_map as burned
+        if len(expired_results) > 0:
+            expired_sprites = expired_results[0]
             for sprite in expired_sprites:
                 x, y, _, _ = sprite.rect
                 fire_map[y, x] = BurnStatus.BURNED
 
         # Remove the expired sprites
-        results = list(filter(lambda x: x[1] < self.max_fire_duration, lists_zipped))
+        non_expired_results = list(
+            filter(lambda x: x[1] < self.max_fire_duration, lists_zipped)
+        )
 
-        if len(results) > 0:
-            self.sprites, self.durations = list(map(list, zip(*results)))
+        # Re-assign sprites and durations, then slice off excess
+        if len(non_expired_results) > 0:
+            num_results = len(non_expired_results)
+            for i in range(num_results):
+                self.sprites[i] = non_expired_results[i][0]
+                self.durations[i] = non_expired_results[i][1]
+            # Slice off everything else since all the non-expired sprites have
+            # been assigned
+            self.sprites = self.sprites[:num_results]
+            self.durations = self.durations[:num_results]
         else:
             self.sprites = []
             self.durations = []
@@ -118,7 +152,7 @@ class FireManager():
         return fire_map
 
     def _get_new_locs(self, x: int, y: int, fire_map: np.ndarray) -> NewLocsType:
-        '''
+        """
         Get the 8-connected locations of the input (x,y) coordinate. This
         function will filter the points that are beyond the boundaries of
         the game screen and/or the points that are already `BURNED` or `BURNING`.
@@ -131,9 +165,10 @@ class FireManager():
             A tuple of tuple of ints containing the adjacent
             pixel locations that are `UNBURNED` and within the
             scope of the game screen
-        '''
+        """
+
         def _filter_function(loc: Tuple[int, int]) -> bool:
-            '''Used in `self.get_new_locs` as the filter function for the new locations
+            """Used in `self.get_new_locs` as the filter function for the new locations
 
             Make sure each new location/pixel is:
                 - Within the game screen boundaries
@@ -144,21 +179,33 @@ class FireManager():
 
             Returns:
                 Whether or not the `loc` was inside the boundaries
-            '''
+            """
             acceptable_statuses = [
-                BurnStatus.UNBURNED, BurnStatus.FIRELINE, BurnStatus.SCRATCHLINE,
-                BurnStatus.WETLINE
+                BurnStatus.UNBURNED,
+                BurnStatus.FIRELINE,
+                BurnStatus.SCRATCHLINE,
+                BurnStatus.WETLINE,
             ]
 
-            in_boundaries = loc[0] < fire_map.shape[1] \
-                            and loc[0] >= 0 \
-                            and loc[1] < fire_map.shape[0] \
-                            and loc[1] >= 0 \
-                            and fire_map[loc[1], loc[0]] in acceptable_statuses
+            in_boundaries = (
+                loc[0] < fire_map.shape[1]
+                and loc[0] >= 0
+                and loc[1] < fire_map.shape[0]
+                and loc[1] >= 0
+                and fire_map[loc[1], loc[0]] in acceptable_statuses
+            )
             return in_boundaries
 
-        new_locs = ((x + 1, y), (x + 1, y + 1), (x, y + 1), (x - 1, y + 1), (x - 1, y),
-                    (x - 1, y - 1), (x, y - 1), (x + 1, y - 1))
+        new_locs = (
+            (x + 1, y),
+            (x + 1, y + 1),
+            (x, y + 1),
+            (x - 1, y + 1),
+            (x - 1, y),
+            (x - 1, y - 1),
+            (x, y - 1),
+            (x + 1, y - 1),
+        )
         # Make sure each new location/pixel is:
         #   Within the game screen boundaries
         #   UNBURNED
@@ -166,9 +213,10 @@ class FireManager():
 
         return new_locs
 
-    def _update_rate_of_spread(self, rate_of_spread: np.ndarray,
-                               fire_map: np.ndarray) -> np.ndarray:
-        '''Update the burn amounts based on control line status.
+    def _update_rate_of_spread(
+        self, rate_of_spread: np.ndarray, fire_map: np.ndarray
+    ) -> np.ndarray:
+        """Update the burn amounts based on control line status.
 
         This will subtract the rate of spread for all control line locations in
         `rate_of_spread` by the numbers set in `enums.RosAttenuation`.
@@ -185,14 +233,15 @@ class FireManager():
 
         Returns:
             An updated `rate_of_spread` array, taking into account the control lines
-        '''
+        """
         assert fire_map.shape == rate_of_spread.shape
 
         factor = np.zeros_like(rate_of_spread)
         if self.attenuate_line_ros:
             factor[np.where(fire_map == BurnStatus.FIRELINE)] = RoSAttenuation.FIRELINE
-            factor[np.where(
-                fire_map == BurnStatus.SCRATCHLINE)] = RoSAttenuation.SCRATCHLINE
+            factor[
+                np.where(fire_map == BurnStatus.SCRATCHLINE)
+            ] = RoSAttenuation.SCRATCHLINE
             factor[np.where(fire_map == BurnStatus.WETLINE)] = RoSAttenuation.WETLINE
             rate_of_spread = rate_of_spread - factor
         else:
@@ -204,23 +253,26 @@ class FireManager():
 
 
 class RothermelFireManager(FireManager):
-    '''
+    """
     This FireManager will spread the fire based on the basic [Rothermel
     Model](https://www.fs.fed.us/rm/pubs_series/rmrs/gtr/rmrs_gtr371.pdf).
-    '''
-    def __init__(self,
-                 init_pos: Tuple[int, int],
-                 fire_size: int,
-                 max_fire_duration: int,
-                 pixel_scale: int,
-                 update_rate: float,
-                 fuel_particle: FuelParticle,
-                 terrain: Terrain,
-                 environment: Environment,
-                 max_time: int = None,
-                 attenuate_line_ros: bool = True,
-                 headless: bool = False) -> None:
-        '''
+    """
+
+    def __init__(
+        self,
+        init_pos: Tuple[int, int],
+        fire_size: int,
+        max_fire_duration: int,
+        pixel_scale: float,
+        update_rate: float,
+        fuel_particle: FuelParticle,
+        terrain: Terrain,
+        environment: Environment,
+        max_time: int = None,
+        attenuate_line_ros: bool = True,
+        headless: bool = False,
+    ) -> None:
+        """
         Initialize the class by recording the initial fire location and size.
         Create the fire sprite and fire_map and mark the location of the
         initial fire.
@@ -254,19 +306,22 @@ class RothermelFireManager(FireManager):
                                 different control lines will completely stop the fire.
             headless: Flag to run in a headless state. This will allow PyGame objects to
                       not be initialized.
-        '''
-        super().__init__(init_pos, fire_size, max_fire_duration, attenuate_line_ros,
-                         headless)
+        """
+        super().__init__(
+            init_pos, fire_size, max_fire_duration, attenuate_line_ros, headless
+        )
         self.pixel_scale = pixel_scale
         self.update_rate = update_rate
         self.max_time = max_time
-        self.elapsed_time = 0
+        self.elapsed_time = 0.0
         self.fuel_particle = fuel_particle
         self.terrain = terrain
-
         self.environment = environment
-        self.environment.U = np.asarray(environment.U, dtype=np.float32)
-        self.environment.U_dir = np.asarray(environment.U, dtype=np.float32)
+
+        # Convert potential constant or nested sequence wind magnitude
+        # and directions to numpy arrays with values at each game/terrain
+        # pixel. This will allow for easier computation
+        self.U, self.U_dir = self._get_environment_parameters(environment)
 
         # Keep track of how much each pixel has burned.
         # This is needed since each pixel represents a specific number of feet
@@ -280,8 +335,62 @@ class RothermelFireManager(FireManager):
         # Create a FireSpreadGraph to track the fire
         self.fs_graph = FireSpreadGraph(self.terrain.screen_size)
 
+    def _get_environment_parameters(
+        self, environment: Environment
+    ) -> Tuple[np.ndarray, np.ndarray]:
+        """
+        Convert the input Environment U and U_dir (wind and wind-direction) parameters
+        to numpy arrays with shape self.terrain.data.shape for use with the class.
+
+        Arguments:
+            environment: The input environment to convert
+
+        Returns:
+            The environment with U and U_dir converted to numpy arrays
+        """
+
+        def convert_param_to_numpy(
+            param: Union[float, Sequence[Sequence[float]], np.ndarray]
+        ) -> np.ndarray:
+            """
+            Convert the input paramter from float or nested sequence of floats
+            to a numpy array.
+            """
+            if isinstance(param, float):
+                param = np.full(self.terrain.screen_size, param, dtype=np.float32)
+            elif isinstance(param, np.ndarray):
+                if param.shape != self.terrain.screen_size:
+                    raise ValueError(
+                        f"The input parameter shape of {param.shape} "
+                        "should match the terrain shape "
+                        f"of {self.terrain.screen_size}"
+                    )
+            else:
+                # Should be a Sequence[Sequence[float]], but check all sub-elements
+                if not all(
+                    isinstance(sub_seq, collections.Sequence) for sub_seq in param
+                ):
+                    raise ValueError(
+                        "The input parameter should be "
+                        "one of (float | Sequence[Sequence[float]] | "
+                        f"np.ndarray), but got {type(param)}"
+                    )
+                param = np.asarray(param)
+                if param.shape != self.terrain.screen_size:
+                    raise ValueError(
+                        f"The input parameter shape of {param.shape} "
+                        "should match the terrain shape "
+                        f"of {self.terrain.screen_size}"
+                    )
+            return param
+
+        U = convert_param_to_numpy(environment.U)
+        U_dir = convert_param_to_numpy(environment.U_dir)
+
+        return U, U_dir
+
     def _compute_slopes(self) -> Tuple[np.ndarray, np.ndarray]:
-        '''
+        """
         Compute the gradient/slope magnitude and direction for every point for use
         with the Rothermel calculation. This is easier than computing on the fly for
         every new location in the update() call.
@@ -289,14 +398,16 @@ class RothermelFireManager(FireManager):
         Returns:
             The gradient/slope magnitude for every pixel ([0]) and the gradient
             direction/angle for every pixel ([1])
-        '''
+        """
         grad_y, grad_x = np.gradient(self.terrain.elevations)
         grad_mag = np.sqrt(grad_x**2 + grad_y**2)
         grad_dir = np.tan(grad_y / (grad_x + 0.000001))
         return grad_mag, grad_dir
 
-    def _accrue_sprites(self, sprite_idx: int, fire_map: np.ndarray) -> SpriteParamsType:
-        '''
+    def _accrue_sprites(
+        self, sprite_idx: int, fire_map: np.ndarray
+    ) -> Union[SpriteParamsType, None]:
+        """
         Pull all neccessary information for the update step in a multiprocessable way.
         This will return a list of lists containing the Rothermel computation information
         for a single sprite and all of its possible new locations.
@@ -309,22 +420,23 @@ class RothermelFireManager(FireManager):
         Returns:
             The sprite parameters needed for a Rothermel calculation for each sprite for
             each possible new spreadable fire location
-        '''
+        """
 
         sprite = self.sprites[sprite_idx]
-        x, y, _, _ = sprite.rect
+        x, y = sprite.rect.x, sprite.rect.y
         new_locs = self._get_new_locs(x, y, fire_map)
         num_locs = len(new_locs)
         if num_locs == 0:
-            return
+            return None
 
         new_locs_uzip = tuple(zip(*new_locs))
-        new_loc_x = new_locs_uzip[0]
-        new_loc_y = new_locs_uzip[1]
+        new_loc_x = list(int(val) for val in new_locs_uzip[0])
+        new_loc_y = list(int(val) for val in new_locs_uzip[1])
         loc_x = [x] * num_locs
         loc_y = [y] * num_locs
         n_w_0, n_delta, n_M_x, n_sigma = list(
-            zip(*[astuple(fuel) for fuel in self.terrain.fuels[new_locs_uzip[::-1]]]))
+            zip(*[astuple(fuel) for fuel in self.terrain.fuels[new_locs_uzip[::-1]]])
+        )
         # Set the FuelParticle parameters into arrays
         h = [self.fuel_particle.h] * num_locs
         S_T = [self.fuel_particle.S_T] * num_locs
@@ -333,20 +445,35 @@ class RothermelFireManager(FireManager):
         # Set the Environment parameters into arrays
         M_f = [self.environment.M_f] * num_locs
         U = []
-        U.extend(list(self.environment.U[new_locs_uzip[::-1]]))
+        U.extend(list(self.U[new_locs_uzip[::-1]]))
         U_dir = []
-        U_dir.extend(list(self.environment.U_dir[new_locs_uzip[::-1]]))
+        U_dir.extend(list(self.U_dir[new_locs_uzip[::-1]]))
         # Set the slope parameters into arrays
         slope_mag = self.slope_mag[new_locs_uzip[::-1]].tolist()
         slope_dir = self.slope_dir[new_locs_uzip[::-1]].tolist()
 
-        return [
-            loc_x, loc_y, new_loc_x, new_loc_y, n_w_0, n_delta, n_M_x, n_sigma, h, S_T,
-            S_e, p_p, M_f, U, U_dir, slope_mag, slope_dir
-        ]
+        return (
+            loc_x,
+            loc_y,
+            new_loc_x,
+            new_loc_y,
+            n_w_0,
+            n_delta,
+            n_M_x,
+            n_sigma,
+            h,
+            S_T,
+            S_e,
+            p_p,
+            M_f,
+            U,
+            U_dir,
+            slope_mag,
+            slope_dir,
+        )
 
-    def _flatten_params(self, all_params: SpriteParamsType) -> List[np.ndarray]:
-        '''
+    def _flatten_params(self, all_params: List[SpriteParamsType]) -> List[np.ndarray]:
+        """
         Flatten the sprite parameters into an array of shape
         (num_parameters, num_points_to_compute). This will allow for the Rothermel
         calculation to be done in a multiprocessable way.
@@ -361,23 +488,25 @@ class RothermelFireManager(FireManager):
             The sprtie parameters with shape (num_parameters, num_points_to_compute).
             The input is transformed from a list of lists/tuples into a 2D array
             containing the information in a vectorized/multiprocessing format
-        '''
+        """
         if len(self.sprites) == 1:  # single burning pixel case (first sim step typically)
             arr = np.asarray(all_params, dtype=np.float32)
             arr = np.reshape(arr, (arr.shape[1], arr.shape[0] * arr.shape[2]))
         else:  # Multiple burning pixels
             num_params_per_example = len(all_params[0])
-            arr = [
-                np.hstack([x[i] for x in all_params])
+            list_arr = [
+                # Ignore type warning since everyting gets converted to array of floats
+                np.hstack([x[i] for x in all_params])  # type: ignore
                 for i in range(num_params_per_example)
             ]
-            arr = np.asarray(arr, dtype=np.float32)
+            arr = np.asarray(list_arr, dtype=np.float32)
 
         return [arr[i, :] for i in range(arr.shape[0])]
 
-    def _update_with_new_locs(self, y_coords: np.ndarray, x_coords: np.ndarray,
-                              fire_map: np.ndarray) -> np.ndarray:
-        '''
+    def _update_with_new_locs(
+        self, y_coords: np.ndarray, x_coords: np.ndarray, fire_map: np.ndarray
+    ) -> np.ndarray:
+        """
         Update `self.sprites` with new sprites, `self.durations` with new durations, and
         return an updated fire map with new burn locations
 
@@ -389,7 +518,7 @@ class RothermelFireManager(FireManager):
 
         Returns:
             A NumPy array of the updated `fire_map`
-        '''
+        """
         y_coords, x_coords = np.unique(np.vstack((y_coords, x_coords)), axis=1)
         # Check which coordinates have passed the threhold for burning
         new_burn = np.argwhere(self.burn_amounts[y_coords, x_coords] > self.pixel_scale)
@@ -416,7 +545,7 @@ class RothermelFireManager(FireManager):
         return fire_map
 
     def draw_spread_graph(self, game_screen: pygame.Surface = None) -> plt.Figure:
-        '''
+        """
         Create a matplotlib Figure with the fire spread graph overlain on the
         terrain image.
 
@@ -427,9 +556,10 @@ class RothermelFireManager(FireManager):
         Returns:
             A matplotlib.pyplot.Figure containing the graph on top of the
                 terrain image
-        '''
+        """
         if game_screen is None:
-            background_image = pygame.surfarray.pixels3d(self.terrain.image).copy()
+            if self.terrain.image is not None:
+                background_image = pygame.surfarray.pixels3d(self.terrain.image).copy()
         else:
             background_image = pygame.surfarray.pixels3d(game_screen).copy()
         background_image = background_image.swapaxes(1, 0)
@@ -438,7 +568,7 @@ class RothermelFireManager(FireManager):
         return fig
 
     def update(self, fire_map: np.ndarray) -> Tuple[np.ndarray, GameStatus]:
-        '''
+        """
         Update the spreading of the fires. This function will remove
         any fires that have exceded their duration and will spread fires
         that have reached the correct rate of spread for a long enough
@@ -450,7 +580,7 @@ class RothermelFireManager(FireManager):
 
         Returns:
             A NumPy array of the updated `fire_map` and the current `GameStatus`
-        '''
+        """
         # Remove all fires that are past the max duration
         self._prune_sprites(fire_map)
         # Increment the durations
@@ -466,25 +596,6 @@ class RothermelFireManager(FireManager):
             if self.update_rate > self.max_time or self.elapsed_time > self.max_time:
                 return fire_map, GameStatus.QUIT
 
-        # Initialize all the vectorized variables
-        loc_x = []
-        loc_y = []
-        new_loc_x = []
-        new_loc_y = []
-        w_0 = []
-        delta = []
-        M_x = []
-        sigma = []
-        h = []
-        S_T = []
-        S_e = []
-        p_p = []
-        M_f = []
-        U = []
-        U_dir = []
-        slope_mag = []
-        slope_dir = []
-
         sprite_idxs = list(range(num_sprites))
 
         all_params = [self._accrue_sprites(idx, fire_map) for idx in sprite_idxs]
@@ -495,14 +606,45 @@ class RothermelFireManager(FireManager):
             return fire_map, GameStatus.RUNNING
 
         [
-            loc_x, loc_y, new_loc_x, new_loc_y, w_0, delta, M_x, sigma, h, S_T, S_e, p_p,
-            M_f, U, U_dir, slope_mag, slope_dir
+            loc_x,
+            loc_y,
+            new_loc_x,
+            new_loc_y,
+            w_0,
+            delta,
+            M_x,
+            sigma,
+            h,
+            S_T,
+            S_e,
+            p_p,
+            M_f,
+            U,
+            U_dir,
+            slope_mag,
+            slope_dir,
         ] = self._flatten_params(all_params)
 
         # Compute the rate of spread with vectorized function
-        R = compute_rate_of_spread(loc_x, loc_y, new_loc_x, new_loc_y, w_0, delta, M_x,
-                                   sigma, h, S_T, S_e, p_p, M_f, U, U_dir, slope_mag,
-                                   slope_dir)
+        R = compute_rate_of_spread(
+            loc_x,
+            loc_y,
+            new_loc_x,
+            new_loc_y,
+            w_0,
+            delta,
+            M_x,
+            sigma,
+            h,
+            S_T,
+            S_e,
+            p_p,
+            M_f,
+            U,
+            U_dir,
+            slope_mag,
+            slope_dir,
+        )
 
         # Scale the rate of spread by the update rate
         R *= self.update_rate
@@ -532,12 +674,18 @@ class RothermelFireManager(FireManager):
 
 
 class ConstantSpreadFireManager(FireManager):
-    '''
+    """
     This FireManager will spread fire at a constant rate in all directions.
-    '''
-    def __init__(self, init_pos: Tuple[int, int], fire_size: int, max_fire_duration: int,
-                 rate_of_spread: int) -> None:
-        '''
+    """
+
+    def __init__(
+        self,
+        init_pos: Tuple[int, int],
+        fire_size: int,
+        max_fire_duration: int,
+        rate_of_spread: int,
+    ) -> None:
+        """
         Initialize the class by recording the initial fire location and size.
         Create the fire sprite and `fire_map` and mark the location of the
         initial fire.
@@ -554,12 +702,12 @@ class ConstantSpreadFireManager(FireManager):
                                interior do not have to keep being rendered.
             rate_of_spread: The number of frames that must pass before a fire
                             can spread to adjacent pixels.
-        '''
+        """
         super().__init__(init_pos, fire_size, max_fire_duration)
         self.rate_of_spread = rate_of_spread
 
     def update(self, fire_map: np.ndarray) -> np.ndarray:
-        '''
+        """
         Spread the fire and add new fire sprites to the display. The fire
         will spread at a constant rate in all directions based on
         self.rate_of_spread. `self.fire_map` is updated accordingly based on
@@ -570,10 +718,10 @@ class ConstantSpreadFireManager(FireManager):
 
         Returns:
             An updated NumPy array of the current `fire_map`
-        '''
+        """
         self._prune_sprites(fire_map)
         for sprite, duration in zip(self.sprites, self.durations):
-            x, y, _, _ = sprite.rect
+            x, y = sprite.rect.x, sprite.rect.y
             # Create new sprites and mark the area as burning if
             # it has been burning long enough to spread
             if duration == self.rate_of_spread:

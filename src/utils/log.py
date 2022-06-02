@@ -1,9 +1,9 @@
-import os
 import logging
+import os
 
 
 def create_logger(name: str) -> logging.Logger:
-    '''Create a `Logger` to be used in different modules
+    """Create a `Logger` to be used in different modules
 
     Parameters:
     -----------
@@ -14,14 +14,13 @@ def create_logger(name: str) -> logging.Logger:
     --------
     log: logging.Logger
         The `Logger` object that will be used to create log statements in the terminal.
-    '''
-    if os.environ.get('LOGLEVEL') is not None:
-        log_level = os.environ.get('LOGLEVEL')
-    else:
-        log_level = 'INFO'
+    """
+    if (log_level := os.environ.get("LOGLEVEL")) is None:
+        log_level = "INFO"
 
-    formatter = logging.Formatter('%(asctime)s : %(levelname)s : '
-                                  '(%(pathname)s:%(lineno)d) : %(message)s')
+    formatter = logging.Formatter(
+        "%(asctime)s : %(levelname)s : " "(%(pathname)s:%(lineno)d) : %(message)s"
+    )
 
     log = logging.getLogger(name)
     log.setLevel(log_level)

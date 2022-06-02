@@ -19,15 +19,37 @@ flake8:
     - docker
   script:
     - flake8 .
+  needs: []
   only:
     - merge_requests
 
-yapf:
+black:
   stage: Static Analysis
   tags:
     - docker
   script:
-    - if [ `yapf -r ./ -d | wc -l` -gt 0 ] ; then false ; else true ;fi
+    - black --check ./
+  needs: []
+  only:
+    - merge_requests
+
+mypy:
+  stage: Static Analysis
+  tags:
+    - docker
+  script:
+    - mypy --config-file .mypy.ini .
+  needs: []
+  only:
+    - merge_requests
+
+isort:
+  stage: Static Analysis
+  tags:
+    - docker
+  script:
+    - isort --check --trailing-comma -m=3 .
+  needs: []
   only:
     - merge_requests
 
@@ -69,7 +91,7 @@ coverage:
   needs: []
   only:
     - merge_requests
-    - master
+    - main
 
 ################
 # GitLab Pages #
@@ -104,7 +126,7 @@ pages:
     paths:
       - public
   only:
-    - master
+    - main
 
 ###########################
 # Packaging and Releasing #
@@ -144,7 +166,7 @@ release-dev:
     - !reference [.delete-package, script]
     - !reference [.release, script]
   only:
-    - master
+    - main
 
 release:
   stage: Release

@@ -2,7 +2,6 @@
 # https://fireline.pages.mitre.org/rothermel-modeling/config.html
 area:
   screen_size: 9
-  terrain_size: 3
   pixel_scale: 50
 
 display:
@@ -13,26 +12,43 @@ simulation:
   update_rate: 1
   runtime: 24h
   headless: true
+  record: true
 
 mitigation:
   ros_attenuation: true
 
+operational:
+  seed:
+  latitude: 39.67
+  longitude: 119.8
+  height: 4000
+  width: 4000
+  resolution: 30
+
 terrain:
-  elevation_function: flat
-  perlin:
-    amplitude: 500
-    shape: (9, 9)
-    resolution: (1, 1)
-    seed: 1111
-  gaussian:
-    amplitude: 500
-    mu_x: 50
-    mu_y: 50
-    sigma_x: 50
-    sigma_y: 50
-  fuel_array_function: chaparral
-  chaparral:
-    seed: 1111
+  topography:
+    type: functional
+    functional:
+      function: flat
+      perlin:
+        octaves: 3
+        persistence: 0.7
+        lacunarity: 2.0
+        seed: 827
+        range_min: 100.0
+        range_max: 300.0
+      gaussian:
+        amplitude: 500
+        mu_x: 50
+        mu_y: 50
+        sigma_x: 50
+        sigma_y: 50
+  fuel:
+    type: functional
+    functional:
+      function: chaparral
+      chaparral:
+        seed: 1113
 
 fire:
   fire_initial_position: (5, 3)
@@ -42,7 +58,16 @@ environment:
   moisture: 0.03
 
 wind:
-  wind_function: simple
+  function: simple
+  cfd:
+    time_to_train: 1000 # Seconds, longer is better
+    iterations: 1
+    scale: 1
+    timestep_dt: 1.0
+    diffusion: 0.0
+    viscosity: 0.0000001
+    speed: 19
+    direction: north
   simple:
     speed: 7
     direction: 90.0
@@ -53,18 +78,13 @@ wind:
       octaves: 3
       persistence: 0.7
       lacunarity: 2.0
-      min: 7
-      max: 47
+      range_min: 7
+      range_max: 47
     direction:
       seed: 650
       scale: 1500
       octaves: 2
       persistence: 0.9
       lacunarity: 1.0
-      min: 0.0
-      max: 360.0
-
-render:
-  inline: false
-  post_agent: false
-  post_agent_with_fire: true
+      range_min: 0.0
+      range_max: 360.0

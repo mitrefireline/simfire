@@ -1,13 +1,22 @@
 import math
-import pygame
+
 import numpy as np
+import pygame
 
-terrain_features = 0
+terrain_features: np.ndarray
 
 
-class Fluid():
-    def __init__(self, n: int, iterations: int, scale: int, dt: float, diffusion: float,
-                 viscosity: float, terrain: np.ndarray) -> None:
+class Fluid:
+    def __init__(
+        self,
+        n: int,
+        iterations: int,
+        scale: int,
+        dt: float,
+        diffusion: float,
+        viscosity: float,
+        terrain: np.ndarray,
+    ) -> None:
         self.N: int = n  # Width x Height of the Screen
         self.itr = iterations
 
@@ -71,14 +80,18 @@ class Fluid():
                 vx = self.Vx[i][j]
                 vy = self.Vy[i][j]
 
-                if (not (abs(vx) < 0.1 and abs(vy)) <= 0.1):
+                if not (abs(vx) < 0.1 and abs(vy)) <= 0.1:
                     meanval = int(np.mean([vx, vy]))
                     if meanval < 0:
                         meanval = 0
                     if meanval > 255:
                         meanval = 255
-                    pygame.draw.line(surface, [meanval, meanval, meanval, meanval],
-                                     [x, y], [x + vx, y + vy])
+                    pygame.draw.line(
+                        surface,
+                        [meanval, meanval, meanval, meanval],
+                        [x, y],
+                        [x + vx, y + vy],
+                    )
         pygame.display.flip()
 
 
@@ -152,14 +165,16 @@ def set_bnd(b: int, x: np.ndarray, N: int):
     #             x[row][j] = -x[row+1][j] if b == 1 else x[row+1][j];
 
 
-def lin_solve(b: int, x: np.ndarray, x0: np.ndarray, a: float, c: float, itr: int,
-              N: int):
+def lin_solve(
+    b: int, x: np.ndarray, x0: np.ndarray, a: float, c: float, itr: int, N: int
+):
     cRecip = 1.0 / c
     for t in range(0, itr):
         for j in range(1, N - 1):
             for i in range(1, N - 1):
-                calc = (x0[i][j] + a *
-                        (x[i + 1][j] + x[i - 1][j] + x[i][j + 1] + x[i][j - 1])) * cRecip
+                calc = (
+                    x0[i][j] + a * (x[i + 1][j] + x[i - 1][j] + x[i][j + 1] + x[i][j - 1])
+                ) * cRecip
                 global terrain_features
                 if terrain_features[i][j] != 1.0:
                     x[i][j] = calc
@@ -171,8 +186,9 @@ def lin_solve(b: int, x: np.ndarray, x0: np.ndarray, a: float, c: float, itr: in
 # Precalculates a value and passes everything to lin_solve
 
 
-def diffuse(b: int, x: np.ndarray, x0: np.ndarray, diff: float, dt: float, itr: int,
-            N: int):
+def diffuse(
+    b: int, x: np.ndarray, x0: np.ndarray, diff: float, dt: float, itr: int, N: int
+):
     a = dt * diff * (N - 2) * (N - 2)
     lin_solve(b, x, x0, a, 1 + 6 * a, itr, N)
 
@@ -180,12 +196,25 @@ def diffuse(b: int, x: np.ndarray, x0: np.ndarray, diff: float, dt: float, itr: 
 # Incompressible object, clean up stage for each cell
 
 
-def project(velocX: np.ndarray, velocY: np.ndarray, p: np.ndarray, div: np.ndarray,
-            itr: int, N: int):
+def project(
+    velocX: np.ndarray,
+    velocY: np.ndarray,
+    p: np.ndarray,
+    div: np.ndarray,
+    itr: int,
+    N: int,
+):
     for j in range(1, N - 1):
         for i in range(1, N - 1):
-            div[i][j] = (-0.5 * (velocX[i + 1][j] - velocX[i - 1][j] + velocY[i][j + 1] -
-                                 velocY[i][j - 1])) / N
+            div[i][j] = (
+                -0.5
+                * (
+                    velocX[i + 1][j]
+                    - velocX[i - 1][j]
+                    + velocY[i][j + 1]
+                    - velocY[i][j - 1]
+                )
+            ) / N
             p[i][j] = 0
 
     set_bnd(0, div, N)
@@ -206,8 +235,15 @@ def project(velocX: np.ndarray, velocY: np.ndarray, p: np.ndarray, div: np.ndarr
 # of cells around the spot where it lands, then applies that value to current cell
 
 
-def advect(b: int, d: np.ndarray, d0: np.ndarray, velocX: np.ndarray, velocY: np.ndarray,
-           dt: float, N: int):
+def advect(
+    b: int,
+    d: np.ndarray,
+    d0: np.ndarray,
+    velocX: np.ndarray,
+    velocY: np.ndarray,
+    dt: float,
+    N: int,
+):
     dtx = dt * (N - 2)
     dty = dt * (N - 2)
 

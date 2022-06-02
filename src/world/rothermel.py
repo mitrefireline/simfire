@@ -6,22 +6,43 @@ from numba import vectorize
 # Use GPU if available, else CPU
 try:
     if len(GPUtil.getAvailable()) > 0:
-        device = 'cuda'
+        device = "cuda"
     else:
-        device = 'cpu'
+        device = "cpu"
 except ValueError:
-    device = 'cpu'
+    device = "cpu"
 
 
-@vectorize([('float32(float32,float32,float32,float32,float32,float32,'
-             'float32,float32,float32,float32,float32,float32,'
-             'float32,float32,float32,float32,float32)')],
-           target=device)
-def compute_rate_of_spread(loc_x: float, loc_y: float, new_loc_x: float, new_loc_y: float,
-                           w_0: float, delta: float, M_x: float, sigma: float, h: float,
-                           S_T: float, S_e: float, p_p: float, M_f: float, U: float,
-                           U_dir: float, slope_mag: float, slope_dir: float) -> float:
-    '''
+@vectorize(
+    [
+        (
+            "float32(float32,float32,float32,float32,float32,float32,"
+            "float32,float32,float32,float32,float32,float32,"
+            "float32,float32,float32,float32,float32)"
+        )
+    ],
+    target=device,
+)
+def compute_rate_of_spread(
+    loc_x: float,
+    loc_y: float,
+    new_loc_x: float,
+    new_loc_y: float,
+    w_0: float,
+    delta: float,
+    M_x: float,
+    sigma: float,
+    h: float,
+    S_T: float,
+    S_e: float,
+    p_p: float,
+    M_f: float,
+    U: float,
+    U_dir: float,
+    slope_mag: float,
+    slope_dir: float,
+) -> float:
+    """
     Compute the basic Rothermel rate of spread. All measurements are assumed to be in
     feet, minutes, and pounds, and BTU. This function is vecotrized and compiled by numba
     for GPU support. The target device (CPU or GPU) is determined in the config based on
@@ -49,7 +70,10 @@ def compute_rate_of_spread(loc_x: float, loc_y: float, new_loc_x: float, new_loc
 
     Returns:
         R: The computed rate of spread in ft/min
-    '''
+    """
+    # Check for non-burnable fuel and return 0 (no spread)
+    if w_0 == 0:
+        return 0
     # Mineral Damping Coefficient
     eta_S = min(0.174 * S_e**-0.19, 1)
     # Moisture Damping Coefficient
@@ -67,7 +91,7 @@ def compute_rate_of_spread(loc_x: float, loc_y: float, new_loc_x: float, new_loc
     gamma_prime_max = sigma**1.5 / (495 + 0.0594 * sigma**1.5)
     A = 133 * sigma**-0.7913
     # Optimum Reaction Velocity (1/min)
-    gamma_prime = gamma_prime_max * (B / B_op)**A * exp(A * (1 - B / B_op))
+    gamma_prime = gamma_prime_max * (B / B_op) ** A * exp(A * (1 - B / B_op))
     # Reaction Intensity (BTU/ft^2-min)
     I_R = gamma_prime * w_n * h * eta_M * eta_S
     # Propagating Flux Ratio
@@ -83,14 +107,13 @@ def compute_rate_of_spread(loc_x: float, loc_y: float, new_loc_x: float, new_loc
     angle_of_travel = atan2(loc_y - new_loc_y, new_loc_x - loc_x)
     # Subtract 90 degrees because this angle is North-oriented
     wind_angle_radians = radians(90 - U_dir)
-    wind_along_angle_of_travel = U * \
-                                 cos(wind_angle_radians - angle_of_travel)
+    wind_along_angle_of_travel = U * cos(wind_angle_radians - angle_of_travel)
     # This is the wind speed in in this direction
     U = wind_along_angle_of_travel
     # Negative wind leads to trouble with calculation and doesn't
     # physically make sense
     U = max(U, 0)
-    phi_w = c * U**b * (B / B_op)**-e
+    phi_w = c * U**b * (B / B_op) ** -e
 
     # Slope Factor
     # Phi is the slope between the two locations (i.e. the change in elevation).

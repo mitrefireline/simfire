@@ -1,13 +1,22 @@
-from typing import Sequence
-from dataclasses import dataclass, field
+from dataclasses import dataclass
+from typing import Sequence, Union
+
+import numpy as np
 
 
 @dataclass
 class FuelParticle:
-    '''
+    """
     Set default values here since the paper assumes they're constant. These
     could be changed, but for now it's easier to assume they're constant.
-    '''
+
+    Parameters:
+        h: Low heat content (BTU/lb).
+        S_T: Total mineral conetent.
+        S_e: Effective mineral content.
+        p_p: Oven-dry particle density (lb/fg^3)
+    """
+
     # Low Heat Content (BTU/lb)
     h: float = 8000
     # Total Mineral Content
@@ -19,30 +28,17 @@ class FuelParticle:
 
 
 @dataclass
-class Tile:
-    '''
-    Class that records the location of each terrain tile for a FuelArray.
-    '''
-    # x coordinate of the top-left corner of the tile in the array
-    x: float
-    # y coordinate of the top-left corner of the tile in the array
-    y: float
-    # Tile width in the x direction (ft)
-    w: float
-    # Tile height in the y direction (ft)
-    h: float
-    # Area of the tile (ft^2)
-    area: float = field(init=False)
-
-    def __post_init__(self):
-        self.area = self.w * self.h
-
-
-@dataclass
 class Fuel:
-    '''
+    """
     Class that describes the parameters of a fuel type
-    '''
+
+    Parameters:
+        w_0: Oven-dry Fuel Load (lb/ft^2).
+        delta: Fuel bed depth (ft).
+        M_x: Dead fuel moisture of extinction.
+        sigma: Surface-area-to-volume ratio (ft^2/ft^3).
+    """
+
     # Oven-dry Fuel Load (lb/ft^2)
     w_0: float
     # Fuel bed depth (ft)
@@ -54,29 +50,27 @@ class Fuel:
 
 
 @dataclass
-class FuelArray:
-    '''
-    These parameters relate to the fuel in a tile. Need a Tile as a
-    parameter to get area and volume information. Need a Fuel parameter
-    to get information on how the FuelArray will burn.
-    '''
-    # Tile on which the fuel exists
-    tile: Tile
-    # Fuel properties that describe the FuelArray
-    fuel: Fuel
-
-
-@dataclass
 class Environment:
-    '''
+    """
     These parameters relate to the environment of the tile. For now we'll
     assume these values are constant over a small area.
-    '''
+    The wind speed and direction can be a constant value, nested sequences,
+    or numpy arrays. The FireManager will convert the constant values and
+    nested sequences to numpy arrays internally.
+
+    Parameters:
+        M_f: Fuel moisture (amount of water in fuel/vegetation). 1-3% for SoCal, usually
+             never more than 8% for SoCal.
+        U: Wind speed at midflame height (ft/min).
+        U_dir: Wind direction at midflame height (degrees). 0 is North, 90 is East, 180
+               is South, 270 is West.
+    """
+
     # Fuel Moisture (amount of water in fuel/vegetation)
     # 1-3% for SoCal, usually never more than 8% for SoCal
     M_f: float
     # Wind speed at midflame height (ft/min)
-    U: Sequence[Sequence[float]]
+    U: Union[float, Sequence[Sequence[float]], np.ndarray]
     # Wind direction at midflame height (degrees)
     # 0 is North, 90 is East, 180 is South, 270 is West
-    U_dir: float
+    U_dir: Union[float, Sequence[Sequence[float]], np.ndarray]

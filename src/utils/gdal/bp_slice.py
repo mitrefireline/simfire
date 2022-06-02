@@ -4,8 +4,9 @@ import csv
 import os
 import glob
 
+
 def produceSlices(tif):
-    '''
+    """
     Slices up the input tif into equal resolution .tif files
 
     Arguments:
@@ -13,7 +14,7 @@ def produceSlices(tif):
 
     Returns:
         None.
-    '''
+    """
     gt = tif.GetGeoTransform()
     xmin = gt[0]
     ymax = gt[3]
@@ -28,23 +29,28 @@ def produceSlices(tif):
     xsize = 1
     ysize = 1
 
-    xsteps = [xmin + xsize * i for i in range(x_slices+1)]
-    ysteps = [ymax - ysize * i for i in range(y_slices+1)]
+    xsteps = [xmin + xsize * i for i in range(x_slices + 1)]
+    ysteps = [ymax - ysize * i for i in range(y_slices + 1)]
 
     for i in range(x_slices):
         for j in range(y_slices):
             xmin = xsteps[i]
-            xmax = xsteps[i+1]
+            xmax = xsteps[i + 1]
             ymax = ysteps[j]
-            ymin = ysteps[j+1]
+            ymin = ysteps[j + 1]
 
             west = str(int(abs(xmin)))
             north = str(int(abs(ymax)))
 
-            gdal.Warp(f'/nfs/lslab2/fireline/data/risk/30m/n{north}w{west}.tif', tif, outputBounds = (xmin, ymin, xmax, ymax))
+            gdal.Warp(
+                f"/nfs/lslab2/fireline/data/risk/30m/n{north}w{west}.tif",
+                tif,
+                outputBounds=(xmin, ymin, xmax, ymax),
+            )
+
 
 def preprocess():
-    '''
+    """
     Opens a BP_CA_ALIGNED.tif file which is a file that is projected to WGS84 and cropped to (-125,43),(-113, 32)
     within the /nfs/lslab2/fireline/data/risk/CA/ folder
 
@@ -57,11 +63,12 @@ def preprocess():
         None
 
     Returns:
-        None.  Instead, produces 30m x 30m resolution slices of BP_CA_ALIGNED.tif into the 
+        None.  Instead, produces 30m x 30m resolution slices of BP_CA_ALIGNED.tif into the
         /nfs/lslab2/fireline/data/risk/CA/30m/ folder
-    '''
-    tif = gdal.Open('/nfs/lslab2/fireline/data/risk/CA/BP_CA_ALIGNED.tif')
+    """
+    tif = gdal.Open("/nfs/lslab2/fireline/data/risk/CA/BP_CA_ALIGNED.tif")
     produceSlices(tif)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     preprocess()

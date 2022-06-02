@@ -497,7 +497,7 @@ class DataLayer:
 
 class BurnProbabilityLayer(DataLayer):
     def __init__(self, lat_long_box: LatLongBox) -> None:
-        '''
+        """
         Initialize the elevation layer by retrieving the correct topograpchic data
             and computing the area.
 
@@ -507,12 +507,12 @@ class BurnProbabilityLayer(DataLayer):
             width: The width of the screen size
             resolution: The resolution to get data
 
-        '''
+        """
         self.lat_long_box = lat_long_box
-        self.path = Path('/nfs/lslab2/fireline/data/risk/')
-        res = str(self.lat_long_box.resolution) + 'm'
+        self.path = Path("/nfs/lslab2/fireline/data/risk/")
+        res = str(self.lat_long_box.resolution) + "m"
 
-        #TODO: Add check here if resolution isnt available
+        # TODO: Add check here if resolution isnt available
 
         self.datapath = self.path / res
         self.data = self._make_contour_and_data()
@@ -527,7 +527,7 @@ class BurnProbabilityLayer(DataLayer):
 
         for key, _ in self.lat_long_box.tiles.items():
 
-            if key == 'single':
+            if key == "single":
                 # simple case
                 tr = (self.lat_long_box.bl[0][0], self.lat_long_box.tr[1][0])
                 bl = (self.lat_long_box.tr[0][0], self.lat_long_box.bl[1][0])
@@ -544,13 +544,13 @@ class BurnProbabilityLayer(DataLayer):
                 tif_data = np.flip(tif_data, 0)
                 tif_data = np.expand_dims(tif_data, axis=-1)
 
-                if key == 'north':
+                if key == "north":
                     # stack tiles along axis = 0 -> leftmost: bottom, rightmost: top
                     data = np.concatenate((data, tif_data), axis=0)
-                elif key == 'east':
+                elif key == "east":
                     # stack tiles along axis = 2 -> leftmost, rightmost
                     data = np.concatenate((data, tif_data), axis=1)
-                elif key == 'square':
+                elif key == "square":
                     if idx + 1 == 1:
                         data = np.concatenate((data, tif_data), axis=1)
                     elif idx + 1 == 2:
@@ -561,11 +561,11 @@ class BurnProbabilityLayer(DataLayer):
 
         tr = (self.lat_long_box.bl[0][0], self.lat_long_box.tr[1][0])
         bl = (self.lat_long_box.tr[0][0], self.lat_long_box.bl[1][0])
-        data_array = data[tr[0]:bl[0], tr[1]:bl[1]]
+        data_array = data[tr[0] : bl[0], tr[1] : bl[1]]
         return data_array
 
     def _get_dems(self) -> List[Path]:
-        '''
+        """
         This method will use the outputed tiles and return the correct dem files
 
         Arguments:
@@ -574,14 +574,14 @@ class BurnProbabilityLayer(DataLayer):
         Return:
             None
 
-        '''
+        """
 
         self.tif_filenames = []
 
         for _, ranges in self.lat_long_box.tiles.items():
             for range in ranges:
                 (five_deg_n, five_deg_w) = range
-                tif_data_region = Path(f'n{five_deg_n}w{five_deg_w}.tif')
+                tif_data_region = Path(f"n{five_deg_n}w{five_deg_w}.tif")
                 tif_file = self.datapath / tif_data_region
                 self.tif_filenames.append(tif_file)
 

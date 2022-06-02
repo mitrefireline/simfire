@@ -14,7 +14,7 @@ from ..layers import (
     OperationalFuelLayer,
     OperationalTopographyLayer,
     TopographyLayer,
-    BurnProbabilityLayer
+    BurnProbabilityLayer,
 )
 
 
@@ -229,18 +229,16 @@ class TestOperationalTopographyLayer(unittest.TestCase):
 
 class TestBurnProbabilityLayer(unittest.TestCase):
     def setUp(self) -> None:
-        '''
-
-        '''
+        """ """
 
     def test__make_contour_and_data(self) -> None:
-        '''
+        """
         Test that the call to _generate_contours() runs propoerly.
         This method returns the data array containing the elevations within the
             specified bounding box region of the given latitudes and longitudes.
 
         NOTE: This method should always return a square
-        '''
+        """
         resolution = 30
         # 2 Tiles (easternly)
         center = (33.4, 115.04)
@@ -250,10 +248,10 @@ class TestBurnProbabilityLayer(unittest.TestCase):
         self.assertEqual(topographyGen.data.shape[0], topographyGen.data.shape[1])
 
     def test__get_dems(self) -> None:
-        '''
+        """
         Test that the call to _get_dems() runs properly.
         This method will generate a list of the DEMs in the fireline /nfs/
-        '''
+        """
 
         resolution = 30
         # Single Tile
@@ -277,7 +275,7 @@ class TestBurnProbabilityLayer(unittest.TestCase):
         topographyGen = BurnProbabilityLayer(lat_long_box)
         self.assertEqual(4, len(topographyGen.tif_filenames))
 
-        
+
 class TestFunctionalTopograpyLayer(unittest.TestCase):
     def setUp(self) -> None:
         # Create arbitrary function to test

@@ -7,6 +7,7 @@ import numpy as np
 
 from ...world.fuel_array_functions import chaparral_fn
 from ..layers import (
+    BurnProbabilityLayer,
     DataLayer,
     FunctionalFuelLayer,
     FunctionalTopographyLayer,
@@ -14,7 +15,6 @@ from ..layers import (
     OperationalFuelLayer,
     OperationalTopographyLayer,
     TopographyLayer,
-    BurnProbabilityLayer,
 )
 
 

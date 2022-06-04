@@ -1,10 +1,7 @@
-from pathlib import Path
-import numpy as np
-from osgeo import gdal, ogr, osr
-import matplotlib.pyplot as plt
-import csv
-import os
 import glob
+
+import matplotlib.pyplot as plt
+from osgeo import gdal, osr
 
 
 def GetExtent(ds):
@@ -52,13 +49,10 @@ def mass_preprocess():
 
 
 def preprocess():
-    # tif = gdal.Open('/nfs/lslab2/fireline/data/risk/CA/BP_CA.tif')
     tif = gdal.Open("gdalwarps/n39w122.tif")
     array = tif.GetRasterBand(1).ReadAsArray()
     plt.imshow(array)
     plt.savefig("n39w122.png")
-
-    # cmdline:  gdalwarp /nfs/lslab2/fireline/data/risk/CA/BP_CA.tif testy.tif -tr 30 30 -overwrite -t_srs "+proj=utm +datum=NAD83"
 
 
 if __name__ == "__main__":

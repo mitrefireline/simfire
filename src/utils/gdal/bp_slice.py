@@ -1,8 +1,4 @@
-from pathlib import Path
 from osgeo import gdal
-import csv
-import os
-import glob
 
 
 def produceSlices(tif):
@@ -51,13 +47,17 @@ def produceSlices(tif):
 
 def preprocess():
     """
-    Opens a BP_CA_ALIGNED.tif file which is a file that is projected to WGS84 and cropped to (-125,43),(-113, 32)
+    Opens a BP_CA_ALIGNED.tif file which is a file that
+    is projected to WGS84 and cropped to (-125,43),(-113, 32)
     within the /nfs/lslab2/fireline/data/risk/CA/ folder
 
-    If BP_CA_ALIGNED.tif is missing you must run the following commands in order below within the terminal:
+    If BP_CA_ALIGNED.tif is missing you must run the following
+    commands in order below within the terminal:
 
-    1) gdalwarp BP_CA.tif BP_CA_WGS84.tif -overwrite -t_srs "+proj=longlat +ellps=WGS84"
-    2) gdalwarp BP_CA_WGS84.tif BP_CA_ALIGNED.tif -overwrite -t_srs "+proj=longlat +ellps=WGS84" -te -125.0 32.0 -113.0 43.0
+    1) gdalwarp BP_CA.tif BP_CA_WGS84.tif -overwrite
+        -t_srs "+proj=longlat +ellps=WGS84"
+    2) gdalwarp BP_CA_WGS84.tif BP_CA_ALIGNED.tif -overwrite
+        -t_srs "+proj=longlat +ellps=WGS84" -te -125.0 32.0 -113.0 43.0
 
     Arguments:
         None

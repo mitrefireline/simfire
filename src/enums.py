@@ -152,6 +152,22 @@ class ElevationConstants:
     MEAN_ELEVATION: int = 2_500
 
 
+@dataclass
+class WindConstants:
+    """
+    Constants to be used in the file and can be imported for reference.
+
+    Paremeters:
+        MIN_SPEED: Minimum wind speed (mph).
+        MAX_SPEED: Maximum wind speed (mph). The maximum recorded wind speed in CA is 209
+                   mph, so to be safe, let's set it to 250. You never know with climate
+                   change.
+    """
+
+    MIN_SPEED: int = 0
+    MAX_SPEED: int = 250
+
+
 FuelModelToFuel = {
     1: ShortGrass,
     2: GrassTimberShrubOverstory,

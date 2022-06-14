@@ -109,8 +109,8 @@ class WindController2:
         diffusion: float = 0.0,
         viscosity: float = 0.0000001,
         terrain_features: np.ndarray = None,
-        wind_speed: float = 27,
-        wind_direction: str = "North",
+        wind_speed: float = 27.0,
+        wind_direction: str = "north",
     ) -> None:
         self.N = screen_size
         self.iterations = result_accuracy
@@ -139,13 +139,13 @@ class WindController2:
 
     def iterate_wind_step(self) -> None:
         for v in range(0, self.N):
-            if self.wind_direction == "north":
+            if self.wind_direction.lower() == "north":
                 self.fvect.addVelocity(v, 1, 0, self.wind_speed)
-            elif self.wind_direction == "east":
+            elif self.wind_direction.lower() == "east":
                 self.fvect.addVelocity(self.N - 1, v, -1 * self.wind_speed, 0)
-            elif self.wind_direction == "south":
+            elif self.wind_direction.lower() == "south":
                 self.fvect.addVelocity(1, v, -1 * self.wind_speed, 0)
-            elif self.wind_direction == "west":
+            elif self.wind_direction.lower() == "west":
                 self.fvect.addVelocity(1, v, self.wind_speed, 0)
             else:
                 print("Bad source direction input")

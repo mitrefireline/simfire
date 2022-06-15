@@ -1,10 +1,17 @@
 import warnings
 from abc import ABC, abstractmethod
+from enum import IntEnum
 from typing import Dict, Iterable, List, Optional, Tuple, Union
 
 import numpy as np
 
-from ..enums import BurnStatus, ElevationConstants, FuelConstants, GameStatus
+from ..enums import (
+    BurnStatus,
+    ElevationConstants,
+    FuelConstants,
+    GameStatus,
+    WindConstants,
+)
 from ..game.managers.fire import RothermelFireManager
 from ..game.managers.mitigation import (
     FireLineManager,
@@ -26,7 +33,7 @@ class Simulation(ABC):
     Base class with several built in methods for interacting with different simulators.
 
     Current simulators using this API:
-      - [RothermelSimulator](https://gitlab.mitre.org/fireline/rothermel-modeling)
+      - `RothermelSimulator <https://gitlab.mitre.org/fireline/rothermel-modeling>`_
     """
 
     def __init__(self, config: Config) -> None:
@@ -133,13 +140,23 @@ class Simulation(ABC):
         """
         pass
 
-    @abstractmethod
     def get_disaster_categories(self) -> Dict[str, int]:
         """
         Returns all possible categories that a location in the map can be in.
 
         Returns:
             A dictionary of enum name to enum value.
+        """
+        return {i.name: i.value for i in self.disaster_categories}
+
+    @property
+    @abstractmethod
+    def disaster_categories(self) -> Iterable[IntEnum]:
+        """
+        Returns the possible categories that a location in the map can be in.
+
+        Returns:
+            An enum of possible categories.
         """
         pass
 
@@ -148,6 +165,10 @@ class RothermelSimulation(Simulation):
     def __init__(self, config: Config) -> None:
         """
         Initialize the `RothermelSimulation` object for interacting with the RL harness.
+
+        Arguments:
+            config: The `Config` that specifies simulation parameters, read in from a
+                    YAML file.
         """
         super().__init__(config)
         self.game_status = GameStatus.RUNNING
@@ -247,14 +268,15 @@ class RothermelSimulation(Simulation):
             "wetline": BurnStatus.WETLINE,
         }
 
-    def get_disaster_categories(self) -> Dict[str, int]:
+    @property
+    def disaster_categories(self) -> Iterable[BurnStatus]:
         """
         Returns all possible categories that a location in the map can be in.
 
         Returns:
-             A dictionary of enum name to enum value.
+            A dictionary of enum name to enum value.
         """
-        return {i.name: i.value for i in BurnStatus}
+        return BurnStatus
 
     def get_attribute_bounds(self) -> Dict[str, object]:
         """
@@ -282,7 +304,19 @@ class RothermelSimulation(Simulation):
                 "max": ElevationConstants.MAX_ELEVATION,
             }
         }
+
         bounds.update(elevation_bounds)
+
+        wind_dir_min = 0.0
+        wind_dir_max = 360.0
+
+        wind_bounds = {
+            "wind": {
+                "speed": {"min": WindConstants.MIN_SPEED, "max": WindConstants.MAX_SPEED},
+                "direction": {"min": wind_dir_min, "max": wind_dir_max},
+            }
+        }
+        bounds.update(wind_bounds)
         return bounds
 
     def get_attribute_data(self) -> Dict[str, np.ndarray]:
@@ -365,7 +399,7 @@ class RothermelSimulation(Simulation):
         Update the `self.fire_map` with new mitigation points
 
         Arguments:
-            points: A list of `(x, y, mitigation)` tuples. These will be added to
+            points: A list of `(column, row, mitigation)` tuples. These will be added to
                    `self.fire_map`.
         """
         firelines = []
@@ -373,13 +407,13 @@ class RothermelSimulation(Simulation):
         wetlines = []
 
         # Loop through all points, and add the mitigations to their respective lists
-        for i, (x, y, mitigation) in enumerate(points):
+        for i, (column, row, mitigation) in enumerate(points):
             if mitigation == BurnStatus.FIRELINE:
-                firelines.append((x, y))
+                firelines.append((column, row))
             elif mitigation == BurnStatus.SCRATCHLINE:
-                scratchlines.append((x, y))
+                scratchlines.append((column, row))
             elif mitigation == BurnStatus.WETLINE:
-                wetlines.append((x, y))
+                wetlines.append((column, row))
             else:
                 log.warning(
                     f"The mitigation,{mitigation}, provided at location[{i}] is "

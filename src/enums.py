@@ -59,12 +59,12 @@ class BurnStatus(IntEnum):
         - WETLINE
     """
 
-    UNBURNED = 0
-    BURNING = auto()
-    BURNED = auto()
-    FIRELINE = auto()
-    SCRATCHLINE = auto()
-    WETLINE = auto()
+    UNBURNED: int = 0
+    BURNING: int = auto()
+    BURNED: int = auto()
+    FIRELINE: int = auto()
+    SCRATCHLINE: int = auto()
+    WETLINE: int = auto()
 
 
 @dataclass
@@ -95,10 +95,10 @@ class SpriteLayer(IntEnum):
         - RESOURCE
     """
 
-    TERRAIN = 1
-    FIRE = 2
-    LINE = 3
-    RESOURCE = 4
+    TERRAIN: int = 1
+    FIRE: int = 2
+    LINE: int = 3
+    RESOURCE: int = 4
 
 
 class GameStatus(Enum):

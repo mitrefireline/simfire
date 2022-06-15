@@ -44,10 +44,8 @@ setuptools.setup(
     description="Rothermel fire modeler using PyGame for display",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://gitlab.mitre.org/fireline/rothermel-modeling",
-    project_urls={
-        "Documentation": "https://fireline.pages.mitre.org/rothermel-modeling/"
-    },
+    url="https://gitlab.mitre.org/fireline/simfire",
+    project_urls={"Documentation": "https://fireline.pages.mitre.org/simfire/"},
     classifiers=["Programming Language :: Python :: 3"],
     package_dir={"rothsim": "src", "assets": "assets"},
     packages=packages,

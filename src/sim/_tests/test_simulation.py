@@ -92,7 +92,7 @@ class RothermelSimulationTest(unittest.TestCase):
             BurnStatus.BURNED,
         )
 
-        self.fire_map = self.simulation_flat.run(time="1h")
+        self.fire_map, _ = self.simulation_flat.run(time="1h")
         # assert the fire map is all BURNED
         self.assertEqual(
             self.fire_map.max(),
@@ -104,7 +104,7 @@ class RothermelSimulationTest(unittest.TestCase):
         self.simulation_flat.reset()
 
         # Check that we can run for one step
-        self.fire_map = self.simulation_flat.run(time=1)
+        self.fire_map, _ = self.simulation_flat.run(time=1)
         self.assertEqual(
             self.simulation_flat.elapsed_time,
             self.config.simulation.update_rate,

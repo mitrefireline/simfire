@@ -59,12 +59,12 @@ class BurnStatus(IntEnum):
         - WETLINE
     """
 
-    UNBURNED = 0
-    BURNING = auto()
-    BURNED = auto()
-    FIRELINE = auto()
-    SCRATCHLINE = auto()
-    WETLINE = auto()
+    UNBURNED: int = 0
+    BURNING: int = auto()
+    BURNED: int = auto()
+    FIRELINE: int = auto()
+    SCRATCHLINE: int = auto()
+    WETLINE: int = auto()
 
 
 @dataclass
@@ -95,10 +95,10 @@ class SpriteLayer(IntEnum):
         - RESOURCE
     """
 
-    TERRAIN = 1
-    FIRE = 2
-    LINE = 3
-    RESOURCE = 4
+    TERRAIN: int = 1
+    FIRE: int = 2
+    LINE: int = 3
+    RESOURCE: int = 4
 
 
 class GameStatus(Enum):
@@ -150,6 +150,22 @@ class ElevationConstants:
     MIN_ELEVATION: int = -282
     MAX_ELEVATION: int = 11_000
     MEAN_ELEVATION: int = 2_500
+
+
+@dataclass
+class WindConstants:
+    """
+    Constants to be used in the file and can be imported for reference.
+
+    Paremeters:
+        MIN_SPEED: Minimum wind speed (mph).
+        MAX_SPEED: Maximum wind speed (mph). The maximum recorded wind speed in CA is 209
+                   mph, so to be safe, let's set it to 250. You never know with climate
+                   change.
+    """
+
+    MIN_SPEED: int = 0
+    MAX_SPEED: int = 250
 
 
 FuelModelToFuel = {

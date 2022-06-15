@@ -1,5 +1,5 @@
 # For a description of config parameters, go to
-# https://fireline.pages.mitre.org/rothermel-modeling/config.html
+# https://fireline.pages.mitre.org/simfire/config.html
 area:
   screen_size: 9
   pixel_scale: 50

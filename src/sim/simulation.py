@@ -33,7 +33,7 @@ class Simulation(ABC):
     Base class with several built in methods for interacting with different simulators.
 
     Current simulators using this API:
-      - `RothermelSimulator <https://gitlab.mitre.org/fireline/rothermel-modeling>`_
+      - `RothermelSimulator <https://gitlab.mitre.org/fireline/simfire>`_
     """
 
     def __init__(self, config: Config) -> None:

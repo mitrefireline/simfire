@@ -59,6 +59,7 @@ tls_verify = False
 autodoc_typehints = "description"
 
 # Autoapi settings
+autoapi_options = ["members", "undoc-members", "show-inheritance", "show-module-summary"]
 autoapi_python_class_content = "both"
 autoapi_type = "python"
 autoapi_dirs = ["../../src/"]

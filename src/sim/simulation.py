@@ -33,7 +33,7 @@ class Simulation(ABC):
     Base class with several built in methods for interacting with different simulators.
 
     Current simulators using this API:
-      - `RothermelSimulator <https://gitlab.mitre.org/fireline/simfire>`_
+      - `SimFire <https://gitlab.mitre.org/fireline/simfire>`_
     """
 
     def __init__(self, config: Config) -> None:
@@ -161,10 +161,10 @@ class Simulation(ABC):
         pass
 
 
-class RothermelSimulation(Simulation):
+class FireSimulation(Simulation):
     def __init__(self, config: Config) -> None:
         """
-        Initialize the `RothermelSimulation` object for interacting with the RL harness.
+        Initialize the `FireSimulation` object for interacting with the RL harness.
 
         Arguments:
             config: The `Config` that specifies simulation parameters, read in from a
@@ -238,7 +238,7 @@ class RothermelSimulation(Simulation):
 
     def _create_fire(self) -> None:
         """
-        This function will initialize the rothermel fire strategies.
+        This function will initialize the fire strategies.
         """
         self.fire_manager = RothermelFireManager(
             self.config.fire.fire_initial_position,
@@ -257,7 +257,7 @@ class RothermelSimulation(Simulation):
 
     def get_actions(self) -> Dict[str, int]:
         """
-        Return the action space for the Rothermel simulation.
+        Return the action space for the fire simulation.
 
         Returns:
             The action / mitigation strategies available: Dict[str, int]
@@ -280,7 +280,7 @@ class RothermelSimulation(Simulation):
 
     def get_attribute_bounds(self) -> Dict[str, object]:
         """
-        Return the observation space bounds for the Rothermel simulation
+        Return the observation space bounds for the fire simulation
 
         Returns:
             The dictionary of observation space bounds containing NumPy arrays.

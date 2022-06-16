@@ -1,6 +1,6 @@
 # Configuring the Simulation
 
-The configuration for the Rothermel simulation is all done through a [YAML](https://yaml.org/) file. All of the configurable settings will be explained in the sections below.
+The configuration for SimFire is all done through a [YAML](https://yaml.org/) file. All of the configurable settings will be explained in the sections below.
 
 This file can have any name, as a path is required to load the configuration file, but the hierarchy of the file must match the hierarchy found in the example [`config.yml`](https://gitlab.mitre.org/fireline/simfire/-/blob/master/config.yml). This example configuration can be seen in its entirety at the [bottom of this page](#example-config-file).
 
@@ -198,7 +198,7 @@ Defines the Environment class.
 
 #### moisture
 (`float`)<br>
-Used in Rothermel calculation. Most of Southern California has the default value of 0.03.
+Used in simulator fire spread calculation. Most of Southern California has the default value of 0.03.
 
 ---
 

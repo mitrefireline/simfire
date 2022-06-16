@@ -18,7 +18,7 @@ from datetime import date
 
 # -- Project information -----------------------------------------------------
 
-project = "fiReLine Rothermel Model"
+project = "SimFire"
 copyright = f"{date.today().year}, fiReLine"
 author = (
     "Marissa Dotter, Michael Doyle, Dhanuj Gandikota, Chris Kempis, Alex Tapley, "

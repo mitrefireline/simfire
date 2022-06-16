@@ -6,11 +6,11 @@ import numpy as np
 
 from ...enums import BurnStatus
 from ...game.sprites import Terrain
-from ...sim.simulation import RothermelSimulation
+from ...sim.simulation import FireSimulation
 from ...utils.config import Config, ConfigError
 
 
-class RothermelSimulationTest(unittest.TestCase):
+class FireSimulationTest(unittest.TestCase):
     def setUp(self) -> None:
         self.config = Config("./src/utils/_tests/test_configs/test_config.yml")
         self.config_flat_simple = Config(
@@ -19,8 +19,8 @@ class RothermelSimulationTest(unittest.TestCase):
 
         self.screen_size = (self.config.area.screen_size, self.config.area.screen_size)
 
-        self.simulation = RothermelSimulation(self.config)
-        self.simulation_flat = RothermelSimulation(self.config_flat_simple)
+        self.simulation = FireSimulation(self.config)
+        self.simulation_flat = FireSimulation(self.config_flat_simple)
 
         topo_layer = self.config.terrain.topography_layer
         fuel_layer = self.config.terrain.fuel_layer
@@ -52,7 +52,7 @@ class RothermelSimulationTest(unittest.TestCase):
 
     def test_get_actions(self) -> None:
         """
-        Test that the call to `get_actions()` runs properly and returns all Rothermel
+        Test that the call to `get_actions()` runs properly and returns all fire
         `FireLineManager()` features.
         """
         simulation_actions = self.simulation.get_actions()
@@ -60,7 +60,7 @@ class RothermelSimulationTest(unittest.TestCase):
 
     def test_get_attribute_bounds(self) -> None:
         """
-        Test that the call to get_actions() runs properly and returns all Rothermel
+        Test that the call to get_actions() runs properly and returns all fire
         features (Fire, Wind, FireLine, Terrain).
         """
         simulation_attributes = self.simulation.get_attribute_bounds()
@@ -68,7 +68,7 @@ class RothermelSimulationTest(unittest.TestCase):
 
     def test_get_attribute_data(self) -> None:
         """
-        Test that the call to get_actions() runs properly and returns all Rothermel
+        Test that the call to get_actions() runs properly and returns all fire
         features (Fire, Wind, FireLine, Terrain).
         """
         simulation_attributes = self.simulation.get_attribute_data()

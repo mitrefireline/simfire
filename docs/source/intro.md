@@ -1,6 +1,6 @@
 # Introduction
 
-The Rothermel Fire Modeler uses [PyGame](https://www.pygame.org/wiki/about) to display and simulate the Rothermel Surface Fire Spread Model described in [this](https://www.fs.fed.us/rm/pubs_series/rmrs/gtr/rmrs_gtr371.pdf) paper.
+SimFire uses [PyGame](https://www.pygame.org/wiki/about) to display and simulate different fire spread models, including the Rothermel Surface fire spread model described in [this](https://www.fs.fed.us/rm/pubs_series/rmrs/gtr/rmrs_gtr371.pdf) paper.
 
 [GitLab Page](https://gitlab.mitre.org/fireline/simfire)
 
@@ -18,10 +18,10 @@ Then, install the requirements:
 pip install -r requirements.txt
 ```
 
-And run the `game_rothermel.py` script:
+And run the `run_game.py` script:
 
 ```shell
-python game_rothermel.py
+python run_game.py
 ```
 
 ## Installing the Package
@@ -34,7 +34,7 @@ Then, you can install the `rothsim` package with the following command, making s
 pip install rothsim --extra-index-url https://__token__:<your_personal_token>@gitlab.mitre.org/api/v4/projects/34582/packages/pypi/simple
 ```
 
-For information on how to use the package, for now, use [`game_rothermel.py`](https://gitlab.mitre.org/fireline/simfire/-/blob/master/game_rothermel.py) as a jumping-off point. And to configure simulation, go to the [Configuring the Simulation](config.md) page.
+For information on how to use the package, for now, use [`run_game.py`](https://gitlab.mitre.org/fireline/simfire/-/blob/master/run_game.py) as a jumping-off point. And to configure simulation, go to the [Configuring the Simulation](config.md) page.
 
 ### Modifying `.bashrc` for Easy Install
 

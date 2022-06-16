@@ -66,12 +66,12 @@ unittests:
   only:
     - merge_requests
 
-game_rothermel.py:
+run_game.py:
   stage: Tests
   tags:
     - lslab2
   script:
-    - SDL_VIDEODRIVER="dummy" python game_rothermel.py
+    - SDL_VIDEODRIVER="dummy" python run_game.py
   needs: []
   only:
     - merge_requests

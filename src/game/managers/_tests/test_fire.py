@@ -323,8 +323,8 @@ class TestRothermelFireManager(unittest.TestCase):
     def test_update(self) -> None:
         """
         Test that the RothermelFireManager will update correctly. There is no need to
-        check the Rothermel rate of spread calculation since that has its own unit test.
-        Instead, check that the fire will spread correctly once enough time has passed.
+        check the rate of spread calculation since that has its own unit test. Instead,
+        check that the fire will spread correctly once enough time has passed.
         """
         # Create simulation parameters that will guarantee fire spread
         fire_map = np.full_like(self.terrain.fuels, BurnStatus.UNBURNED)

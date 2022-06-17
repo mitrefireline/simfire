@@ -2,7 +2,7 @@
 
 The configuration for SimFire is all done through a [YAML](https://yaml.org/) file. All of the configurable settings will be explained in the sections below.
 
-This file can have any name, as a path is required to load the configuration file, but the hierarchy of the file must match the hierarchy found in the example [`config.yml`](https://gitlab.mitre.org/fireline/simfire/-/blob/master/config.yml). This example configuration can be seen in its entirety at the [bottom of this page](#example-config-file).
+This file can have any name, as a path is required to load the configuration file, but the hierarchy of the file must match the hierarchy found in the example [`config.yml`](https://gitlab.mitre.org/fireline/simfire/-/blob/main/config.yml). This example configuration can be seen in its entirety at the [bottom of this page](#example-config-file).
 
 ## Settings
 
@@ -61,7 +61,7 @@ Whether or not to run the simulation in a headless state.
 
 #### ros_attenuation
 (`bool`)<br>
-Whether or not to attenuate rate of spread based on the type of line being used. These attenuation values can be seen in [`enums.py`](https://gitlab.mitre.org/fireline/simfire/-/blob/master/src/enums.py#L48). These values will be subtracted from the rate of spread for a given pixel based on the control line type. If this value is set to `false`, all lines will completely stop a fire and the rate of spread for any pixel with a control line will be set to zero.
+Whether or not to attenuate rate of spread based on the type of line being used. These attenuation values can be seen in [`enums.py`](https://gitlab.mitre.org/fireline/simfire/-/blob/main/src/enums.py#L48). These values will be subtracted from the rate of spread for a given pixel based on the control line type. If this value is set to `false`, all lines will completely stop a fire and the rate of spread for any pixel with a control line will be set to zero.
 
 ---
 
@@ -322,7 +322,7 @@ Whether or not to render with post agent and fire in place.
 
 ## Example Config File
 
-Go [here](https://gitlab.mitre.org/fireline/simfire/-/blob/master/configs) for more examples.
+Go [here](https://gitlab.mitre.org/fireline/simfire/-/blob/main/configs) for more examples.
 
 ```yaml
 area:

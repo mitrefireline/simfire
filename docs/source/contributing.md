@@ -3,17 +3,17 @@
 Contributing to the SimFire codebase ([GitLab](https://gitlab.mitre.org/fireline/simfire)) requires a process to be followed. This page will explain how to follow that process and will provide some tools to make local development easier.
 
 **Some guidlines**:
-  1. Nobody can commit directly to `master`.
-  2. You must create a merge request in order to publish changes to `master`.
-  3. Before merging, all stages of the GitLab CI pipeline must pass. This includes linting with [`flake8`](https://flake8.pycqa.org/en/latest/) ([config](https://gitlab.mitre.org/fireline/simfire/-/blob/master/.flake8)), code-formatting with [`black`](https://github.com/psf/black) ([config](https://gitlab.mitre.org/fireline/simfire/-/blob/master/pyproject.toml)), passing the Python unit tests, and creating the documentation.
-  4. Once all pipeline stages have passed, then the branch can be merged into master.
+  1. Nobody can commit directly to `main`.
+  2. You must create a merge request in order to publish changes to `main`.
+  3. Before merging, all stages of the GitLab CI pipeline must pass. This includes linting with [`flake8`](https://flake8.pycqa.org/en/latest/) ([config](https://gitlab.mitre.org/fireline/simfire/-/blob/main/.flake8)), code-formatting with [`black`](https://github.com/psf/black) ([config](https://gitlab.mitre.org/fireline/simfire/-/blob/main/pyproject.toml)), passing the Python unit tests, and creating the documentation.
+  4. Once all pipeline stages have passed, then the branch can be merged into main.
   5. These pipeline stages can be tested locally to ensure that they are passed on the remote side (explained in [Using Pre-commit](#using-pre-commit))
 
 ### Important Docstring Information
 
-Do your best to make sure that all docstrings adhere to the following Google format found in `fire.py` [here](https://gitlab.mitre.org/fireline/simfire/-/blob/master/src/game/managers/fire.py). The reasoning can be found [here](https://www.sphinx-doc.org/en/master/usage/extensions/napoleon.html). We're using single quotes instead of double quotes for docstrings.
+Do your best to make sure that all docstrings adhere to the following Google format found in `fire.py` [here](https://gitlab.mitre.org/fireline/simfire/-/blob/main/src/game/managers/fire.py). The reasoning can be found [here](https://www.sphinx-doc.org/en/main/usage/extensions/napoleon.html). We're using single quotes instead of double quotes for docstrings.
 
-If you are editing a file and see that a docstring doesn't adhere to the Python3 Google Style Guide exemplified in [`fire.py`](https://gitlab.mitre.org/fireline/simfire/-/blob/master/src/game/managers/fire.py), please be a good steward and fix it so that it does.
+If you are editing a file and see that a docstring doesn't adhere to the Python3 Google Style Guide exemplified in [`fire.py`](https://gitlab.mitre.org/fireline/simfire/-/blob/main/src/game/managers/fire.py), please be a good steward and fix it so that it does.
 
 ## Issue & Merge Request Creation
 Create or assign an issue to yourself at the [Group Issue Board Page](https://gitlab.mitre.org/groups/fireline/-/boards), add the label `Rothermel Model`, and move it to “Doing”.

@@ -2,7 +2,7 @@
 #
 # This file only contains a selection of the most common options. For a full
 # list see the documentation:
-# https://www.sphinx-doc.org/en/master/usage/configuration.html
+# https://www.sphinx-doc.org/en/main/usage/configuration.html
 
 # -- Path setup --------------------------------------------------------------
 
@@ -29,7 +29,7 @@ author = (
 if os.environ.get("CI_COMMIT_TAG"):
     release = os.environ["CI_COMMIT_TAG"]
 else:
-    release = "0.0.0"
+    release = "latest"
 
 # -- General configuration ---------------------------------------------------
 

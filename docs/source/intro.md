@@ -34,7 +34,7 @@ Then, you can install the `rothsim` package with the following command, making s
 pip install rothsim --extra-index-url https://__token__:<your_personal_token>@gitlab.mitre.org/api/v4/projects/34582/packages/pypi/simple
 ```
 
-For information on how to use the package, for now, use [`run_game.py`](https://gitlab.mitre.org/fireline/simfire/-/blob/master/run_game.py) as a jumping-off point. And to configure simulation, go to the [Configuring the Simulation](config.md) page.
+For information on how to use the package, for now, use [`run_game.py`](https://gitlab.mitre.org/fireline/simfire/-/blob/main/run_game.py) as a jumping-off point. And to configure simulation, go to the [Configuring the Simulation](config.md) page.
 
 ### Modifying `.bashrc` for Easy Install
 
@@ -70,7 +70,7 @@ pip_install_rothsim <version number>
 
 ```
 
-By default, it will get the most recent version. Right now, whatever is in `master` will always be version `0.0.0`. The other versions can be seen in the [Releases Section of the GitLab](https://gitlab.mitre.org/fireline/simfire/-/releases) or on the [Package Registry Page](https://gitlab.mitre.org/fireline/simfire/-/packages).
+By default, it will get the most recent version. Right now, whatever is in `main` will always be version `0.0.0`. The other versions can be seen in the [Releases Section of the GitLab](https://gitlab.mitre.org/fireline/simfire/-/releases) or on the [Package Registry Page](https://gitlab.mitre.org/fireline/simfire/-/packages).
 
 
 ## Setting Up xpra for Remote Simulation Visualization

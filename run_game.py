@@ -4,13 +4,13 @@ from pathlib import Path
 import numpy as np
 from skimage.draw import line
 
-from src.enums import BurnStatus, GameStatus
-from src.game.game import Game
-from src.game.managers.fire import RothermelFireManager
-from src.game.managers.mitigation import FireLineManager
-from src.game.sprites import Terrain
-from src.utils.config import Config
-from src.world.parameters import Environment, FuelParticle
+from simfire.enums import BurnStatus, GameStatus
+from simfire.game.game import Game
+from simfire.game.managers.fire import RothermelFireManager
+from simfire.game.managers.mitigation import FireLineManager
+from simfire.game.sprites import Terrain
+from simfire.utils.config import Config
+from simfire.world.parameters import Environment, FuelParticle
 
 
 def main():

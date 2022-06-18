@@ -12,7 +12,7 @@ from ...utils.config import Config, ConfigError
 
 class FireSimulationTest(unittest.TestCase):
     def setUp(self) -> None:
-        self.config = Config("./src/utils/_tests/test_configs/test_config.yml")
+        self.config = Config("./simfire/utils/_tests/test_configs/test_config.yml")
         self.config_flat_simple = Config(
             Path(self.config.path).parent / "test_config_flat_simple.yml"
         )

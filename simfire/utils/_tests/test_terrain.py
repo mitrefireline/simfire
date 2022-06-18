@@ -9,7 +9,7 @@ from ..terrain import chaparral, random_seed_list, w_0_seed
 
 class TerrainTest(unittest.TestCase):
     def setUp(self) -> None:
-        self.config = Config("./src/utils/_tests/test_configs/test_config.yml")
+        self.config = Config("./simfire/utils/_tests/test_configs/test_config.yml")
         self.length = 3
 
     def test_chaparral(self) -> None:

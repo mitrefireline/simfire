@@ -20,7 +20,7 @@ import pygame  # noqa: E402
 
 class TestGame(unittest.TestCase):
     def setUp(self) -> None:
-        self.config = Config("./src/utils/_tests/test_configs/test_config.yml")
+        self.config = Config("./simfire/utils/_tests/test_configs/test_config.yml")
         self.screen_size = (self.config.area.screen_size, self.config.area.screen_size)
         self.game = Game(self.screen_size)
 
@@ -223,7 +223,7 @@ class TestGame(unittest.TestCase):
 
 class TestHeadlessGame(unittest.TestCase):
     def setUp(self) -> None:
-        self.config = Config("./src/utils/_tests/test_configs/test_config.yml")
+        self.config = Config("./simfire/utils/_tests/test_configs/test_config.yml")
         self.screen_size = (self.config.area.screen_size, self.config.area.screen_size)
         self.headless = True
         self.game = Game(self.screen_size, headless=self.headless)
@@ -285,7 +285,7 @@ class TestHeadlessGame(unittest.TestCase):
 
 class TestMultiprocessGame(unittest.TestCase):
     def setUp(self) -> None:
-        self.config = Config("./src/utils/_tests/test_configs/test_config.yml")
+        self.config = Config("./simfire/utils/_tests/test_configs/test_config.yml")
         self.screen_size = (self.config.area.screen_size, self.config.area.screen_size)
         self.headless = True
         self.game = Game(self.screen_size, headless=self.headless)
@@ -352,7 +352,7 @@ class TestMultiprocessGame(unittest.TestCase):
 
 class TestRecordingGame(unittest.TestCase):
     def setUp(self) -> None:
-        self.config = Config("./src/utils/_tests/test_configs/test_config.yml")
+        self.config = Config("./simfire/utils/_tests/test_configs/test_config.yml")
         self.screen_size = (self.config.area.screen_size, self.config.area.screen_size)
         self.headless = False
         self.game = Game(self.screen_size, headless=self.headless, record=True)

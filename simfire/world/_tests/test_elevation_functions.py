@@ -9,7 +9,7 @@ from ..elevation_functions import ElevationFn, flat, gaussian, perlin
 class TestElevationFunctions(unittest.TestCase):
     def setUp(self) -> None:
         """Load the config"""
-        self.yaml = Path("./src/utils/_tests/test_configs/test_config.yml")
+        self.yaml = Path("./simfire/utils/_tests/test_configs/test_config.yml")
         self.cfg = Config(self.yaml)
         return super().setUp()
 

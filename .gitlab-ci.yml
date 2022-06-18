@@ -61,7 +61,8 @@ unittests:
   tags:
     - lslab2
   script:
-    - SDL_VIDEODRIVER=dummy python -m unittest discover -s src -t .. -p 'test_*.py'
+    # - SDL_VIDEODRIVER=dummy python -m unittest -v discover -s src -t .. -p 'test_*.py'
+    - SDL_VIDEODRIVER=dummy pytest --junitxml=report.xml
   needs: []
   only:
     - merge_requests

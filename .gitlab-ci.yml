@@ -20,7 +20,7 @@ flake8:
   tags:
     - lslab2
   script:
-    - flake8 .
+    - poetry run flake8 .
   needs: []
   only:
     - merge_requests
@@ -63,8 +63,8 @@ unittests:
   tags:
     - lslab2
   script:
-    # - SDL_VIDEODRIVER=dummy python -m unittest -v discover -s src -t .. -p 'test_*.py'
-    - SDL_VIDEODRIVER=dummy pytest --junitxml=report.xml
+    # - SDL_VIDEODRIVER=dummy poetry run python -m unittest -v discover -s src -t .. -p 'test_*.py'
+    - SDL_VIDEODRIVER=dummy poetry run pytest --junitxml=report.xml
   artifacts:
     reports:
       junit: report.xml
@@ -77,7 +77,7 @@ run_game.py:
   tags:
     - lslab2
   script:
-    - SDL_VIDEODRIVER="dummy" python run_game.py
+    - SDL_VIDEODRIVER="dummy" poetry run python run_game.py
   needs: []
   only:
     - merge_requests
@@ -87,10 +87,10 @@ coverage:
   tags:
   - lslab2
   script:
-    - pip install pytest-cov
-    - SDL_VIDEODRIVER=dummy python -m coverage run -m pytest
-    - SDL_VIDEODRIVER=dummy python -m coverage report
-    - SDL_VIDEODRIVER=dummy python -m coverage xml
+    - poetry install -E coverage
+    - SDL_VIDEODRIVER=dummy poetry run python -m coverage run -m pytest
+    - SDL_VIDEODRIVER=dummy poetry run python -m coverage report
+    - SDL_VIDEODRIVER=dummy poetry run python -m coverage xml
   artifacts:
     reports:
       cobertura: coverage.xml
@@ -104,8 +104,8 @@ coverage:
 ################
 .pages:
   script:
-    - pip install -U sphinx sphinx-autoapi sphinx-rtd-theme myst-parser
-    - sphinx-build -d docs/build/doctrees docs/source docs/build/html
+    - poetry install -E docs
+    - poetry run sphinx-build -d docs/build/doctrees docs/source docs/build/html
     - mv docs/build/html public/
 
 test-pages:
@@ -142,10 +142,9 @@ test-release:
   tags:
     - lslab2
   script:
-    - pip install wheel
-    - python setup.py bdist_wheel
+    - poetry build
     - pip install -U dist/*.whl
-    - python tests/package.py
+    - poetry run python tests/package.py
   needs: []
   only:
     - merge_requests

@@ -18,7 +18,7 @@ stages:
 flake8:
   stage: Static Analysis
   tags:
-    - docker
+    - lslab2
   script:
     - flake8 .
   needs: []
@@ -28,7 +28,7 @@ flake8:
 black:
   stage: Static Analysis
   tags:
-    - docker
+    - lslab2
   script:
     - poetry run black --check ./
   needs: []
@@ -38,7 +38,7 @@ black:
 mypy:
   stage: Static Analysis
   tags:
-    - docker
+    - lslab2
   script:
     - poetry run mypy --config-file .mypy.ini .
   needs: []
@@ -48,7 +48,7 @@ mypy:
 isort:
   stage: Static Analysis
   tags:
-    - docker
+    - lslab2
   script:
     - poetry run isort --check --trailing-comma -m=3 .
   needs: []
@@ -111,7 +111,7 @@ coverage:
 test-pages:
   stage: Documentation
   tags:
-    - docker
+    - lslab2
   extends: .pages
   needs: []
   artifacts:
@@ -125,7 +125,7 @@ test-pages:
 pages:
   stage: Documentation
   tags:
-    - docker
+    - lslab2
     - pages
   extends: .pages
   artifacts:
@@ -140,7 +140,7 @@ pages:
 test-release:
   stage: Release
   tags:
-    - docker
+    - lslab2
   script:
     - pip install wheel
     - python setup.py bdist_wheel
@@ -167,7 +167,7 @@ test-release:
 release-dev:
   stage: Release
   tags:
-    - docker
+    - lslab2
   script:
     - !reference [.delete-package, script]
     - !reference [.release, script]
@@ -177,7 +177,7 @@ release-dev:
 release:
   stage: Release
   tags:
-    - docker
+    - lslab2
   extends: .release
   only:
     - tags

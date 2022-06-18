@@ -2,7 +2,9 @@ image: "python:3.9"
 
 before_script:
   - python --version
-  - pip install -r dev-requirements.txt
+  - pip install poetry
+  - poetry --version
+  - poetry install
 
 stages:
   - Static Analysis
@@ -28,7 +30,7 @@ black:
   tags:
     - docker
   script:
-    - black --check ./
+    - poetry run black --check ./
   needs: []
   only:
     - merge_requests
@@ -38,7 +40,7 @@ mypy:
   tags:
     - docker
   script:
-    - mypy --config-file .mypy.ini .
+    - poetry run mypy --config-file .mypy.ini .
   needs: []
   only:
     - merge_requests
@@ -48,7 +50,7 @@ isort:
   tags:
     - docker
   script:
-    - isort --check --trailing-comma -m=3 .
+    - poetry run isort --check --trailing-comma -m=3 .
   needs: []
   only:
     - merge_requests
@@ -63,6 +65,9 @@ unittests:
   script:
     # - SDL_VIDEODRIVER=dummy python -m unittest -v discover -s src -t .. -p 'test_*.py'
     - SDL_VIDEODRIVER=dummy pytest --junitxml=report.xml
+  artifacts:
+    reports:
+      junit: report.xml
   needs: []
   only:
     - merge_requests
@@ -82,7 +87,7 @@ coverage:
   tags:
   - lslab2
   script:
-    - pip install pytest pytest-cov
+    - pip install pytest-cov
     - SDL_VIDEODRIVER=dummy python -m coverage run -m pytest
     - SDL_VIDEODRIVER=dummy python -m coverage report
     - SDL_VIDEODRIVER=dummy python -m coverage xml

@@ -66,6 +66,7 @@ unittests:
     # - SDL_VIDEODRIVER=dummy poetry run python -m unittest -v discover -s src -t .. -p 'test_*.py'
     - SDL_VIDEODRIVER=dummy poetry run pytest --junitxml=report.xml
   artifacts:
+    when: always
     reports:
       junit: report.xml
   needs: []

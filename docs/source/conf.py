@@ -62,7 +62,7 @@ autodoc_typehints = "description"
 autoapi_options = ["members", "undoc-members", "show-inheritance", "show-module-summary"]
 autoapi_python_class_content = "both"
 autoapi_type = "python"
-autoapi_dirs = ["../../src/"]
+autoapi_dirs = ["../../simfire/"]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]

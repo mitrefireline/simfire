@@ -4,7 +4,10 @@ before_script:
   - python --version
   - pip install poetry
   - poetry --version
-  - poetry install
+
+.install_dev:
+  script:
+    - poetry install
 
 stages:
   - Static Analysis
@@ -20,7 +23,8 @@ flake8:
   tags:
     - lslab2
   script:
-    - poetry run flake8 .
+    - pip install flake8
+    - flake8 .
   needs: []
   only:
     - merge_requests
@@ -30,7 +34,8 @@ black:
   tags:
     - lslab2
   script:
-    - poetry run black --check ./
+    - pip install black
+    - black --check ./
   needs: []
   only:
     - merge_requests
@@ -40,7 +45,8 @@ mypy:
   tags:
     - lslab2
   script:
-    - poetry run mypy --config-file .mypy.ini .
+    - pip install mypy
+    - mypy --config-file .mypy.ini .
   needs: []
   only:
     - merge_requests
@@ -50,7 +56,8 @@ isort:
   tags:
     - lslab2
   script:
-    - poetry run isort --check --trailing-comma -m=3 .
+    - pip install isort
+    - isort --check --trailing-comma -m=3 .
   needs: []
   only:
     - merge_requests
@@ -63,7 +70,7 @@ unittests:
   tags:
     - lslab2
   script:
-    # - SDL_VIDEODRIVER=dummy poetry run python -m unittest -v discover -s src -t .. -p 'test_*.py'
+    - !reference [.install_dev, script]
     - SDL_VIDEODRIVER=dummy poetry run pytest --junitxml=report.xml
   artifacts:
     when: always
@@ -78,6 +85,7 @@ run_game.py:
   tags:
     - lslab2
   script:
+    - !reference [.install_dev, script]
     - SDL_VIDEODRIVER="dummy" poetry run python run_game.py
   needs: []
   only:

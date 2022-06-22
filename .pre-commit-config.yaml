@@ -23,6 +23,7 @@ repos:
       - id: mypy
         name: mypy
         exclude: /_tests/
+        exclude: tests/
         language: python
         entry: mypy
         args: [--config-file, .mypy.ini]

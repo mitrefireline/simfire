@@ -11,9 +11,9 @@ Contributing to the SimFire codebase ([GitLab](https://gitlab.mitre.org/fireline
 
 ### Important Docstring Information
 
-Do your best to make sure that all docstrings adhere to the following Google format found in `fire.py` [here](https://gitlab.mitre.org/fireline/simfire/-/blob/main/src/game/managers/fire.py). The reasoning can be found [here](https://www.sphinx-doc.org/en/main/usage/extensions/napoleon.html). We're using single quotes instead of double quotes for docstrings.
+Do your best to make sure that all docstrings adhere to the following Google format found in `fire.py` [here](https://gitlab.mitre.org/fireline/simfire/-/blob/main/simfire/game/managers/fire.py). The reasoning can be found [here](https://www.sphinx-doc.org/en/main/usage/extensions/napoleon.html). We're using single quotes instead of double quotes for docstrings.
 
-If you are editing a file and see that a docstring doesn't adhere to the Python3 Google Style Guide exemplified in [`fire.py`](https://gitlab.mitre.org/fireline/simfire/-/blob/main/src/game/managers/fire.py), please be a good steward and fix it so that it does.
+If you are editing a file and see that a docstring doesn't adhere to the Python3 Google Style Guide exemplified in [`fire.py`](https://gitlab.mitre.org/fireline/simfire/-/blob/main/simfire/game/managers/fire.py), please be a good steward and fix it so that it does.
 
 ## Issue & Merge Request Creation
 Create or assign an issue to yourself at the [Group Issue Board Page](https://gitlab.mitre.org/groups/fireline/-/boards), add the label `Rothermel Model`, and move it to “Doing”.

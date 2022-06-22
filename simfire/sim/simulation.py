@@ -58,7 +58,7 @@ class Simulation(ABC):
         Returns:
             A tuple of the following:
                 - The Burned/Unburned/ControlLine pixel map (`self.fire_map`). Values
-                  range from [0, 6] (see src/enums.py:BurnStatus).
+                  range from [0, 6] (see simfire/enums.py:BurnStatus).
                 - A boolean indicating whether the simulation has reached the end.
         """
         pass
@@ -443,7 +443,7 @@ class FireSimulation(Simulation):
         Returns:
             A tuple of the following:
                 - The Burned/Unburned/ControlLine pixel map (`self.fire_map`). Values
-                  range from [0, 6] (see src/enums.py:BurnStatus).
+                  range from [0, 6] (see simfire/enums.py:BurnStatus).
                 - A boolean indicating whether the simulation has reached the end.
         """
         # reset the fire status to running

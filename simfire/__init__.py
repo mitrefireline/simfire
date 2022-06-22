@@ -1,1 +1,5 @@
-__version__ = "0.0.0"
+from importlib.metadata import version
+
+__version__ = version("simfire")
+
+del version

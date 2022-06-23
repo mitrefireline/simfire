@@ -152,7 +152,7 @@ test-release:
     - lslab2
   script:
     - poetry build
-    - pip install -U dist/*.whl
+    - poetry run pip install -U dist/*.whl
     - poetry run python tests/package.py
   needs: []
   only:

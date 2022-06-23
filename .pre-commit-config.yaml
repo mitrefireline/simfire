@@ -2,17 +2,31 @@ exclude: 'assets/'
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v3.2.0
+    rev: v4.3.0
     hooks:
-      - id: trailing-whitespace
+      - id: check-added-large-files
       - id: check-docstring-first
       - id: check-json
-      - id: check-added-large-files
-      - id: debug-statements
-      - id: requirements-txt-fixer
       - id: check-merge-conflict
+      - id: debug-statements
       - id: end-of-file-fixer
+      - id: requirements-txt-fixer
       - id: sort-simple-yaml
+      - id: trailing-whitespace
+  - repo: https://gitlab.com/smop/pre-commit-hooks
+    rev: v1.0.0
+    hooks:
+      - id: check-poetry
+        name: check Poetry TOML
+        description: Validates the structure of the pyproject.toml file
+        entry: poetry check
+        language: system
+        pass_filenames: false
+        files: pyproject.toml
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: v2.27.1
+    hooks:
+      - id: commitizen
   - repo: local
     hooks:
       - id: black
@@ -36,6 +50,6 @@ repos:
         args: [--trailing-comma, -m=3]
         types: [python]
   - repo: https://gitlab.com/PyCQA/flake8
-    rev: 3.8.3
+    rev: 3.9.2
     hooks:
     -   id: flake8

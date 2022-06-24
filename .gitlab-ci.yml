@@ -160,25 +160,35 @@ test-release:
 
 .release:
   script:
-    - pip install twine wheel
-    - python setup.py bdist_wheel
-    - TWINE_PASSWORD=${CI_JOB_TOKEN} TWINE_USERNAME=gitlab-ci-token python -m twine upload --verbose --repository-url https://gitlab.mitre.org/api/v4/projects/${CI_PROJECT_ID}/packages/pypi dist/*
+    - poetry build
+    - poetry config repositories.mitre-gitlab https://gitlab.mitre.org/api/v4/projects/${CI_PROJECT_ID}/packages/pypi
+    - poetry publish --repository mitre-gitlab -u gitlab-ci-token -p ${CI_JOB_TOKEN}
 
-.delete-package:
-  script: >
-    apt update -y && apt install jq -y
-
-    delete_api_path=$(curl -H "PRIVATE-TOKEN: ${REGISTRY_DELETE_TOKEN}" "https://gitlab.mitre.org/api/v4/projects/${CI_PROJECT_ID}/packages/" | jq -r '.[] | select(.version=="0.0.0") | ._links.delete_api_path')
-
-    curl --request DELETE -H "PRIVATE-TOKEN: ${REGISTRY_DELETE_TOKEN}" "${delete_api_path}"
-
-release-dev:
+tag:
   stage: Release
   tags:
     - lslab2
+  before_script:
+    - DEBIAN_FRONTEND=noninteractive apt update
+    - DEBIAN_FRONTEND=noninteractive apt -y install php php-json git curl
   script:
-    - !reference [.delete-package, script]
-    - !reference [.release, script]
+    - poetry version patch
+    - VERSION=$(poetry version -s)
+    - LOG=$(git log -1 | grep -Po '(?<=Resolve ")(.*?)(?=")')
+    - ISSUE=$(git log -1 | grep -Po '(?<=Closes )(.*?).*')
+    - MR=$(git log -1 | grep -Po '(?<=fireline/simfire)(.*?).*')
+    - echo -e "# Version ${VERSION}\n\nThis version includes:\n\n* ${LOG} (closed ${ISSUE} with merge request ${MR})" > RELEASE.md
+    - MESSAGE="$(php -r "echo json_encode(['name' => 'Version $VERSION', 'tag_name' => '$VERSION', 'description' => file_get_contents('RELEASE.md')]);")";
+    - git remote remove origin
+    - git remote add git remote add api-origin https://oauth2:${CI_TAG_TOKEN}@gitlab.mitre.org/fireline/simfire.git
+    - git config --global user.email "fireline@mitre.org"
+    - git config --global user.name "fiReLine CI Bot"
+    - git add pyproject.toml
+    - git commit -m "Change pyproject.toml version to $VERSION"
+    - git push api-origin
+    - git tag -a $VERSION -m "$VERSION"
+    - git push api-origin $VERSION
+    - curl --header 'Content-Type: application/json' --header "PRIVATE-TOKEN: ${CI_TAG_TOKEN}" --data "$MESSAGE" --request POST https://gitlab.mitre.org/api/v4/projects/${CI_PROJECT_ID}/releases
   only:
     - main
 

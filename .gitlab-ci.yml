@@ -178,9 +178,9 @@ tag:
     - ISSUE=$(git log -1 | grep -Po '(?<=Closes )(.*?).*')
     - MR=$(git log -1 | grep -Po '(?<=fireline/simfire)(.*?).*')
     - echo -e "# Version ${VERSION}\n\nThis version includes:\n\n* ${LOG} (closed ${ISSUE} with merge request ${MR})" > RELEASE.md
-    - MESSAGE="$(php -r "echo json_encode(['name' => 'Version $VERSION', 'tag_name' => '$VERSION', 'description' => file_get_contents('RELEASE.md')]);")";
+    - MESSAGE="$(php -r "echo json_encode(['name' => 'Version $VERSION', 'tag_name' => '$VERSION', 'description' => file_get_contents('RELEASE.md')]);")"
     - git remote remove origin
-    - git remote add git remote add api-origin https://oauth2:${CI_TAG_TOKEN}@gitlab.mitre.org/fireline/simfire.git
+    - git remote add api-origin https://oauth2:${CI_TAG_TOKEN}@gitlab.mitre.org/fireline/simfire.git
     - git config --global user.email "fireline@mitre.org"
     - git config --global user.name "fiReLine CI Bot"
     - git add pyproject.toml

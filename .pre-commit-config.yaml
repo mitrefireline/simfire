@@ -23,10 +23,6 @@ repos:
         language: system
         pass_filenames: false
         files: pyproject.toml
-  - repo: https://github.com/commitizen-tools/commitizen
-    rev: v2.27.1
-    hooks:
-      - id: commitizen
   - repo: local
     hooks:
       - id: black

@@ -188,7 +188,11 @@ tag:
     - git push api-origin
     - git tag -a $VERSION -m "$VERSION"
     - git push api-origin $VERSION
-    - curl --header 'Content-Type: application/json' --header "PRIVATE-TOKEN: ${CI_TAG_TOKEN}" --data "$MESSAGE" --request POST https://gitlab.mitre.org/api/v4/projects/${CI_PROJECT_ID}/releases
+    - >
+      curl --header 'Content-Type: application/json' \
+           --header "PRIVATE-TOKEN: ${CI_TAG_TOKEN}" \
+           --data "$MESSAGE" \
+           --request POST https://gitlab.mitre.org/api/v4/projects/${CI_PROJECT_ID}/releases
   only:
     - main
 

@@ -190,7 +190,7 @@ tag:
   only:
     - main
 
-release:
+release_gitlab:
   stage: Release
   tags:
     - lslab2
@@ -198,5 +198,16 @@ release:
     - poetry build
     - poetry config repositories.mitre-gitlab https://gitlab.mitre.org/api/v4/projects/${CI_PROJECT_ID}/packages/pypi
     - poetry publish --repository mitre-gitlab -u gitlab-ci-token -p ${CI_JOB_TOKEN}
+  only:
+    - tags
+
+release_artifactory:
+  stage: Release
+  tags:
+    - lslab2
+  script:
+    - poetry build
+    - poetry config repositories.mitre-artifactory https://artifacts.mitre.org/artifactory/api/pypi/python
+    - poetry publish --repository mitre-artifactory -u fireline-ci-bot -p ${CI_ARTIFACTORY_TOKEN}
   only:
     - tags

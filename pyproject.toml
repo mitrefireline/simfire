@@ -8,6 +8,9 @@ authors = ["Tim Welsh <twelsh@mitre.org>", "Marissa Dotter <mdotter@mitre.org>",
            "Alex Tapley <atapley@mitre.org>", "Michael Threet <mthreet@mitre.org>"]
 readme = "README.md"
 include = ["assets/**/*"]
+keywords = ["python", "reinforcement learning", "simulation", "fire"]
+documentation = "https://fireline.pages.mitre.org/simfire/"
+repository = "https://gitlab.mitre.org/fireline/simfire"
 
 [tool.poetry.dependencies]
 python = "~3.9"

@@ -158,12 +158,6 @@ test-release:
   only:
     - merge_requests
 
-.release:
-  script:
-    - poetry build
-    - poetry config repositories.mitre-gitlab https://gitlab.mitre.org/api/v4/projects/${CI_PROJECT_ID}/packages/pypi
-    - poetry publish --repository mitre-gitlab -u gitlab-ci-token -p ${CI_JOB_TOKEN}
-
 tag:
   stage: Release
   tags:
@@ -180,8 +174,8 @@ tag:
     - echo -e "# Version ${VERSION}\n\nThis version includes:\n\n* ${LOG} (closed ${ISSUE} with merge request ${MR})" > RELEASE.md
     - MESSAGE="$(php -r "echo json_encode(['name' => 'Version $VERSION', 'tag_name' => '$VERSION', 'description' => file_get_contents('RELEASE.md')]);")"
     - git remote remove origin
-    - git remote add api-origin https://oauth2:${CI_TAG_TOKEN}@gitlab.mitre.org/fireline/simfire.git
-    - git config --global user.email "fireline@mitre.org"
+    - git remote add api-origin https://oauth2:${CI_TAG_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git
+    - git config --global user.email "fireline-ci-bot@mitre.org"
     - git config --global user.name "fiReLine CI Bot"
     - git add pyproject.toml
     - git commit -m "Change pyproject.toml version to $VERSION"
@@ -200,6 +194,9 @@ release:
   stage: Release
   tags:
     - lslab2
-  extends: .release
+  script:
+    - poetry build
+    - poetry config repositories.mitre-gitlab https://gitlab.mitre.org/api/v4/projects/${CI_PROJECT_ID}/packages/pypi
+    - poetry publish --repository mitre-gitlab -u gitlab-ci-token -p ${CI_JOB_TOKEN}
   only:
     - tags

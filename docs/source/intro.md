@@ -15,7 +15,8 @@ git clone git@gitlab.mitre.org:fireline/simfire.git
 Then, install the requirements:
 
 ```shell
-pip install -r requirements.txt
+pip install poetry
+poetry install --no-dev
 ```
 
 And run the `run_game.py` script:

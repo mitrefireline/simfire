@@ -254,8 +254,8 @@ class FireManager:
 
 class RothermelFireManager(FireManager):
     """
-    This FireManager will spread the fire based on the basic [Rothermel
-    Model](https://www.fs.fed.us/rm/pubs_series/rmrs/gtr/rmrs_gtr371.pdf).
+    This FireManager will spread the fire based on the basic `Rothermel
+    Model <https://www.fs.fed.us/rm/pubs_series/rmrs/gtr/rmrs_gtr371.pdf`_.
     """
 
     def __init__(

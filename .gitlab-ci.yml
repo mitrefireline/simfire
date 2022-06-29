@@ -182,7 +182,7 @@ tag:
     - git config --global user.name "fiReLine CI Bot"
     - git add pyproject.toml
     - git commit -m "Change pyproject.toml version to $VERSION"
-    - git push origin main
+    - git push origin HEAD:main
     - git tag -a $VERSION -m "$VERSION"
     - git push origin $VERSION
     - >

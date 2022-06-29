@@ -135,7 +135,6 @@ pages:
   stage: Documentation
   tags:
     - lslab2
-    - pages
   extends: .pages
   artifacts:
     paths:
@@ -168,6 +167,7 @@ tag:
     - poetry --version
     - DEBIAN_FRONTEND=noninteractive apt update
     - DEBIAN_FRONTEND=noninteractive apt -y install php php-json git curl
+    - git --version
   script:
     - poetry version patch
     - VERSION=$(poetry version -s)
@@ -175,14 +175,14 @@ tag:
     - ISSUE=$(git log -1 | grep -Po '(?<=Closes )(.*?).*')
     - MR=$(git log -1 | grep -Po '(?<=fireline/simfire)(.*?).*')
     - echo -e "# Version ${VERSION}\n\nThis version includes:\n\n* ${LOG} (closed ${ISSUE} with merge request ${MR})" > RELEASE.md
-    - MESSAGE="$(php -r "echo json_encode(['name' => 'Version $VERSION', 'tag_name' => '$VERSION', 'description' => file_get_contents('RELEASE.md')]);")"
+    - MESSAGE="$(php -r "echo json_encode(['name' => '$VERSION', 'tag_name' => '$VERSION', 'description' => file_get_contents('RELEASE.md')]);")"
     - git remote remove origin
     - git remote add origin https://oauth2:${CI_TAG_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git
     - git config --global user.email "fireline-ci-bot@mitre.org"
     - git config --global user.name "fiReLine CI Bot"
     - git add pyproject.toml
-    - git commit -m "Change pyproject.toml version to $VERSION"
-    - git push origin HEAD:main
+    - git commit -m "[skip ci] Change pyproject.toml version to $VERSION"
+    - git push -o ci.skip origin HEAD:main
     - git tag -a $VERSION -m "$VERSION"
     - git push origin $VERSION
     - >

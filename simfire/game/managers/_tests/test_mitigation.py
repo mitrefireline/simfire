@@ -23,7 +23,7 @@ class TestControlLineManager(unittest.TestCase):
     """
 
     def setUp(self) -> None:
-        self.config = Config("./src/utils/_tests/test_configs/test_config.yml")
+        self.config = Config("./simfire/utils/_tests/test_configs/test_config.yml")
         self.screen_size = (self.config.area.screen_size, self.config.area.screen_size)
         points = line(self.screen_size[0] // 4, 0, 0, self.screen_size[1] // 4)
         y = points[0].tolist()
@@ -106,7 +106,7 @@ class TestFireLineManager(unittest.TestCase):
     """
 
     def setUp(self) -> None:
-        self.config = Config("./src/utils/_tests/test_configs/test_config.yml")
+        self.config = Config("./simfire/utils/_tests/test_configs/test_config.yml")
         self.screen_size = (self.config.area.screen_size, self.config.area.screen_size)
         points = line(self.screen_size[0] // 4, 0, 0, self.screen_size[1] // 4)
         y = points[0].tolist()
@@ -150,7 +150,7 @@ class TestScratchLineManager(unittest.TestCase):
     """
 
     def setUp(self) -> None:
-        self.config = Config("./src/utils/_tests/test_configs/test_config.yml")
+        self.config = Config("./simfire/utils/_tests/test_configs/test_config.yml")
         self.screen_size = (self.config.area.screen_size, self.config.area.screen_size)
         points = line(self.screen_size[0] // 4, 0, 0, self.screen_size[1] // 4)
         y = points[0].tolist()
@@ -194,7 +194,7 @@ class TestWetLineManager(unittest.TestCase):
     """
 
     def setUp(self) -> None:
-        self.config = Config("./src/utils/_tests/test_configs/test_config.yml")
+        self.config = Config("./simfire/utils/_tests/test_configs/test_config.yml")
         self.screen_size = (self.config.area.screen_size, self.config.area.screen_size)
         points = line(self.screen_size[0] // 4, 0, 0, self.screen_size[1] // 4)
         y = points[0].tolist()

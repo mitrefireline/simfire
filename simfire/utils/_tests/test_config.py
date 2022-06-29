@@ -8,7 +8,7 @@ from ..config import Config
 
 class ConfigTest(unittest.TestCase):
     def setUp(self) -> None:
-        self.yaml = Path("./src/utils/_tests/test_configs/test_config.yml")
+        self.yaml = Path("./simfire/utils/_tests/test_configs/test_config.yml")
         self.cfg = Config(self.yaml)
         with open(self.yaml, "r") as f:
             self.true_yaml_data = yaml.safe_load(f)

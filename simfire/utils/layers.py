@@ -593,7 +593,7 @@ class OperationalTopographyLayer(TopographyLayer):
         tr = (self.lat_long_box.bl[0][0], self.lat_long_box.tr[1][0])
         bl = (self.lat_long_box.tr[0][0], self.lat_long_box.bl[1][0])
         data_array = data[tr[0] : bl[0], tr[1] : bl[1]]
-        # Convert from meters to feet for use with Rothermel
+        # Convert from meters to feet for use with simulator
         data_array = 3.28084 * data_array
         return data_array
 
@@ -702,7 +702,7 @@ class OperationalFuelLayer(FuelLayer):
             width: The width of the screen size (meters)
             resolution: The resolution to get data (meters)
             type: The type of data you wnt to load: 'display' or 'simulation'
-                  display: rgb data for rothermel
+                  display: rgb data for simulator
                   simulation: fuel model values for RL Harness/Simulation
         """
         self.lat_long_box = lat_long_box
@@ -798,7 +798,7 @@ class OperationalFuelLayer(FuelLayer):
 
     def _make_fuel_data(self) -> np.ndarray:
         """
-        Map Fire Behavior Fuel Model data to the Fuel type that Rothermel expects
+        Map Fire Behavior Fuel Model data to the Fuel type that the fire simulator expects
 
         Arguments:
             None

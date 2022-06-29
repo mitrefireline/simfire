@@ -11,7 +11,7 @@ from . import DummyFuelLayer, DummyTopographyLayer
 
 class TestTerrain(unittest.TestCase):
     def setUp(self) -> None:
-        self.config = Config("./src/utils/_tests/test_configs/test_config.yml")
+        self.config = Config("./simfire/utils/_tests/test_configs/test_config.yml")
         self.screen_size = (32, 32)
         self.fuel_layer = DummyFuelLayer(self.screen_size)
         self.topo_layer = DummyTopographyLayer(self.screen_size)
@@ -112,7 +112,7 @@ class TestTerrain(unittest.TestCase):
 
 class TestFire(unittest.TestCase):
     def setUp(self) -> None:
-        self.config = Config("./src/utils/_tests/test_configs/test_config.yml")
+        self.config = Config("./simfire/utils/_tests/test_configs/test_config.yml")
         self.pos = (self.config.area.screen_size // 2, self.config.area.screen_size // 2)
         self.size = self.config.display.fire_size
         self.fire = Fire(self.pos, self.size)

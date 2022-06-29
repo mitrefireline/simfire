@@ -13,7 +13,7 @@ from ..fire import ConstantSpreadFireManager, FireManager, RothermelFireManager
 
 class TestFireManager(unittest.TestCase):
     def setUp(self) -> None:
-        self.config = Config("./src/utils/_tests/test_configs/test_config.yml")
+        self.config = Config("./simfire/utils/_tests/test_configs/test_config.yml")
         self.init_pos = (
             self.config.area.screen_size // 2,
             self.config.area.screen_size // 2,
@@ -162,7 +162,7 @@ class TestFireManager(unittest.TestCase):
 class TestRothermelFireManager(unittest.TestCase):
     def setUp(self) -> None:
         self.config = Config(
-            "./src/utils/_tests/test_configs/test_config_rothermel_manager.yml"
+            "./simfire/utils/_tests/test_configs/test_config_rothermel_manager.yml"
         )
         self.screen_size = (self.config.area.screen_size, self.config.area.screen_size)
         self.headless = False
@@ -323,8 +323,8 @@ class TestRothermelFireManager(unittest.TestCase):
     def test_update(self) -> None:
         """
         Test that the RothermelFireManager will update correctly. There is no need to
-        check the Rothermel rate of spread calculation since that has its own unit test.
-        Instead, check that the fire will spread correctly once enough time has passed.
+        check the rate of spread calculation since that has its own unit test. Instead,
+        check that the fire will spread correctly once enough time has passed.
         """
         # Create simulation parameters that will guarantee fire spread
         fire_map = np.full_like(self.terrain.fuels, BurnStatus.UNBURNED)
@@ -395,7 +395,7 @@ class TestRothermelFireManager(unittest.TestCase):
 
 class TestConstantSpreadFireManager(unittest.TestCase):
     def setUp(self) -> None:
-        self.config = Config("./src/utils/_tests/test_configs/test_config.yml")
+        self.config = Config("./simfire/utils/_tests/test_configs/test_config.yml")
         self.init_pos = (
             self.config.area.screen_size // 5,
             self.config.area.screen_size // 7,

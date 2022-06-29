@@ -99,8 +99,8 @@
 #     wm_mag = generate_magnitude_array(wm_velocity_x, wm_velocity_y)
 #     wm_dir = generate_direction_array(wm_velocity_x, wm_velocity_y)
 
-#     rothsim_path = Path.home() / '.rothsim'
-#     wind_path = rothsim_path / 'wind'
+#     simfire_path = Path.home() / '.simfire'
+#     wind_path = simfire_path / 'wind'
 #     wind_path.mkdir(parents=True)
 #     np.save(wind_path / 'generated_wind_magnitudes.npy', wm_mag)
 #     np.save(wind_path / 'generated_wind_directions.npy', wm_dir)

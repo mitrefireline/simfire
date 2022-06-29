@@ -59,7 +59,7 @@ class Game:
         if not self.headless:
             pygame.init()
             self.screen = pygame.display.set_mode(screen_size)
-            pygame.display.set_caption("Rothermel 2D Simulator")
+            pygame.display.set_caption("SimFire")
             with resources.path("assets.icons", "fireline_logo.png") as path:
                 fireline_logo_path = path
             pygame.display.set_icon(load_image(str(fireline_logo_path)))

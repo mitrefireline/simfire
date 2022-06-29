@@ -8,9 +8,8 @@ Fir delta, the Fuel bed depth is used
 
 As specified in: https://www.fs.fed.us/rm/pubs_series/rmrs/gtr/rmrs_gtr371.pdf
 
-Urban, Snow/Ice, Agricutlture, Water, Barren are Non-Burnable fuel types
-    as described in:
-    https://gacc.nifc.gov/oncc/docs/40-Standard%20Fire%20Behavior%20Fuel%20Models.pdf
+Urban, Snow/Ice, Agricutlture, Water, Barren are Non-Burnable fuel types as described in:
+https://gacc.nifc.gov/oncc/docs/40-Standard%20Fire%20Behavior%20Fuel%20Models.pdf
 """
 from .parameters import Fuel
 

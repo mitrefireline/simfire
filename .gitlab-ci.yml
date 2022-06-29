@@ -181,7 +181,7 @@ tag:
     - git config --global user.email "fireline-ci-bot@mitre.org"
     - git config --global user.name "fiReLine CI Bot"
     - git add pyproject.toml
-    - git commit -m "[skip ci] Change pyproject.toml version to $VERSION"
+    - git commit -m "Change pyproject.toml version to $VERSION"
     - git push -o ci.skip origin HEAD:main
     - git tag -a $VERSION -m "$VERSION"
     - git push origin $VERSION

@@ -175,7 +175,7 @@ tag:
     - echo -e "# Version ${VERSION}\n\nThis version includes:\n\n* ${LOG} (closed ${ISSUE} with merge request ${MR})" > RELEASE.md
     - MESSAGE="$(php -r "echo json_encode(['name' => 'Version $VERSION', 'tag_name' => '$VERSION', 'description' => file_get_contents('RELEASE.md')]);")"
     - git remote remove origin
-    - git remote add api-origin https://oauth2:${CI_TAG_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git
+    - git remote add origin https://oauth2:${CI_TAG_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git
     - git config --global user.email "fireline-ci-bot@mitre.org"
     - git config --global user.name "fiReLine CI Bot"
     - git add pyproject.toml

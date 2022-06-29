@@ -163,9 +163,11 @@ tag:
   tags:
     - lslab2
   before_script:
+    - python --version
+    - pip install poetry
+    - poetry --version
     - DEBIAN_FRONTEND=noninteractive apt update
     - DEBIAN_FRONTEND=noninteractive apt -y install php php-json git curl
-    - pip install poetry
   script:
     - poetry version patch
     - VERSION=$(poetry version -s)
@@ -182,7 +184,7 @@ tag:
     - git commit -m "Change pyproject.toml version to $VERSION"
     - git push api-origin main
     - git tag -a $VERSION -m "$VERSION"
-    - git push api-origin $VERSION
+    - git push origin $VERSION
     - >
       curl --header 'Content-Type: application/json' \
            --header "PRIVATE-TOKEN: ${CI_TAG_TOKEN}" \

@@ -1,3 +1,4 @@
+*.gitignore
 *.pyc
 __pycache__
 .vscode
@@ -10,3 +11,7 @@ docs/build
 simulation.gif
 .coverage
 coverage.xml
+*.npy
+*.txt
+topography_tester.py
+download.py

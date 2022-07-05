@@ -921,6 +921,15 @@ class HistoricalLayer(DataLayer):
     Base class for use with operational and procedurally generated
     fuel data. This class implements the code needed to
     create the terrain image to use with the display.
+
+    TODO: Add ability to start mitigations during simulation runtime
+    TODO: Update database with validated information on start, end time
+    TODO: Update lines database with validated start end times
+            if start/end time are not within start/end time of fire:
+                1: if both, ignore data point
+                2: if either, use start/end to bound it
+    TODO: Add fire start init position to database
+    TODO: Add wind shapefile
     """
 
     def __init__(
@@ -940,24 +949,45 @@ class HistoricalLayer(DataLayer):
         """
         import geopandas
 
-        base_path = Path(f"/nfs/lslab2/fireline/data/perimeters/{year}/ValidationGIS/")
-        # shapefile = Path('USAshapefile')
-        op_data_archive = Path(f"WFIGSOp_{year}")
-        # fire_perim_hist = Path('IAFPH')
+        self.fire_name = fire_name
+        self.year = year
 
-        # conus_path = base_path / shapefile
-        op_path = base_path / op_data_archive
-        # fire_perim_path = base_path / fire_perim_hist
+        polygon_data_archive = Path("WFIGSOp")
+        line_data_archive = Path("WFIGSLine")
 
-        # conus_data = geopandas.read_file(str(conus_path))
-        op_data = geopandas.read_file(str(op_path))
-        # fire_perim_data = geopandas.read_file(str(fire_perim_path))
+        base_path = Path(f"/nfs/lslab2/fireline/data/perimeters/{self.year}/CA/")
+
+        polygon_path = base_path / polygon_data_archive
+        line_path = base_path / line_data_archive
+
+        polygon_data = geopandas.read_file(str(polygon_path))
+        line_data = geopandas.read_file(str(line_path))
 
         try:
-            self.time_loc_data = op_data.loc[op_data["IncidentNa"].isin([fire_name])]
+            self.polygon_time_loc_data = polygon_data.loc[
+                polygon_data["IncidentNa"].isin([self.fire_name.upper])
+            ]
+            if len(self.polygon_time_loc_data) == 0:
+                try:
+                    self.polygon_time_loc_data = polygon_data.loc[
+                        polygon_data["IncidentNa"].isin([self.fire_name.lower])
+                    ]
+                except ValueError:
+                    print(f"{self.fire_name} not found in the database.")
+            self.line_time_loc_data = line_data.loc[
+                line_data["IncidentNa"].isin([self.fire_name.upper])
+            ]
+            if len(self.line_time_loc_data) == 0:
+                try:
+                    self.line_time_loc_data = line_data.loc[
+                        line_data["IncidentNa"].isin([self.fire_name.lower])
+                    ]
+                except ValueError:
+                    print(f"{self.fire_name} not found in the database.")
         except ValueError:
-            print(f"{fire_name} not found in the database.")
+            print(f"{self.fire_name} not found in the database.")
 
+        self._get_metadata()
         self._get_centroid()
         self.actual_dist_w = int(self._calc_distance())
         self._get_width_height()
@@ -997,7 +1027,7 @@ class HistoricalLayer(DataLayer):
 
         """
 
-        self.date_time_array = self.time_loc_data.CreateDate.values
+        self.date_time_array = self.polygon_time_loc_data.CreateDate.values
         self.start_time = self.date_time_array[0]
         self.end_time = self.date_time_array[-1]
 
@@ -1032,7 +1062,7 @@ class HistoricalLayer(DataLayer):
         """
 
         self.points_array = np.zeros((self.width, self.height))
-        available_perimeters = self.time_loc_data.boundary
+        available_perimeters = self.polygon_time_loc_data.boundary
         for idx, perimeter in enumerate(available_perimeters[:-3]):
             abs_west = [abs(perimeter.xy[0][i]) for i in range(len(perimeter.xy[0]))]
             points_list = tuple(zip(perimeter.xy[1], abs_west))
@@ -1101,10 +1131,10 @@ class HistoricalLayer(DataLayer):
         Assume 30m resolution
 
         """
-        self.max_w = abs(self.time_loc_data.bounds.iloc[-1].maxx)
-        self.min_w = abs(self.time_loc_data.bounds.iloc[-1].minx)
-        self.max_n = self.time_loc_data.bounds.iloc[-1].maxy
-        self.min_n = self.time_loc_data.bounds.iloc[-1].miny
+        self.max_w = abs(self.polygon_time_loc_data.bounds.iloc[-1].maxx)
+        self.min_w = abs(self.polygon_time_loc_data.bounds.iloc[-1].minx)
+        self.max_n = self.polygon_time_loc_data.bounds.iloc[-1].maxy
+        self.min_n = self.polygon_time_loc_data.bounds.iloc[-1].miny
 
         self.centroid = ((self.max_n + self.min_n) / 2, (self.min_w + self.max_w) / 2)
 
@@ -1126,3 +1156,39 @@ class HistoricalLayer(DataLayer):
         c = 2 * asin(sqrt(a))
         m = 6371 * c * 1000
         return m
+
+    def _get_metadata(self) -> None:
+        """
+        Function that gets all metadata for historical fire.
+            Includes:
+                Perimeter Start Date/Time
+                Perimeter End Date/Time
+                GIS ACRES (Total)
+                Shape Length
+                Shape Area
+                Mitigation Type
+                Mitgation Start Date/Time
+                Mitgation End Date/Time
+
+        """
+
+        self.polygon_meta = dict()
+        self.lines_meta = dict()
+        for idx, _ in enumerate(range(len(self.polygon_time_loc_data))):
+            indv_metadata = dict()
+            polygon_data = self.polygon_time_loc_data.iloc[idx]
+            indv_metadata["perimeter start"] = polygon_data.GDB_FROM_D
+            indv_metadata["perimeter end"] = polygon_data.GDB_TO_DAT
+            indv_metadata["GIS Acres"] = polygon_data.GISAcres
+            indv_metadata["perimeter shape length"] = polygon_data.Shape_Leng
+            indv_metadata["perimeter shape area"] = polygon_data.Shape_Area
+            self.polygon_meta.update({idx: indv_metadata})
+
+        for idxs, _ in enumerate(range(len(self.line_time_loc_data))):
+            indv_line_metadata = dict()
+            line_data = self.line_time_loc_data.iloc[idxs]
+            indv_line_metadata["mitigation type"] = line_data.FeatureCat
+            indv_line_metadata["mitigation start"] = line_data.GDB_FROM_D
+            indv_line_metadata["mitigation end"] = line_data.GDB_TO_DAT
+            indv_line_metadata["mitigation shape length"] = line_data.SHAPE_Leng
+            self.lines_meta.update({idxs: indv_line_metadata})

@@ -2,7 +2,7 @@
 #
 # This file only contains a selection of the most common options. For a full
 # list see the documentation:
-# https://www.sphinx-doc.org/en/master/usage/configuration.html
+# https://www.sphinx-doc.org/en/main/usage/configuration.html
 
 # -- Path setup --------------------------------------------------------------
 
@@ -18,18 +18,18 @@ from datetime import date
 
 # -- Project information -----------------------------------------------------
 
-project = "fiReLine Rothermel Model"
+project = "SimFire"
 copyright = f"{date.today().year}, fiReLine"
 author = (
-    "Marissa Dotter, Michael Doyle, Dhanuj Gandikota, Chris Kempis, Alex Tapley, "
-    "Michael Threet, Tim Welsh"
+    "Marissa Dotter, Michael Doyle, Dhanuj Gandikota, Chris Kempis, Lauren Schambach, "
+    "Alex Tapley, Michael Threet, Tim Welsh"
 )
 
 # The full version, including alpha/beta/rc tags
 if os.environ.get("CI_COMMIT_TAG"):
     release = os.environ["CI_COMMIT_TAG"]
 else:
-    release = "0.0.0"
+    release = "latest"
 
 # -- General configuration ---------------------------------------------------
 
@@ -59,9 +59,10 @@ tls_verify = False
 autodoc_typehints = "description"
 
 # Autoapi settings
+autoapi_options = ["members", "undoc-members", "show-inheritance", "show-module-summary"]
 autoapi_python_class_content = "both"
 autoapi_type = "python"
-autoapi_dirs = ["../../src/"]
+autoapi_dirs = ["../../simfire/"]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
@@ -76,7 +77,7 @@ exclude_patterns = ["**/_tests"]
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = "sphinx_rtd_theme"
+html_theme = "furo"
 html_logo = "../../assets/icons/rl_logo.png"
 html_theme_options = {
     "logo_only": False,

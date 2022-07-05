@@ -1,7 +1,7 @@
 # For a description of config parameters, go to
 # https://fireline.pages.mitre.org/simfire/config.html
 area:
-  screen_size: 225
+  screen_size: 9
   pixel_scale: 50
 
 display:
@@ -11,8 +11,8 @@ display:
 simulation:
   update_rate: 1
   runtime: 24h
-  headless: false
-  record: true
+  headless: true
+  record: false
 
 mitigation:
   ros_attenuation: true
@@ -21,8 +21,8 @@ operational:
   seed:
   latitude: 39.67
   longitude: 119.8
-  height: 4000
-  width: 4000
+  height: 400
+  width: 400
   resolution: 30
 
 historical:
@@ -51,23 +51,25 @@ terrain:
         sigma_x: 50
         sigma_y: 50
   fuel:
-    type: operational
+    type: functional
     functional:
       function: chaparral
       chaparral:
         seed: 1113
 
 fire:
-  fire_initial_position: (65, 65)
+  fire_initial_position: (5, 3)
   max_fire_duration: 4
 
 environment:
   moisture: 0.03
 
 wind:
+  # This should stay as perlin for use with testing
   function: perlin
   cfd:
-    time_to_train: 1000
+    time_to_train: 1000 # Seconds, longer is better
+    iterations: 1
     scale: 1
     timestep_dt: 1.0
     diffusion: 0.0

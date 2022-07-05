@@ -51,23 +51,24 @@ terrain:
         sigma_x: 50
         sigma_y: 50
   fuel:
-    type: operational
+    type: functional
     functional:
       function: chaparral
       chaparral:
         seed: 1113
 
 fire:
-  fire_initial_position: (65, 65)
+  fire_initial_position: (16, 16)
   max_fire_duration: 4
 
 environment:
   moisture: 0.03
 
 wind:
-  function: perlin
+  function: simple
   cfd:
     time_to_train: 1000
+    iterations: 1
     scale: 1
     timestep_dt: 1.0
     diffusion: 0.0
@@ -75,7 +76,7 @@ wind:
     speed: 19
     direction: north
   simple:
-    speed: 7
+    speed: 1
     direction: 90.0
   perlin:
     speed:

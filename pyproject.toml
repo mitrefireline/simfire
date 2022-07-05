@@ -1,3 +1,54 @@
+[tool.poetry]
+name = "simfire"
+version = "1.4.5"
+description = "Fire simulator built in Python"
+authors = ["Tim Welsh <twelsh@mitre.org>", "Marissa Dotter <mdotter@mitre.org>",
+           "Michael Doyle <mdoyle@mitre.org>", "Dhanuj Gandikota <dgandikota@mitre.org>",
+           "Chris Kempis <ckempis@mitre.org>", "Lauren Schambach <lschambach@mitre.org>",
+           "Alex Tapley <atapley@mitre.org>", "Michael Threet <mthreet@mitre.org>"]
+readme = "README.md"
+include = ["assets/**/*"]
+keywords = ["python", "reinforcement learning", "simulation", "fire"]
+documentation = "https://fireline.pages.mitre.org/simfire/"
+repository = "https://gitlab.mitre.org/fireline/simfire"
+
+[tool.poetry.dependencies]
+python = "~3.9"
+GPUtil = "^1.4.0"
+matplotlib = "^3.5.2"
+noise = "^1.2.2"
+numba = "^0.55.2"
+numpy = "^1.22.4"
+Pillow = "^9.1.1"
+pygame = "^2.1.2"
+PyYAML = "^6.0"
+reportlab = "^3.6.10"
+scikit-image = "^0.19.3"
+svglib = "^1.3.0"
+pytest-cov = {version = "^3.0.0", optional = true}
+Sphinx = {version = "^5.0.2", optional = true}
+sphinx-autoapi = {version = "^1.8.4", optional = true}
+sphinx-rtd-theme = {version = "^1.0.0", optional = true}
+myst-parser = {version = "^0.18.0", optional = true}
+furo = {version = "^2022.6.4.1", optional = true}
+
+[tool.poetry.dev-dependencies]
+black = "^22.3.0"
+certifi = "^2022.6.15"
+flake8 = "^4.0.1"
+isort = "^5.10.1"
+mypy = "^0.961"
+pre-commit = "^2.19.0"
+pytest = "^7.1.2"
+
+[tool.poetry.extras]
+coverage = ["pytest-cov"]
+docs = ["Sphinx", "sphinx-autoapi", "sphinx-rtd-theme", "myst-parser", "furo"]
+
 [tool.black]
 line-length = 90
 target-version = ['py39']
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

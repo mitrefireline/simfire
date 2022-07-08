@@ -1,3 +1,6 @@
+"""
+Module containing all config parsing and dataclass logic.
+"""
 import dataclasses
 import os
 from copy import deepcopy

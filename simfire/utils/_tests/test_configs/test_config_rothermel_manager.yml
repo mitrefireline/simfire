@@ -52,7 +52,7 @@ terrain:
 
 fire:
   fire_initial_position:
-  type: static
+    type: static
     static:
       position: (16, 16)
     random:

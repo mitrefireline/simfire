@@ -51,7 +51,12 @@ terrain:
         seed: 1113
 
 fire:
-  fire_initial_position: (65, 65)
+  fire_initial_position:
+    type: static
+    static:
+      position: (65, 65)
+    random:
+      seed: 1234
   max_fire_duration: 4
 
 environment:

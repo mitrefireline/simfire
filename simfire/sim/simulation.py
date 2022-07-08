@@ -496,6 +496,7 @@ class FireSimulation(Simulation):
             "fuel": self._get_fuel_seed(),
             "wind_speed": self._get_wind_speed_seed(),
             "wind_direction": self._get_wind_direction_seed(),
+            "fire_initial_position": self._get_fire_initial_position_seed(),
         }
         # Make sure to delete all the seeds that are None, so the user knows not to try
         # and set them
@@ -609,6 +610,19 @@ class FireSimulation(Simulation):
         else:
             return None
 
+    def _get_fire_initial_position_seed(self) -> Optional[int]:
+        """
+        Returns the seed for the current fire start location.
+
+        Only the 'random' option has a seed value associated with it.
+
+        Returns:
+            The seed for the currently configured fire start location.
+        """
+        # The seed is set to None for static start locations
+        # The seed is set to an int value for random start locations
+        return self.config.fire.seed
+
     def set_seeds(self, seeds: Dict[str, int]) -> bool:
         """
         Sets the seeds for different available randomization parameters.
@@ -638,9 +652,11 @@ class FireSimulation(Simulation):
         if "wind_speed" in keys and "wind_direction" not in keys:
             self.config.reset_wind(speed_seed=seeds["wind_speed"])
             success = True
-        if "wind_speed" not in keys and "wind_direction" in keys:
+        if "wind_direction" in keys and "wind_speed" not in keys:
             self.config.reset_wind(direction_seed=seeds["wind_direction"])
             success = True
+        if "fire_initial_position" in keys:
+            self.config.reset_fire(seeds["fire_initial_position"])
 
         valid_keys = list(self.get_seeds().keys())
         for key in keys:

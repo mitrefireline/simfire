@@ -211,6 +211,18 @@ class FireSimulationTest(unittest.TestCase):
             f"({returned_seeds})",
         )
 
+        # Test the fire initial position seed
+        seed = 208
+        seeds = {"fire_initial_position": seed}
+        self.simulation.set_seeds(seeds)
+        returned_seed = self.simulation.get_seeds()["fire_initial_position"]
+        self.assertEqual(
+            seed,
+            returned_seeds["fire_initial_position"],
+            msg=f"The input fire initial position seed ({seed}) does not "
+            f"match the returned seed ({returned_seed})",
+        )
+
         # Give no valid keys to hit the log warning
         seeds = {"not_valid": 1111}
         success = self.simulation.set_seeds(seeds)

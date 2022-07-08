@@ -118,10 +118,9 @@ class TerrainConfig:
 
 @dataclasses.dataclass
 class FireConfig:
-    def __init__(self, fire_initial_position: str, max_fire_duration: str):
-        fire_pos = fire_initial_position[1:-1].split(",")
-        self.fire_initial_position = (int(fire_pos[0]), int(fire_pos[1]))
-        self.max_fire_duration = int(max_fire_duration)
+    fire_initial_position: Tuple[int, int]
+    max_fire_duration: int
+    seed: Optional[int] = None
 
 
 @dataclasses.dataclass
@@ -416,8 +415,27 @@ class Config:
         Returns:
             The YAML data converted to a FireConfig dataclass
         """
-        # No processing needed for the FireConfig
-        return FireConfig(**self.yaml_data["fire"])
+        max_fire_duration = int(self.yaml_data["fire"]["max_fire_duration"])
+        fire_init_pos_type = self.yaml_data["fire"]["fire_initial_position"]["type"]
+        if fire_init_pos_type == "static":
+            fire_pos = self.yaml_data["fire"]["fire_initial_position"]["static"][
+                "position"
+            ]
+            fire_pos = fire_pos[1:-1].split(",")
+            fire_initial_position = (int(fire_pos[0]), int(fire_pos[1]))
+            return FireConfig(fire_initial_position, max_fire_duration)
+        elif fire_init_pos_type == "random":
+            screen_size = self.yaml_data["area"]["screen_size"]
+            seed = self.yaml_data["fire"]["fire_initial_position"]["random"]["seed"]
+            rng = np.random.default_rng(seed)
+            pos_x = rng.integers(screen_size[1], dtype=int)
+            pos_y = rng.integers(screen_size[0], dtype=int)
+            return FireConfig((pos_x, pos_y), max_fire_duration)
+        else:
+            raise ConfigError(
+                "The specified fire initial position type "
+                f"({fire_init_pos_type}) is not supported"
+            )
 
     def _load_environment(self) -> EnvironmentConfig:
         """
@@ -630,6 +648,28 @@ class Config:
                     )
 
         self.wind = self._load_wind()
+
+    def reset_fire(self, seed: Optional[int]) -> None:
+        """
+        Reset the fire initial position seed.
+
+        Arguments:
+            seed: The seed used to randomize fire initial position generation.
+        """
+        try:
+            # Change the seed for the current fire initital position type
+            fire_init_pos_type = self.yaml_data["fire"]["fire_initial_position"]["type"]
+            self.yaml_data["fire"]["fire_initial_position"][fire_init_pos_type][
+                "seed"
+            ] = seed
+            # Reload the FireConfig with the updated seed in the yaml data
+            self.fire = self._load_fire()
+        except KeyError:
+            log.warning(
+                "Trying to set a seed for fire initial position type "
+                f"({fire_init_pos_type}), which does not support the use of a "
+                "seed. The seed value will be ignored."
+            )
 
     def save(self, path: Union[str, Path]) -> None:
         """

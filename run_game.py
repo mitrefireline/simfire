@@ -88,7 +88,9 @@ def main():
 
     if cfg.simulation.record:
         out_path = os.curdir + "/simulation.gif"
-        game.frames[0].save(out_path, save_all=True, duration=100, loop=0)
+        game.frames[0].save(
+            out_path, save_all=True, duration=100, loop=0, append_images=game.frames[1:]
+        )
 
     if cfg.simulation.draw_spread_graph:
         fig = fire_manager.draw_spread_graph(game.screen)

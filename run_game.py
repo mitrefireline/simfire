@@ -90,25 +90,26 @@ def main():
         out_path = os.curdir + "/simulation.gif"
         game.frames[0].save(out_path, save_all=True, duration=100, loop=0)
 
-    fig = fire_manager.draw_spread_graph(game.screen)
-    if cfg.simulation.headless:
-        save_path = os.curdir + "fire_spread_graph.png"
-        print(
-            "Game is running in a headless state. Saving fire spread "
-            f"graph to {save_path}"
-        )
-        fig.savefig(save_path)
-    else:
-        if "DISPLAY" in os.environ:
+    if cfg.simulation.draw_spread_graph:
+        fig = fire_manager.draw_spread_graph(game.screen)
+        if cfg.simulation.headless:
+            save_path = os.curdir + "fire_spread_graph.png"
             print(
-                "Game is running in a non-headless state. Displaying fire spread "
-                f'graph on DISPLAY {os.environ["DISPLAY"]}'
+                "Game is running in a headless state. Saving fire spread "
+                f"graph to {save_path}"
             )
-            import matplotlib.pyplot as plt
+            fig.savefig(save_path)
+        else:
+            if "DISPLAY" in os.environ:
+                print(
+                    "Game is running in a non-headless state. Displaying fire spread "
+                    f'graph on DISPLAY {os.environ["DISPLAY"]}'
+                )
+                import matplotlib.pyplot as plt
 
-            plt.show()
-            while plt.fignum_exists(fig.number):
-                continue
+                plt.show()
+                while plt.fignum_exists(fig.number):
+                    continue
 
 
 if __name__ == "__main__":

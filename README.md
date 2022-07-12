@@ -14,8 +14,10 @@ For more comprehensive documentation, go to our [docs page](https://fireline.pag
 ## Running the Simulation
 
 <p align="center">
-  <img src="assets/gifs/rothermel_elevation.gif" width="225" />
-  <img src="assets/gifs/rothermel_fireline.gif" width="228" />
+  <img src="assets/gifs/simulation_33.06N_116.58W.gif" width="225" />
+  <img src="assets/gifs/simulation_39.67N_119.80W.gif" width="225" />
+  <figcaption align = "center"><b>Left: Fire simulated near Julian, CA. Right: Fire simulated near Reno, NV.
+                                  <br>Both fires have winds from the east at 20mph<b></figcaption>
 </p>
 
 Clone the repository:

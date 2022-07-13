@@ -12,6 +12,7 @@ simulation:
   update_rate: 1
   runtime: 24h
   headless: true
+  draw_spread_graph: false
   record: false
   save_path: "/home/mdoyle/simfire/simulation_outputs/"
 

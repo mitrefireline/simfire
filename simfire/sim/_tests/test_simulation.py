@@ -288,3 +288,13 @@ class FireSimulationTest(unittest.TestCase):
         categories = self.simulation.get_disaster_categories()
         self.assertEqual(list(categories.keys()), list(BurnStatus.__members__))
         self.assertEqual(list(categories.values()), [e.value for e in BurnStatus])
+
+    def test_rendering(self) -> None:
+        """
+        Test toggling the display and rendering the simulation correctly.
+        """
+        # Setting this to True, should start a watcher subprocess that
+        self.simulation_flat.record = True
+        self.simulation_flat.rendering = True
+        self.fire_map, _ = self.simulation_flat.run(time="1h")
+        self.simulation_flat.reset()

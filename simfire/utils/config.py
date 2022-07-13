@@ -60,12 +60,13 @@ class DisplayConfig:
 @dataclasses.dataclass
 class SimulationConfig:
     def __init__(
-        self, update_rate: str, runtime: str, headless: bool, record: bool
+        self, update_rate: str, runtime: str, headless: bool, record: bool, save_path: str
     ) -> None:
         self.update_rate = float(update_rate)
         self.runtime = str_to_minutes(runtime)
         self.headless = headless
         self.record = record
+        self.save_path = Path(save_path)
 
 
 @dataclasses.dataclass

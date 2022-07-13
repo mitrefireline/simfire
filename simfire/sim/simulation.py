@@ -1,6 +1,9 @@
+import multiprocessing
 import warnings
 from abc import ABC, abstractmethod
+from datetime import datetime
 from enum import IntEnum
+from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Tuple, Union
 
 import numpy as np
@@ -12,6 +15,7 @@ from ..enums import (
     GameStatus,
     WindConstants,
 )
+from ..game.game import Game
 from ..game.managers.fire import RothermelFireManager
 from ..game.managers.mitigation import (
     FireLineManager,
@@ -171,8 +175,9 @@ class FireSimulation(Simulation):
                     YAML file.
         """
         super().__init__(config)
-        self.game_status = GameStatus.RUNNING
-        self.fire_status = GameStatus.RUNNING
+        self._rendering: bool = False
+        self.game_status: GameStatus = GameStatus.RUNNING
+        self.fire_status: GameStatus = GameStatus.RUNNING
         self.fire_map: np.ndarray
         self.reset()
 
@@ -725,3 +730,74 @@ class FireSimulation(Simulation):
             )
 
         return success
+
+    @property
+    def record(self) -> bool:
+        """ """
+        return self._record
+
+    @record.setter
+    def record(self, record: bool) -> None:
+        self._record = record
+
+    def _render(self) -> None:
+        """ """
+        current_fire_sprites = self.fire_sprites
+        while self.fire_status == GameStatus.RUNNING and self._rendering:
+            if current_fire_sprites == self.fire_sprites:
+                pass
+            else:
+                self._game.update(
+                    self.terrain,
+                    self.fire_sprites,
+                    self.fireline_sprites,
+                    self.config.wind.speed,
+                    self.config.wind.direction,
+                )
+                self._game.fire_map = self.fire_map
+                current_fire_sprites = self.fire_sprites
+
+        if self.record:
+            now = datetime.now().strftime("%m-%d-%Y_%H-%M-%S")
+            out_path = Path(self.config.simulation.save_path) / now
+            if not out_path.parent.is_dir():
+                log.warning(
+                    "Designated save path from the config does not exist, "
+                    "creating parent directories"
+                )
+                parents = True
+            else:
+                parents = False
+
+            out_path.mkdir(parents) if not out_path.isdir() else None
+
+            # Save the GIF created by self._game
+            gif_out_path = out_path / "simulation.gif"
+            self._game.frames[0].save(gif_out_path, save_all=True, duration=100, loop=0)
+
+            # Create the fire_spread_graph and save it to PNG
+            fig_out_path = out_path / "fire_spread_graph.png"
+            fig = self.fire_manager.draw_spread_graph(self._game.screen)
+            fig.savefig(fig_out_path)
+
+    @property
+    def rendering(self) -> bool:
+        """ """
+        return self._rendering
+
+    @rendering.setter
+    def rendering(self, start_rendering: bool) -> None:
+        """ """
+        if start_rendering:
+            # Create the game and start the subprocess
+            self._game = Game(
+                (self.config.area.screen_size, self.config.area.screen_size),
+                record=self.record,
+            )
+            self._render_process = multiprocessing.Process(target=self._render)
+            self._render_process.start()
+            self._rendering = True
+        else:
+            self._rendering = False
+            # Stop the subprocess
+            self._render_process.terminate()

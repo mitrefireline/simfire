@@ -87,12 +87,12 @@ def main():
         game.fire_map = fire_map
 
     if cfg.simulation.record:
-        out_path = Path().cwd() + "/simulation.gif"
+        out_path = Path().cwd() / "simulation.gif"
         game.frames[0].save(out_path, save_all=True, duration=100, loop=0)
 
     fig = fire_manager.draw_spread_graph(game.screen)
     if cfg.simulation.headless:
-        save_path = Path().cwd() + "fire_spread_graph.png"
+        save_path = Path().cwd() / "fire_spread_graph.png"
         print(
             "Game is running in a headless state. Saving fire spread "
             f"graph to {save_path}"

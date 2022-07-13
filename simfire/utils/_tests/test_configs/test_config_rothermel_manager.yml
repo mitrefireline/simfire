@@ -13,6 +13,7 @@ simulation:
   runtime: 24h
   headless: false
   record: true
+  save_path: "/home/mdoyle/simfire/simulation_outputs/"
 
 mitigation:
   ros_attenuation: true

@@ -25,7 +25,6 @@ class ControlLineManager:
         pixel_scale: float,
         terrain: Terrain,
         headless: bool = False,
-        sprite_type: Type = Union[Type[FireLine], Type[ScratchLine], Type[WetLine]],
     ) -> None:
         """
         Initialize the class with the display size of each `ControlLine` sprite,
@@ -46,7 +45,7 @@ class ControlLineManager:
         self.pixel_scale = pixel_scale
         self.terrain = terrain
         self.line_type: BurnStatus
-        self.sprite_type = sprite_type
+        self.sprite_type: Union[Type[FireLine], Type[ScratchLine], Type[WetLine]]
         self.sprites: List[pygame.sprite.Sprite] = []
         self.headless = headless
 
@@ -113,9 +112,9 @@ class FireLineManager(ControlLineManager):
             pixel_scale=pixel_scale,
             terrain=terrain,
             headless=headless,
-            sprite_type=FireLine,
         )
         self.line_type = BurnStatus.FIRELINE
+        self.sprite_type = FireLine
 
 
 class ScratchLineManager(ControlLineManager):

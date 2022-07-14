@@ -769,11 +769,14 @@ class FireSimulation(Simulation):
             else:
                 parents = False
 
-            out_path.mkdir(parents) if not out_path.isdir() else None
+            out_path.mkdir(parents) if not out_path.is_dir() else None
 
             # Save the GIF created by self._game
             gif_out_path = out_path / "simulation.gif"
-            self._game.frames[0].save(gif_out_path, save_all=True, duration=100, loop=0)
+            if self._game.frames is not None:
+                self._game.frames[0].save(
+                    gif_out_path, save_all=True, duration=100, loop=0
+                )
 
             # Create the fire_spread_graph and save it to PNG
             fig_out_path = out_path / "fire_spread_graph.png"

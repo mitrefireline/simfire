@@ -1,6 +1,6 @@
 import math
 from importlib import resources
-from typing import List, Optional, Sequence, Tuple
+from typing import List, Optional, Sequence, Tuple, Union
 
 import numpy as np
 import pygame
@@ -207,7 +207,7 @@ class Game:
         return floorColorRGB
 
     def _get_wind_mag_surf(
-        self, wind_magnitude_map: Sequence[Sequence[float]]
+        self, wind_magnitude_map: Union[Sequence[Sequence[float]], np.ndarray]
     ) -> pygame.surface.Surface:
         """
         Compute the wind magnitude surface for display.
@@ -237,7 +237,7 @@ class Game:
         return wind_mag_surf
 
     def _get_wind_dir_surf(
-        self, wind_direction_map: Sequence[Sequence[float]]
+        self, wind_direction_map: Union[Sequence[Sequence[float]], np.ndarray]
     ) -> pygame.Surface:
         """
         Compute the wind direction surface for display.
@@ -264,8 +264,8 @@ class Game:
         terrain: Terrain,
         fire_sprites: Sequence[Fire],
         fireline_sprites: Sequence[FireLine],
-        wind_magnitude_map: Sequence[Sequence[float]],
-        wind_direction_map: Sequence[Sequence[float]],
+        wind_magnitude_map: Union[Sequence[Sequence[float]], np.ndarray],
+        wind_direction_map: Union[Sequence[Sequence[float]], np.ndarray],
     ) -> GameStatus:
         """
         Update the game display using the provided terrain, sprites, and

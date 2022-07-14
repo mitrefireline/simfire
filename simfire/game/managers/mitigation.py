@@ -1,7 +1,6 @@
 from typing import List, Optional, Sequence, Tuple, Type, Union
 
 import numpy as np
-import pygame
 
 from ...enums import BurnStatus
 from ..sprites import FireLine, ScratchLine, Terrain, WetLine
@@ -46,7 +45,9 @@ class ControlLineManager:
         self.terrain = terrain
         self.line_type: BurnStatus
         self.sprite_type: Union[Type[FireLine], Type[ScratchLine], Type[WetLine]]
-        self.sprites: List[pygame.sprite.Sprite] = []
+        # The child classes will instantiate self.sprites with the correct typing
+        # (e.g. List[FireLine])
+        self.sprites: List
         self.headless = headless
 
     def _add_point(self, point: PointType) -> None:
@@ -115,6 +116,7 @@ class FireLineManager(ControlLineManager):
         )
         self.line_type = BurnStatus.FIRELINE
         self.sprite_type = FireLine
+        self.sprites: List[FireLine] = []
 
 
 class ScratchLineManager(ControlLineManager):
@@ -150,6 +152,7 @@ class ScratchLineManager(ControlLineManager):
         )
         self.line_type = BurnStatus.SCRATCHLINE
         self.sprite_type = ScratchLine
+        self.sprites: List[ScratchLine] = []
 
 
 class WetLineManager(ControlLineManager):
@@ -185,3 +188,4 @@ class WetLineManager(ControlLineManager):
         )
         self.line_type = BurnStatus.WETLINE
         self.sprite_type = WetLine
+        self.sprites: List[WetLine] = []

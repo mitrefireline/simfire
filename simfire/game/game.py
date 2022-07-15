@@ -1,4 +1,5 @@
 import math
+import pathlib
 from importlib import resources
 from typing import List, Optional, Sequence, Tuple
 
@@ -7,9 +8,12 @@ import pygame
 from PIL import Image
 
 from ..enums import BurnStatus, GameStatus
+from ..utils.log import create_logger
 from ..utils.units import mph_to_ftpm
 from .image import load_image
 from .sprites import Fire, FireLine, Terrain
+
+log = create_logger(__name__)
 
 
 class Game:
@@ -258,6 +262,35 @@ class Game:
                 wind_dir_surf.set_at((x_idx, y_idx), pyColor)
 
         return wind_dir_surf
+
+    def quit(self) -> None:
+        """
+        Close the PyGame window and stop the `Game`
+        """
+        pygame.display.quit()
+        pygame.quit()
+
+    def save(self, path: pathlib.Path, duration: int = 100) -> None:
+        """Save a GIF of the simulation to a specified path
+
+        Arguments:
+            path: The path to save the GIF to with filename.
+            duration: The time to display the current frame of the GIF, in milliseconds.
+        """
+        if self.frames is not None:
+            self.frames[0].save(
+                path,
+                save_all=True,
+                duration=duration,
+                loop=0,
+                append_images=self.frames[1:],
+            )
+        else:
+            log.error(
+                "self.frames is set to None when attempting to save. Make sure "
+                "self.frames is not set to None when saving a GIF."
+            )
+            raise ValueError
 
     def update(
         self,

@@ -10,3 +10,5 @@ docs/build
 *.gif
 .coverage
 coverage.xml
+.mypy_cache
+.pytest_cache

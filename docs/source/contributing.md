@@ -40,7 +40,7 @@ Then, install the **developer** requirements:
 poetry install
 ```
 
-## Using Pre-commit
+## Using Pre-commit (**Highly Recommended**)
 
 If you'd like, you can install [pre-commit](https://pre-commit.com/) to run linting and code-formatting before you are able to commit. This will ensure that you pass this portion of the remote pipelines when you push to your merge request.
 

@@ -1,4 +1,3 @@
-import multiprocessing
 import warnings
 from abc import ABC, abstractmethod
 from datetime import datetime
@@ -49,6 +48,9 @@ class Simulation(ABC):
                     YAML file.
         """
         self.config = config
+        # Create a _now time to use for the simulation object. This is used to
+        # create folders based on individual simulation runs.
+        self._now = datetime.now().strftime("%m-%d-%Y_%H-%M-%S")
 
     @abstractmethod
     def run(self, time: Union[str, int]) -> Tuple[np.ndarray, bool]:
@@ -430,7 +432,13 @@ class FireSimulation(Simulation):
         self.fire_map = self.scratchline_manager.update(self.fire_map, scratchlines)
         self.fire_map = self.wetline_manager.update(self.fire_map, wetlines)
 
-    def run(self, time: Union[str, int]) -> Tuple[np.ndarray, bool]:
+    def run(
+        self,
+        time: Union[str, int],
+        render: bool = False,
+        record: bool = False,
+        spread_graph: bool = False,
+    ) -> Tuple[np.ndarray, bool]:
         """
         Runs the simulation with or without mitigation lines.
 
@@ -444,6 +452,11 @@ class FireSimulation(Simulation):
             time: Either how many updates to run the simulation, based on the config
                   value, `config.simulation.update_rate`, or a length of time expressed
                   as a string (e.g. `120m`, `2h`, `2hour`, `2hours`, `1h 60m`, etc.)
+            render: Whether or not to render the simulation during the current `run`.
+            record: Whether or not to record the simulation's run in a GIF. Will be output
+                    to the location specified in the config section: `simulation.save_path`
+                    (`docs <https://fireline.pages.mitre.org/simfire/config.html#save_path>`_)
+            spread_graph: Whether or not to save the spread graph of the simulation.
 
         Returns:
             A tuple of the following:
@@ -451,6 +464,11 @@ class FireSimulation(Simulation):
                   range from [0, 6] (see simfire/enums.py:BurnStatus).
                 - A boolean indicating whether the simulation has reached the end.
         """
+        if not render and (record or spread_graph):
+            log.warning(
+                "Cannot record a simulation without rendering it: the simulation "
+                "will not create a GIF recording or a spread graph"
+            )
         # reset the fire status to running
         self.fire_status = GameStatus.RUNNING
 
@@ -465,14 +483,35 @@ class FireSimulation(Simulation):
         num_updates = 0
         self.elapsed_time = self.fire_manager.elapsed_time
 
+        # Create the Game and switch the internal variable to track if we're
+        # currently rendering
+        if render:
+            self._game = Game(
+                (self.config.area.screen_size, self.config.area.screen_size),
+                record=record,
+            )
+            self._rendering = True
+
         while self.fire_status == GameStatus.RUNNING and num_updates < total_updates:
             self.fire_sprites = self.fire_manager.sprites
             self.fire_map, self.fire_status = self.fire_manager.update(self.fire_map)
+            if render:
+                self._render()
             num_updates += 1
             # elapsed_time is in minutes
             self.elapsed_time = self.fire_manager.elapsed_time
 
         self.active = True if self.fire_status == GameStatus.RUNNING else False
+
+        if render:
+            if record:
+                self._save_gif()
+            if spread_graph:
+                self._save_spread_graph()
+            self._rendering = False
+            self._game.quit()
+
+        # Save the spread graph
 
         return self.fire_map, self.active
 
@@ -731,73 +770,58 @@ class FireSimulation(Simulation):
 
         return success
 
-    @property
-    def record(self) -> bool:
-        """ """
-        return self._record
-
-    @record.setter
-    def record(self, record: bool) -> None:
-        self._record = record
-
     def _render(self) -> None:
-        """ """
-        current_fire_sprites = self.fire_sprites
-        while self.fire_status == GameStatus.RUNNING and self._rendering:
-            if current_fire_sprites == self.fire_sprites:
-                pass
-            else:
-                self._game.update(
-                    self.terrain,
-                    self.fire_sprites,
-                    self.fireline_sprites,
-                    self.config.wind.speed,
-                    self.config.wind.direction,
-                )
-                self._game.fire_map = self.fire_map
-                current_fire_sprites = self.fire_sprites
+        """
+        Render `self._game` frame with `self._game.update`
+        """
+        self._game.update(
+            self.terrain,
+            self.fire_sprites,
+            self.fireline_sprites,
+            self.config.wind.speed,
+            self.config.wind.direction,
+        )
+        self._game.fire_map = self.fire_map
 
-        if self.record:
-            now = datetime.now().strftime("%m-%d-%Y_%H-%M-%S")
-            out_path = Path(self.config.simulation.save_path) / now
-            if not out_path.parent.is_dir():
-                log.warning(
-                    "Designated save path from the config does not exist, "
-                    "creating parent directories"
-                )
-                parents = True
-            else:
-                parents = False
-
-            out_path.mkdir(parents) if not out_path.isdir() else None
-
-            # Save the GIF created by self._game
-            gif_out_path = out_path / "simulation.gif"
-            self._game.frames[0].save(gif_out_path, save_all=True, duration=100, loop=0)
-
-            # Create the fire_spread_graph and save it to PNG
-            fig_out_path = out_path / "fire_spread_graph.png"
-            fig = self.fire_manager.draw_spread_graph(self._game.screen)
-            fig.savefig(fig_out_path)
-
-    @property
-    def rendering(self) -> bool:
-        """ """
-        return self._rendering
-
-    @rendering.setter
-    def rendering(self, start_rendering: bool) -> None:
-        """ """
-        if start_rendering:
-            # Create the game and start the subprocess
-            self._game = Game(
-                (self.config.area.screen_size, self.config.area.screen_size),
-                record=self.record,
+    def _create_out_path(self) -> Path:
+        """
+        Creates the output path if it does not exist.
+        """
+        out_path = Path(self.config.simulation.save_path).expanduser() / self._now
+        if not out_path.parent.is_dir():
+            log.warning(
+                "Designated save path from the config does not exist, "
+                "creating parent directories"
             )
-            self._render_process = multiprocessing.Process(target=self._render)
-            self._render_process.start()
-            self._rendering = True
+            parents = True
         else:
-            self._rendering = False
-            # Stop the subprocess
-            self._render_process.terminate()
+            parents = False
+
+        log.info(f"Creating directory {out_path}")
+        out_path.mkdir(parents=parents) if not out_path.is_dir() else None
+        return out_path
+
+    def _save_gif(self) -> None:
+        """
+        Save the GIF from `self._game`
+        """
+        out_path = self._create_out_path()
+        log.info("Saving GIF...")
+        # Save the GIF created by self._game
+        gif_out_path = out_path / f"simulation_{datetime.now().strftime('%H-%M-%S')}.gif"
+        self._game.save(gif_out_path, duration=100)  # 0.1s
+        log.info("Finished saving GIF")
+
+    def _save_spread_graph(self) -> None:
+        """
+        Save the fire spread graph from `self._game`
+        """
+        out_path = self._create_out_path()
+        log.info("Saving fire spread graph...")
+        # Create the fire_spread_graph and save it to PNG
+        fig_out_path = (
+            out_path / f"fire_spread_graph_{datetime.now().strftime('%H-%M-%S')}.png"
+        )
+        fig = self.fire_manager.draw_spread_graph(self._game.screen)
+        fig.savefig(fig_out_path)
+        log.info("Done saving fire spread graph")

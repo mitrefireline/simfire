@@ -8,6 +8,9 @@ from ...enums import BurnStatus
 from ...game.sprites import Terrain
 from ...sim.simulation import FireSimulation
 from ...utils.config import Config, ConfigError
+from ...utils.log import create_logger
+
+log = create_logger(__name__)
 
 
 class FireSimulationTest(unittest.TestCase):
@@ -289,12 +292,29 @@ class FireSimulationTest(unittest.TestCase):
         self.assertEqual(list(categories.keys()), list(BurnStatus.__members__))
         self.assertEqual(list(categories.values()), [e.value for e in BurnStatus])
 
-    def test_rendering(self) -> None:
+    def test__create_out_path(self) -> None:
+        """
+        Test the creation of the output path
+        """
+        datefmtstr = r"\d{2}-\d{2}-\d{4}_\d{2}-\d{2}-\d{2}"
+        out_path = self.simulation._create_out_path()
+        self.assertIsInstance(out_path, Path)
+        self.assertEqual(
+            out_path,
+            Path(self.simulation.config.simulation.save_path).expanduser()
+            / self.simulation._now,
+        )
+        self.assertRegex(out_path.name, datefmtstr)
+
+    def test__render(self) -> None:
         """
         Test toggling the display and rendering the simulation correctly.
         """
         # Setting this to True, should start a watcher subprocess that
-        self.simulation_flat.record = True
-        self.simulation_flat.rendering = True
-        self.fire_map, _ = self.simulation_flat.run(time="1h")
-        self.simulation_flat.reset()
+        self.fire_map, _ = self.simulation_flat.run(time="5m")
+        self.fire_map, _ = self.simulation_flat.run(
+            time="5m", render=True, record=True, spread_graph=True
+        )
+        self.fire_map, _ = self.simulation_flat.run(
+            time="5m", render=False, record=False, spread_graph=True
+        )

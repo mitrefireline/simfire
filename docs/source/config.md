@@ -55,6 +55,10 @@ The amount of time that the simulation is supposed to run. This can be expressed
 (`bool`)<br>
 Whether or not to run the simulation in a headless state.
 
+#### save_path
+(`str`)<br>
+Where to save GIF recordings and burn graphs of simulation [runs](https://fireline.pages.mitre.org/simfire/autoapi/simfire/sim/simulation/index.html#simfire.sim.simulation.FireSimulation.run). It will create subfolders in `save_path` that are of the format `<month>-<day>-<year>_<hour>-<minute>-<second>` based on when the outputs were saved to file.
+
 ---
 
 ### Mitigation Parameters

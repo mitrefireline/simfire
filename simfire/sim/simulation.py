@@ -454,8 +454,9 @@ class FireSimulation(Simulation):
                   as a string (e.g. `120m`, `2h`, `2hour`, `2hours`, `1h 60m`, etc.)
             render: Whether or not to render the simulation during the current `run`.
             record: Whether or not to record the simulation's run in a GIF. Will be output
-                    to the location specified in the config section: `simulation.save_path`
-                    (`docs <https://fireline.pages.mitre.org/simfire/config.html#save_path>`_)
+                    to the location specified in the config section:
+                    `simulation.save_path`
+                    (`docs <fireline.pages.mitre.org/simfire/config.html#save_path>`_)
             spread_graph: Whether or not to save the spread graph of the simulation.
 
         Returns:

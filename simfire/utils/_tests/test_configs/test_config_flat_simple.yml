@@ -11,7 +11,8 @@ display:
 simulation:
   update_rate: 1
   runtime: 24h
-  headless: false
+  headless: true
+  draw_spread_graph: false
   record: true
   save_path: "~/.simfire/simulation_outputs/"
 

@@ -1,3 +1,4 @@
+import os
 import unittest
 from pathlib import Path
 from typing import Dict
@@ -5,12 +6,14 @@ from typing import Dict
 import numpy as np
 
 from ...enums import BurnStatus
-from ...game.sprites import Terrain
+from ...game.sprites import Agent, Terrain
 from ...sim.simulation import FireSimulation
 from ...utils.config import Config, ConfigError
 from ...utils.log import create_logger
 
 log = create_logger(__name__)
+
+os.environ["SDL_VIDEODRIVER"] = "dummy"
 
 
 class FireSimulationTest(unittest.TestCase):
@@ -305,16 +308,119 @@ class FireSimulationTest(unittest.TestCase):
             / self.simulation._now,
         )
         self.assertRegex(out_path.name, datefmtstr)
+        out_path.rmdir()
 
-    def test__render(self) -> None:
+    def test_update_agent_positions(self) -> None:
         """
-        Test toggling the display and rendering the simulation correctly.
+        Test the update_agent_positions method
+        """
+        self.simulation.update_agent_positions([(1, 1, 5)])
+        self.assertEqual(
+            self.simulation.agent_positions[1][1],
+            5,
+            msg="The agent ID was " "not set to the correct value",
+        )
+        self.assertIsInstance(self.simulation.agents[5], Agent)
+        self.simulation.update_agent_positions([(2, 2, 5)])
+        self.assertEqual(
+            self.simulation.agent_positions[2][2],
+            5,
+            msg="The agent was " "not moved correctly",
+        )
+        self.assertNotEqual(
+            self.simulation.agent_positions[1][1],
+            5,
+            msg="The agent was " "not removed from the original position",
+        )
+
+    def test__create_agent_positions(self) -> None:
+        """
+        Test creating the agent positions
+        """
+        agent_positions = np.zeros_like(self.simulation.fire_map)
+        self.assertTrue(
+            self.simulation.agent_positions.all() == agent_positions.all(),
+            msg="The agent positions are not the same as the initial fire "
+            "map (all zeros)",
+        )
+
+    def test_rendering(self) -> None:
+        """
+        Test setting the `rendering` property
+        """
+        self.simulation.rendering = True
+        self.assertTrue(
+            self.simulation.rendering, msg="`rendering` was not set correctly to True"
+        )
+        self.assertIsNotNone(self.simulation._game, msg="simulation._game was not set")
+        self.simulation.rendering = False
+        self.assertFalse(
+            self.simulation.rendering, msg="simulation.rendering was not set to False"
+        )
+
+    def test_save_gif(self) -> None:
+        """
+        Test the saving of the GIF after running
+
+        In the config, headless must be set to false for this test to pass
+        """
+        self.simulation_flat.config.simulation.headless = False
+        self.simulation_flat.rendering = True
+        self.simulation_flat.run(1)
+        self.simulation_flat.save_gif("tmp.gif")
+        tmp_file = self.simulation_flat._create_out_path() / "tmp.gif"
+        self.assertTrue(tmp_file.exists(), msg="The GIF was not saved correctly")
+        tmp_file.unlink()
+        self.simulation_flat.save_gif("tmp")
+        self.assertTrue(tmp_file.exists(), msg="The GIF was not saved correctly")
+        tmp_file.unlink()
+        tmp_file.parent.rmdir()
+        self.simulation_flat.rendering = False
+
+    def test_save_spread_graph(self) -> None:
+        """
+        Test the saving of the spread graph
+
+        In the config, headless must be set to false for this test to pass
+        """
+        self.simulation_flat.config.simulation.headless = False
+        self.simulation_flat.rendering = True
+        self.simulation_flat.run(1)
+        self.simulation_flat.save_spread_graph("tmp.png")
+        tmp_file = self.simulation_flat._create_out_path() / "tmp.png"
+        self.assertTrue(tmp_file.exists(), msg="The spread graph was not saved correctly")
+        tmp_file.unlink()
+        self.simulation_flat.save_spread_graph("tmp")
+        self.assertTrue(tmp_file.exists(), msg="The spread graph was not saved correctly")
+        tmp_file.unlink()
+        tmp_file.parent.rmdir()
+        self.simulation_flat.rendering = False
+
+    def test_render(self) -> None:
+        """
+        General test toggling the display and rendering the simulation correctly.
+
+        Does not correspond to a specific function
         """
         # Setting this to True, should start a watcher subprocess that
-        self.fire_map, _ = self.simulation_flat.run(time="5m")
-        self.fire_map, _ = self.simulation_flat.run(
-            time="5m", render=True, record=True, spread_graph=True
-        )
-        self.fire_map, _ = self.simulation_flat.run(
-            time="5m", render=False, record=False, spread_graph=True
-        )
+        initial_pos = [[100, 100, 0], [85, 85, 1], [60, 60, 4]]
+        self.fire_map, _ = self.simulation_flat.run(time="1h")
+        self.simulation_flat.rendering = True
+        self.simulation_flat.update_agent_positions(initial_pos)
+        self.fire_map, _ = self.simulation_flat.run(time="1h")
+        for i in range(100):
+            self.fire_map, _ = self.simulation_flat.run(1)
+            if i % 2 == 0:
+                initial_pos[0][1] = (
+                    initial_pos[0][1] + 1
+                ) % self.simulation_flat.fire_map.shape[1]
+                initial_pos[1][0] = (
+                    initial_pos[1][0] - 1
+                ) % self.simulation_flat.fire_map.shape[0]
+                initial_pos[2][1] = (
+                    initial_pos[2][1] - 1
+                ) % self.simulation_flat.fire_map.shape[1]
+                self.simulation_flat.update_agent_positions(initial_pos)
+        self.simulation_flat.save_gif()
+        self.simulation_flat.save_spread_graph()
+        self.simulation_flat.rendering = False

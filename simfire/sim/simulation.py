@@ -21,7 +21,7 @@ from ..game.managers.mitigation import (
     ScratchLineManager,
     WetLineManager,
 )
-from ..game.sprites import Terrain
+from ..game.sprites import Agent, Terrain
 from ..utils.config import Config
 from ..utils.layers import FunctionalFuelLayer
 from ..utils.log import create_logger
@@ -181,6 +181,8 @@ class FireSimulation(Simulation):
         self.game_status: GameStatus = GameStatus.RUNNING
         self.fire_status: GameStatus = GameStatus.RUNNING
         self.fire_map: np.ndarray
+        self.agent_positions: np.ndarray
+        self.agents: Dict[int, Agent] = {}
         self.reset()
 
     def reset(self) -> None:
@@ -189,6 +191,7 @@ class FireSimulation(Simulation):
         and all mitigations to initial conditions
         """
         self._create_fire_map()
+        self._create_agent_positions()
         self._create_terrain()
         self._create_fire()
         self._create_mitigations()
@@ -432,13 +435,28 @@ class FireSimulation(Simulation):
         self.fire_map = self.scratchline_manager.update(self.fire_map, scratchlines)
         self.fire_map = self.wetline_manager.update(self.fire_map, wetlines)
 
-    def run(
-        self,
-        time: Union[str, int],
-        render: bool = False,
-        record: bool = False,
-        spread_graph: bool = False,
-    ) -> Tuple[np.ndarray, bool]:
+    def update_agent_positions(self, points: Iterable[Tuple[int, int, int]]) -> None:
+        """
+        Update the `self.agent_positions` with new agent positions
+
+        Arguments:
+            points: A list of `(column, row, agent_id)` tuples. These will be added to
+                    `self.agent_positions`.
+        """
+        for column, row, agent_id in points:
+            # Resets current agent positions to 0 before updating the new positions
+            self.agent_positions[self.agent_positions == agent_id] = 0
+            self.agent_positions[row][column] = agent_id
+            try:
+                self.agents[agent_id].pos = (column, row)
+            except KeyError:
+                self.agents[agent_id] = Agent(
+                    (column, row),
+                    size=self.config.display.agent_size,
+                    headless=self.config.simulation.headless,
+                )
+
+    def run(self, time: Union[str, int]) -> Tuple[np.ndarray, bool]:
         """
         Runs the simulation with or without mitigation lines.
 
@@ -465,11 +483,6 @@ class FireSimulation(Simulation):
                   range from [0, 6] (see simfire/enums.py:BurnStatus).
                 - A boolean indicating whether the simulation has reached the end.
         """
-        if not render and (record or spread_graph):
-            log.warning(
-                "Cannot record a simulation without rendering it: the simulation "
-                "will not create a GIF recording or a spread graph"
-            )
         # reset the fire status to running
         self.fire_status = GameStatus.RUNNING
 
@@ -484,35 +497,16 @@ class FireSimulation(Simulation):
         num_updates = 0
         self.elapsed_time = self.fire_manager.elapsed_time
 
-        # Create the Game and switch the internal variable to track if we're
-        # currently rendering
-        if render:
-            self._game = Game(
-                (self.config.area.screen_size, self.config.area.screen_size),
-                record=record,
-            )
-            self._rendering = True
-
         while self.fire_status == GameStatus.RUNNING and num_updates < total_updates:
             self.fire_sprites = self.fire_manager.sprites
             self.fire_map, self.fire_status = self.fire_manager.update(self.fire_map)
-            if render:
+            if self._rendering:
                 self._render()
             num_updates += 1
             # elapsed_time is in minutes
             self.elapsed_time = self.fire_manager.elapsed_time
 
         self.active = True if self.fire_status == GameStatus.RUNNING else False
-
-        if render:
-            if record:
-                self._save_gif()
-            if spread_graph:
-                self._save_spread_graph()
-            self._rendering = False
-            self._game.quit()
-
-        # Save the spread graph
 
         return self.fire_map, self.active
 
@@ -528,6 +522,12 @@ class FireSimulation(Simulation):
         )
         x, y = self.config.fire.fire_initial_position
         self.fire_map[y, x] = BurnStatus.BURNING
+
+    def _create_agent_positions(self) -> None:
+        """
+        Resets the `self.agent_positions` attribute to entirely `0`
+        """
+        self.agent_positions = np.zeros_like(self.fire_map)
 
     def get_seeds(self) -> Dict[str, Optional[int]]:
         """
@@ -771,18 +771,99 @@ class FireSimulation(Simulation):
 
         return success
 
+    def save_gif(self, filename: Optional[Union[str, Path]] = None) -> None:
+        """
+        Saves the most recent simulation as a GIF.
+
+        Will save a GIF of all calls to `run` from the last time `self.rendering` was set
+        to `True`.
+        """
+        # Convert to a Path object for easy manipulation
+        if not isinstance(filename, Path) and filename is not None:
+            filename = Path(filename)
+        out_path = self._create_out_path()
+        log.info("Saving GIF...")
+        # Save the GIF created by self._game
+        if filename is None:
+            now = datetime.now().strftime("%H-%M-%S")
+            filename = f"simulation_{now}.gif"
+        else:
+            if Path(filename).suffix != ".gif":
+                filename.rename(filename.with_suffix(".gif"))
+        gif_out_path = out_path / filename
+        self._game.save(gif_out_path, duration=100)  # 0.1s
+        log.info("Finished saving GIF")
+
+    def save_spread_graph(self, filename: Optional[Union[str, Path]] = None) -> None:
+        """
+        Saves the most recent simulation as a PNG.
+
+        Will save a PNG of the spread graph from the last time `self.rendering` was set
+        to `True`.
+        """
+        # Convert to a Path object for easy manipulation
+        if not isinstance(filename, Path) and filename is not None:
+            filename = Path(filename)
+        out_path = self._create_out_path()
+        log.info("Saving fire spread graph...")
+        # Create the fire_spread_graph and save it to PNG
+        if filename is None:
+            now = datetime.now().strftime("%H-%M-%S")
+            filename = f"fire_spread_graph_{now}.png"
+        else:
+            if filename.suffix != ".png":
+                filename.rename(filename.with_suffix(".png"))
+            fig_out_path = out_path / filename
+        fig = self.fire_manager.draw_spread_graph(self._game.screen)
+        fig.savefig(fig_out_path)
+        log.info("Done saving fire spread graph")
+
+    @property
+    def rendering(self) -> bool:
+        """
+        Returns whether or not the simulator is currently rendering.
+
+        Returns:
+            Whether or not the simulator is currently rendering.
+        """
+        return self._rendering
+
+    @rendering.setter
+    def rendering(self, value: bool) -> None:
+        """
+        Sets whether or not the simulator is currently rendering.
+
+        Arguments:
+            value: Whether or not the simulator is currently rendering.
+        """
+        self._rendering = value
+        if value:
+            # Create the Game and switch the internal variable to track if we're
+            # currently rendering
+            self._game = Game(
+                (self.config.area.screen_size, self.config.area.screen_size),
+                record=True,
+            )
+        else:
+            self._game.quit()
+
+        # Save the spread graph
+
     def _render(self) -> None:
         """
         Render `self._game` frame with `self._game.update`
         """
+        agent_sprites = list(self.agents.values())
         self._game.update(
             self.terrain,
             self.fire_sprites,
             self.fireline_sprites,
+            agent_sprites,
             self.config.wind.speed,
             self.config.wind.direction,
         )
         self._game.fire_map = self.fire_map
+        self._last_screen = self._game.screen
 
     def _create_out_path(self) -> Path:
         """
@@ -798,31 +879,7 @@ class FireSimulation(Simulation):
         else:
             parents = False
 
-        log.info(f"Creating directory {out_path}")
-        out_path.mkdir(parents=parents) if not out_path.is_dir() else None
+        if not out_path.is_dir():
+            log.info(f"Creating directory {out_path}")
+            out_path.mkdir(parents=parents) if not out_path.is_dir() else None
         return out_path
-
-    def _save_gif(self) -> None:
-        """
-        Save the GIF from `self._game`
-        """
-        out_path = self._create_out_path()
-        log.info("Saving GIF...")
-        # Save the GIF created by self._game
-        gif_out_path = out_path / f"simulation_{datetime.now().strftime('%H-%M-%S')}.gif"
-        self._game.save(gif_out_path, duration=100)  # 0.1s
-        log.info("Finished saving GIF")
-
-    def _save_spread_graph(self) -> None:
-        """
-        Save the fire spread graph from `self._game`
-        """
-        out_path = self._create_out_path()
-        log.info("Saving fire spread graph...")
-        # Create the fire_spread_graph and save it to PNG
-        fig_out_path = (
-            out_path / f"fire_spread_graph_{datetime.now().strftime('%H-%M-%S')}.png"
-        )
-        fig = self.fire_manager.draw_spread_graph(self._game.screen)
-        fig.savefig(fig_out_path)
-        log.info("Done saving fire spread graph")

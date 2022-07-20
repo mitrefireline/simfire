@@ -51,10 +51,12 @@ class AreaConfig:
 class DisplayConfig:
     fire_size: int
     control_line_size: int
+    agent_size: int
 
     def __post_init__(self) -> None:
         self.fire_size = int(self.fire_size)
         self.control_line_size = int(self.control_line_size)
+        self.agent_size = int(self.agent_size)
 
 
 @dataclasses.dataclass

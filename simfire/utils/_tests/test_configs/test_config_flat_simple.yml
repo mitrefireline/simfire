@@ -7,14 +7,15 @@ area:
 display:
   fire_size: 2
   control_line_size: 2
+  agent_size: 4
 
 simulation:
   update_rate: 1
   runtime: 24h
-  headless: true
+  headless: false
   draw_spread_graph: false
-  record: true
-  save_path: "~/.simfire/simulation_outputs/"
+  record: false
+  save_path: "/tmp"
 
 mitigation:
   ros_attenuation: true

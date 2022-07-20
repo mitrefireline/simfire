@@ -11,7 +11,7 @@ from ..enums import BurnStatus, GameStatus
 from ..utils.log import create_logger
 from ..utils.units import mph_to_ftpm
 from .image import load_image
-from .sprites import Fire, FireLine, Terrain
+from .sprites import Agent, Fire, FireLine, Terrain
 
 log = create_logger(__name__)
 
@@ -297,6 +297,7 @@ class Game:
         terrain: Terrain,
         fire_sprites: Sequence[Fire],
         fireline_sprites: Sequence[FireLine],
+        agent_sprites: Sequence[Agent],
         wind_magnitude_map: Union[Sequence[Sequence[float]], np.ndarray],
         wind_direction_map: Union[Sequence[Sequence[float]], np.ndarray],
     ) -> GameStatus:
@@ -321,6 +322,8 @@ class Game:
             fire_sprites = list(fire_sprites)
         if not isinstance(fireline_sprites, list):
             fireline_sprites = list(fireline_sprites)
+        if not isinstance(agent_sprites, list):
+            agent_sprites = list(agent_sprites)
 
         if not self.headless:
             for event in pygame.event.get():
@@ -341,7 +344,10 @@ class Game:
         fire_sprites_group = pygame.sprite.LayeredUpdates(
             *(fire_sprites + fireline_sprites)
         )
-        all_sprites = pygame.sprite.LayeredUpdates(*fire_sprites_group, terrain)
+        agent_sprites_group = pygame.sprite.LayeredUpdates(*agent_sprites)
+        all_sprites = pygame.sprite.LayeredUpdates(
+            *agent_sprites_group, *fire_sprites_group, terrain
+        )
 
         # Update and draw the sprites
         if not self.headless:
@@ -351,6 +357,7 @@ class Game:
                         self.screen.blit(self.background, sprite.rect, sprite.rect)
 
                 fire_sprites_group.update()
+                agent_sprites_group.update()
                 terrain.update(self.fire_map)
                 all_sprites.draw(self.screen)
 

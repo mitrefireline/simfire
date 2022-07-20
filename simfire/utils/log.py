@@ -22,8 +22,12 @@ def create_logger(name: str) -> logging.Logger:
 
     FORMAT = "%(asctime)s : %(levelname)s : (%(pathname)s:%(lineno)d) : %(message)s"
 
-    logging.basicConfig(level=log_level, format=FORMAT, datefmt="[%X]",
-                        handlers=[RichHandler(markup=True)])
+    logging.basicConfig(
+        level=log_level,
+        format=FORMAT,
+        datefmt="[%X]",
+        handlers=[RichHandler(markup=True)],
+    )
 
     log = logging.getLogger(name)
     return log

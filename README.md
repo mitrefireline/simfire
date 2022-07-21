@@ -40,6 +40,33 @@ And run the `run_game.py` script:
 python run_game.py
 ```
 
+### Running as a Python Module
+
+```python
+from simfire.utils.config import Config
+from simfire.sim.simulation import FireSimulation
+
+config = Config("configs/operational_config.yml")
+sim = FireSimulation(config)
+
+# Run a 1 hour simulation
+sim.run("1h")
+
+# Run the same simulation for 30 more minutes
+sim.run("30m")
+
+# Render the next 2 hours of simulation
+sim.rendering = True
+sim.run("2h")
+
+# Now save a GIF and fire spread graph from the last 2 hours of simulation
+sim.save_gif()
+sim.save_spread_graph()
+# Saved to the location specified in the config: simulation.save_path
+
+# Turn off rendering
+sim.rendering = False
+```
 
 ## Installing the Package
 

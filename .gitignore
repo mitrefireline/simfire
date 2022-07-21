@@ -7,5 +7,8 @@ dist
 **/*.egg-info
 docs/build
 *.png
+*.gif
 .coverage
 coverage.xml
+.mypy_cache
+.pytest_cache

@@ -51,10 +51,12 @@ class AreaConfig:
 class DisplayConfig:
     fire_size: int
     control_line_size: int
+    agent_size: int
 
     def __post_init__(self) -> None:
         self.fire_size = int(self.fire_size)
         self.control_line_size = int(self.control_line_size)
+        self.agent_size = int(self.agent_size)
 
 
 @dataclasses.dataclass
@@ -66,12 +68,14 @@ class SimulationConfig:
         headless: bool,
         draw_spread_graph: bool,
         record: bool,
+        save_path: str,
     ) -> None:
         self.update_rate = float(update_rate)
         self.runtime = str_to_minutes(runtime)
         self.headless = headless
         self.draw_spread_graph = draw_spread_graph
         self.record = record
+        self.save_path = Path(save_path)
 
 
 @dataclasses.dataclass

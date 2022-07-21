@@ -1,6 +1,8 @@
 import logging
 import os
 
+from rich.logging import RichHandler
+
 
 def create_logger(name: str) -> logging.Logger:
     """Create a `Logger` to be used in different modules
@@ -18,13 +20,15 @@ def create_logger(name: str) -> logging.Logger:
     if (log_level := os.environ.get("LOGLEVEL")) is None:
         log_level = "INFO"
 
-    formatter = logging.Formatter(
-        "%(asctime)s : %(levelname)s : " "(%(pathname)s:%(lineno)d) : %(message)s"
+    FORMAT = "%(asctime)s : %(levelname)s : (%(pathname)s:%(lineno)d) : %(message)s"
+
+    logging.basicConfig(
+        level=log_level,
+        format=FORMAT,
+        datefmt="[%X]",
+        handlers=[RichHandler(markup=True)],
     )
 
     log = logging.getLogger(name)
     log.setLevel(log_level)
-    console = logging.StreamHandler()
-    console.setFormatter(formatter)
-    log.addHandler(console)
     return log

@@ -79,7 +79,12 @@ def main():
         fire_sprites = fire_manager.sprites
         fireline_sprites = fireline_manager.sprites
         game_status = game.update(
-            terrain, fire_sprites, fireline_sprites, cfg.wind.speed, cfg.wind.direction
+            terrain,
+            fire_sprites,
+            fireline_sprites,
+            [],
+            cfg.wind.speed,
+            cfg.wind.direction,
         )
         fire_map = game.fire_map
         fire_map = fireline_manager.update(fire_map)
@@ -87,9 +92,15 @@ def main():
         game.fire_map = fire_map
 
     if cfg.simulation.record:
-        out_path = os.curdir + "/simulation.gif"
-        game.frames[0].save(
-            out_path, save_all=True, duration=100, loop=0, append_images=game.frames[1:]
+        out_path = Path().cwd() / "simulation.gif"
+        game.save(out_path)
+
+    fig = fire_manager.draw_spread_graph(game.screen)
+    if cfg.simulation.headless:
+        save_path = Path().cwd() / "fire_spread_graph.png"
+        print(
+            "Game is running in a headless state. Saving fire spread "
+            f"graph to {save_path}"
         )
 
     if cfg.simulation.draw_spread_graph:

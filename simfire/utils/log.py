@@ -30,4 +30,5 @@ def create_logger(name: str) -> logging.Logger:
     )
 
     log = logging.getLogger(name)
+    log.setLevel(log_level)
     return log

@@ -788,8 +788,8 @@ class FireSimulation(Simulation):
             now = datetime.now().strftime("%H-%M-%S")
             filename = f"simulation_{now}.gif"
         else:
-            if Path(filename).suffix != ".gif":
-                filename.rename(filename.with_suffix(".gif"))
+            if filename.suffix != ".gif":
+                filename = filename.with_suffix(".gif")
         gif_out_path = out_path / filename
         self._game.save(gif_out_path, duration=100)  # 0.1s
         log.info("Finished saving GIF")
@@ -812,8 +812,8 @@ class FireSimulation(Simulation):
             filename = f"fire_spread_graph_{now}.png"
         else:
             if filename.suffix != ".png":
-                filename.rename(filename.with_suffix(".png"))
-            fig_out_path = out_path / filename
+                filename = filename.with_suffix(".png")
+        fig_out_path = out_path / filename
         fig = self.fire_manager.draw_spread_graph(self._game.screen)
         fig.savefig(fig_out_path)
         log.info("Done saving fire spread graph")

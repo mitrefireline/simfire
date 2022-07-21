@@ -395,32 +395,3 @@ class FireSimulationTest(unittest.TestCase):
         tmp_file.unlink()
         tmp_file.parent.rmdir()
         self.simulation_flat.rendering = False
-
-    def test_render(self) -> None:
-        """
-        General test toggling the display and rendering the simulation correctly.
-
-        Does not correspond to a specific function
-        """
-        # Setting this to True, should start a watcher subprocess that
-        initial_pos = [[100, 100, 0], [85, 85, 1], [60, 60, 4]]
-        self.fire_map, _ = self.simulation_flat.run(time="1h")
-        self.simulation_flat.rendering = True
-        self.simulation_flat.update_agent_positions(initial_pos)
-        self.fire_map, _ = self.simulation_flat.run(time="1h")
-        for i in range(100):
-            self.fire_map, _ = self.simulation_flat.run(1)
-            if i % 2 == 0:
-                initial_pos[0][1] = (
-                    initial_pos[0][1] + 1
-                ) % self.simulation_flat.fire_map.shape[1]
-                initial_pos[1][0] = (
-                    initial_pos[1][0] - 1
-                ) % self.simulation_flat.fire_map.shape[0]
-                initial_pos[2][1] = (
-                    initial_pos[2][1] - 1
-                ) % self.simulation_flat.fire_map.shape[1]
-                self.simulation_flat.update_agent_positions(initial_pos)
-        self.simulation_flat.save_gif()
-        self.simulation_flat.save_spread_graph()
-        self.simulation_flat.rendering = False

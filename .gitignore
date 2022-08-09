@@ -9,9 +9,12 @@ dist
 docs/build
 *.png
 simulation.gif
-.coverage
-coverage.xml
 *.npy
 *.txt
 topography_tester.py
 download.py
+*.gif
+.coverage
+coverage.xml
+.mypy_cache
+.pytest_cache

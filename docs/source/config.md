@@ -12,17 +12,11 @@ This file can have any name, as a path is required to load the configuration fil
 
 #### screen_size
 (`int`)<br>
-Determines how large the simulation is in pixels. The `screen_size` sets both the
-height and the width of the screen.
-
-#### terrain_size
-(`int`)<br>
-Number of terrain tiles in each row/column.
+Determines how large the simulation is in pixels. The `screen_size` sets both the height and the width of the screen.
 
 #### pixel_scale
 (`float`)<br>
-The number of feet across that one pixel represents. i.e. for the default value, one
-pixel represents a 50ft x 50ft square of land.
+The number of feet across that one pixel represents. i.e. for the default value, one pixel represents a 50ft x 50ft square of land.
 
 ---
 
@@ -30,13 +24,15 @@ pixel represents a 50ft x 50ft square of land.
 
 #### fire_size
 (`int`)<br>
-The size of the flame/fire size in pixels. Only used for display purposes, and does
-not change fire dynamics.
+The size of the flame/fire size in pixels. Only used for display purposes, and does not change fire dynamics.
 
 #### control_line_size
 (`int`)<br>
-The size of the control lines in pixels. Only used for display purposes, and does not
-change how much space the control line takes up in the simulation.
+The size of the control lines in pixels. Only used for display purposes, and does not change how much space the control line takes up in the simulation.
+
+#### agent_size
+(`int`)<br>
+The size of the agent(s) in pixels. Only used for display purposes, and does not change how much space the agent takes up in the simulation.
 
 ---
 
@@ -44,8 +40,7 @@ change how much space the control line takes up in the simulation.
 
 #### update_rate
 (`float`)<br>
-The number of minutes that each game/frame update represents in simulation time. Note
-that this can be fractional to account for times that are non-integer and/or less than 1.
+The number of minutes that each game/frame update represents in simulation time. Note that this can be fractional to account for times that are non-integer and/or less than 1.
 
 #### runtime
 (`str`)<br>
@@ -54,6 +49,10 @@ The amount of time that the simulation is supposed to run. This can be expressed
 #### headless
 (`bool`)<br>
 Whether or not to run the simulation in a headless state.
+
+#### save_path
+(`str`)<br>
+Where to save GIF recordings and burn graphs of simulation [runs](https://fireline.pages.mitre.org/simfire/autoapi/simfire/sim/simulation/index.html#simfire.sim.simulation.FireSimulation.run). It will create subfolders in `save_path` that are of the format `<month>-<day>-<year>_<hour>-<minute>-<second>` based on when the outputs were saved to file.
 
 ---
 

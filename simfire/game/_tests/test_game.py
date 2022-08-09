@@ -204,10 +204,12 @@ class TestGame(unittest.TestCase):
             max_time=self.config.simulation.runtime,
             headless=headless,
         )
+        agent_sprites = []
         status = self.game.update(
             terrain,
             fire_manager.sprites,
             fireline_manager.sprites,
+            agent_sprites,
             self.config.wind.speed,
             self.config.wind.direction,
         )
@@ -266,10 +268,12 @@ class TestHeadlessGame(unittest.TestCase):
             max_time=self.config.simulation.runtime,
             headless=self.headless,
         )
+        agent_sprites = []
         status = self.game.update(
             terrain,
             fire_manager.sprites,
             fireline_manager.sprites,
+            agent_sprites,
             self.config.wind.speed,
             self.config.wind.direction,
         )
@@ -328,10 +332,12 @@ class TestMultiprocessGame(unittest.TestCase):
             headless=self.headless,
         )
         pool_size = 1
+        agent_sprites = []
         inputs = (
             terrain,
             fire_manager.sprites,
             fireline_manager.sprites,
+            agent_sprites,
             self.config.wind.speed,
             self.config.wind.direction,
         )
@@ -394,10 +400,12 @@ class TestRecordingGame(unittest.TestCase):
             max_time=self.config.simulation.runtime,
             headless=self.headless,
         )
+        agent_sprites = []
         status = self.game.update(
             terrain,
             fire_manager.sprites,
             fireline_manager.sprites,
+            agent_sprites,
             self.config.wind.speed,
             self.config.wind.direction,
         )

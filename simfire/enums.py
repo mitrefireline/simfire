@@ -92,13 +92,13 @@ class SpriteLayer(IntEnum):
         - TERRAIN
         - FIRE
         - LINE
-        - RESOURCE
+        - AGENT
     """
 
     TERRAIN: int = 1
     FIRE: int = 2
     LINE: int = 3
-    RESOURCE: int = 4
+    AGENT: int = 4
 
 
 class GameStatus(Enum):

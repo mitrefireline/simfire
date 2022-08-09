@@ -544,7 +544,7 @@ class RothermelFireManager(FireManager):
 
         return fire_map
 
-    def draw_spread_graph(self, game_screen: pygame.Surface = None) -> plt.Figure:
+    def draw_spread_graph(self, game_screen: pygame.surface.Surface = None) -> plt.Figure:
         """
         Create a matplotlib Figure with the fire spread graph overlain on the
         terrain image.

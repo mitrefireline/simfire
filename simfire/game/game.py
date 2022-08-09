@@ -1,15 +1,19 @@
 import math
+import pathlib
 from importlib import resources
-from typing import List, Optional, Sequence, Tuple
+from typing import List, Optional, Sequence, Tuple, Union
 
 import numpy as np
 import pygame
 from PIL import Image
 
 from ..enums import BurnStatus, GameStatus
+from ..utils.log import create_logger
 from ..utils.units import mph_to_ftpm
 from .image import load_image
-from .sprites import Fire, FireLine, Terrain
+from .sprites import Agent, Fire, FireLine, Terrain
+
+log = create_logger(__name__)
 
 
 class Game:
@@ -207,7 +211,7 @@ class Game:
         return floorColorRGB
 
     def _get_wind_mag_surf(
-        self, wind_magnitude_map: Sequence[Sequence[float]]
+        self, wind_magnitude_map: Union[Sequence[Sequence[float]], np.ndarray]
     ) -> pygame.surface.Surface:
         """
         Compute the wind magnitude surface for display.
@@ -237,7 +241,7 @@ class Game:
         return wind_mag_surf
 
     def _get_wind_dir_surf(
-        self, wind_direction_map: Sequence[Sequence[float]]
+        self, wind_direction_map: Union[Sequence[Sequence[float]], np.ndarray]
     ) -> pygame.Surface:
         """
         Compute the wind direction surface for display.
@@ -259,13 +263,43 @@ class Game:
 
         return wind_dir_surf
 
+    def quit(self) -> None:
+        """
+        Close the PyGame window and stop the `Game`
+        """
+        pygame.display.quit()
+        pygame.quit()
+
+    def save(self, path: pathlib.Path, duration: int = 100) -> None:
+        """Save a GIF of the simulation to a specified path
+
+        Arguments:
+            path: The path to save the GIF to with filename.
+            duration: The time to display the current frame of the GIF, in milliseconds.
+        """
+        if self.frames is not None:
+            self.frames[0].save(
+                path,
+                save_all=True,
+                duration=duration,
+                loop=0,
+                append_images=self.frames[1:],
+            )
+        else:
+            log.error(
+                "self.frames is set to None when attempting to save. Make sure "
+                "self.frames is not set to None when saving a GIF."
+            )
+            raise ValueError
+
     def update(
         self,
         terrain: Terrain,
         fire_sprites: Sequence[Fire],
         fireline_sprites: Sequence[FireLine],
-        wind_magnitude_map: Sequence[Sequence[float]],
-        wind_direction_map: Sequence[Sequence[float]],
+        agent_sprites: Sequence[Agent],
+        wind_magnitude_map: Union[Sequence[Sequence[float]], np.ndarray],
+        wind_direction_map: Union[Sequence[Sequence[float]], np.ndarray],
     ) -> GameStatus:
         """
         Update the game display using the provided terrain, sprites, and
@@ -288,6 +322,8 @@ class Game:
             fire_sprites = list(fire_sprites)
         if not isinstance(fireline_sprites, list):
             fireline_sprites = list(fireline_sprites)
+        if not isinstance(agent_sprites, list):
+            agent_sprites = list(agent_sprites)
 
         if not self.headless:
             for event in pygame.event.get():
@@ -308,7 +344,10 @@ class Game:
         fire_sprites_group = pygame.sprite.LayeredUpdates(
             *(fire_sprites + fireline_sprites)
         )
-        all_sprites = pygame.sprite.LayeredUpdates(*fire_sprites_group, terrain)
+        agent_sprites_group = pygame.sprite.LayeredUpdates(*agent_sprites)
+        all_sprites = pygame.sprite.LayeredUpdates(
+            *agent_sprites_group, *fire_sprites_group, terrain
+        )
 
         # Update and draw the sprites
         if not self.headless:
@@ -318,6 +357,7 @@ class Game:
                         self.screen.blit(self.background, sprite.rect, sprite.rect)
 
                 fire_sprites_group.update()
+                agent_sprites_group.update()
                 terrain.update(self.fire_map)
                 all_sprites.draw(self.screen)
 

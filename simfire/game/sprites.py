@@ -1,3 +1,5 @@
+import os
+import sys
 import tempfile
 from typing import Any, Optional, Tuple
 
@@ -128,15 +130,10 @@ class Terrain(pygame.sprite.Sprite):
         Returns:
             out_image: The input image with the contour lines drawn on it
         """
+        image = self.fuel_layer.image.squeeze()
         # Create a figure with axes
         fig, ax = plt.subplots()
-        image = self.fuel_layer.image.squeeze().astype(np.uint8)
-        if self.hist_layer is not None:
-            hist_image = self.hist_layer.image
-            hist_mask = np.all(hist_image != (0, 0, 0), axis=-1)
-            hist_mask = np.stack((hist_mask,) * 3, axis=-1)
-            image = hist_mask * hist_image + (1 - hist_mask) * image
-
+        # the decimal points look messy)
         contours = ax.contour(
             self.topo_layer.data.squeeze(), origin="upper", colors="black"
         )
@@ -166,8 +163,12 @@ class Terrain(pygame.sprite.Sprite):
             drawing.height = drawing.height * scale_y
             drawing.scale(scale_x, scale_y)
             # Convert to Pillow
+            # The fmt argument will display the levels as whole numbers (otherwise
+            # sending stdout to devnull to avoid the annoying `x_order_1: collinear!`
+            sys.stdout = open(os.devnull, "w")
             out_img_pil = renderPM.drawToPIL(drawing)
-        plt.close()
+            sys.stdout = sys.__stdout__
+        plt.close(fig)
         # Slice the alpha channel off
         out_img = np.array(out_img_pil, dtype=np.uint8)[..., :3]
 
@@ -361,5 +362,66 @@ class WetLine(pygame.sprite.Sprite):
         This doesn't require to be updated right now. May change in the future if we
         learn new things about the physics.
 
+        """
+        pass
+
+
+class Agent(pygame.sprite.Sprite):
+    """
+    This sprite represents a fire burning on one pixel of the terrain. Its
+    image is generally kept very small to make rendering easier. All fire
+    spreading is handled by the FireManager it is attached to.
+    """
+
+    def __init__(self, pos: Tuple[int, int], size: int, headless: bool = False) -> None:
+        """
+        Initialize the class by recording the position and size of the sprite
+        and creating a solid color texture.
+
+        Arguments:
+            pos: The (x, y) pixel position of the sprite
+            size: The pixel size of the sprite
+            headless: Flag to run in a headless state. This will allow PyGame objects to
+                      not be initialized.
+        """
+        super().__init__()
+
+        self._pos = pos
+        self.agent_color: Optional[np.ndarray] = None
+        self.size = size
+        self.headless = headless
+        self.rect: pygame.rect.Rect
+
+        if self.headless:
+            self.image = None
+            # Need to use self.rect to track the location of the sprite
+            # When running headless, we need this to be a tuple instead of a PyGame Rect
+            self.rect = pygame.Rect(*(pos + (size, size)))
+        else:
+            if self.agent_color is None:
+                self.agent_color = np.zeros((self.size, self.size, 3))
+                self.agent_color[:, :, 0] = 221
+                self.agent_color[:, :, 1] = 160
+                self.agent_color[:, :, 2] = 221
+            self.image = pygame.surfarray.make_surface(self.agent_color)
+
+            self.rect = self.image.get_rect()
+            self.rect.update(*(self.pos + (size, size)))
+
+        # Layer 3 so that it appears on top of the terrain and line (if applicable)
+        self.layer: int = SpriteLayer.AGENT
+
+    @property
+    def pos(self) -> Tuple[int, int]:
+        return self._pos
+
+    @pos.setter
+    def pos(self, value: Tuple[int, int]) -> None:
+        self._pos = value
+        self.rect.update(*(self.pos + (self.size, self.size)))
+
+    def update(self, *args, **kwargs) -> None:
+        """
+        Currently unused.
         """
         pass

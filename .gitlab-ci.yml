@@ -102,7 +102,9 @@ coverage:
     - SDL_VIDEODRIVER=dummy poetry run python -m coverage xml
   artifacts:
     reports:
-      cobertura: coverage.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
   needs: []
   only:
     - merge_requests

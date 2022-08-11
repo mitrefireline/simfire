@@ -23,7 +23,6 @@ from ..game.managers.mitigation import (
 )
 from ..game.sprites import Agent, Terrain
 from ..utils.config import Config
-from ..utils.layers import FunctionalFuelLayer
 from ..utils.log import create_logger
 from ..utils.units import str_to_minutes
 from ..world.parameters import Environment, FuelParticle
@@ -296,7 +295,7 @@ class FireSimulation(Simulation):
             The dictionary of observation space bounds containing NumPy arrays.
         """
         bounds = {}
-        if isinstance(self.terrain.fuel_layer, FunctionalFuelLayer):
+        if True:
             fuel_bounds = {
                 "w_0": {"min": FuelConstants.W_0_MIN, "max": FuelConstants.W_0_MAX},
                 "sigma": {"min": FuelConstants.SIGMA, "max": FuelConstants.SIGMA},
@@ -715,6 +714,15 @@ class FireSimulation(Simulation):
                 warnings.warn(message)
                 success = False
         return success
+
+    def set_fire_initial_position(self, pos: Tuple[int, int]) -> None:
+        """
+        Manually set the fire intial position for a static fire.
+
+        Arguments:
+            pos: The (x, y) coordinates to start the fire at
+        """
+        self.config.reset_fire(pos=pos)
 
     def get_layer_types(self) -> Dict[str, str]:
         """

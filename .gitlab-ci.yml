@@ -100,6 +100,7 @@ coverage:
     - SDL_VIDEODRIVER=dummy poetry run python -m coverage run -m pytest
     - SDL_VIDEODRIVER=dummy poetry run python -m coverage report
     - SDL_VIDEODRIVER=dummy poetry run python -m coverage xml
+  coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
   artifacts:
     reports:
       coverage_report:

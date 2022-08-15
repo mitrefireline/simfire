@@ -52,11 +52,32 @@ class DisplayConfig:
     fire_size: int
     control_line_size: int
     agent_size: int
+    rescale_size: Optional[int] = None
 
     def __post_init__(self) -> None:
         self.fire_size = int(self.fire_size)
         self.control_line_size = int(self.control_line_size)
         self.agent_size = int(self.agent_size)
+        if self.rescale_size is not None:
+            try:
+                self.rescale_size = int(self.rescale_size)
+            except ValueError:
+                if isinstance(self.rescale_size, str):
+                    if self.rescale_size.upper() == "NONE":
+                        self.rescale_size = None
+                    else:
+                        raise ValueError(
+                            f"Specified value  of {self.rescale_size} for "
+                            "config:display:rescale_size is not valid. "
+                            "Specify either an integer value or None"
+                        )
+                else:
+                    raise TypeError(
+                        "Speicified type of config:display:rescale_size "
+                        f"({type(self.rescale_size)}) with value "
+                        f"{self.rescale_size} is invalid. rescale_size "
+                        "should be int or None."
+                    )
 
 
 @dataclasses.dataclass

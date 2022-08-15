@@ -24,8 +24,14 @@ def main():
 
     fuel_particle = FuelParticle()
 
+    if cfg.display.rescale_size is not None:
+        rescale_size = (cfg.display.rescale_size, cfg.display.rescale_size)
+    else:
+        rescale_size = None
     game = Game(
-        (cfg.area.screen_size, cfg.area.screen_size), record=cfg.simulation.record
+        (cfg.area.screen_size, cfg.area.screen_size),
+        rescale_size=rescale_size,
+        record=cfg.simulation.record,
     )
 
     terrain = Terrain(

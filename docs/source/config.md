@@ -331,6 +331,8 @@ area:
 display:
   fire_size: 2
   control_line_size: 2
+  agent_size: 4
+  rescale_size: 225
 
 simulation:
   update_rate: 1

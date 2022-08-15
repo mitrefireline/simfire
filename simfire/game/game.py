@@ -375,7 +375,8 @@ class Game:
                     self.display_screen.blit(self.screen, (0, 0))
                 else:
                     self.display_screen.blit(
-                        pygame.transform.scale(self.screen, self.rescale_size), (0, 0)
+                        pygame.transform.smoothscale(self.screen, self.rescale_size),
+                        (0, 0),
                     )
 
                 if self.record and self.frames is not None:

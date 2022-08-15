@@ -25,6 +25,7 @@ class Game:
     def __init__(
         self,
         screen_size: Tuple[int, int],
+        rescale_size: Optional[Tuple[int, int]] = None,
         headless: bool = False,
         record: bool = False,
         show_wind_magnitude: bool = False,
@@ -39,6 +40,7 @@ class Game:
 
         Arguments:
             screen_size: The (n,n) size of the game screen/display in pixels.
+            rescale_size: The (s, s) size of the display to resize to
             headless: Flag to run in a headless state.
             record: Flag to save a recording of the simulation game screen
         """
@@ -48,6 +50,7 @@ class Game:
                 "Got record=True and headless=True"
             )
         self.screen_size = screen_size
+        self.rescale_size = rescale_size
         self.headless = headless
         self.record = record
         self.show_wind_magnitude = show_wind_magnitude
@@ -62,7 +65,14 @@ class Game:
         self.background: Optional[pygame.surface.Surface] = None
         if not self.headless:
             pygame.init()
-            self.screen = pygame.display.set_mode(screen_size)
+            # self.screen is for drawing all backgrounds/sprites at the simulation's scale
+            # self.display_screen is for actually displaying the simulation to the user
+            # These can have different sizes to do potential rescaling
+            if self.rescale_size is None:
+                self.display_screen = pygame.display.set_mode(self.screen_size)
+            else:
+                self.display_screen = pygame.display.set_mode(self.rescale_size)
+            self.screen = pygame.Surface(self.screen_size)
             pygame.display.set_caption("SimFire")
             with resources.path("assets.icons", "fireline_logo.png") as path:
                 fireline_logo_path = path
@@ -360,6 +370,13 @@ class Game:
                 agent_sprites_group.update()
                 terrain.update(self.fire_map)
                 all_sprites.draw(self.screen)
+
+                if self.rescale_size is None:
+                    self.display_screen.blit(self.screen, (0, 0))
+                else:
+                    self.display_screen.blit(
+                        pygame.transform.scale(self.screen, self.rescale_size), (0, 0)
+                    )
 
                 if self.record and self.frames is not None:
                     screen_bytes = pygame.image.tostring(self.screen, "RGB")

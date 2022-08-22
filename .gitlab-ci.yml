@@ -148,7 +148,33 @@ pages:
 ###########################
 # Packaging and Releasing #
 ###########################
-test-release:
+.commit_version:
+  script:
+    - git remote remove origin
+    - git remote add origin https://oauth2:${CI_TAG_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git
+    - git config --global user.email "fireline-ci-bot@mitre.org"
+    - git config --global user.name "fiReLine CI Bot"
+    - git add pyproject.toml
+    - git commit -m "Change pyproject.toml version to $VERSION"
+    - git push -o ci.skip origin HEAD:main
+
+.check_version_and_commit:
+  script:
+    - POETRY_VERSION=$(poetry version -s)
+    - >
+      if [ $POETRY_VERSION != $CI_COMMIT_TAG ]; then
+        VERSION=$CI_COMMIT_TAG
+        poetry version $VERSION
+        git remote remove origin
+        git remote add origin https://oauth2:${CI_TAG_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git
+        git config --global user.email "fireline-ci-bot@mitre.org"
+        git config --global user.name "fiReLine CI Bot"
+        git add pyproject.toml
+        git commit -m "Change pyproject.toml version to $VERSION"
+        git push -o ci.skip origin HEAD:main
+      fi
+
+test_release:
   stage: Release
   tags:
     - lslab2
@@ -179,13 +205,7 @@ tag:
     - MR=$(git log -1 | grep -Po '(?<=fireline/simfire)(.*?).*')
     - echo -e "# Version ${VERSION}\n\nThis version includes:\n\n* ${LOG} (closed ${ISSUE} with merge request ${MR})" > RELEASE.md
     - MESSAGE="$(php -r "echo json_encode(['name' => '$VERSION', 'tag_name' => '$VERSION', 'description' => file_get_contents('RELEASE.md')]);")"
-    - git remote remove origin
-    - git remote add origin https://oauth2:${CI_TAG_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git
-    - git config --global user.email "fireline-ci-bot@mitre.org"
-    - git config --global user.name "fiReLine CI Bot"
-    - git add pyproject.toml
-    - git commit -m "Change pyproject.toml version to $VERSION"
-    - git push -o ci.skip origin HEAD:main
+    - !reference [.commit_version, script]
     - git tag -a $VERSION -m "$VERSION"
     - git push origin $VERSION
     - >
@@ -201,6 +221,7 @@ release_gitlab:
   tags:
     - lslab2
   script:
+    - !reference [.check_version_and_commit, script]
     - poetry build
     - poetry config repositories.mitre-gitlab https://gitlab.mitre.org/api/v4/projects/${CI_PROJECT_ID}/packages/pypi
     - poetry publish --repository mitre-gitlab -u gitlab-ci-token -p ${CI_JOB_TOKEN}
@@ -212,6 +233,7 @@ release_artifactory:
   tags:
     - lslab2
   script:
+    - !reference [.check_version_and_commit, script]
     - poetry build
     - poetry config repositories.mitre-artifactory https://artifacts.mitre.org/artifactory/api/pypi/python
     - poetry publish --repository mitre-artifactory -u fireline-ci-bot -p ${CI_ARTIFACTORY_TOKEN}

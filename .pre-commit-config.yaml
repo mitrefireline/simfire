@@ -32,11 +32,11 @@ repos:
         types: [python]
       - id: mypy
         name: mypy
-        exclude: /_tests/
-        exclude: tests/
         language: python
         entry: mypy
-        args: [--config-file, .mypy.ini]
+        args: [--config-file, pyproject.toml]
+        exclude: /_tests/
+        exclude: tests/
         # use your preferred Python version
         types: [python]
       - id: isort

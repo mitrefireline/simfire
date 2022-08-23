@@ -46,7 +46,7 @@ mypy:
     - lslab2
   script:
     - pip install mypy
-    - mypy --config-file .mypy.ini .
+    - mypy --config-file pyproject.toml .
   needs: []
   only:
     - merge_requests

@@ -50,6 +50,15 @@ docs = ["Sphinx", "sphinx-autoapi", "sphinx-rtd-theme", "myst-parser", "furo"]
 line-length = 90
 target-version = ['py39']
 
+[tool.mypy]
+ignore_missing_imports = true
+allow_redefinition = true
+exclude = [
+    '/_tests/',
+    '^generate_cfd_wind_layer\.py$',
+    'tests/'
+]
+
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"

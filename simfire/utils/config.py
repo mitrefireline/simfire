@@ -725,7 +725,7 @@ class Config:
                     "seed. The seed value will be ignored."
                 )
         elif seed is None and pos is not None:
-            self._load_fire(pos=pos)
+            self.fire = self._load_fire(pos=pos)
         else:
             raise ValueError("Both `seed` and `pos` cannot be specified together")
 

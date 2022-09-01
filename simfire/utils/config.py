@@ -13,7 +13,10 @@ from yaml.parser import ParserError  # type: ignore
 
 from ..world.elevation_functions import flat, gaussian, perlin
 from ..world.fuel_array_functions import chaparral_fn
-from ..world.wind_mechanics.wind_controller import WindController
+from ..world.wind_mechanics.wind_controller import (
+    WindController,
+    WindControllerCFD,
+)
 from .layers import (
     FuelLayer,
     FunctionalFuelLayer,
@@ -195,7 +198,10 @@ class Config:
         self.terrain = self._load_terrain()
         self.fire = self._load_fire()
         self.environment = self._load_environment()
-        self.wind = self._load_wind()
+        if cfd_precompute is False:
+            self.wind = self._load_wind()
+        else:
+            self.cfd_setup = self._cfd_wind_setup()
 
     def _load_yaml(self) -> Dict[str, Any]:
         """
@@ -579,6 +585,33 @@ class Config:
         direction_arr = direction_arr.astype(np.float64)
 
         return WindConfig(speed_arr, direction_arr, speed_fn, direction_fn)
+
+    def _cfd_wind_setup(self) -> WindControllerCFD:
+        screen_size: int = self.yaml_data["area"]["screen_size"]
+        result_accuracy: int = self.yaml_data["wind"]["cfd"]["result_accuracy"]
+        # scale: int = self.yaml_data['wind']['cfd']['scale']
+        scale: int = self.yaml_data["area"]["pixel_scale"]
+        timestep: float = self.yaml_data["wind"]["cfd"]["timestep_dt"]
+        diffusion: float = self.yaml_data["wind"]["cfd"]["diffusion"]
+        viscosity: float = self.yaml_data["wind"]["cfd"]["viscosity"]
+        terrain_features: np.ndarray = self.terrain.topography_layer.data
+        wind_speed: float = self.yaml_data["wind"]["cfd"]["speed"]
+        wind_direction: str = self.yaml_data["wind"]["cfd"]["direction"]
+        time_to_train = self.yaml_data["wind"]["cfd"]["time_to_train"]
+
+        wind_map = WindControllerCFD(
+            screen_size,
+            result_accuracy,
+            scale,
+            timestep,
+            diffusion,
+            viscosity,
+            terrain_features,
+            wind_speed,
+            wind_direction,
+            time_to_train,
+        )
+        return wind_map
 
     def reset_terrain(
         self,

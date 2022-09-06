@@ -54,11 +54,32 @@ class DisplayConfig:
     fire_size: int
     control_line_size: int
     agent_size: int
+    rescale_size: Optional[int] = None
 
     def __post_init__(self) -> None:
         self.fire_size = int(self.fire_size)
         self.control_line_size = int(self.control_line_size)
         self.agent_size = int(self.agent_size)
+        if self.rescale_size is not None:
+            try:
+                self.rescale_size = int(self.rescale_size)
+            except ValueError:
+                if isinstance(self.rescale_size, str):
+                    if self.rescale_size.upper() == "NONE":
+                        self.rescale_size = None
+                    else:
+                        raise ValueError(
+                            f"Specified value  of {self.rescale_size} for "
+                            "config:display:rescale_size is not valid. "
+                            "Specify either an integer value or None"
+                        )
+                else:
+                    raise TypeError(
+                        "Speicified type of config:display:rescale_size "
+                        f"({type(self.rescale_size)}) with value "
+                        f"{self.rescale_size} is invalid. rescale_size "
+                        "should be int or None."
+                    )
 
 
 @dataclasses.dataclass
@@ -470,26 +491,7 @@ class Config:
 
         return fuel_type, fuel_layer, fn_name, kwargs
 
-    def _create_historical_layer(self):
-        """
-        Create a HistoricalLayer given the config parameters.
-        This is an optional dataclass.
-
-        Returns:
-            A HIstoricalLayer that sets the screen size, area, and fire start location.
-        """
-        HistoricalConfig = self._load_historical()
-        historical_layer = HistoricalLayer(
-            (
-                HistoricalConfig.fire_init_pos_lat,
-                abs(HistoricalConfig.fire_init_pos_long),
-            ),
-            HistoricalConfig.name,
-            HistoricalConfig.year,
-        )
-        return historical_layer
-
-    def _load_fire(self) -> FireConfig:
+    def _load_fire(self, pos: Optional[Tuple[int, int]] = None) -> FireConfig:
         """
         Load the FireConfig from the YAML data.
 
@@ -499,13 +501,23 @@ class Config:
         max_fire_duration = int(self.yaml_data["fire"]["max_fire_duration"])
         fire_init_pos_type = self.yaml_data["fire"]["fire_initial_position"]["type"]
         if fire_init_pos_type == "static":
-            fire_pos = self.yaml_data["fire"]["fire_initial_position"]["static"][
-                "position"
-            ]
-            fire_pos = fire_pos[1:-1].split(",")
-            fire_initial_position = (int(fire_pos[0]), int(fire_pos[1]))
+            # If pos is unspecified, read from the YAML data
+            if pos is None:
+                fire_pos = self.yaml_data["fire"]["fire_initial_position"]["static"][
+                    "position"
+                ]
+                fire_pos = fire_pos[1:-1].split(",")
+                fire_initial_position = (int(fire_pos[0]), int(fire_pos[1]))
+            # Pos is specified, so use that
+            else:
+                fire_initial_position = pos
             return FireConfig(fire_initial_position, max_fire_duration)
         elif fire_init_pos_type == "random":
+            if pos is not None:
+                log.warn(
+                    "`pos` is specified, but the initialization type is `random`. "
+                    "Ignoring `pos`."
+                )
             screen_size = self.yaml_data["area"]["screen_size"]
             seed = self.yaml_data["fire"]["fire_initial_position"]["random"]["seed"]
             rng = np.random.default_rng(seed)
@@ -730,27 +742,41 @@ class Config:
 
         self.wind = self._load_wind()
 
-    def reset_fire(self, seed: Optional[int]) -> None:
+    def reset_fire(
+        self, seed: Optional[int] = None, pos: Optional[Tuple[int, int]] = None
+    ) -> None:
         """
-        Reset the fire initial position seed.
+        Reset the fire initial position seed. Note that both `seed` and `pos` cannot
+        be specified together since `seed` is used for random/dynamic cases and `pos`
+        is used for static cases.
 
         Arguments:
             seed: The seed used to randomize fire initial position generation.
+            pos: The static position to start the fire at
         """
-        try:
-            # Change the seed for the current fire initital position type
-            fire_init_pos_type = self.yaml_data["fire"]["fire_initial_position"]["type"]
-            self.yaml_data["fire"]["fire_initial_position"][fire_init_pos_type][
-                "seed"
-            ] = seed
-            # Reload the FireConfig with the updated seed in the yaml data
-            self.fire = self._load_fire()
-        except KeyError:
-            log.warning(
-                "Trying to set a seed for fire initial position type "
-                f"({fire_init_pos_type}), which does not support the use of a "
-                "seed. The seed value will be ignored."
-            )
+        if seed is None and pos is None:
+            raise ValueError("Both `seed` and `pos` cannot be None")
+        elif seed is not None and pos is None:
+            try:
+                # Change the seed for the current fire initital position type
+                fire_init_pos_type = self.yaml_data["fire"]["fire_initial_position"][
+                    "type"
+                ]
+                self.yaml_data["fire"]["fire_initial_position"][fire_init_pos_type][
+                    "seed"
+                ] = seed
+                # Reload the FireConfig with the updated seed in the yaml data
+                self.fire = self._load_fire()
+            except KeyError:
+                log.warning(
+                    "Trying to set a seed for fire initial position type "
+                    f"({fire_init_pos_type}), which does not support the use of a "
+                    "seed. The seed value will be ignored."
+                )
+        elif seed is None and pos is not None:
+            self.fire = self._load_fire(pos=pos)
+        else:
+            raise ValueError("Both `seed` and `pos` cannot be specified together")
 
     def save(self, path: Union[str, Path]) -> None:
         """

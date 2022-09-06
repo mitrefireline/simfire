@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "simfire"
-version = "1.4.9"
+version = "1.4.15"
 description = "Fire simulator built in Python"
 authors = ["Tim Welsh <twelsh@mitre.org>", "Marissa Dotter <mdotter@mitre.org>",
            "Michael Doyle <mdoyle@mitre.org>", "Dhanuj Gandikota <dgandikota@mitre.org>",
@@ -49,6 +49,15 @@ docs = ["Sphinx", "sphinx-autoapi", "sphinx-rtd-theme", "myst-parser", "furo"]
 [tool.black]
 line-length = 90
 target-version = ['py39']
+
+[tool.mypy]
+ignore_missing_imports = true
+allow_redefinition = true
+exclude = [
+    '/_tests/',
+    '^generate_cfd_wind_layer\.py$',
+    'tests/'
+]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

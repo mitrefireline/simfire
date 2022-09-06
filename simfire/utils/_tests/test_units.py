@@ -1,7 +1,12 @@
 import unittest
 
-from ..units import (ftpm_to_mph, mph_to_ftpm, str_to_minutes, 
-                        chains_to_feet_handline, chains_to_feet_dozerline)
+from ..units import (
+    chains_to_feet_dozerline,
+    chains_to_feet_handline,
+    ftpm_to_mph,
+    mph_to_ftpm,
+    str_to_minutes,
+)
 
 
 class TestUnits(unittest.TestCase):
@@ -38,4 +43,3 @@ class TestUnits(unittest.TestCase):
         """
         self.assertEqual(chains_to_feet_dozerline(2.0), (132, 30))
         self.assertEqual(chains_to_feet_dozerline(0.5), (33, 30))
-

@@ -1,6 +1,6 @@
 import re
 from datetime import timedelta
-from typing import Union
+from typing import Tuple, Union
 
 import numpy as np
 
@@ -84,26 +84,27 @@ def str_to_minutes(string: str) -> int:
         )
     )
 
-def chains_to_feet_handline(chains: float) -> Union[int, int]:
+
+def chains_to_feet_handline(chains: float) -> Tuple[int, int]:
     """
     Convert "chains" to (width x hieght) / hour per individual firefighters.
 
     Calculated by averaging from a 20-person hand-crew.
     https://www.nifc.gov/nicc/logistics/references/Wildland%20Fire%20Incident%20Management%20Field%20Guide.pdf
     pgs: 110-113
-    
+
     Chains are defined as 66 ft x 3 ft
     """
     return int(chains * 66), 3
 
 
-def chains_to_feet_dozerline(chains: float) -> Union[int, int]:
+def chains_to_feet_dozerline(chains: float) -> Tuple[int, int]:
     """
     Convert "chains" to (width x hieght) / hour per dozer.
 
     https://www.nifc.gov/nicc/logistics/references/Wildland%20Fire%20Incident%20Management%20Field%20Guide.pdf
     pgs: 114-116
-    
+
     Chains are defined as 66 ft x 30 ft
     """
     return int(chains * 66), 30

@@ -247,39 +247,18 @@ class Config:
             the data layers are `operational`
         """
 
-        if self.yaml_data["historical"]["use"]:
-            historical_layer = self._create_historical_layer()
-            if (
-                self.yaml_data["terrain"]["topography"]["type"] == "operational"
-                or self.yaml_data["terrain"]["fuel"]["type"] == "operational"
-            ):
-                lat = historical_layer.centroid[0]
-                lon = historical_layer.centroid[1]
-                height = historical_layer.actual_dist_w
-                width = historical_layer.actual_dist_w
-                resolution = self.yaml_data["operational"]["resolution"]
-                return (
-                    LatLongBox((lat, lon), height, width, resolution),
-                    historical_layer,
-                )
-            else:
-                raise ConfigError(
-                    "Cannot use historical data when topography and fuel "
-                    "types are set to 'functional'"
-                )
+        if (
+            self.yaml_data["terrain"]["topography"]["type"] == "operational"
+            or self.yaml_data["terrain"]["fuel"]["type"] == "operational"
+        ):
+            lat = self.yaml_data["operational"]["latitude"]
+            lon = self.yaml_data["operational"]["longitude"]
+            height = self.yaml_data["operational"]["height"]
+            width = self.yaml_data["operational"]["width"]
+            resolution = self.yaml_data["operational"]["resolution"]
+            return LatLongBox((lat, lon), height, width, resolution), None
         else:
-            if (
-                self.yaml_data["terrain"]["topography"]["type"] == "operational"
-                or self.yaml_data["terrain"]["fuel"]["type"] == "operational"
-            ):
-                lat = self.yaml_data["operational"]["latitude"]
-                lon = self.yaml_data["operational"]["longitude"]
-                height = self.yaml_data["operational"]["height"]
-                width = self.yaml_data["operational"]["width"]
-                resolution = self.yaml_data["operational"]["resolution"]
-                return LatLongBox((lat, lon), height, width, resolution), None
-            else:
-                return None, None
+            return None, None
 
     def _load_area(self) -> AreaConfig:
         """

@@ -94,7 +94,7 @@ class WindController:
 
 
 # For CFD Implementations
-class WindController2:
+class WindControllerCFD:
     """
     This is a PRECOMPUTE wind controller.  It generates and tracks objects that dictate
     wind magnitude and wind direction for map given size of the screen.
@@ -111,6 +111,7 @@ class WindController2:
         terrain_features: np.ndarray = None,
         wind_speed: float = 27.0,
         wind_direction: str = "north",
+        time_to_train: int = 1000,
     ) -> None:
         self.N = screen_size
         self.iterations = result_accuracy
@@ -118,13 +119,25 @@ class WindController2:
         self.timestep = timestep
         self.diffusion = diffusion
         self.viscosity = viscosity
+        self.terrain_features = terrain_features
         self.wind_speed = wind_speed
         self.wind_direction = wind_direction
+        self.time_to_train = time_to_train
 
         if terrain_features is None:
             self.terrain_features = np.zeros((self.N, self.N))
         else:
-            self.terrain_features = np.array(terrain_features, dtype=np.float32)
+
+            def terrain_downsample(height):
+                if height > np.average(self.terrain_features):
+                    return 1
+                else:
+                    return 0
+
+            downsampled_terrain_vectorize = np.vectorize(terrain_downsample)
+            bounded_terrain = downsampled_terrain_vectorize(self.terrain_features)
+
+            self.terrain_features = np.array(bounded_terrain, dtype=np.float32)
         # TODO Load terrain setup here
 
         self.fvect = Fluid(

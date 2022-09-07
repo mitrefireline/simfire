@@ -12,7 +12,7 @@ display:
 
 simulation:
   update_rate: 1
-  runtime: 24h
+  runtime: 15m
   headless: false
   draw_spread_graph: false
   record: true
@@ -23,10 +23,10 @@ mitigation:
 
 operational:
   seed:
-  latitude: 36.095
+  latitude: 39.095
   longitude: 120.52
-  height: 20000
-  width: 20000
+  height: 2000
+  width: 2000
   resolution: 30
 
 historical:

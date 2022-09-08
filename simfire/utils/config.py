@@ -18,9 +18,11 @@ from ..world.wind_mechanics.wind_controller import (
     WindControllerCFD,
 )
 from .layers import (
+    DataLayer,
     FuelLayer,
     FunctionalFuelLayer,
     FunctionalTopographyLayer,
+    HistoricalLayer,
     LatLongBox,
     OperationalFuelLayer,
     OperationalTopographyLayer,
@@ -128,6 +130,20 @@ class OperationalConfig:
 
 
 @dataclasses.dataclass
+class HistoricalConfig:
+    """
+    Class that tracks historical layer.
+    """
+
+    use: bool
+    fire_init_pos_lat: float
+    fire_init_pos_long: float
+    name: str
+    year: str
+    historical_layer = DataLayer
+
+
+@dataclasses.dataclass
 class FunctionalConfig:
     """
     Class that tracks functional layer names and keyword arguments.
@@ -188,7 +204,7 @@ class Config:
         # operational to functional
         self.original_screen_size = self.yaml_data["area"]["screen_size"]
 
-        self.lat_long_box = self._make_lat_long_box()
+        self.lat_long_box, self.historical_layer = self._make_lat_long_box()
 
         self.area = self._load_area()
         self.display = self._load_display()
@@ -224,7 +240,9 @@ class Config:
             raise ConfigError(message)
         return yaml_data
 
-    def _make_lat_long_box(self) -> Union[LatLongBox, None]:
+    def _make_lat_long_box(
+        self,
+    ) -> Tuple[Optional[LatLongBox], Optional[HistoricalLayer]]:
         """
         Optionally create the LatLongBox used by the data layers if any
         of the data layers are of type `operational`.
@@ -234,6 +252,7 @@ class Config:
             LatLongBox with the config coordinates and shape if any of
             the data layers are `operational`
         """
+
         if (
             self.yaml_data["terrain"]["topography"]["type"] == "operational"
             or self.yaml_data["terrain"]["fuel"]["type"] == "operational"
@@ -243,9 +262,9 @@ class Config:
             height = self.yaml_data["operational"]["height"]
             width = self.yaml_data["operational"]["width"]
             resolution = self.yaml_data["operational"]["resolution"]
-            return LatLongBox((lat, lon), height, width, resolution)
+            return LatLongBox((lat, lon), height, width, resolution), None
         else:
-            return None
+            return None, None
 
     def _load_area(self) -> AreaConfig:
         """
@@ -302,6 +321,15 @@ class Config:
         """
         # No processing needed for the OperationalConfig
         return OperationalConfig(**self.yaml_data["operational"])
+
+    def _load_historical(self) -> HistoricalConfig:
+        """
+        Load the HistoricalConfig from the YAML data.
+
+        returns:
+            The YAML data converted to an HistoricalConfig dataclass
+        """
+        return HistoricalConfig(**self.yaml_data["historical"])
 
     def _load_terrain(self) -> TerrainConfig:
         """
@@ -640,7 +668,7 @@ class Config:
             lat, long = location
             self.yaml_data["operational"]["latitude"] = lat
             self.yaml_data["operational"]["longitude"] = long
-            self.lat_long_box = self._make_lat_long_box()
+            self.lat_long_box, self.historical_layer = self._make_lat_long_box()
 
         # Can only reset functional topography seeds, since operational is updated
         # via the `location` argument
@@ -680,7 +708,7 @@ class Config:
             self.yaml_data["terrain"]["fuel"]["type"] = fuel_type
 
         # Remake the LatLongBox
-        self.lat_long_box = self._make_lat_long_box()
+        self.lat_long_box, self.historical_layer = self._make_lat_long_box()
         # Remake the AreaConfig since operational/functional could have changed
         self.area = self._load_area()
         # Remake the terrain

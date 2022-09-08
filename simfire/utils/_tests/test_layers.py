@@ -36,20 +36,20 @@ class TestLatLongBox(unittest.TestCase):
         height, width = 1600, 1600
         lat_long_box = LatLongBox(center, height, width, resolution)
         test_output_dems = ((33, 117), (33, 115))
-        self.assertEqual(lat_long_box.five_deg_north_min, test_output_dems[0][0])
-        self.assertEqual(lat_long_box.five_deg_north_max, test_output_dems[1][0])
-        self.assertEqual(lat_long_box.five_deg_west_min, test_output_dems[1][1])
-        self.assertEqual(lat_long_box.five_deg_west_max, test_output_dems[0][1])
+        self.assertEqual(lat_long_box.deg_north_min, test_output_dems[0][0])
+        self.assertEqual(lat_long_box.deg_north_max, test_output_dems[1][0])
+        self.assertEqual(lat_long_box.deg_west_min, test_output_dems[1][1])
+        self.assertEqual(lat_long_box.deg_west_max, test_output_dems[0][1])
 
         # 4 Tiles
         center = (35.001, 117.001)
         height, width = 1600, 1600
         lat_long_box = LatLongBox(center, height, width, resolution)
         test_output_dems = ((34, 118), (34, 117), (35, 117), (35, 118))
-        self.assertEqual(lat_long_box.five_deg_north_min, test_output_dems[0][0])
-        self.assertEqual(lat_long_box.five_deg_north_max, test_output_dems[2][0])
-        self.assertEqual(lat_long_box.five_deg_west_min, test_output_dems[1][1])
-        self.assertEqual(lat_long_box.five_deg_west_max, test_output_dems[0][1])
+        self.assertEqual(lat_long_box.deg_north_min, test_output_dems[0][0])
+        self.assertEqual(lat_long_box.deg_north_max, test_output_dems[2][0])
+        self.assertEqual(lat_long_box.deg_west_min, test_output_dems[1][1])
+        self.assertEqual(lat_long_box.deg_west_max, test_output_dems[0][1])
 
     def test__stack_tiles(self) -> None:
         """
@@ -284,7 +284,7 @@ class TestOperationalFuelLayer(unittest.TestCase):
         """
         resolution = 30
         # Single Tile
-        center = (35.2, 115.6)
+        center = (35.2, 117.6)
         height, width = 1600, 1600
         lat_long_box = LatLongBox(center, height, width, resolution)
         FuelGen = OperationalFuelLayer(lat_long_box)
@@ -311,7 +311,7 @@ class TestOperationalFuelLayer(unittest.TestCase):
         """
         resolution = 30
         # Single Tile
-        center = (35.2, 115.6)
+        center = (35.2, 117.6)
         height, width = 1600, 1600
         lat_long_box = LatLongBox(center, height, width, resolution)
         FuelGen = OperationalFuelLayer(lat_long_box)

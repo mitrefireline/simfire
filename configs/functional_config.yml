@@ -28,6 +28,13 @@ operational:
   width: 4000
   resolution: 30
 
+historical:
+  use: false
+  fire_init_pos_lat: 36.095
+  fire_init_pos_long: -120.522
+  name: Mineral
+  year: '2020'
+
 terrain:
   topography:
     type: functional

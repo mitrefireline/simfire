@@ -13,7 +13,7 @@ def timeit(func):
         start = time()
         result = func(*args, **kwargs)
         end = time()
-        print(f"{func.__name__} executed in {end - start:.4f} seconds")
+        log.info(f"{func.__name__} executed in {end - start:.4f} seconds")
         return result
 
     return wrapper

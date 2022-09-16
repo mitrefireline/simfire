@@ -27,6 +27,7 @@ from ..utils.log import create_logger
 from ..utils.units import str_to_minutes
 from ..world.parameters import Environment, FuelParticle
 
+
 log = create_logger(__name__)
 
 

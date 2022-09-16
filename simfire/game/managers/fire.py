@@ -15,9 +15,13 @@ import pygame
 
 from ...enums import BurnStatus, GameStatus, RoSAttenuation
 from ...utils.graph import FireSpreadGraph
+from ...utils.log import create_logger
 from ...world.parameters import Environment, FuelParticle
 from ...world.rothermel import compute_rate_of_spread
 from ..sprites import Fire, Terrain
+
+
+log = create_logger(__name__)
 
 NewLocsType = Tuple[Tuple[int, int], ...]
 
@@ -234,7 +238,16 @@ class FireManager:
         Returns:
             An updated `rate_of_spread` array, taking into account the control lines
         """
-        assert fire_map.shape == rate_of_spread.shape
+        # Changed this from an assert to an if and log error due to bandit report:
+        # Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
+        #    Severity: Low   Confidence: High
+        #    CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+        #    Location: simfire/game/managers/fire.py:237:8
+        #    More Info: https://bandit.readthedocs.io/en/1.7.4/plugins/b101_assert_used.html
+        if fire_map.shape != rate_of_spread.shape:
+            log.error("The fire map does not match the shape of the rate of spread in "
+                      "FireManager._update_rate_of_spread")
+            raise AssertionError
 
         factor = np.zeros_like(rate_of_spread)
         if self.attenuate_line_ros:

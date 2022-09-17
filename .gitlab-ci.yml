@@ -114,7 +114,7 @@ coverage:
   tags:
   - lslab2
   script:
-    - poetry install -E coverage
+    - poetry install --with coverage
     - SDL_VIDEODRIVER=dummy poetry run python -m coverage run -m pytest
     - SDL_VIDEODRIVER=dummy poetry run python -m coverage report
     - SDL_VIDEODRIVER=dummy poetry run python -m coverage xml
@@ -134,7 +134,7 @@ coverage:
 ################
 .pages:
   script:
-    - poetry install -E docs
+    - poetry install --with docs
     - poetry run sphinx-build -d docs/build/doctrees docs/source docs/build/html
     - mv docs/build/html public/
 

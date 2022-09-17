@@ -1,6 +1,10 @@
 from functools import wraps
 from time import time
 
+from ..utils.log import create_logger
+
+log = create_logger(__name__)
+
 
 def timeit(func):
     """

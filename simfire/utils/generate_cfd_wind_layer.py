@@ -13,6 +13,10 @@ import pygame
 from simfire.utils.config import Config
 from simfire.world.wind_mechanics.wind_controller import WindControllerCFD
 
+from ..utils.log import create_logger
+
+log = create_logger(__name__)
+
 pygame.init()
 
 

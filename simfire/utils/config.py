@@ -31,7 +31,6 @@ from .layers import (
 from .log import create_logger
 from .units import mph_to_ftpm, scale_ms_to_ftpm, str_to_minutes
 
-
 log = create_logger(__name__)
 
 

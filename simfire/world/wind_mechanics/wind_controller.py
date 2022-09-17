@@ -3,10 +3,9 @@ from typing import Optional
 import numpy as np
 import pygame
 
+from ...utils.log import create_logger
 from .cfd_wind import Fluid
 from .perlin_wind import WindNoise
-from ...utils.log import create_logger
-
 
 log = create_logger(__name__)
 

@@ -2,7 +2,8 @@ image: "python:3.9"
 
 before_script:
   - python --version
-  - pip install poetry
+  - curl -sSL https://install.python-poetry.org | python -
+  - export PATH=$PATH:$HOME/.local/bin
   - poetry --version
 
 .install_dev:
@@ -11,6 +12,7 @@ before_script:
 
 stages:
   - Static Analysis
+  - Security
   - Tests
   - Documentation
   - Release
@@ -61,6 +63,22 @@ isort:
   needs: []
   only:
     - merge_requests
+
+
+############
+# Security #
+############
+bandit:
+  stage: Security
+  tags:
+    - lslab2
+  script:
+    - pip install bandit
+    - bandit -r .
+  needs: []
+  only:
+    - merge_requests
+
 
 #########
 # Tests #

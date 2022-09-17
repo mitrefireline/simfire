@@ -13,11 +13,10 @@ from ..enums import (
     TERRAIN_TEXTURE_PATH,
     FuelModelToFuel,
 )
-from ...utils.log import create_logger
+from ..utils.log import create_logger
 from ..world.elevation_functions import ElevationFn
 from ..world.fuel_array_functions import FuelArrayFn
 from ..world.parameters import Fuel
-
 
 log = create_logger(__name__)
 
@@ -93,11 +92,12 @@ class LatLongBox:
         TODO: This method only creates a square, needs re-tooling to create a rectangle
         """
         # Changed this from an assert to an if and log error due to bandit report:
-        # Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
-        #    Severity: Low   Confidence: High
-        #    CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
-        #    Location: simfire/utils/layers.py:90:8
-        #    More Info: https://bandit.readthedocs.io/en/1.7.4/plugins/b101_assert_used.html
+        # Issue: [B101:assert_used] Use of assert detected. The enclosed code will be
+        #        removed when compiling to optimised byte code.
+        #  Severity: Low   Confidence: High
+        #  CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
+        #  Location: simfire/utils/layers.py:90:8
+        #  More Info: https://bandit.readthedocs.io/en/1.7.4/plugins/b101_assert_used.html
         if height != width:
             log.error("The height and width must be equal for the LatLongBox")
             raise AssertionError

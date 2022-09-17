@@ -13,7 +13,6 @@ from ..utils.units import mph_to_ftpm
 from .image import load_image
 from .sprites import Agent, Fire, FireLine, Terrain
 
-
 log = create_logger(__name__)
 
 

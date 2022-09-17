@@ -2,7 +2,7 @@ image: "python:3.9"
 
 before_script:
   - python --version
-  - curl -sSL https://install.python-poetry.org | python -
+  - curl -sSkL https://install.python-poetry.org | python -
   - export PATH=$PATH:$HOME/.local/bin
   - poetry --version
 

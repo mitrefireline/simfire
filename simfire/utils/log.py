@@ -20,13 +20,13 @@ def create_logger(name: str) -> logging.Logger:
     if (log_level := os.environ.get("LOGLEVEL")) is None:
         log_level = "INFO"
 
-    FORMAT = "%(asctime)s : %(levelname)s : (%(pathname)s:%(lineno)d) : %(message)s"
-
+    FORMAT = "%(message)s"
+    handlers = [RichHandler(markup=False)]
     logging.basicConfig(
         level=log_level,
         format=FORMAT,
-        datefmt="[%X]",
-        handlers=[RichHandler(markup=True)],
+        datefmt="[%m/%d/%Y %I:%M:%S %p]",
+        handlers=handlers,
     )
 
     log = logging.getLogger(name)

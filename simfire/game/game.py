@@ -92,9 +92,9 @@ class Game:
         """
         self.show_wind_magnitude = not self.show_wind_magnitude
         if self.show_wind_magnitude is False:
-            print("Wind Magnitude OFF")
+            log.info("Wind Magnitude OFF")
         else:
-            print("Wind Magnitude ON")
+            log.info("Wind Magnitude ON")
         return
 
     def _toggle_wind_direction_display(self):
@@ -103,9 +103,9 @@ class Game:
         """
         self.show_wind_direction = not self.show_wind_direction
         if self.show_wind_direction is False:
-            print("Wind Direction OFF")
+            log.info("Wind Direction OFF")
         else:
-            print("Wind Direction ON")
+            log.info("Wind Direction ON")
         return
 
     def _disable_wind_magnitude_display(self):

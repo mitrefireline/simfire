@@ -3,8 +3,11 @@ from typing import Optional
 import numpy as np
 import pygame
 
+from ...utils.log import create_logger
 from .cfd_wind import Fluid
 from .perlin_wind import WindNoise
+
+log = create_logger(__name__)
 
 pygame.init()
 
@@ -161,7 +164,7 @@ class WindControllerCFD:
             elif self.wind_direction.lower() == "west":
                 self.fvect.addVelocity(1, v, self.wind_speed, 0)
             else:
-                print("Bad source direction input")
+                log.error("Bad source direction input")
 
         self.fvect.step()
         return

@@ -47,7 +47,7 @@ mypy:
   tags:
     - lslab2
   script:
-    - pip install mypy
+    - pip install mypy types-setuptools
     - mypy --config-file pyproject.toml .
   needs: []
   only:

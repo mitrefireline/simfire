@@ -7,7 +7,8 @@ authors = ["Tim Welsh <twelsh@mitre.org>", "Marissa Dotter <mdotter@mitre.org>",
            "Chris Kempis <ckempis@mitre.org>", "Lauren Schambach <lschambach@mitre.org>",
            "Alex Tapley <atapley@mitre.org>", "Michael Threet <mthreet@mitre.org>"]
 readme = "README.md"
-include = ["assets/**/*"]
+include = ["simfire/utils/textures/terrain.jpg"]
+
 keywords = ["python", "reinforcement learning", "simulation", "fire"]
 documentation = "https://fireline.pages.mitre.org/simfire/"
 repository = "https://gitlab.mitre.org/fireline/simfire"
@@ -47,6 +48,7 @@ mypy = "^0.961"
 pre-commit = "^2.19.0"
 pytest = "^7.1.2"
 bandit = "^1.7.4"
+types-setuptools = "^65.3.0"
 
 [tool.black]
 line-length = 90

@@ -10,7 +10,10 @@ from simfire.game.managers.fire import RothermelFireManager
 from simfire.game.managers.mitigation import FireLineManager
 from simfire.game.sprites import Terrain
 from simfire.utils.config import Config
+from simfire.utils.log import create_logger
 from simfire.world.parameters import Environment, FuelParticle
+
+log = create_logger(__name__)
 
 
 def main():
@@ -105,7 +108,7 @@ def main():
     fig = fire_manager.draw_spread_graph(game.screen)
     if cfg.simulation.headless:
         save_path = Path().cwd() / "fire_spread_graph.png"
-        print(
+        log.info(
             "Game is running in a headless state. Saving fire spread "
             f"graph to {save_path}"
         )
@@ -114,14 +117,14 @@ def main():
         fig = fire_manager.draw_spread_graph(game.screen)
         if cfg.simulation.headless:
             save_path = os.curdir + "fire_spread_graph.png"
-            print(
+            log.info(
                 "Game is running in a headless state. Saving fire spread "
                 f"graph to {save_path}"
             )
             fig.savefig(save_path)
         else:
             if "DISPLAY" in os.environ:
-                print(
+                log.info(
                     "Game is running in a non-headless state. Displaying fire spread "
                     f'graph on DISPLAY {os.environ["DISPLAY"]}'
                 )

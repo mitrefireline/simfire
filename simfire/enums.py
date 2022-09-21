@@ -8,15 +8,12 @@ different types of control lines, and the current game status.
 """
 from dataclasses import dataclass
 from enum import Enum, IntEnum, auto
-from importlib import resources
 from pathlib import Path
 from typing import Tuple
 
 import numpy as np
+import pkg_resources
 from PIL import Image
-
-with resources.path("assets.textures", "terrain.jpg") as path:
-    TERRAIN_TEXTURE_PATH: Path = path
 
 from .world.presets import (
     Brush,
@@ -38,6 +35,10 @@ from .world.presets import (
     SouthernRough,
     TallGrass,
     TimberLitterUnderstory,
+)
+
+TERRAIN_TEXTURE_PATH: Path = Path(
+    pkg_resources.resource_filename("simfire.utils.textures", "terrain.jpg")
 )
 
 DRY_TERRAIN_BROWN_IMG: Image.Image = Image.fromarray(

@@ -60,6 +60,24 @@ terrain:
       function: chaparral
       chaparral:
         seed: 1113
+    burn_probability:
+      type: operational
+      functional:
+        function: perlin
+        perlin:
+          octaves: 3
+          persistence: 0.7
+          lacunarity: 2.0
+          seed: 827
+          range_min: 100.0
+          range_max: 300.0
+        gaussian:
+          amplitude: 500
+          mu_x: 50
+          mu_y: 50
+          sigma_x: 50
+          sigma_y: 50
+
 
 fire:
   fire_initial_position:

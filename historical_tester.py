@@ -7,9 +7,10 @@ from src.game.game import Game
 from src.game.managers.fire import RothermelFireManager
 from src.game.managers.mitigation import FireLineManager
 from src.game.sprites import Terrain
+from src.world.parameters import Environment, FuelParticle
+
 from src.utils.config import Config
 from src.utils.units import str_to_minutes
-from src.world.parameters import Environment, FuelParticle
 
 
 def main():

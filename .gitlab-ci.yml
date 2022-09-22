@@ -2,10 +2,17 @@ image: "python:3.9"
 
 before_script:
   - python --version
-  - pip install -r dev-requirements.txt
+  - curl -sSkL https://install.python-poetry.org | python -
+  - export PATH=$PATH:$HOME/.local/bin
+  - poetry --version
+
+.install_dev:
+  script:
+    - poetry install
 
 stages:
   - Static Analysis
+  - Security
   - Tests
   - Documentation
   - Release
@@ -16,8 +23,9 @@ stages:
 flake8:
   stage: Static Analysis
   tags:
-    - docker
+    - lslab2
   script:
+    - pip install flake8
     - flake8 .
   needs: []
   only:
@@ -26,8 +34,9 @@ flake8:
 black:
   stage: Static Analysis
   tags:
-    - docker
+    - lslab2
   script:
+    - pip install black
     - black --check ./
   needs: []
   only:
@@ -36,9 +45,10 @@ black:
 mypy:
   stage: Static Analysis
   tags:
-    - docker
+    - lslab2
   script:
-    - mypy --config-file .mypy.ini .
+    - pip install mypy types-setuptools
+    - mypy --config-file pyproject.toml .
   needs: []
   only:
     - merge_requests
@@ -46,12 +56,29 @@ mypy:
 isort:
   stage: Static Analysis
   tags:
-    - docker
+    - lslab2
   script:
+    - pip install isort
     - isort --check --trailing-comma -m=3 .
   needs: []
   only:
     - merge_requests
+
+
+############
+# Security #
+############
+bandit:
+  stage: Security
+  tags:
+    - lslab2
+  script:
+    - pip install bandit
+    - bandit -r .
+  needs: []
+  only:
+    - merge_requests
+
 
 #########
 # Tests #
@@ -61,17 +88,24 @@ unittests:
   tags:
     - lslab2
   script:
-    - SDL_VIDEODRIVER=dummy python -m unittest discover -s src -t .. -p 'test_*.py'
+    - !reference [.install_dev, script]
+    - SDL_VIDEODRIVER=dummy poetry run pytest --junitxml=report.xml
+  artifacts:
+    when: always
+    reports:
+      junit: report.xml
   needs: []
+  timeout: 15m
   only:
     - merge_requests
 
-game_rothermel.py:
+run_game.py:
   stage: Tests
   tags:
     - lslab2
   script:
-    - SDL_VIDEODRIVER="dummy" python game_rothermel.py
+    - !reference [.install_dev, script]
+    - SDL_VIDEODRIVER="dummy" poetry run python run_game.py
   needs: []
   only:
     - merge_requests
@@ -81,14 +115,18 @@ coverage:
   tags:
   - lslab2
   script:
-    - pip install pytest pytest-cov
-    - SDL_VIDEODRIVER=dummy python -m coverage run -m pytest
-    - SDL_VIDEODRIVER=dummy python -m coverage report
-    - SDL_VIDEODRIVER=dummy python -m coverage xml
+    - poetry install --with coverage
+    - SDL_VIDEODRIVER=dummy poetry run python -m coverage run -m pytest
+    - SDL_VIDEODRIVER=dummy poetry run python -m coverage report
+    - SDL_VIDEODRIVER=dummy poetry run python -m coverage xml
+  coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
   artifacts:
     reports:
-      cobertura: coverage.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
   needs: []
+  timeout: 20m
   only:
     - merge_requests
     - main
@@ -98,14 +136,14 @@ coverage:
 ################
 .pages:
   script:
-    - pip install -U sphinx sphinx-autoapi sphinx-rtd-theme myst-parser
-    - sphinx-build -d docs/build/doctrees docs/source docs/build/html
+    - poetry install --with docs
+    - poetry run sphinx-build -d docs/build/doctrees docs/source docs/build/html
     - mv docs/build/html public/
 
 test-pages:
   stage: Documentation
   tags:
-    - docker
+    - lslab2
   extends: .pages
   needs: []
   artifacts:
@@ -119,59 +157,105 @@ test-pages:
 pages:
   stage: Documentation
   tags:
-    - docker
-    - pages
+    - lslab2
   extends: .pages
   artifacts:
     paths:
       - public
   only:
-    - main
+    - tags
 
 ###########################
 # Packaging and Releasing #
 ###########################
-test-release:
+.commit_version:
+  script:
+    - git remote remove origin
+    - git remote add origin https://oauth2:${CI_TAG_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git
+    - git config --global user.email "fireline-ci-bot@mitre.org"
+    - git config --global user.name "fiReLine CI Bot"
+    - git add pyproject.toml
+    - git commit -m "Change pyproject.toml version to $VERSION"
+    - git push -o ci.skip origin HEAD:main
+
+.check_version_and_commit:
+  script:
+    - POETRY_VERSION=$(poetry version -s)
+    - >
+      if [ $POETRY_VERSION != $CI_COMMIT_TAG ]; then
+        VERSION=$CI_COMMIT_TAG
+        poetry version $VERSION
+        git remote remove origin
+        git remote add origin https://oauth2:${CI_TAG_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git
+        git config --global user.email "fireline-ci-bot@mitre.org"
+        git config --global user.name "fiReLine CI Bot"
+        git add pyproject.toml
+        git commit -m "Change pyproject.toml version to $VERSION"
+        git push -o ci.skip origin HEAD:main
+      fi
+
+test_release:
   stage: Release
   tags:
-    - docker
+    - lslab2
   script:
-    - pip install wheel
-    - python setup.py bdist_wheel
-    - pip install -U dist/*.whl
-    - python tests/package.py
+    - poetry build
+    - poetry run pip install -U dist/*.whl
+    - poetry run python tests/package.py
   needs: []
   only:
     - merge_requests
 
-.release:
-  script:
-    - pip install twine wheel
-    - python setup.py bdist_wheel
-    - TWINE_PASSWORD=${CI_JOB_TOKEN} TWINE_USERNAME=gitlab-ci-token python -m twine upload --verbose --repository-url https://gitlab.mitre.org/api/v4/projects/${CI_PROJECT_ID}/packages/pypi dist/*
-
-.delete-package:
-  script: >
-    apt update -y && apt install jq -y
-
-    delete_api_path=$(curl -H "PRIVATE-TOKEN: ${REGISTRY_DELETE_TOKEN}" "https://gitlab.mitre.org/api/v4/projects/${CI_PROJECT_ID}/packages/" | jq -r '.[] | select(.version=="0.0.0") | ._links.delete_api_path')
-
-    curl --request DELETE -H "PRIVATE-TOKEN: ${REGISTRY_DELETE_TOKEN}" "${delete_api_path}"
-
-release-dev:
+tag:
   stage: Release
   tags:
-    - docker
+    - lslab2
+  before_script:
+    - python --version
+    - pip install poetry
+    - poetry --version
+    - DEBIAN_FRONTEND=noninteractive apt update
+    - DEBIAN_FRONTEND=noninteractive apt -y install php php-json git curl
+    - git --version
   script:
-    - !reference [.delete-package, script]
-    - !reference [.release, script]
+    - poetry version patch
+    - VERSION=$(poetry version -s)
+    - LOG=$(git log -1 | grep -Po '(?<=Resolve ")(.*?)(?=")')
+    - ISSUE=$(git log -1 | grep -Po '(?<=Closes )(.*?).*')
+    - MR=$(git log -1 | grep -Po '(?<=fireline/simfire)(.*?).*')
+    - echo -e "# Version ${VERSION}\n\nThis version includes:\n\n* ${LOG} (closed ${ISSUE} with merge request ${MR})" > RELEASE.md
+    - MESSAGE="$(php -r "echo json_encode(['name' => '$VERSION', 'tag_name' => '$VERSION', 'description' => file_get_contents('RELEASE.md')]);")"
+    - !reference [.commit_version, script]
+    - git tag -a $VERSION -m "$VERSION"
+    - git push origin $VERSION
+    - >
+      curl --header 'Content-Type: application/json' \
+           --header "PRIVATE-TOKEN: ${CI_TAG_TOKEN}" \
+           --data "$MESSAGE" \
+           --request POST https://gitlab.mitre.org/api/v4/projects/${CI_PROJECT_ID}/releases
   only:
     - main
 
-release:
+release_gitlab:
   stage: Release
   tags:
-    - docker
-  extends: .release
+    - lslab2
+  script:
+    - !reference [.check_version_and_commit, script]
+    - poetry build
+    - poetry config repositories.mitre-gitlab https://gitlab.mitre.org/api/v4/projects/${CI_PROJECT_ID}/packages/pypi
+    - poetry publish --repository mitre-gitlab -u gitlab-ci-token -p ${CI_JOB_TOKEN}
+  only:
+    - tags
+
+release_artifactory:
+  stage: Release
+  tags:
+    - lslab2
+  script:
+    - !reference [.check_version_and_commit, script]
+    - poetry build
+    - poetry config repositories.mitre-artifactory https://artifacts.mitre.org/artifactory/api/pypi/python
+    - poetry publish --repository mitre-artifactory -u fireline-ci-bot -p ${CI_ARTIFACTORY_TOKEN}
   only:
     - tags

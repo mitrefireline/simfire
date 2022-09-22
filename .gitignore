@@ -1,3 +1,4 @@
+*.gitignore
 *.pyc
 __pycache__
 .vscode
@@ -7,5 +8,13 @@ dist
 **/*.egg-info
 docs/build
 *.png
+simulation.gif
+*.npy
+*.txt
+topography_tester.py
+download.py
+*.gif
 .coverage
 coverage.xml
+.mypy_cache
+.pytest_cache

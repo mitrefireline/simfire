@@ -10,20 +10,20 @@ import traceback
 from importlib import import_module
 from modulefinder import ModuleFinder
 
-import rothsim
-from rothsim import game, sim, utils, world
-from rothsim.game import managers
+import simfire
+from simfire import game, sim, utils, world
+from simfire.game import managers
 
 # Find all of the submodules
 finder = ModuleFinder()
-sub_modules = ["rothsim." + m for m in finder.find_all_submodules(rothsim)]
-sub_modules += ["rothsim.game." + m for m in finder.find_all_submodules(game)]
+sub_modules = ["simfire." + m for m in finder.find_all_submodules(simfire)]
+sub_modules += ["simfire.game." + m for m in finder.find_all_submodules(game)]
 sub_modules += [
-    "rothsim.game.managers." + m for m in finder.find_all_submodules(managers)
+    "simfire.game.managers." + m for m in finder.find_all_submodules(managers)
 ]
-sub_modules += ["rothsim.utils." + m for m in finder.find_all_submodules(utils)]
-sub_modules += ["rothsim.world." + m for m in finder.find_all_submodules(world)]
-sub_modules += ["rothsim.sim." + m for m in finder.find_all_submodules(sim)]
+sub_modules += ["simfire.utils." + m for m in finder.find_all_submodules(utils)]
+sub_modules += ["simfire.world." + m for m in finder.find_all_submodules(world)]
+sub_modules += ["simfire.sim." + m for m in finder.find_all_submodules(sim)]
 
 # Import all of the found submodules
 for module in sub_modules:

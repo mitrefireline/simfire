@@ -1,8 +1,8 @@
 # Configuring the Simulation
 
-The configuration for the Rothermel simulation is all done through a [YAML](https://yaml.org/) file. All of the configurable settings will be explained in the sections below.
+The configuration for SimFire is all done through a [YAML](https://yaml.org/) file. All of the configurable settings will be explained in the sections below.
 
-This file can have any name, as a path is required to load the configuration file, but the hierarchy of the file must match the hierarchy found in the example [`config.yml`](https://gitlab.mitre.org/fireline/rothermel-modeling/-/blob/master/config.yml). This example configuration can be seen in its entirety at the [bottom of this page](#example-config-file).
+This file can have any name, as a path is required to load the configuration file, but the hierarchy of the file must match the hierarchy found in the example [`config.yml`](https://gitlab.mitre.org/fireline/simfire/-/blob/main/config.yml). This example configuration can be seen in its entirety at the [bottom of this page](#example-config-file).
 
 ## Settings
 
@@ -12,17 +12,11 @@ This file can have any name, as a path is required to load the configuration fil
 
 #### screen_size
 (`int`)<br>
-Determines how large the simulation is in pixels. The `screen_size` sets both the
-height and the width of the screen.
-
-#### terrain_size
-(`int`)<br>
-Number of terrain tiles in each row/column.
+Determines how large the simulation is in pixels. The `screen_size` sets both the height and the width of the screen.
 
 #### pixel_scale
 (`float`)<br>
-The number of feet across that one pixel represents. i.e. for the default value, one
-pixel represents a 50ft x 50ft square of land.
+The number of feet across that one pixel represents. i.e. for the default value, one pixel represents a 50ft x 50ft square of land.
 
 ---
 
@@ -30,13 +24,15 @@ pixel represents a 50ft x 50ft square of land.
 
 #### fire_size
 (`int`)<br>
-The size of the flame/fire size in pixels. Only used for display purposes, and does
-not change fire dynamics.
+The size of the flame/fire size in pixels. Only used for display purposes, and does not change fire dynamics.
 
 #### control_line_size
 (`int`)<br>
-The size of the control lines in pixels. Only used for display purposes, and does not
-change how much space the control line takes up in the simulation.
+The size of the control lines in pixels. Only used for display purposes, and does not change how much space the control line takes up in the simulation.
+
+#### agent_size
+(`int`)<br>
+The size of the agent(s) in pixels. Only used for display purposes, and does not change how much space the agent takes up in the simulation.
 
 ---
 
@@ -44,8 +40,7 @@ change how much space the control line takes up in the simulation.
 
 #### update_rate
 (`float`)<br>
-The number of minutes that each game/frame update represents in simulation time. Note
-that this can be fractional to account for times that are non-integer and/or less than 1.
+The number of minutes that each game/frame update represents in simulation time. Note that this can be fractional to account for times that are non-integer and/or less than 1.
 
 #### runtime
 (`str`)<br>
@@ -55,13 +50,17 @@ The amount of time that the simulation is supposed to run. This can be expressed
 (`bool`)<br>
 Whether or not to run the simulation in a headless state.
 
+#### save_path
+(`str`)<br>
+Where to save GIF recordings and burn graphs of simulation [runs](https://fireline.pages.mitre.org/simfire/autoapi/simfire/sim/simulation/index.html#simfire.sim.simulation.FireSimulation.run). It will create subfolders in `save_path` that are of the format `<month>-<day>-<year>_<hour>-<minute>-<second>` based on when the outputs were saved to file.
+
 ---
 
 ### Mitigation Parameters
 
 #### ros_attenuation
 (`bool`)<br>
-Whether or not to attenuate rate of spread based on the type of line being used. These attenuation values can be seen in [`enums.py`](https://gitlab.mitre.org/fireline/rothermel-modeling/-/blob/master/src/enums.py#L48). These values will be subtracted from the rate of spread for a given pixel based on the control line type. If this value is set to `false`, all lines will completely stop a fire and the rate of spread for any pixel with a control line will be set to zero.
+Whether or not to attenuate rate of spread based on the type of line being used. These attenuation values can be seen in [`enums.py`](https://gitlab.mitre.org/fireline/simfire/-/blob/main/simfire/enums.py#L48). These values will be subtracted from the rate of spread for a given pixel based on the control line type. If this value is set to `false`, all lines will completely stop a fire and the rate of spread for any pixel with a control line will be set to zero.
 
 ---
 
@@ -198,7 +197,7 @@ Defines the Environment class.
 
 #### moisture
 (`float`)<br>
-Used in Rothermel calculation. Most of Southern California has the default value of 0.03.
+Used in simulator fire spread calculation. Most of Southern California has the default value of 0.03.
 
 ---
 
@@ -322,7 +321,7 @@ Whether or not to render with post agent and fire in place.
 
 ## Example Config File
 
-Go [here](https://gitlab.mitre.org/fireline/rothermel-modeling/-/blob/master/configs) for more examples.
+Go [here](https://gitlab.mitre.org/fireline/simfire/-/blob/main/configs) for more examples.
 
 ```yaml
 area:
@@ -332,6 +331,8 @@ area:
 display:
   fire_size: 2
   control_line_size: 2
+  agent_size: 4
+  rescale_size: 225
 
 simulation:
   update_rate: 1

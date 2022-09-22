@@ -1,5 +1,5 @@
 # For a description of config parameters, go to
-# https://fireline.pages.mitre.org/rothermel-modeling/config.html
+# https://fireline.pages.mitre.org/simfire/config.html
 area:
   screen_size: 225
   pixel_scale: 50
@@ -7,12 +7,15 @@ area:
 display:
   fire_size: 2
   control_line_size: 2
+  agent_size: 4
 
 simulation:
   update_rate: 1
   runtime: 24h
   headless: false
+  draw_spread_graph: false
   record: true
+  save_path: "~/.simfire/simulation_outputs"
 
 mitigation:
   ros_attenuation: true
@@ -24,6 +27,13 @@ operational:
   height: 4000
   width: 4000
   resolution: 30
+
+historical:
+  use: false
+  fire_init_pos_lat: 36.095
+  fire_init_pos_long: -120.522
+  name: Mineral
+  year: '2020'
 
 terrain:
   topography:
@@ -51,7 +61,12 @@ terrain:
         seed: 1113
 
 fire:
-  fire_initial_position: (16, 16)
+  fire_initial_position:
+    type: static
+    static:
+      position: (16, 16)
+    random:
+      seed: 1234
   max_fire_duration: 4
 
 environment:

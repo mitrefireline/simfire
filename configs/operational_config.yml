@@ -1,5 +1,5 @@
 # For a description of config parameters, go to
-# https://fireline.pages.mitre.org/rothermel-modeling/config.html
+# https://fireline.pages.mitre.org/simfire/config.html
 area:
   screen_size: 225
   pixel_scale: 50
@@ -7,23 +7,34 @@ area:
 display:
   fire_size: 2
   control_line_size: 2
+  agent_size: 4
+  rescale_size: 512
 
 simulation:
   update_rate: 1
-  runtime: 24h
+  runtime: 15m
   headless: false
+  draw_spread_graph: false
   record: true
+  save_path: "~/.simfire/simulation_outputs"
 
 mitigation:
   ros_attenuation: true
 
 operational:
   seed:
-  latitude: 39.67
-  longitude: 119.8
-  height: 4000
-  width: 4000
+  latitude: 39.095
+  longitude: 120.52
+  height: 2000
+  width: 2000
   resolution: 30
+
+historical:
+  use: true
+  fire_init_pos_lat: 41.11037
+  fire_init_pos_long: -120.923293
+  name: carmel
+  year: '2020'
 
 terrain:
   topography:
@@ -51,7 +62,12 @@ terrain:
         seed: 1113
 
 fire:
-  fire_initial_position: (65, 65)
+  fire_initial_position:
+    type: static
+    static:
+      position: (65, 65)
+    random:
+      seed: 1234
   max_fire_duration: 4
 
 environment:

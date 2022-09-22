@@ -1,3 +1,68 @@
+[tool.poetry]
+name = "simfire"
+version = "1.4.20"
+description = "Fire simulator built in Python"
+authors = ["Tim Welsh <twelsh@mitre.org>", "Marissa Dotter <mdotter@mitre.org>",
+           "Michael Doyle <mdoyle@mitre.org>", "Dhanuj Gandikota <dgandikota@mitre.org>",
+           "Chris Kempis <ckempis@mitre.org>", "Lauren Schambach <lschambach@mitre.org>",
+           "Alex Tapley <atapley@mitre.org>", "Michael Threet <mthreet@mitre.org>"]
+readme = "README.md"
+include = ["simfire/utils/textures/terrain.jpg"]
+
+keywords = ["python", "reinforcement learning", "simulation", "fire"]
+documentation = "https://fireline.pages.mitre.org/simfire/"
+repository = "https://gitlab.mitre.org/fireline/simfire"
+
+[tool.poetry.dependencies]
+python = "~3.9"
+GPUtil = "^1.4.0"
+matplotlib = "^3.5.2"
+noise = "^1.2.2"
+numba = "^0.55.2"
+numpy = "^1.22.4"
+Pillow = "^9.1.1"
+pygame = "^2.1.2"
+PyYAML = "^6.0"
+reportlab = "^3.6.10"
+scikit-image = "^0.19.3"
+svglib = "^1.3.0"
+rich = "^12.5.1"
+geopandas = "^0.11.1"
+
+[tool.poetry.group.coverage.dependencies]
+pytest-cov = "^3.0.0"
+
+[tool.poetry.group.docs.dependencies]
+Sphinx = "^5.0.2"
+sphinx-autoapi = "^1.8.4"
+sphinx-rtd-theme = "^1.0.0"
+myst-parser = "^0.18.0"
+furo = "^2022.6.4.1"
+
+[tool.poetry.group.dev.dependencies]
+black = "^22.3.0"
+certifi = "^2022.6.15"
+flake8 = "^4.0.1"
+isort = "^5.10.1"
+mypy = "^0.961"
+pre-commit = "^2.19.0"
+pytest = "^7.1.2"
+bandit = "^1.7.4"
+types-setuptools = "^65.3.0"
+
 [tool.black]
 line-length = 90
 target-version = ['py39']
+
+[tool.mypy]
+ignore_missing_imports = true
+allow_redefinition = true
+exclude = [
+    '/_tests/',
+    '^generate_cfd_wind_layer\.py$',
+    'tests/'
+]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

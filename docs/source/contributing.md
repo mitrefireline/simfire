@@ -1,22 +1,22 @@
 # Contributing
 
-Contributing to the Rothermel Fire Modeling codebase ([GitLab](https://gitlab.mitre.org/fireline/rothermel-modeling)) requires a process to be followed. This page will explain how to follow that process and will provide some tools to make local development easier.
+Contributing to the SimFire codebase ([GitLab](https://gitlab.mitre.org/fireline/simfire)) requires a process to be followed. This page will explain how to follow that process and will provide some tools to make local development easier.
 
 **Some guidlines**:
-  1. Nobody can commit directly to `master`.
-  2. You must create a merge request in order to publish changes to `master`.
-  3. Before merging, all stages of the GitLab CI pipeline must pass. This includes linting with [`flake8`](https://flake8.pycqa.org/en/latest/) ([config](https://gitlab.mitre.org/fireline/rothermel-modeling/-/blob/master/.flake8)), code-formatting with [`black`](https://github.com/psf/black) ([config](https://gitlab.mitre.org/fireline/rothermel-modeling/-/blob/master/pyproject.toml)), passing the Python unit tests, and creating the documentation.
-  4. Once all pipeline stages have passed, then the branch can be merged into master.
+  1. Nobody can commit directly to `main`.
+  2. You must create a merge request in order to publish changes to `main`.
+  3. Before merging, all stages of the GitLab CI pipeline must pass. This includes linting with [`flake8`](https://flake8.pycqa.org/en/latest/) ([config](https://gitlab.mitre.org/fireline/simfire/-/blob/main/.flake8)), code-formatting with [`black`](https://github.com/psf/black) ([config](https://gitlab.mitre.org/fireline/simfire/-/blob/main/pyproject.toml)), passing the Python unit tests, and creating the documentation.
+  4. Once all pipeline stages have passed, then the branch can be merged into main.
   5. These pipeline stages can be tested locally to ensure that they are passed on the remote side (explained in [Using Pre-commit](#using-pre-commit))
 
 ### Important Docstring Information
 
-Do your best to make sure that all docstrings adhere to the following Google format found in `fire.py` [here](https://gitlab.mitre.org/fireline/rothermel-modeling/-/blob/master/src/game/managers/fire.py). The reasoning can be found [here](https://www.sphinx-doc.org/en/master/usage/extensions/napoleon.html). We're using single quotes instead of double quotes for docstrings.
+Do your best to make sure that all docstrings adhere to the following Google format found in `fire.py` [here](https://gitlab.mitre.org/fireline/simfire/-/blob/main/simfire/game/managers/fire.py). The reasoning can be found [here](https://www.sphinx-doc.org/en/main/usage/extensions/napoleon.html). We're using double quotes for docstrings and strings per the formatting requirements of [`black`](https://github.com/psf/black).
 
-If you are editing a file and see that a docstring doesn't adhere to the Python3 Google Style Guide exemplified in [`fire.py`](https://gitlab.mitre.org/fireline/rothermel-modeling/-/blob/master/src/game/managers/fire.py), please be a good steward and fix it so that it does.
+If you are editing a file and see that a docstring doesn't adhere to the Python3 Google Style Guide exemplified in [`fire.py`](https://gitlab.mitre.org/fireline/simfire/-/blob/main/simfire/game/managers/fire.py), please be a good steward and fix it so that it does.
 
 ## Issue & Merge Request Creation
-Create or assign an issue to yourself at the [Group Issue Board Page](https://gitlab.mitre.org/groups/fireline/-/boards), add the label `Rothermel Model`, and move it to “Doing”.
+Create or assign an issue to yourself at the [Group Issue Board Page](https://gitlab.mitre.org/groups/fireline/-/boards), add the label `SimFire`, and move it to “Doing”.
 
 Create a merge request based on that issue using the "Create Merge Request" button on the issue page.
 
@@ -25,21 +25,26 @@ Create a merge request based on that issue using the "Create Merge Request" butt
 First, clone the repository:
 
 ```shell
-git clone git@gitlab.mitre.org:fireline/rothermel-modeling.git
+git clone git@gitlab.mitre.org:fireline/simfire.git
+```
+
+Install [poetry](https://python-poetry.org/):
+
+```shell
+pip install poetry
 ```
 
 Then, install the **developer** requirements:
 
 ```shell
-pip install -r dev-requirements.txt
+poetry install
 ```
 
-## Using Pre-commit
+## Using Pre-commit (**Highly Recommended**)
 
-If you'd like, you can install [pre-commit](https://pre-commit.com/) to run linting and code-formatting before before you are able to commit. This will ensure that you pass this portion of the remote pipelines when you push to your merge request.
+If you'd like, you can install [pre-commit](https://pre-commit.com/) to run linting and code-formatting before you are able to commit. This will ensure that you pass this portion of the remote pipelines when you push to your merge request.
 
 ```shell
-pip install pre-commit
 pre-commit install
 ```
 
@@ -56,7 +61,7 @@ pre-commit run --all-files
 There are also unit tests that need to be passed, and to make sure you are passing those locally (before pushing to your remote branch and running the pipeline) you can run the following command in the root directory:
 
 ```shell
-python -m unittest discover -s src -t .. -p "test_*.py"
+poetry run pytest
 ```
 
 This will search for all `test_*.py` files and run the tests held in those files.
@@ -66,7 +71,7 @@ This will search for all `test_*.py` files and run the tests held in those files
 If you add a package or module, make sure to create a unit test for it and preferably all classes and functions within it. When creating a package (directory with Python modules), add a `_tests` directory that mirrors the package directory. See the example below:
 
 ```
-src
+simfire
 ├── game
 │   ├── managers
 │   │   ├── __init__.py
@@ -99,17 +104,59 @@ API documentation is autogenerated by [Sphinx AutoAPI](https://sphinx-autoapi.re
 If you'd like to add to this documentation, you can create markdown or `.rst` files in the `docs/source` directory, and **add them to the `index.rst`** under the `toctree`:
 
 ```rst
-Welcome to fiReLine Rothermel Fire Modeler documentation!
-===========================================================
+fiReLine SimFire Fire Simulator
+===============================
+
+Running The Simulation
+----------------------
+:doc:`intro`
+   Introduction to installing and running the simulation.
+
+:doc:`config`
+   The different configuration parameters to set for the simulation and their defaults.
+
+Development
+-----------
+
+:doc:`contributing`
+   How to contribute changes to the codebase or to documentation.
+
+API
+---
+
+:doc:`autoapi/index`
+
+.. Hidden TOCs
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Running the Simulation
+   :hidden:
+
+   intro
+   config
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Development
+   :hidden:
+
+   contributing
 
 .. toctree::
    :maxdepth: 1
-   :caption: Contents:
+   :caption: API Reference
+   :hidden:
 
-   intro.md
-   <Your Markdown or RST file here>
-   contributing.md
-   modules
+   autoapi/index
+
+Indices and tables
+------------------
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
+
 ```
 
 Where your file is located in that `toctree` (Table of Contents Tree) is where the page will exist in the sidebar and on the homepage.
@@ -122,16 +169,16 @@ Every time changes are pushed to a merge request, artifacts will be created that
 
 ### Testing Documentation Locally
 
-In order test documentation locally, you'll first have to install all the necessary packages that are left out of the `requirements.txt` (this is installed automatically during CI):
+In order test documentation locally, you'll first have to install all the necessary packages that are left out of the `poetry install` command (this is installed automatically during CI):
 
 ```shell
-pip install sphinx sphinx-autoapi sphinx-rtd-theme myst-parser
+poetry install -E docs
 ```
 
 Then, you can build the documentation:
 
 ```shell
-sphinx-build -d docs/build/doctrees docs/source docs/build/html
+poetry run sphinx-build -d docs/build/doctrees docs/source docs/build/html
 ```
 
 And view it by opening the `index.html` file located at:

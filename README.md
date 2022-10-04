@@ -21,20 +21,7 @@ For more comprehensive documentation, go to our [docs page](https://fireline.pag
                                     <br>Both fires have winds from the east at 20mph<b></figcaption>
 </figure>
 
-Clone the repository:
-
-```shell
-git clone git@gitlab.mitre.org:fireline/simfire.git
-```
-
-Then, install the requirements:
-
-```shell
-pip install poetry
-poetry install --no-dev
-```
-
-And run the `run_game.py` script:
+Install `simfire` by following the [installation instructions](#installing-the-package). Then run the `run_game.py` script:
 
 ```shell
 python run_game.py

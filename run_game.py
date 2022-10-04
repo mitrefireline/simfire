@@ -23,7 +23,8 @@ def main():
     Create the Managers
     """
 
-    cfg_path = Path("configs/operational_config.yml")
+    cfg_path = Path("configs/functional_config.yml")
+    log.info(f"Starting simulation with {cfg_path}")
     cfg = Config(cfg_path)
 
     fuel_particle = FuelParticle()
@@ -32,19 +33,25 @@ def main():
         rescale_size = (cfg.display.rescale_size, cfg.display.rescale_size)
     else:
         rescale_size = None
+    log.info(f"Creating game with screen size: {cfg.area.screen_size}")
+    log.info(f"Recording: {bool(cfg.simulation.record)}")
     game = Game(
         (cfg.area.screen_size, cfg.area.screen_size),
         rescale_size=rescale_size,
         record=cfg.simulation.record,
     )
 
+    log.info("Loading Terrain...")
     terrain = Terrain(
         cfg.terrain.fuel_layer, cfg.terrain.topography_layer, game.screen_size
     )
+    log.info("Done loading Terrain")
 
+    log.info("Loading Environment...")
     environment = Environment(
         cfg.environment.moisture, cfg.wind.speed, cfg.wind.direction
     )
+    log.info("Done loading environment")
 
     # Need to create two lines to "double up" since the fire can spread
     # to 8-connected squares
@@ -65,6 +72,10 @@ def main():
         pixel_scale=cfg.area.pixel_scale,
         terrain=terrain,
     )
+    log.info(
+        f"Loaded FireLineManager with control line size: {cfg.display.control_line_size}"
+    )
+    log.info(f"Loaded FireLineManager with pixel scale: {cfg.area.pixel_scale}")
 
     fire_map = game.fire_map
     fire_map[cfg.fire.fire_initial_position] = BurnStatus.BURNING
@@ -82,9 +93,20 @@ def main():
         environment,
         max_time=cfg.simulation.runtime,
     )
+    fire_manager_str = str(fire_manager).split(".")[-1].split(" ")[0]
+    log.info(
+        f"Loaded {fire_manager_str} with initial position: "
+        f"{cfg.fire.fire_initial_position}"
+    )
+    log.info(f"Loaded {fire_manager_str} with fire size: {cfg.display.fire_size}")
+    log.info(
+        f"Loaded {fire_manager_str} with fire duration: {cfg.fire.max_fire_duration}"
+    )
+    log.info(f"Loaded {fire_manager_str} with update rate: {cfg.simulation.update_rate}")
 
     game_status = GameStatus.RUNNING
     fire_status = GameStatus.RUNNING
+    log.info("Simulation started")
     while game_status == GameStatus.RUNNING and fire_status == GameStatus.RUNNING:
         fire_sprites = fire_manager.sprites
         fireline_sprites = fireline_manager.sprites
@@ -101,9 +123,12 @@ def main():
         fire_map, fire_status = fire_manager.update(fire_map)
         game.fire_map = fire_map
 
+    log.info("Simulation fininshed")
     if cfg.simulation.record:
         out_path = Path().cwd() / "simulation.gif"
+        log.info(f"Saving {out_path}...")
         game.save(out_path)
+        log.info(f"Saved {out_path}")
 
     fig = fire_manager.draw_spread_graph(game.screen)
     if cfg.simulation.headless:

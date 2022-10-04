@@ -1,8 +1,32 @@
 import logging
 import os
 import sys
+from typing import Union 
 
 from rich.logging import RichHandler
+
+
+class LoggerWriter:
+    """Taken from https://docs.python.org/3.11/howto/logging-cookbook.html
+    """
+    def __init__(self, logger: logging.Logger, level: Union[int, str]) -> None:
+        self.logger = logger
+        self.level = level
+
+    def write(self, message: str) -> None:
+        if message != '\n':  # avoid printing bare newlines, if you like
+            self.logger.log(self.level, message)
+
+    def flush(self) -> None:
+        # doesn't actually do anything, but might be expected of a file-like
+        # object - so optional depending on your situation
+        pass
+
+    def close(self) -> None:
+        # doesn't actually do anything, but might be expected of a file-like
+        # object - so optional depending on your situation. You might want
+        # to set a flag so that later calls to write raise an exception
+        pass
 
 
 def create_logger(name: str) -> logging.Logger:
@@ -21,14 +45,6 @@ def create_logger(name: str) -> logging.Logger:
     if (log_level := os.environ.get("LOGLEVEL")) is None:
         log_level = "INFO"
 
-    # Not really sure why this worked to suppress log output from all modules besides
-    # simfire, but it works so I won't question it too much. - mdoyle
-    stdout_logger = logging.getLogger("STDOUT").addHandler(RichHandler())  # type: ignore
-    stderr_logger = logging.getLogger("STDERR").addHandler(RichHandler())  # type: ignore
-
-    sys.stdout = stdout_logger
-    sys.stderr = stderr_logger
-
     FORMAT = "%(message)s"
     handlers = [RichHandler()]
     logging.basicConfig(
@@ -40,4 +56,5 @@ def create_logger(name: str) -> logging.Logger:
 
     log = logging.getLogger(name)
     log.setLevel(log_level)
+
     return log

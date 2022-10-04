@@ -1,20 +1,18 @@
 import logging
 import os
-import sys
-from typing import Union 
 
 from rich.logging import RichHandler
 
 
 class LoggerWriter:
-    """Taken from https://docs.python.org/3.11/howto/logging-cookbook.html
-    """
-    def __init__(self, logger: logging.Logger, level: Union[int, str]) -> None:
+    """Taken from https://docs.python.org/3.11/howto/logging-cookbook.html"""
+
+    def __init__(self, logger: logging.Logger, level: int) -> None:
         self.logger = logger
         self.level = level
 
     def write(self, message: str) -> None:
-        if message != '\n':  # avoid printing bare newlines, if you like
+        if message != "\n":  # avoid printing bare newlines, if you like
             self.logger.log(self.level, message)
 
     def flush(self) -> None:

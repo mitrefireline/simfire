@@ -27,6 +27,20 @@ class LoggerWriter:
         pass
 
 
+class LogFilter(logging.Filter):
+    """
+    Print all messages that do not include "dealloc" (GPU warning message).
+    """
+
+    def filter(self, record: logging.LogRecord):
+        if "dealloc" in str(getattr(record, "msg")):
+            return False
+        return True
+
+    def __repr__(self):
+        return "LogFilter"
+
+
 def create_logger(name: str) -> logging.Logger:
     """Create a `Logger` to be used in different modules
 
@@ -44,7 +58,9 @@ def create_logger(name: str) -> logging.Logger:
         log_level = "INFO"
 
     FORMAT = "%(message)s"
-    handlers = [RichHandler()]
+    rh = RichHandler()
+    rh.addFilter(LogFilter())
+    handlers = [rh]
     logging.basicConfig(
         level=log_level,
         format=FORMAT,

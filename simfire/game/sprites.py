@@ -8,9 +8,13 @@ import numpy as np
 import pygame
 from reportlab.graphics import renderPM
 from svglib.svglib import svg2rlg
+from wurlitzer import pipes
 
 from ..enums import BURNED_RGB_COLOR, BurnStatus, SpriteLayer
 from ..utils.layers import FuelLayer, HistoricalLayer, TopographyLayer
+from ..utils.log import create_logger
+
+log = create_logger(__name__)
 
 
 class Terrain(pygame.sprite.Sprite):
@@ -153,21 +157,27 @@ class Terrain(pygame.sprite.Sprite):
         # Save the figure as a vector graphic to get just the image (no axes,
         # ticks, figure edges, etc.)
         # Then load it, resize, and convert to numpy
-        with tempfile.NamedTemporaryFile(suffix=".svg") as out_img_path:
-            fig.savefig(out_img_path.name, bbox_inches="tight", pad_inches=0)
-            drawing = svg2rlg(out_img_path.name)
-            # Resize the SVG drawing
-            scale_x = image.shape[1] / drawing.width
-            scale_y = image.shape[0] / drawing.height
-            drawing.width = drawing.width * scale_x
-            drawing.height = drawing.height * scale_y
-            drawing.scale(scale_x, scale_y)
-            # Convert to Pillow
-            # The fmt argument will display the levels as whole numbers (otherwise
-            # sending stdout to devnull to avoid the annoying `x_order_1: collinear!`
-            sys.stdout = open(os.devnull, "w")
-            out_img_pil = renderPM.drawToPIL(drawing)
-            sys.stdout = sys.__stdout__
+        # Added `with pipes():` to get rid of 'colinear!' message output by C library
+        # in svglib:
+        # https://github.com/Distrotech/reportlab/search?q=colinear%21
+        with pipes():
+            with tempfile.NamedTemporaryFile(suffix=".svg") as out_img_path:
+                fig.savefig(out_img_path.name, bbox_inches="tight", pad_inches=0)
+
+                drawing = svg2rlg(out_img_path.name)
+
+                # Resize the SVG drawing
+                scale_x = image.shape[1] / drawing.width
+                scale_y = image.shape[0] / drawing.height
+                drawing.width = drawing.width * scale_x
+                drawing.height = drawing.height * scale_y
+                drawing.scale(scale_x, scale_y)
+                # Convert to Pillow
+                # The fmt argument will display the levels as whole numbers (otherwise
+                # sending stdout to devnull to avoid the annoying `x_order_1: collinear!`
+                sys.stdout = open(os.devnull, "w")
+                out_img_pil = renderPM.drawToPIL(drawing)
+                sys.stdout = sys.__stdout__
         plt.close(fig)
         # Slice the alpha channel off
         out_img = np.array(out_img_pil, dtype=np.uint8)[..., :3]

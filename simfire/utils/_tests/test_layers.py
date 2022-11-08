@@ -207,14 +207,14 @@ class TestOperationalTopographyLayer(unittest.TestCase):
         """
         resolution = 30
         # Single Tile
-        center = (35.2, 115.6)
+        center = (35.2, 119.6)
         height, width = 1600, 1600
         lat_long_box = LatLongBox(center, height, width, resolution)
         topographyGen = OperationalTopographyLayer(lat_long_box)
         self.assertEqual(1, len(topographyGen.tif_filenames))
 
         # 2 Tiles
-        center = (38.4, 115.0)
+        center = (37.4, 115.0)
         height, width = 1600, 1600
         lat_long_box = LatLongBox(center, height, width, resolution)
         topographyGen = OperationalTopographyLayer(lat_long_box)
@@ -273,7 +273,7 @@ class TestOperationalFuelLayer(unittest.TestCase):
         """
         resolution = 30
         # 2 Tiles (easternly)
-        center = (33.4, 115.04)
+        center = (33.4, 116.04)
         height, width = 3200, 3200
         lat_long_box = LatLongBox(center, height, width, resolution)
         FuelGen = OperationalFuelLayer(lat_long_box)
@@ -293,14 +293,14 @@ class TestOperationalFuelLayer(unittest.TestCase):
         self.assertEqual(1, len(FuelGen.tif_filenames))
 
         # 2 Tiles
-        center = (38.4, 118.0)
+        center = (37.4, 118.0)
         height, width = 1600, 1600
         lat_long_box = LatLongBox(center, height, width, resolution)
         FuelGen = OperationalFuelLayer(lat_long_box)
         self.assertEqual(2, len(FuelGen.tif_filenames))
 
         # 4 Tiles
-        center = (34.001, 116.008)
+        center = (32.001, 116.008)
         height, width = 3200, 3200
         lat_long_box = LatLongBox(center, height, width, resolution)
         FuelGen = OperationalFuelLayer(lat_long_box)

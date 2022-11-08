@@ -28,10 +28,19 @@ First, clone the repository:
 git clone git@gitlab.mitre.org:fireline/simfire.git
 ```
 
-Install [poetry](https://python-poetry.org/):
+Create a conda environment (preferred):
 
 ```shell
-pip install poetry
+conda create -n sf python=3.9
+```
+
+Install [poetry](https://python-poetry.org/) and activate the conda environment:
+
+```shell
+curl -sSL https://install.python-poetry.org | python -
+echo "export PATH=$PATH:$HOME/.local/bin" >> $HOME/.bashrc
+source $HOME/.bashrc
+conda activate sf
 ```
 
 Then, install the **developer** requirements:
@@ -172,7 +181,7 @@ Every time changes are pushed to a merge request, artifacts will be created that
 In order test documentation locally, you'll first have to install all the necessary packages that are left out of the `poetry install` command (this is installed automatically during CI):
 
 ```shell
-poetry install -E docs
+poetry install --with docs
 ```
 
 Then, you can build the documentation:

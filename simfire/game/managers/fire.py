@@ -7,7 +7,7 @@ Defines the different `FireManager`s (`ConstantSpreadFireManager` and
 """
 import collections
 from dataclasses import astuple
-from typing import Any, List, Sequence, Tuple, Union
+from typing import Any, List, Optional, Sequence, Tuple, Union
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -283,7 +283,7 @@ class RothermelFireManager(FireManager):
         fuel_particle: FuelParticle,
         terrain: Terrain,
         environment: Environment,
-        max_time: int = None,
+        max_time: Optional[int] = None,
         attenuate_line_ros: bool = True,
         headless: bool = False,
     ) -> None:
@@ -559,7 +559,9 @@ class RothermelFireManager(FireManager):
 
         return fire_map
 
-    def draw_spread_graph(self, game_screen: pygame.surface.Surface = None) -> plt.Figure:
+    def draw_spread_graph(
+        self, game_screen: Optional[pygame.surface.Surface] = None
+    ) -> plt.Figure:
         """
         Create a matplotlib Figure with the fire spread graph overlain on the
         terrain image.

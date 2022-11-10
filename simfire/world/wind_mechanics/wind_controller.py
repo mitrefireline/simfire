@@ -111,7 +111,7 @@ class WindControllerCFD:
         timestep: float = 1.0,
         diffusion: float = 0.0,
         viscosity: float = 0.0000001,
-        terrain_features: np.ndarray = None,
+        terrain_features: Optional[np.ndarray] = None,
         wind_speed: float = 27.0,
         wind_direction: str = "north",
         time_to_train: int = 1000,

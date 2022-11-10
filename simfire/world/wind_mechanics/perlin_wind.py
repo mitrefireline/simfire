@@ -1,3 +1,5 @@
+from typing import Optional
+
 import numpy as np
 from noise import snoise2
 
@@ -10,7 +12,7 @@ class WindNoise:
 
     def __init__(
         self,
-        seed: int = None,
+        seed: Optional[int] = None,
         scale: int = 100,
         octaves: int = 2,
         persistence: float = 0.5,

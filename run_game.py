@@ -130,7 +130,6 @@ def main():
         game.save(out_path)
         log.info(f"Saved {out_path}")
 
-    fig = fire_manager.draw_spread_graph(game.screen)
     if cfg.simulation.headless:
         save_path = Path().cwd() / "fire_spread_graph.png"
         log.info(
@@ -139,6 +138,7 @@ def main():
         )
 
     if cfg.simulation.draw_spread_graph:
+        log.info("Drawing fire spread graph...")
         fig = fire_manager.draw_spread_graph(game.screen)
         if cfg.simulation.headless:
             save_path = os.curdir + "fire_spread_graph.png"

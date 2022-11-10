@@ -74,7 +74,7 @@ class Game:
                 self.display_screen = pygame.display.set_mode(self.rescale_size)
             self.screen = pygame.Surface(self.screen_size)
             pygame.display.set_caption("SimFire")
-            with resources.path("assets.icons", "fireline_logo.png") as path:
+            with resources.path("simfire.utils.assets", "fireline_logo.png") as path:
                 fireline_logo_path = path
             pygame.display.set_icon(load_image(str(fireline_logo_path)))
 

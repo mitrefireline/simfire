@@ -1,4 +1,4 @@
-from typing import List, Sequence, Tuple, Union
+from typing import List, Optional, Sequence, Tuple, Union
 
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -151,7 +151,7 @@ class FireSpreadGraph:
 
     def draw(
         self,
-        background_image: np.ndarray = None,
+        background_image: Optional[np.ndarray] = None,
         show_longest_path: bool = True,
         use_heatmap: bool = True,
     ) -> plt.Figure:

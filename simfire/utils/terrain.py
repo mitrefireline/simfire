@@ -6,7 +6,9 @@ from ..enums import FuelConstants
 from ..world.parameters import Fuel
 
 
-def random_seed_list(length: int, seed: int = None) -> Tuple[Tuple[int, ...], ...]:
+def random_seed_list(
+    length: int, seed: Optional[int] = None
+) -> Tuple[Tuple[int, ...], ...]:
     """
     Create a tuple of tuples  of random integers (to be used as seeds) based on `length`
     and initial input `seed`

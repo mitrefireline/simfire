@@ -31,7 +31,7 @@ class Terrain(pygame.sprite.Sprite):
         topo_layer: TopographyLayer,
         screen_size: Tuple[int, int],
         headless: bool = False,
-        hist_layer: HistoricalLayer = None,
+        hist_layer: Optional[HistoricalLayer] = None,
     ) -> None:
 
         super().__init__()

@@ -1,4 +1,4 @@
-from typing import Callable
+from typing import Callable, Optional
 
 from ..utils.terrain import chaparral
 from .parameters import Fuel
@@ -6,7 +6,7 @@ from .parameters import Fuel
 FuelArrayFn = Callable[[float, float], Fuel]
 
 
-def chaparral_fn(seed: int = None) -> FuelArrayFn:
+def chaparral_fn(seed: Optional[int] = None) -> FuelArrayFn:
     """
     Return a callable that accepts (x, y) coordinates and returns a Fuel with
     Chaparral characterisitics at that coordinate

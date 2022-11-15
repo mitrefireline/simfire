@@ -8,7 +8,7 @@ before_script:
 
 .install_dev:
   script:
-    - poetry install
+    - poetry install --without docs
 
 stages:
   - Static Analysis
@@ -25,8 +25,8 @@ flake8:
   tags:
     - lslab2
   script:
-    - pip install flake8
-    - flake8 .
+    - poetry install --only dev
+    - poetry run flake8 .
   needs: []
   only:
     - merge_requests
@@ -36,8 +36,8 @@ black:
   tags:
     - lslab2
   script:
-    - pip install black
-    - black --check ./
+    - poetry install --only dev
+    - poetry run black --check ./
   needs: []
   only:
     - merge_requests
@@ -47,8 +47,8 @@ mypy:
   tags:
     - lslab2
   script:
-    - pip install mypy types-setuptools
-    - mypy --config-file pyproject.toml .
+    - poetry install --only dev
+    - poetry run mypy --config-file pyproject.toml .
   needs: []
   only:
     - merge_requests
@@ -58,8 +58,8 @@ isort:
   tags:
     - lslab2
   script:
-    - pip install isort
-    - isort --check --trailing-comma -m=3 .
+    - poetry install --only dev
+    - poetry run isort --check --trailing-comma -m=3 .
   needs: []
   only:
     - merge_requests
@@ -73,8 +73,8 @@ bandit:
   tags:
     - lslab2
   script:
-    - pip install bandit
-    - bandit -r .
+    - poetry install --only dev
+    - poetry run bandit -r .
   needs: []
   only:
     - merge_requests
@@ -136,7 +136,7 @@ coverage:
 ################
 .pages:
   script:
-    - poetry install --with docs
+    - poetry install --only docs
     - poetry run sphinx-build -d docs/build/doctrees docs/source docs/build/html
     - mv docs/build/html public/
 
@@ -215,7 +215,8 @@ tag:
     - lslab2
   before_script:
     - python --version
-    - pip install poetry
+    - curl -sSkL https://install.python-poetry.org | python -
+    - export PATH=$PATH:$HOME/.local/bin
     - poetry --version
     - DEBIAN_FRONTEND=noninteractive apt update
     - DEBIAN_FRONTEND=noninteractive apt -y install php php-json git curl

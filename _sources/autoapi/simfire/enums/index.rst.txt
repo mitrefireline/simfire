@@ -1,0 +1,330 @@
+:py:mod:`simfire.enums`
+=======================
+
+.. py:module:: simfire.enums
+
+.. autoapi-nested-parse::
+
+   Enums
+   =====
+
+   Contains many enumeration classes for use throughout `rothermel_model` that depict pixel
+   burn status, the ordering of sprite layers, how much to attenuate the rate of spread on
+   different types of control lines, and the current game status.
+
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   simfire.enums.BurnStatus
+   simfire.enums.RoSAttenuation
+   simfire.enums.SpriteLayer
+   simfire.enums.GameStatus
+   simfire.enums.FuelConstants
+   simfire.enums.ElevationConstants
+   simfire.enums.WindConstants
+
+
+
+
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   simfire.enums.TERRAIN_TEXTURE_PATH
+   simfire.enums.DRY_TERRAIN_BROWN_IMG
+   simfire.enums.BURNED_RGB_COLOR
+   simfire.enums.FuelModelToFuel
+   simfire.enums.FuelModelRGB13
+   simfire.enums.HandLineRate
+   simfire.enums.DozerType
+   simfire.enums.DozerLineRates
+   simfire.enums.AirTankerType
+   simfire.enums.AirTankerRates
+   simfire.enums.HelicopterTypes
+   simfire.enums.HelicopterRates
+
+
+.. py:data:: TERRAIN_TEXTURE_PATH
+   :annotation: :pathlib.Path
+
+   
+
+.. py:data:: DRY_TERRAIN_BROWN_IMG
+   :annotation: :PIL.Image.Image
+
+   
+
+.. py:data:: BURNED_RGB_COLOR
+   :annotation: :Tuple[int, int, int] = [139, 69, 19]
+
+   
+
+.. py:class:: BurnStatus
+
+   Bases: :py:obj:`enum.IntEnum`
+
+   The status of each pixel in a `fire_map`
+
+   Current statuses are:
+       - UNBURNED
+       - BURNING
+       - BURNED
+       - FIRELINE
+       - SCRATCHLINE
+       - WETLINE
+
+   Initialize self.  See help(type(self)) for accurate signature.
+
+   .. py:attribute:: UNBURNED
+      :annotation: :int = 0
+
+      
+
+   .. py:attribute:: BURNING
+      :annotation: :int
+
+      
+
+   .. py:attribute:: BURNED
+      :annotation: :int
+
+      
+
+   .. py:attribute:: FIRELINE
+      :annotation: :int
+
+      
+
+   .. py:attribute:: SCRATCHLINE
+      :annotation: :int
+
+      
+
+   .. py:attribute:: WETLINE
+      :annotation: :int
+
+      
+
+
+.. py:class:: RoSAttenuation
+
+   The factor by which to attenuate the rate of spread (RoS), based on control line
+   type
+
+   The only classes that are attenuated are the different control lines:
+       - FIRELINE
+       - SCRATCHLINE
+       - WETLINE
+
+   .. py:attribute:: FIRELINE
+      :annotation: :float = 980
+
+      
+
+   .. py:attribute:: SCRATCHLINE
+      :annotation: :float = 490
+
+      
+
+   .. py:attribute:: WETLINE
+      :annotation: :float = 245
+
+      
+
+
+.. py:class:: SpriteLayer
+
+   Bases: :py:obj:`enum.IntEnum`
+
+   The types of layers for sprites
+
+   This determines the order with which sprites are layered and displayed on top of each
+   other. The higher the number, the closer to the top of the layer stack. From bottom
+   to top:
+       - TERRAIN
+       - FIRE
+       - LINE
+       - AGENT
+
+   Initialize self.  See help(type(self)) for accurate signature.
+
+   .. py:attribute:: TERRAIN
+      :annotation: :int = 1
+
+      
+
+   .. py:attribute:: FIRE
+      :annotation: :int = 2
+
+      
+
+   .. py:attribute:: LINE
+      :annotation: :int = 3
+
+      
+
+   .. py:attribute:: AGENT
+      :annotation: :int = 4
+
+      
+
+
+.. py:class:: GameStatus
+
+   Bases: :py:obj:`enum.Enum`
+
+   The different statuses that the game can be in
+
+   Currently it can only be in the following modes:
+       - QUIT
+       - RUNNING
+
+   .. py:attribute:: QUIT
+      
+
+      
+
+   .. py:attribute:: RUNNING
+      
+
+      
+
+
+.. py:class:: FuelConstants
+
+   Constants to be used in the file and can be imported for reference.
+
+   :param W_0_MIN: Oven-dry Fuel Load (lb/ft^2) minimum.
+   :param W_0_MAX: Oven-dry Fuel Load (lb/ft^2) maximum.
+   :param DELTA: Fuel bed depth (ft) min and max.
+   :param M_X: Dead fuel moisture of extinction min and max.
+   :param SIGMA: Surface-area-to-volume ratio (ft^2/ft^3) min and max.
+
+   .. py:attribute:: W_0_MIN
+      :annotation: :float = 0.2
+
+      
+
+   .. py:attribute:: W_0_MAX
+      :annotation: :float = 0.6
+
+      
+
+   .. py:attribute:: DELTA
+      :annotation: :float = 6.0
+
+      
+
+   .. py:attribute:: M_X
+      :annotation: :float = 0.2
+
+      
+
+   .. py:attribute:: SIGMA
+      :annotation: :int = 1739
+
+      
+
+
+.. py:class:: ElevationConstants
+
+   Constants to be used in the file and can be imported for reference.
+
+   Paremeters:
+       MIN_ELEVATION: Minimum elevation (ft). Based on the elevation of Death Valley,
+                      the lowest point in California and the US in general.
+       MAX_ELEVATION: Maximum elevation (ft). Based on the elevation of the treeline in
+                      California.
+       MEAN_ELEVATION: Mean elevation (ft). Based on the average elevation of California.
+                       From `NRC.gov <https://www.nrc.gov/docs/ML1408/ML14086A640.pdf>`_.
+
+   .. py:attribute:: MIN_ELEVATION
+      :annotation: :int
+
+      
+
+   .. py:attribute:: MAX_ELEVATION
+      :annotation: :int = 11000
+
+      
+
+   .. py:attribute:: MEAN_ELEVATION
+      :annotation: :int = 2500
+
+      
+
+
+.. py:class:: WindConstants
+
+   Constants to be used in the file and can be imported for reference.
+
+   Paremeters:
+       MIN_SPEED: Minimum wind speed (mph).
+       MAX_SPEED: Maximum wind speed (mph). The maximum recorded wind speed in CA is 209
+                  mph, so to be safe, let's set it to 250. You never know with climate
+                  change.
+
+   .. py:attribute:: MIN_SPEED
+      :annotation: :int = 0
+
+      
+
+   .. py:attribute:: MAX_SPEED
+      :annotation: :int = 250
+
+      
+
+
+.. py:data:: FuelModelToFuel
+   
+
+   
+
+.. py:data:: FuelModelRGB13
+   
+
+   
+
+.. py:data:: HandLineRate
+   
+
+   
+
+.. py:data:: DozerType
+   
+
+   
+
+.. py:data:: DozerLineRates
+   
+
+   
+
+.. py:data:: AirTankerType
+   
+
+   
+
+.. py:data:: AirTankerRates
+   
+
+   
+
+.. py:data:: HelicopterTypes
+   
+
+   
+
+.. py:data:: HelicopterRates
+   
+
+   
+

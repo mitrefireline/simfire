@@ -1,0 +1,77 @@
+:py:mod:`simfire.world.wind_mechanics.cfd_wind`
+===============================================
+
+.. py:module:: simfire.world.wind_mechanics.cfd_wind
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   simfire.world.wind_mechanics.cfd_wind.Fluid
+
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   simfire.world.wind_mechanics.cfd_wind.set_bnd
+   simfire.world.wind_mechanics.cfd_wind.lin_solve
+   simfire.world.wind_mechanics.cfd_wind.diffuse
+   simfire.world.wind_mechanics.cfd_wind.project
+   simfire.world.wind_mechanics.cfd_wind.advect
+
+
+
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   simfire.world.wind_mechanics.cfd_wind.terrain_features
+
+
+.. py:data:: terrain_features
+   :annotation: :numpy.ndarray
+
+   
+
+.. py:class:: Fluid(n, iterations, scale, dt, diffusion, viscosity, terrain)
+
+   .. py:method:: addDensity(x, y, amount)
+
+
+   .. py:method:: addVelocity(x, y, amountX, amountY)
+
+
+   .. py:method:: step()
+
+
+   .. py:method:: renderD(surface)
+
+
+   .. py:method:: renderV(surface)
+
+
+
+.. py:function:: set_bnd(b, x, N)
+
+
+.. py:function:: lin_solve(b, x, x0, a, c, itr, N)
+
+
+.. py:function:: diffuse(b, x, x0, diff, dt, itr, N)
+
+
+.. py:function:: project(velocX, velocY, p, div, itr, N)
+
+
+.. py:function:: advect(b, d, d0, velocX, velocY, dt, N)
+
+

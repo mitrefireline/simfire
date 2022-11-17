@@ -1,0 +1,74 @@
+:py:mod:`simfire.world.elevation_functions`
+===========================================
+
+.. py:module:: simfire.world.elevation_functions
+
+
+Module Contents
+---------------
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   simfire.world.elevation_functions.flat
+   simfire.world.elevation_functions.gaussian
+   simfire.world.elevation_functions.perlin
+
+
+
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   simfire.world.elevation_functions.ElevationFn
+
+
+.. py:data:: ElevationFn
+   
+
+   
+
+.. py:function:: flat()
+
+   Create a callable that returns 0 for all elevations.
+
+   :returns: A callable that computes z values for (x, y) inputs
+
+
+.. py:function:: gaussian(amplitude, mu_x, mu_y, sigma_x, sigma_y)
+
+   Create a callable that returns the value of a Gaussian centered at (mu_x, mu_y) with
+   variances given by sigma_x and sigma_y. The input A will modify the final amplitude.
+
+   :param amplitude: The Gaussian amplitude
+   :param mu_x: The mean/center in the x direction
+   :param mu_y: The mean/center in the y direction
+   :param sigma_x: The variance in the x direction
+   :param sigma_y: The variance in the y direction
+
+   :returns: A callabe that computes z values for (x, y) inputs
+
+
+.. py:function:: perlin(octaves, persistence, lacunarity, seed, range_min, range_max)
+
+   Create a callable that returns the value of a 2D Perlin noise function.
+
+   :param octaves: specifies the number of passes, defaults to 1 (simple noise).
+   :param persistence: specifies the amplitude of each successive octave relative
+                       to the one below it. Defaults to 0.5 (each higher octave's amplitude
+                       is halved). Note the amplitude of the first pass is always 1.0.
+   :param lacunarity: specifies the frequency of each successive octave relative
+                      to the one below it, similar to persistence. Defaults to 2.0.
+   :param seed: The seed to used to generate random terrain. `seed` takes the place of the
+                `base` argument in the `snoise2()` function, which adds offsets to the
+                input (x, y) coordinates to get new terrain
+   :param range_min: The minimum amplitude to scale to
+   :param range_max: The maximum amplitude to scale to
+
+   :returns: A callable that computes Perlin Noise z-values for (x, y) inputs
+
+

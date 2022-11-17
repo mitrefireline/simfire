@@ -1,0 +1,228 @@
+:py:mod:`simfire.utils.layers`
+==============================
+
+.. py:module:: simfire.utils.layers
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   simfire.utils.layers.LatLongBox
+   simfire.utils.layers.DataLayer
+   simfire.utils.layers.TopographyLayer
+   simfire.utils.layers.OperationalTopographyLayer
+   simfire.utils.layers.FunctionalTopographyLayer
+   simfire.utils.layers.FuelLayer
+   simfire.utils.layers.OperationalFuelLayer
+   simfire.utils.layers.FunctionalFuelLayer
+   simfire.utils.layers.HistoricalLayer
+
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   simfire.utils.layers.round_up_to_multiple
+   simfire.utils.layers.round_down_to_multiple
+
+
+
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   simfire.utils.layers.log
+
+
+.. py:data:: log
+   
+
+   
+
+.. py:function:: round_up_to_multiple(number, multiple)
+
+   Round up to the nearest multiple of `multiple`
+
+   :param number: The number to round up.
+   :param multiple: The multiple to round up to.
+
+   :returns: The rounded up number.
+
+
+.. py:function:: round_down_to_multiple(num, divisor)
+
+   Round down to the nearest multiple of `divisor`
+
+   :param num: The number to round down.
+   :param divisor: The divisor to round down to.
+
+   :returns: The rounded down number.
+
+
+.. py:class:: LatLongBox(center = (32.1, 115.8), height = 1600, width = 1600, resolution = 30)
+
+   Class that creates a square coordinate box using a center lat/long point.
+   This is used by any DataLayer that needs real coordinates to access data.
+
+   This class of methods will get initialized with the config using the lat/long
+   bounding box.
+
+   Real-world is measured in meters
+   Data is measured in pixels corresponding to the resolution
+       i.e: resolution = 10m = 1 pixel
+
+   It will get corresponding topographic data from the MERIT DEM:
+   5 x 5 degree tiles
+   3 arc second (90m) resolution
+
+   It will get corresponding topographic data from the USGS DEM:
+   1 x 1 degree tiles
+   1/ 3 arc second (10m) resolution
+
+   1 x 1 degree tiles
+   1 arc second (30m) resolution
+
+   :param center: The lat/long coordinates of the center point of the screen
+   :param height: The height of one side of the screen (meters)
+   :param width: The width of one side of the screen (meters)
+   :param resolution: The resolution to get data (meters)
+
+   TODO: This method only creates a square, needs re-tooling to create a rectangle
+
+
+.. py:class:: DataLayer
+
+   Base class for any data that affects the terrain.
+   The data in this class should have a value for every pixel in the terrain.
+
+   This parent class only exists to set a base value for self.data
+
+
+.. py:class:: TopographyLayer
+
+   Bases: :py:obj:`DataLayer`
+
+   Base class for use with operational and procedurally generated
+   topographic/elevation data. This class implements the code needed to
+   create the contour image to use with the display.
+
+   Simple call to the parent DataLayer class.
+
+   :param None:
+
+   :returns: None
+
+
+.. py:class:: OperationalTopographyLayer(lat_long_box)
+
+   Bases: :py:obj:`TopographyLayer`
+
+   Base class for use with operational and procedurally generated
+   topographic/elevation data. This class implements the code needed to
+   create the contour image to use with the display.
+
+   Initialize the elevation layer by retrieving the correct topograpchic data
+   and computing the area
+
+   :param center: The lat/long coordinates of the center point of the screen.
+   :param height: The height of the screen size (meters).
+   :param width: The width of the screen size (meters).
+   :param resolution: The resolution to get data (meters).
+
+
+.. py:class:: FunctionalTopographyLayer(height, width, elevation_fn, name)
+
+   Bases: :py:obj:`TopographyLayer`
+
+   Layer that stores elevation data computed from a function.
+
+   Initialize the elvation layer by computing the elevations and contours.
+
+   :param height: The height of the data layer
+   :param width: The width of the data layer
+   :param elevation_fn: A callable function that converts (x, y) coorindates to
+                        elevations.
+
+
+.. py:class:: FuelLayer
+
+   Bases: :py:obj:`DataLayer`
+
+   Base class for use with operational and procedurally generated
+   fuel data. This class implements the code needed to
+   create the terrain image to use with the display.
+
+   Simple call to the parent DataLayer class.
+
+   :param None:
+
+   :returns: None
+
+
+.. py:class:: OperationalFuelLayer(lat_long_box, type = '13')
+
+   Bases: :py:obj:`FuelLayer`
+
+   Base class for use with operational and procedurally generated
+   fuel data. This class implements the code needed to
+   create the terrain image to use with the display.
+
+   Initialize the elevation layer by retrieving the correct topograpchic data
+   and computing the area.
+
+   :param center: The lat/long coordinates of the center point of the screen
+   :param height: The height of the screen size (meters)
+   :param width: The width of the screen size (meters)
+   :param resolution: The resolution to get data (meters)
+   :param type: The type of data you wnt to load: 'display' or 'simulation'
+                display: rgb data for simulator
+                simulation: fuel model values for RL Harness/Simulation
+
+
+.. py:class:: FunctionalFuelLayer(height, width, fuel_fn, name)
+
+   Bases: :py:obj:`FuelLayer`
+
+   Layer that stores fuel data computed from a function.
+
+   Initialize the fuel layer by computing the fuels.
+
+   :param height: The height of the data layer
+   :param width: The width of the data layer
+   :param fuel_fn: A callable function that converts (x, y) coorindates to
+                   elevations.
+   :param name: The name of the fuel layer (e.g.: 'chaparral')
+
+
+.. py:class:: HistoricalLayer(fire_init_pos, fire_name = 'Mineral', year = '2020')
+
+   Bases: :py:obj:`DataLayer`
+
+   Base class for use with operational and procedurally generated
+   fuel data. This class implements the code needed to
+   create the terrain image to use with the display.
+
+   TODO: Add ability to start mitigations during simulation runtime
+   TODO: Update database with validated information on start, end time
+   TODO: Update lines database with validated start end times
+           if start/end time are not within start/end time of fire:
+               1: if both, ignore data point
+               2: if either, use start/end to bound it
+   TODO: Add fire start init position to database
+   TODO: Add wind shapefile
+
+   Simple call to the parent DataLayer class.
+
+   :param None:
+
+   :returns: None
+
+

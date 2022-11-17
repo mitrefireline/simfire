@@ -1,0 +1,851 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Contributing" href="contributing.html" /><link rel="prev" title="Introduction" href="intro.html" />
+
+    <link rel="shortcut icon" href="_static/favicon.ico"/><meta name="generator" content="sphinx-5.3.0, furo 2022.09.29"/>
+        <title>Configuring the Simulation - SimFire latest documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=d81277517bee4d6b0349d71bb2661d4890b5617c" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">SimFire latest documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand centered" href="index.html">
+  
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo" src="_static/rl_logo.png" alt="Logo"/>
+  </div>
+  
+  <span class="sidebar-brand-text">SimFire latest documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Running the Simulation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Configuring the Simulation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="autoapi/index.html">API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="autoapi/simfire/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="autoapi/simfire/game/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.game</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4 has-children"><a class="reference internal" href="autoapi/simfire/game/managers/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.game.managers</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l5"><a class="reference internal" href="autoapi/simfire/game/managers/fire/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.game.managers.fire</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="autoapi/simfire/game/managers/mitigation/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.game.managers.mitigation</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/simfire/game/game/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.game.game</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/simfire/game/image/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.game.image</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/simfire/game/sprites/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.game.sprites</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="autoapi/simfire/sim/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.sim</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/simfire/sim/simulation/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.sim.simulation</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="autoapi/simfire/utils/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/simfire/utils/assets/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.assets</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/simfire/utils/textures/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.textures</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/simfire/utils/config/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/simfire/utils/decorators/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.decorators</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/simfire/utils/generate_cfd_wind_layer/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.generate_cfd_wind_layer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/simfire/utils/graph/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.graph</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/simfire/utils/layers/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.layers</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/simfire/utils/log/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.log</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/simfire/utils/terrain/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.terrain</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/simfire/utils/units/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.units</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="autoapi/simfire/world/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4 has-children"><a class="reference internal" href="autoapi/simfire/world/wind_mechanics/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world.wind_mechanics</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" role="switch" type="checkbox"/><label for="toctree-checkbox-8"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l5"><a class="reference internal" href="autoapi/simfire/world/wind_mechanics/cfd_wind/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world.wind_mechanics.cfd_wind</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="autoapi/simfire/world/wind_mechanics/perlin_wind/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world.wind_mechanics.perlin_wind</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="autoapi/simfire/world/wind_mechanics/wind_controller/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world.wind_mechanics.wind_controller</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/simfire/world/elevation_functions/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world.elevation_functions</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/simfire/world/fuel_array_functions/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world.fuel_array_functions</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/simfire/world/parameters/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world.parameters</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/simfire/world/presets/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world.presets</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/simfire/world/rothermel/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world.rothermel</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="autoapi/simfire/enums/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.enums</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <section id="configuring-the-simulation">
+<h1>Configuring the Simulation<a class="headerlink" href="#configuring-the-simulation" title="Permalink to this heading">#</a></h1>
+<p>The configuration for SimFire is all done through a <a class="reference external" href="https://yaml.org/">YAML</a> file. All of the configurable settings will be explained in the sections below.</p>
+<p>This file can have any name, as a path is required to load the configuration file, but the hierarchy of the file must match the hierarchy found in the example <a class="reference external" href="https://gitlab.mitre.org/fireline/simfire/-/blob/main/config.yml"><code class="docutils literal notranslate"><span class="pre">config.yml</span></code></a>. This example configuration can be seen in its entirety at the <span class="xref myst">bottom of this page</span>.</p>
+<section id="settings">
+<h2>Settings<a class="headerlink" href="#settings" title="Permalink to this heading">#</a></h2>
+<hr class="docutils" />
+<section id="area-parameters">
+<h3>Area Parameters<a class="headerlink" href="#area-parameters" title="Permalink to this heading">#</a></h3>
+<section id="screen-size">
+<h4>screen_size<a class="headerlink" href="#screen-size" title="Permalink to this heading">#</a></h4>
+<p>(<code class="docutils literal notranslate"><span class="pre">int</span></code>)<br>
+Determines how large the simulation is in pixels. The <code class="docutils literal notranslate"><span class="pre">screen_size</span></code> sets both the height and the width of the screen.</p>
+</section>
+<section id="pixel-scale">
+<h4>pixel_scale<a class="headerlink" href="#pixel-scale" title="Permalink to this heading">#</a></h4>
+<p>(<code class="docutils literal notranslate"><span class="pre">float</span></code>)<br>
+The number of feet across that one pixel represents. i.e. for the default value, one pixel represents a 50ft x 50ft square of land.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="display-parameters">
+<h3>Display Parameters<a class="headerlink" href="#display-parameters" title="Permalink to this heading">#</a></h3>
+<section id="fire-size">
+<h4>fire_size<a class="headerlink" href="#fire-size" title="Permalink to this heading">#</a></h4>
+<p>(<code class="docutils literal notranslate"><span class="pre">int</span></code>)<br>
+The size of the flame/fire size in pixels. Only used for display purposes, and does not change fire dynamics.</p>
+</section>
+<section id="control-line-size">
+<h4>control_line_size<a class="headerlink" href="#control-line-size" title="Permalink to this heading">#</a></h4>
+<p>(<code class="docutils literal notranslate"><span class="pre">int</span></code>)<br>
+The size of the control lines in pixels. Only used for display purposes, and does not change how much space the control line takes up in the simulation.</p>
+</section>
+<section id="agent-size">
+<h4>agent_size<a class="headerlink" href="#agent-size" title="Permalink to this heading">#</a></h4>
+<p>(<code class="docutils literal notranslate"><span class="pre">int</span></code>)<br>
+The size of the agent(s) in pixels. Only used for display purposes, and does not change how much space the agent takes up in the simulation.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="simulation-parameters">
+<h3>Simulation Parameters<a class="headerlink" href="#simulation-parameters" title="Permalink to this heading">#</a></h3>
+<section id="update-rate">
+<h4>update_rate<a class="headerlink" href="#update-rate" title="Permalink to this heading">#</a></h4>
+<p>(<code class="docutils literal notranslate"><span class="pre">float</span></code>)<br>
+The number of minutes that each game/frame update represents in simulation time. Note that this can be fractional to account for times that are non-integer and/or less than 1.</p>
+</section>
+<section id="runtime">
+<h4>runtime<a class="headerlink" href="#runtime" title="Permalink to this heading">#</a></h4>
+<p>(<code class="docutils literal notranslate"><span class="pre">str</span></code>)<br>
+The amount of time that the simulation is supposed to run. This can be expressed in days, hours, and minutes in any of the following ways and more: <code class="docutils literal notranslate"><span class="pre">2d</span></code>, <code class="docutils literal notranslate"><span class="pre">2day</span></code>, <code class="docutils literal notranslate"><span class="pre">2days</span></code>, <code class="docutils literal notranslate"><span class="pre">24h</span></code>, <code class="docutils literal notranslate"><span class="pre">1d</span> <span class="pre">23h</span> <span class="pre">60m</span></code>, etc. If no designation is given or if the value is given with a space in between the integer and the time span (e.g. <code class="docutils literal notranslate"><span class="pre">2</span> <span class="pre">days</span></code>), the program will assume the units are in minutes.</p>
+</section>
+<section id="headless">
+<h4>headless<a class="headerlink" href="#headless" title="Permalink to this heading">#</a></h4>
+<p>(<code class="docutils literal notranslate"><span class="pre">bool</span></code>)<br>
+Whether or not to run the simulation in a headless state.</p>
+</section>
+<section id="save-path">
+<h4>save_path<a class="headerlink" href="#save-path" title="Permalink to this heading">#</a></h4>
+<p>(<code class="docutils literal notranslate"><span class="pre">str</span></code>)<br>
+Where to save GIF recordings and burn graphs of simulation <a class="reference external" href="https://fireline.pages.mitre.org/simfire/autoapi/simfire/sim/simulation/index.html#simfire.sim.simulation.FireSimulation.run">runs</a>. It will create subfolders in <code class="docutils literal notranslate"><span class="pre">save_path</span></code> that are of the format <code class="docutils literal notranslate"><span class="pre">&lt;month&gt;-&lt;day&gt;-&lt;year&gt;_&lt;hour&gt;-&lt;minute&gt;-&lt;second&gt;</span></code> based on when the outputs were saved to file.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="mitigation-parameters">
+<h3>Mitigation Parameters<a class="headerlink" href="#mitigation-parameters" title="Permalink to this heading">#</a></h3>
+<section id="ros-attenuation">
+<h4>ros_attenuation<a class="headerlink" href="#ros-attenuation" title="Permalink to this heading">#</a></h4>
+<p>(<code class="docutils literal notranslate"><span class="pre">bool</span></code>)<br>
+Whether or not to attenuate rate of spread based on the type of line being used. These attenuation values can be seen in <a class="reference external" href="https://gitlab.mitre.org/fireline/simfire/-/blob/main/simfire/enums.py#L48"><code class="docutils literal notranslate"><span class="pre">enums.py</span></code></a>. These values will be subtracted from the rate of spread for a given pixel based on the control line type. If this value is set to <code class="docutils literal notranslate"><span class="pre">false</span></code>, all lines will completely stop a fire and the rate of spread for any pixel with a control line will be set to zero.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="operational-parameters">
+<h3>Operational Parameters<a class="headerlink" href="#operational-parameters" title="Permalink to this heading">#</a></h3>
+<p>These are the operational parameters that will be used for the operational data layers that rely on a location, if those layers’ types are set to <code class="docutils literal notranslate"><span class="pre">operational</span></code>.</p>
+<section id="seed">
+<h4>seed<a class="headerlink" href="#seed" title="Permalink to this heading">#</a></h4>
+<p>(<code class="docutils literal notranslate"><span class="pre">int</span></code>)<br>
+The seed that would pick a random latitude and longitude. Leave empty if using the <span class="xref myst">latitude</span> and <span class="xref myst">longitude</span> below.</p>
+</section>
+<section id="latitude">
+<h4>latitude<a class="headerlink" href="#latitude" title="Permalink to this heading">#</a></h4>
+<p>(<code class="docutils literal notranslate"><span class="pre">float</span></code>)<br>
+The latitude given in decimal degrees.</p>
+</section>
+<section id="longitude">
+<h4>longitude<a class="headerlink" href="#longitude" title="Permalink to this heading">#</a></h4>
+<p>(<code class="docutils literal notranslate"><span class="pre">float</span></code>)<br>
+The longitude given in decimal degrees.</p>
+</section>
+<section id="height">
+<h4>height<a class="headerlink" href="#height" title="Permalink to this heading">#</a></h4>
+<p>(<code class="docutils literal notranslate"><span class="pre">int</span></code>)<br>
+The height of the screen in meters.</p>
+</section>
+<section id="width">
+<h4>width<a class="headerlink" href="#width" title="Permalink to this heading">#</a></h4>
+<p>(<code class="docutils literal notranslate"><span class="pre">int</span></code>)<br>
+The width of the screen in meters.</p>
+</section>
+<section id="resolution">
+<h4>resolution<a class="headerlink" href="#resolution" title="Permalink to this heading">#</a></h4>
+<p>(<code class="docutils literal notranslate"><span class="pre">int</span></code>)<br>
+The resolution of each pixel in meters. Data is measured in pixels corresponding to the resolution i.e: resolution = 10m = 1 pixel.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="terrain-parameters">
+<h3>Terrain Parameters<a class="headerlink" href="#terrain-parameters" title="Permalink to this heading">#</a></h3>
+<section id="topography">
+<h4>topography<a class="headerlink" href="#topography" title="Permalink to this heading">#</a></h4>
+<p>All configuration settings for the topography in the simulation area.</p>
+<section id="type">
+<h5>type<a class="headerlink" href="#type" title="Permalink to this heading">#</a></h5>
+<p>(<code class="docutils literal notranslate"><span class="pre">str</span></code>)<br>
+Can be either <code class="docutils literal notranslate"><span class="pre">operational</span></code> or <code class="docutils literal notranslate"><span class="pre">functional</span></code>.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">operational</span></code>, will use the parameters in the <span class="xref myst">Operational Parameters</span> section to determine topography in the simulation area.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">functional</span></code>, will use the parameters in <span class="xref myst">terrain.topography.functional</span> to determine topography in the simulation area.</p>
+</section>
+<section id="functional">
+<h5>functional<a class="headerlink" href="#functional" title="Permalink to this heading">#</a></h5>
+<p>All configuration settings for determining the functional topography data layer.</p>
+<section id="function">
+<h6>function<a class="headerlink" href="#function" title="Permalink to this heading">#</a></h6>
+<p>(<code class="docutils literal notranslate"><span class="pre">str</span></code>)<br>
+The function that determines how elevation is distributed throughout the simulation area.
+The available elevation functions are currently:</p>
+<ul class="simple">
+<li><p>perlin</p></li>
+<li><p>gaussian</p></li>
+<li><p>flat</p></li>
+</ul>
+</section>
+<section id="perlin">
+<h6>perlin<a class="headerlink" href="#perlin" title="Permalink to this heading">#</a></h6>
+<p>All arguments that would be passed into the PerlinNoise2D elevation class.</p>
+<ul class="simple">
+<li><p><strong>amplitude</strong> (<code class="docutils literal notranslate"><span class="pre">int</span></code>):<br>
+The amplitude of the perlin noise function.</p></li>
+<li><p><strong>shape</strong> (<code class="docutils literal notranslate"><span class="pre">Tuple[int,</span> <span class="pre">int]</span></code>):<br>
+The output shape of the noise. Most often, should probably be <code class="docutils literal notranslate"><span class="pre">(area.screen_size,</span> <span class="pre">area.screen_size)</span></code>.</p></li>
+<li><p><strong>resolution</strong> (<code class="docutils literal notranslate"><span class="pre">Tuple[int,</span> <span class="pre">int]</span></code>):<br>
+The output resolution of the noise. Could be thought of as the “altitude” and aspect ratio at which the data <code class="docutils literal notranslate"><span class="pre">(1,</span> <span class="pre">1)</span></code> is seen.</p></li>
+<li><p><strong>seed</strong> (<code class="docutils literal notranslate"><span class="pre">int</span></code>):<br>
+The random seed used to determine the terrain elevation so that the user can recreate repeatable terrain.</p></li>
+</ul>
+</section>
+<section id="gaussian">
+<h6>gaussian<a class="headerlink" href="#gaussian" title="Permalink to this heading">#</a></h6>
+<p>All arguments that would be passed into the gaussian function.</p>
+<ul class="simple">
+<li><p><strong>amplitude</strong> (<code class="docutils literal notranslate"><span class="pre">int</span></code>):<br>
+The amplitude of the gaussian noise function.</p></li>
+<li><p><strong>mu_x</strong> (<code class="docutils literal notranslate"><span class="pre">int</span></code>):<br>
+The mean of the 2D normal distribution in the <code class="docutils literal notranslate"><span class="pre">x</span></code> direction.</p></li>
+<li><p><strong>mu_y</strong> (<code class="docutils literal notranslate"><span class="pre">int</span></code>):<br>
+The mean of the 2D normal distribution in the <code class="docutils literal notranslate"><span class="pre">y</span></code> direction.</p></li>
+<li><p><strong>sigma_x</strong> (<code class="docutils literal notranslate"><span class="pre">int</span></code>):<br>
+The variance of the 2D normal distribution in the <code class="docutils literal notranslate"><span class="pre">x</span></code> direction.</p></li>
+<li><p><strong>sigma_x</strong> (<code class="docutils literal notranslate"><span class="pre">int</span></code>):<br>
+The variance of the 2D normal distribution in the <code class="docutils literal notranslate"><span class="pre">y</span></code> direction.</p></li>
+</ul>
+</section>
+</section>
+</section>
+<section id="fuel">
+<h4>fuel<a class="headerlink" href="#fuel" title="Permalink to this heading">#</a></h4>
+<p>All configuration settings for the fuel in the simulation area.</p>
+<section id="id1">
+<h5>type<a class="headerlink" href="#id1" title="Permalink to this heading">#</a></h5>
+<p>(<code class="docutils literal notranslate"><span class="pre">str</span></code>)<br>
+Can be either <code class="docutils literal notranslate"><span class="pre">operational</span></code> or <code class="docutils literal notranslate"><span class="pre">functional</span></code>.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">operational</span></code>, will use the parameters in the <span class="xref myst">Operational Parameters</span> section to determine fuel in the simulation area.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">functional</span></code>, will use the parameters in <span class="xref myst">terrain.fuel.functional</span> to determine fuel in the simulation area.</p>
+</section>
+<section id="id2">
+<h5>functional<a class="headerlink" href="#id2" title="Permalink to this heading">#</a></h5>
+<p>All configuration settings for determining the functional topography data layer.</p>
+<section id="id3">
+<h6>function<a class="headerlink" href="#id3" title="Permalink to this heading">#</a></h6>
+<p>(<code class="docutils literal notranslate"><span class="pre">str</span></code>)<br>
+The function that determines how fuel is distributed throughout the simulation area.
+The available fuel functions are currently:</p>
+<ul class="simple">
+<li><p>chaparral</p></li>
+</ul>
+</section>
+<section id="chaparral">
+<h6>chaparral<a class="headerlink" href="#chaparral" title="Permalink to this heading">#</a></h6>
+<p>All arguments that would be passed into the chaparral fuel array function.</p>
+<ul class="simple">
+<li><p><strong>seed</strong> (<code class="docutils literal notranslate"><span class="pre">int</span></code>):<br>
+The random seed used to determine the fuel distribution so that the user can recreate repeatable fuel patterns.</p></li>
+</ul>
+</section>
+</section>
+</section>
+</section>
+<hr class="docutils" />
+<section id="fire-parameters">
+<h3>Fire Parameters<a class="headerlink" href="#fire-parameters" title="Permalink to this heading">#</a></h3>
+<section id="fire-initial-position">
+<h4>fire_initial_position<a class="headerlink" href="#fire-initial-position" title="Permalink to this heading">#</a></h4>
+<p>(<code class="docutils literal notranslate"><span class="pre">Tuple[int,</span> <span class="pre">int]</span></code>)<br>
+The initial location to start the fire. This should be set every time when running the
+simulation.</p>
+</section>
+<section id="max-fire-duration">
+<h4>max_fire_duration<a class="headerlink" href="#max-fire-duration" title="Permalink to this heading">#</a></h4>
+<p>(<code class="docutils literal notranslate"><span class="pre">int</span></code>)<br>
+The maximum number of frames that a single pixel can be on fire.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="environment-parameters">
+<h3>Environment Parameters<a class="headerlink" href="#environment-parameters" title="Permalink to this heading">#</a></h3>
+<p>Defines the Environment class.</p>
+<section id="moisture">
+<h4>moisture<a class="headerlink" href="#moisture" title="Permalink to this heading">#</a></h4>
+<p>(<code class="docutils literal notranslate"><span class="pre">float</span></code>)<br>
+Used in simulator fire spread calculation. Most of Southern California has the default value of 0.03.</p>
+</section>
+</section>
+<hr class="docutils" />
+<section id="wind-parameters">
+<h3>Wind Parameters<a class="headerlink" href="#wind-parameters" title="Permalink to this heading">#</a></h3>
+<p>Defines wind speed and direction generation.</p>
+<section id="id4">
+<h4>function<a class="headerlink" href="#id4" title="Permalink to this heading">#</a></h4>
+<p>(<code class="docutils literal notranslate"><span class="pre">str</span></code>)<br>
+The function that determines how wind is distributed throughout the simulation area.
+The available wind functions are currently:</p>
+<ul class="simple">
+<li><p>cfd</p></li>
+<li><p>simple</p></li>
+<li><p>perlin</p></li>
+</ul>
+</section>
+<section id="cfd">
+<h4>cfd<a class="headerlink" href="#cfd" title="Permalink to this heading">#</a></h4>
+<p>A function for wind that uses a computational fluid dynamics (CFD) algorithm for wind modeling.</p>
+<ul class="simple">
+<li><p><strong>time_to_train</strong> (<code class="docutils literal notranslate"><span class="pre">int</span></code>): <br>
+&#64;ckempis: The time to train the CFD algorithm when preprocessing.</p></li>
+<li><p><strong>iterations</strong> (<code class="docutils literal notranslate"><span class="pre">int</span></code>): <br>
+&#64;ckempis</p></li>
+<li><p><strong>scale</strong> (<code class="docutils literal notranslate"><span class="pre">int</span></code>): <br>
+&#64;ckempis</p></li>
+<li><p><strong>timestep_dt</strong> (<code class="docutils literal notranslate"><span class="pre">int</span></code>): <br>
+&#64;ckempis</p></li>
+<li><p><strong>diffusion</strong> (<code class="docutils literal notranslate"><span class="pre">int</span></code>): <br>
+&#64;ckempis</p></li>
+<li><p><strong>viscosity</strong> (<code class="docutils literal notranslate"><span class="pre">int</span></code>): <br>
+&#64;ckempis</p></li>
+<li><p><strong>speed</strong> (<code class="docutils literal notranslate"><span class="pre">int</span></code>): <br>
+&#64;ckempis</p></li>
+<li><p><strong>direction</strong> (<code class="docutils literal notranslate"><span class="pre">int</span></code>): <br>
+&#64;ckempis</p></li>
+</ul>
+</section>
+<section id="simple">
+<h4>simple<a class="headerlink" href="#simple" title="Permalink to this heading">#</a></h4>
+<p>A function for wind that keeps direction and speed constant throughout the whole simulation area.</p>
+<ul class="simple">
+<li><p><strong>speed</strong> (<code class="docutils literal notranslate"><span class="pre">int</span></code> | <code class="docutils literal notranslate"><span class="pre">float</span></code>):<br>
+The wind speed in <strong>miles per hour</strong>.</p></li>
+<li><p><strong>direction</strong> (<code class="docutils literal notranslate"><span class="pre">int</span></code> | <code class="docutils literal notranslate"><span class="pre">float</span></code>):<br>
+The wind direction expressed in <strong>degrees clockwise from North</strong> (E.g. East == 90.0, South == 180.0, etc.).</p></li>
+</ul>
+</section>
+<section id="id5">
+<h4>perlin<a class="headerlink" href="#id5" title="Permalink to this heading">#</a></h4>
+<p>All arguments that would be passed into the WindController class.</p>
+<section id="speed">
+<h5>speed<a class="headerlink" href="#speed" title="Permalink to this heading">#</a></h5>
+<p>All arguments that define wind speed layer generation.</p>
+<ul class="simple">
+<li><p><strong>seed</strong> (<code class="docutils literal notranslate"><span class="pre">int</span></code>):<br>
+The random seed used to determine the wind speed layer so that the user can recreate repeatable wind speed layers.</p></li>
+<li><p><strong>scale</strong> (<code class="docutils literal notranslate"><span class="pre">int</span></code>):<br>
+How large to make the noise. Can be seen as an “elevation”, but don’t take that literally.</p></li>
+<li><p><strong>octaves</strong> (<code class="docutils literal notranslate"><span class="pre">int</span></code>):<br>
+How many passes/layers to the noise algorithm. Each pass adds more detail.</p></li>
+<li><p><strong>persistence</strong> (<code class="docutils literal notranslate"><span class="pre">float</span></code>):<br>
+How much more each successive value brings. Keep between 0 and 1.0.</p></li>
+<li><p><strong>lacunarity</strong> (<code class="docutils literal notranslate"><span class="pre">float</span></code>):<br>
+The level of detail added per pass. Usually kept at 2.0.</p></li>
+<li><p><strong>min</strong> (<code class="docutils literal notranslate"><span class="pre">int</span></code>| <code class="docutils literal notranslate"><span class="pre">float</span></code>):<br>
+The <em>minimum</em> wind speed for any individual pixel location. Expressed in <strong>miles per hour</strong>.</p></li>
+<li><p><strong>max</strong> (<code class="docutils literal notranslate"><span class="pre">int</span></code> | <code class="docutils literal notranslate"><span class="pre">float</span></code>):<br>
+The <em>maximum</em> wind speed for any individual pixel location. Expressed in <strong>miles per hour</strong>.</p></li>
+</ul>
+</section>
+<section id="direction">
+<h5>direction<a class="headerlink" href="#direction" title="Permalink to this heading">#</a></h5>
+<p>All arguments that define wind direction layer generation.</p>
+<ul class="simple">
+<li><p><strong>seed</strong> (<code class="docutils literal notranslate"><span class="pre">int</span></code>):<br>
+The random seed used to determine the wind speed layer so that the user can recreate repeatable wind speed layers.</p></li>
+<li><p><strong>scale</strong> (<code class="docutils literal notranslate"><span class="pre">int</span></code>):<br>
+How large to make the noise. Can be seen as an “elevation”, but don’t take that literally.</p></li>
+<li><p><strong>octaves</strong> (<code class="docutils literal notranslate"><span class="pre">int</span></code>):<br>
+How many passes/layers to the noise algorithm. Each pass adds more detail.</p></li>
+<li><p><strong>persistence</strong> (<code class="docutils literal notranslate"><span class="pre">float</span></code>):<br>
+How much more each successive value brings. Keep between 0 and 1.0.</p></li>
+<li><p><strong>lacunarity</strong> (<code class="docutils literal notranslate"><span class="pre">float</span></code>):<br>
+The level of detail added per pass. Usually kept at 2.0.</p></li>
+<li><p><strong>min</strong> (<code class="docutils literal notranslate"><span class="pre">int</span></code>):<br>
+The <em>minimum</em> wind direction for any individual pixel location. Expressed in <strong>degrees clockwise from North</strong> (E.g. East == 90.0, South == 180.0, etc.).</p></li>
+<li><p><strong>max</strong> (<code class="docutils literal notranslate"><span class="pre">int</span></code>):<br>
+The <em>maximum</em> wind direction for any individual pixel location. Expressed in <strong>degrees clockwise from North</strong> (E.g. East == 90.0, South == 180.0, etc.).</p></li>
+</ul>
+</section>
+</section>
+</section>
+<hr class="docutils" />
+<section id="render-parameters">
+<h3>Render Parameters<a class="headerlink" href="#render-parameters" title="Permalink to this heading">#</a></h3>
+<p>Defines rendering.</p>
+<section id="inline">
+<h4>inline<a class="headerlink" href="#inline" title="Permalink to this heading">#</a></h4>
+<p>(<code class="docutils literal notranslate"><span class="pre">bool</span></code>)<br>
+Whether or not to render at each call to the <code class="docutils literal notranslate"><span class="pre">step()</span></code> function in <code class="docutils literal notranslate"><span class="pre">FirelineEnv</span></code>.</p>
+</section>
+<section id="post-agent">
+<h4>post_agent<a class="headerlink" href="#post-agent" title="Permalink to this heading">#</a></h4>
+<p>(<code class="docutils literal notranslate"><span class="pre">bool</span></code>)<br>
+Whether or not to render with post agent in place.</p>
+</section>
+<section id="post-agent-with-fire">
+<h4>post_agent_with_fire<a class="headerlink" href="#post-agent-with-fire" title="Permalink to this heading">#</a></h4>
+<p>(<code class="docutils literal notranslate"><span class="pre">bool</span></code>)<br>
+Whether or not to render with post agent and fire in place.</p>
+</section>
+</section>
+</section>
+<hr class="docutils" />
+<section id="example-config-file">
+<h2>Example Config File<a class="headerlink" href="#example-config-file" title="Permalink to this heading">#</a></h2>
+<p>Go <a class="reference external" href="https://gitlab.mitre.org/fireline/simfire/-/blob/main/configs">here</a> for more examples.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">area</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="nt">screen_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">225</span><span class="w"></span>
+<span class="w">  </span><span class="nt">pixel_scale</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span><span class="w"></span>
+
+<span class="nt">display</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="nt">fire_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span><span class="w"></span>
+<span class="w">  </span><span class="nt">control_line_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span><span class="w"></span>
+<span class="w">  </span><span class="nt">agent_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span><span class="w"></span>
+<span class="w">  </span><span class="nt">rescale_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">225</span><span class="w"></span>
+
+<span class="nt">simulation</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="nt">update_rate</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span><span class="w"></span>
+<span class="w">  </span><span class="nt">runtime</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">24h</span><span class="w"></span>
+<span class="w">  </span><span class="nt">headless</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w"></span>
+<span class="w">  </span><span class="nt">record</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"></span>
+
+<span class="nt">mitigation</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="nt">ros_attenuation</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"></span>
+
+<span class="nt">operational</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="nt">seed</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="nt">latitude</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">39.67</span><span class="w"></span>
+<span class="w">  </span><span class="nt">longitude</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">119.8</span><span class="w"></span>
+<span class="w">  </span><span class="nt">height</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4000</span><span class="w"></span>
+<span class="w">  </span><span class="nt">width</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4000</span><span class="w"></span>
+<span class="w">  </span><span class="nt">resolution</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">30</span><span class="w"></span>
+
+<span class="nt">terrain</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="nt">topography</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">functional</span><span class="w"></span>
+<span class="w">    </span><span class="nt">functional</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">perlin</span><span class="w"></span>
+<span class="w">      </span><span class="nt">perlin</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="nt">octaves</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span><span class="w"></span>
+<span class="w">        </span><span class="nt">persistence</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.7</span><span class="w"></span>
+<span class="w">        </span><span class="nt">lacunarity</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2.0</span><span class="w"></span>
+<span class="w">        </span><span class="nt">seed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">827</span><span class="w"></span>
+<span class="w">        </span><span class="nt">range_min</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">100.0</span><span class="w"></span>
+<span class="w">        </span><span class="nt">range_max</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">300.0</span><span class="w"></span>
+<span class="w">      </span><span class="nt">gaussian</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="nt">amplitude</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">500</span><span class="w"></span>
+<span class="w">        </span><span class="nt">mu_x</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span><span class="w"></span>
+<span class="w">        </span><span class="nt">mu_y</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span><span class="w"></span>
+<span class="w">        </span><span class="nt">sigma_x</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span><span class="w"></span>
+<span class="w">        </span><span class="nt">sigma_y</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span><span class="w"></span>
+<span class="w">  </span><span class="nt">fuel</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">functional</span><span class="w"></span>
+<span class="w">    </span><span class="nt">functional</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">chaparral</span><span class="w"></span>
+<span class="w">      </span><span class="nt">chaparral</span><span class="p">:</span><span class="w"></span>
+<span class="w">        </span><span class="nt">seed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1113</span><span class="w"></span>
+
+<span class="nt">fire</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="nt">fire_initial_position</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">(16, 16)</span><span class="w"></span>
+<span class="w">  </span><span class="nt">max_fire_duration</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span><span class="w"></span>
+
+<span class="nt">environment</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="nt">moisture</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.03</span><span class="w"></span>
+
+<span class="nt">wind</span><span class="p">:</span><span class="w"></span>
+<span class="w">  </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">perlin</span><span class="w"></span>
+<span class="w">  </span><span class="nt">cfd</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">time_to_train</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1000</span><span class="w"></span>
+<span class="w">    </span><span class="nt">iterations</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span><span class="w"></span>
+<span class="w">    </span><span class="nt">scale</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span><span class="w"></span>
+<span class="w">    </span><span class="nt">timestep_dt</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0</span><span class="w"></span>
+<span class="w">    </span><span class="nt">diffusion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.0</span><span class="w"></span>
+<span class="w">    </span><span class="nt">viscosity</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.0000001</span><span class="w"></span>
+<span class="w">    </span><span class="nt">speed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">19</span><span class="w"></span>
+<span class="w">    </span><span class="nt">direction</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">north</span><span class="w"></span>
+<span class="w">  </span><span class="nt">simple</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">speed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">7</span><span class="w"></span>
+<span class="w">    </span><span class="nt">direction</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">90.0</span><span class="w"></span>
+<span class="w">  </span><span class="nt">perlin</span><span class="p">:</span><span class="w"></span>
+<span class="w">    </span><span class="nt">speed</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="nt">seed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2345</span><span class="w"></span>
+<span class="w">      </span><span class="nt">scale</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">400</span><span class="w"></span>
+<span class="w">      </span><span class="nt">octaves</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span><span class="w"></span>
+<span class="w">      </span><span class="nt">persistence</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.7</span><span class="w"></span>
+<span class="w">      </span><span class="nt">lacunarity</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2.0</span><span class="w"></span>
+<span class="w">      </span><span class="nt">range_min</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">7</span><span class="w"></span>
+<span class="w">      </span><span class="nt">range_max</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">47</span><span class="w"></span>
+<span class="w">    </span><span class="nt">direction</span><span class="p">:</span><span class="w"></span>
+<span class="w">      </span><span class="nt">seed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">650</span><span class="w"></span>
+<span class="w">      </span><span class="nt">scale</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1500</span><span class="w"></span>
+<span class="w">      </span><span class="nt">octaves</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span><span class="w"></span>
+<span class="w">      </span><span class="nt">persistence</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.9</span><span class="w"></span>
+<span class="w">      </span><span class="nt">lacunarity</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0</span><span class="w"></span>
+<span class="w">      </span><span class="nt">range_min</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.0</span><span class="w"></span>
+<span class="w">      </span><span class="nt">range_max</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">360.0</span><span class="w"></span>
+</pre></div>
+</div>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="contributing.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Contributing</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="intro.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Introduction</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2022, fiReLine
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            <div class="icons">
+              
+            </div>
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Configuring the Simulation</a><ul>
+<li><a class="reference internal" href="#settings">Settings</a><ul>
+<li><a class="reference internal" href="#area-parameters">Area Parameters</a><ul>
+<li><a class="reference internal" href="#screen-size">screen_size</a></li>
+<li><a class="reference internal" href="#pixel-scale">pixel_scale</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#display-parameters">Display Parameters</a><ul>
+<li><a class="reference internal" href="#fire-size">fire_size</a></li>
+<li><a class="reference internal" href="#control-line-size">control_line_size</a></li>
+<li><a class="reference internal" href="#agent-size">agent_size</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#simulation-parameters">Simulation Parameters</a><ul>
+<li><a class="reference internal" href="#update-rate">update_rate</a></li>
+<li><a class="reference internal" href="#runtime">runtime</a></li>
+<li><a class="reference internal" href="#headless">headless</a></li>
+<li><a class="reference internal" href="#save-path">save_path</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#mitigation-parameters">Mitigation Parameters</a><ul>
+<li><a class="reference internal" href="#ros-attenuation">ros_attenuation</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#operational-parameters">Operational Parameters</a><ul>
+<li><a class="reference internal" href="#seed">seed</a></li>
+<li><a class="reference internal" href="#latitude">latitude</a></li>
+<li><a class="reference internal" href="#longitude">longitude</a></li>
+<li><a class="reference internal" href="#height">height</a></li>
+<li><a class="reference internal" href="#width">width</a></li>
+<li><a class="reference internal" href="#resolution">resolution</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#terrain-parameters">Terrain Parameters</a><ul>
+<li><a class="reference internal" href="#topography">topography</a><ul>
+<li><a class="reference internal" href="#type">type</a></li>
+<li><a class="reference internal" href="#functional">functional</a><ul>
+<li><a class="reference internal" href="#function">function</a></li>
+<li><a class="reference internal" href="#perlin">perlin</a></li>
+<li><a class="reference internal" href="#gaussian">gaussian</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#fuel">fuel</a><ul>
+<li><a class="reference internal" href="#id1">type</a></li>
+<li><a class="reference internal" href="#id2">functional</a><ul>
+<li><a class="reference internal" href="#id3">function</a></li>
+<li><a class="reference internal" href="#chaparral">chaparral</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#fire-parameters">Fire Parameters</a><ul>
+<li><a class="reference internal" href="#fire-initial-position">fire_initial_position</a></li>
+<li><a class="reference internal" href="#max-fire-duration">max_fire_duration</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#environment-parameters">Environment Parameters</a><ul>
+<li><a class="reference internal" href="#moisture">moisture</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#wind-parameters">Wind Parameters</a><ul>
+<li><a class="reference internal" href="#id4">function</a></li>
+<li><a class="reference internal" href="#cfd">cfd</a></li>
+<li><a class="reference internal" href="#simple">simple</a></li>
+<li><a class="reference internal" href="#id5">perlin</a><ul>
+<li><a class="reference internal" href="#speed">speed</a></li>
+<li><a class="reference internal" href="#direction">direction</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#render-parameters">Render Parameters</a><ul>
+<li><a class="reference internal" href="#inline">inline</a></li>
+<li><a class="reference internal" href="#post-agent">post_agent</a></li>
+<li><a class="reference internal" href="#post-agent-with-fire">post_agent_with_fire</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#example-config-file">Example Config File</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/scripts/furo.js"></script>
+    </body>
+</html>

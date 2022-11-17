@@ -1,0 +1,17 @@
+:py:mod:`simfire.world.wind_mechanics`
+======================================
+
+.. py:module:: simfire.world.wind_mechanics
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   cfd_wind/index.rst
+   perlin_wind/index.rst
+   wind_controller/index.rst
+
+

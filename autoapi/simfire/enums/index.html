@@ -1,0 +1,846 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+<link rel="index" title="Index" href="../../../genindex.html" /><link rel="search" title="Search" href="../../../search.html" /><link rel="prev" title="simfire.world.rothermel" href="../world/rothermel/index.html" />
+
+    <link rel="shortcut icon" href="../../../_static/favicon.ico"/><meta name="generator" content="sphinx-5.3.0, furo 2022.09.29"/>
+        <title>simfire.enums - SimFire latest documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo.css?digest=d81277517bee4d6b0349d71bb2661d4890b5617c" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../../index.html"><div class="brand">SimFire latest documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand centered" href="../../../index.html">
+  
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo" src="../../../_static/rl_logo.png" alt="Logo"/>
+  </div>
+  
+  <span class="sidebar-brand-text">SimFire latest documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../../search.html" role="search">
+  <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Running the Simulation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../config.html">Configuring the Simulation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../../index.html">API Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2 current has-children"><a class="reference internal" href="../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire</span></code></a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l3 has-children"><a class="reference internal" href="../game/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.game</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../game/managers/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.game.managers</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l5"><a class="reference internal" href="../game/managers/fire/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.game.managers.fire</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../game/managers/mitigation/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.game.managers.mitigation</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../game/game/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.game.game</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../game/image/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.game.image</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../game/sprites/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.game.sprites</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../sim/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.sim</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../sim/simulation/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.sim.simulation</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../utils/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../utils/assets/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.assets</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/textures/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.textures</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/config/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/decorators/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.decorators</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/generate_cfd_wind_layer/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.generate_cfd_wind_layer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/graph/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.graph</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/layers/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.layers</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/log/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.log</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/terrain/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.terrain</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../utils/units/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.units</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../world/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../world/wind_mechanics/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world.wind_mechanics</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" role="switch" type="checkbox"/><label for="toctree-checkbox-8"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l5"><a class="reference internal" href="../world/wind_mechanics/cfd_wind/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world.wind_mechanics.cfd_wind</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../world/wind_mechanics/perlin_wind/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world.wind_mechanics.perlin_wind</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../world/wind_mechanics/wind_controller/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world.wind_mechanics.wind_controller</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../world/elevation_functions/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world.elevation_functions</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../world/fuel_array_functions/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world.fuel_array_functions</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../world/parameters/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world.parameters</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../world/presets/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world.presets</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../world/rothermel/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world.rothermel</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3 current current-page"><a class="current reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.enums</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <section id="module-simfire.enums">
+<span id="simfire-enums"></span><h1><a class="reference internal" href="#module-simfire.enums" title="simfire.enums"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.enums</span></code></a><a class="headerlink" href="#module-simfire.enums" title="Permalink to this heading">#</a></h1>
+<section id="enums">
+<p>Contains many enumeration classes for use throughout <cite>rothermel_model</cite> that depict pixel
+burn status, the ordering of sprite layers, how much to attenuate the rate of spread on
+different types of control lines, and the current game status.</p>
+</section>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this heading">#</a></h2>
+<section id="classes">
+<h3>Classes<a class="headerlink" href="#classes" title="Permalink to this heading">#</a></h3>
+<div class="table-wrapper autosummary longtable docutils container">
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#simfire.enums.BurnStatus" title="simfire.enums.BurnStatus"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BurnStatus</span></code></a></p></td>
+<td><p>The status of each pixel in a <cite>fire_map</cite></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#simfire.enums.RoSAttenuation" title="simfire.enums.RoSAttenuation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RoSAttenuation</span></code></a></p></td>
+<td><p>The factor by which to attenuate the rate of spread (RoS), based on control line</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#simfire.enums.SpriteLayer" title="simfire.enums.SpriteLayer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SpriteLayer</span></code></a></p></td>
+<td><p>The types of layers for sprites</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#simfire.enums.GameStatus" title="simfire.enums.GameStatus"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GameStatus</span></code></a></p></td>
+<td><p>The different statuses that the game can be in</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#simfire.enums.FuelConstants" title="simfire.enums.FuelConstants"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FuelConstants</span></code></a></p></td>
+<td><p>Constants to be used in the file and can be imported for reference.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#simfire.enums.ElevationConstants" title="simfire.enums.ElevationConstants"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ElevationConstants</span></code></a></p></td>
+<td><p>Constants to be used in the file and can be imported for reference.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#simfire.enums.WindConstants" title="simfire.enums.WindConstants"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WindConstants</span></code></a></p></td>
+<td><p>Constants to be used in the file and can be imported for reference.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="attributes">
+<h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this heading">#</a></h3>
+<div class="table-wrapper autosummary longtable docutils container">
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#simfire.enums.TERRAIN_TEXTURE_PATH" title="simfire.enums.TERRAIN_TEXTURE_PATH"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TERRAIN_TEXTURE_PATH</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#simfire.enums.DRY_TERRAIN_BROWN_IMG" title="simfire.enums.DRY_TERRAIN_BROWN_IMG"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DRY_TERRAIN_BROWN_IMG</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#simfire.enums.BURNED_RGB_COLOR" title="simfire.enums.BURNED_RGB_COLOR"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BURNED_RGB_COLOR</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#simfire.enums.FuelModelToFuel" title="simfire.enums.FuelModelToFuel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FuelModelToFuel</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#simfire.enums.FuelModelRGB13" title="simfire.enums.FuelModelRGB13"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FuelModelRGB13</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#simfire.enums.HandLineRate" title="simfire.enums.HandLineRate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HandLineRate</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#simfire.enums.DozerType" title="simfire.enums.DozerType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DozerType</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#simfire.enums.DozerLineRates" title="simfire.enums.DozerLineRates"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DozerLineRates</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#simfire.enums.AirTankerType" title="simfire.enums.AirTankerType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AirTankerType</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#simfire.enums.AirTankerRates" title="simfire.enums.AirTankerRates"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AirTankerRates</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#simfire.enums.HelicopterTypes" title="simfire.enums.HelicopterTypes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HelicopterTypes</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#simfire.enums.HelicopterRates" title="simfire.enums.HelicopterRates"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HelicopterRates</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="py data">
+<dt class="sig sig-object py" id="simfire.enums.TERRAIN_TEXTURE_PATH">
+<span class="sig-prename descclassname"><span class="pre">simfire.enums.</span></span><span class="sig-name descname"><span class="pre">TERRAIN_TEXTURE_PATH</span></span><em class="property"><span class="w"> </span><span class="pre">:pathlib.Path</span></em><a class="headerlink" href="#simfire.enums.TERRAIN_TEXTURE_PATH" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="simfire.enums.DRY_TERRAIN_BROWN_IMG">
+<span class="sig-prename descclassname"><span class="pre">simfire.enums.</span></span><span class="sig-name descname"><span class="pre">DRY_TERRAIN_BROWN_IMG</span></span><em class="property"><span class="w"> </span><span class="pre">:PIL.Image.Image</span></em><a class="headerlink" href="#simfire.enums.DRY_TERRAIN_BROWN_IMG" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="simfire.enums.BURNED_RGB_COLOR">
+<span class="sig-prename descclassname"><span class="pre">simfire.enums.</span></span><span class="sig-name descname"><span class="pre">BURNED_RGB_COLOR</span></span><em class="property"><span class="w"> </span><span class="pre">:Tuple[int,</span> <span class="pre">int,</span> <span class="pre">int]</span> <span class="pre">=</span> <span class="pre">[139,</span> <span class="pre">69,</span> <span class="pre">19]</span></em><a class="headerlink" href="#simfire.enums.BURNED_RGB_COLOR" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="simfire.enums.BurnStatus">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simfire.enums.</span></span><span class="sig-name descname"><span class="pre">BurnStatus</span></span><a class="headerlink" href="#simfire.enums.BurnStatus" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.IntEnum" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">enum.IntEnum</span></code></a></p>
+<p>The status of each pixel in a <cite>fire_map</cite></p>
+<dl class="simple">
+<dt>Current statuses are:</dt><dd><ul class="simple">
+<li><p>UNBURNED</p></li>
+<li><p>BURNING</p></li>
+<li><p>BURNED</p></li>
+<li><p>FIRELINE</p></li>
+<li><p>SCRATCHLINE</p></li>
+<li><p>WETLINE</p></li>
+</ul>
+</dd>
+</dl>
+<p>Initialize self.  See help(type(self)) for accurate signature.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.enums.BurnStatus.UNBURNED">
+<span class="sig-name descname"><span class="pre">UNBURNED</span></span><em class="property"><span class="w"> </span><span class="pre">:int</span> <span class="pre">=</span> <span class="pre">0</span></em><a class="headerlink" href="#simfire.enums.BurnStatus.UNBURNED" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.enums.BurnStatus.BURNING">
+<span class="sig-name descname"><span class="pre">BURNING</span></span><em class="property"><span class="w"> </span><span class="pre">:int</span></em><a class="headerlink" href="#simfire.enums.BurnStatus.BURNING" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.enums.BurnStatus.BURNED">
+<span class="sig-name descname"><span class="pre">BURNED</span></span><em class="property"><span class="w"> </span><span class="pre">:int</span></em><a class="headerlink" href="#simfire.enums.BurnStatus.BURNED" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.enums.BurnStatus.FIRELINE">
+<span class="sig-name descname"><span class="pre">FIRELINE</span></span><em class="property"><span class="w"> </span><span class="pre">:int</span></em><a class="headerlink" href="#simfire.enums.BurnStatus.FIRELINE" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.enums.BurnStatus.SCRATCHLINE">
+<span class="sig-name descname"><span class="pre">SCRATCHLINE</span></span><em class="property"><span class="w"> </span><span class="pre">:int</span></em><a class="headerlink" href="#simfire.enums.BurnStatus.SCRATCHLINE" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.enums.BurnStatus.WETLINE">
+<span class="sig-name descname"><span class="pre">WETLINE</span></span><em class="property"><span class="w"> </span><span class="pre">:int</span></em><a class="headerlink" href="#simfire.enums.BurnStatus.WETLINE" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="simfire.enums.RoSAttenuation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simfire.enums.</span></span><span class="sig-name descname"><span class="pre">RoSAttenuation</span></span><a class="headerlink" href="#simfire.enums.RoSAttenuation" title="Permalink to this definition">#</a></dt>
+<dd><p>The factor by which to attenuate the rate of spread (RoS), based on control line
+type</p>
+<dl class="simple">
+<dt>The only classes that are attenuated are the different control lines:</dt><dd><ul class="simple">
+<li><p>FIRELINE</p></li>
+<li><p>SCRATCHLINE</p></li>
+<li><p>WETLINE</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.enums.RoSAttenuation.FIRELINE">
+<span class="sig-name descname"><span class="pre">FIRELINE</span></span><em class="property"><span class="w"> </span><span class="pre">:float</span> <span class="pre">=</span> <span class="pre">980</span></em><a class="headerlink" href="#simfire.enums.RoSAttenuation.FIRELINE" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.enums.RoSAttenuation.SCRATCHLINE">
+<span class="sig-name descname"><span class="pre">SCRATCHLINE</span></span><em class="property"><span class="w"> </span><span class="pre">:float</span> <span class="pre">=</span> <span class="pre">490</span></em><a class="headerlink" href="#simfire.enums.RoSAttenuation.SCRATCHLINE" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.enums.RoSAttenuation.WETLINE">
+<span class="sig-name descname"><span class="pre">WETLINE</span></span><em class="property"><span class="w"> </span><span class="pre">:float</span> <span class="pre">=</span> <span class="pre">245</span></em><a class="headerlink" href="#simfire.enums.RoSAttenuation.WETLINE" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="simfire.enums.SpriteLayer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simfire.enums.</span></span><span class="sig-name descname"><span class="pre">SpriteLayer</span></span><a class="headerlink" href="#simfire.enums.SpriteLayer" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.IntEnum" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">enum.IntEnum</span></code></a></p>
+<p>The types of layers for sprites</p>
+<p>This determines the order with which sprites are layered and displayed on top of each
+other. The higher the number, the closer to the top of the layer stack. From bottom
+to top:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>TERRAIN</p></li>
+<li><p>FIRE</p></li>
+<li><p>LINE</p></li>
+<li><p>AGENT</p></li>
+</ul>
+</div></blockquote>
+<p>Initialize self.  See help(type(self)) for accurate signature.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.enums.SpriteLayer.TERRAIN">
+<span class="sig-name descname"><span class="pre">TERRAIN</span></span><em class="property"><span class="w"> </span><span class="pre">:int</span> <span class="pre">=</span> <span class="pre">1</span></em><a class="headerlink" href="#simfire.enums.SpriteLayer.TERRAIN" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.enums.SpriteLayer.FIRE">
+<span class="sig-name descname"><span class="pre">FIRE</span></span><em class="property"><span class="w"> </span><span class="pre">:int</span> <span class="pre">=</span> <span class="pre">2</span></em><a class="headerlink" href="#simfire.enums.SpriteLayer.FIRE" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.enums.SpriteLayer.LINE">
+<span class="sig-name descname"><span class="pre">LINE</span></span><em class="property"><span class="w"> </span><span class="pre">:int</span> <span class="pre">=</span> <span class="pre">3</span></em><a class="headerlink" href="#simfire.enums.SpriteLayer.LINE" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.enums.SpriteLayer.AGENT">
+<span class="sig-name descname"><span class="pre">AGENT</span></span><em class="property"><span class="w"> </span><span class="pre">:int</span> <span class="pre">=</span> <span class="pre">4</span></em><a class="headerlink" href="#simfire.enums.SpriteLayer.AGENT" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="simfire.enums.GameStatus">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simfire.enums.</span></span><span class="sig-name descname"><span class="pre">GameStatus</span></span><a class="headerlink" href="#simfire.enums.GameStatus" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">enum.Enum</span></code></a></p>
+<p>The different statuses that the game can be in</p>
+<dl class="simple">
+<dt>Currently it can only be in the following modes:</dt><dd><ul class="simple">
+<li><p>QUIT</p></li>
+<li><p>RUNNING</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.enums.GameStatus.QUIT">
+<span class="sig-name descname"><span class="pre">QUIT</span></span><a class="headerlink" href="#simfire.enums.GameStatus.QUIT" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.enums.GameStatus.RUNNING">
+<span class="sig-name descname"><span class="pre">RUNNING</span></span><a class="headerlink" href="#simfire.enums.GameStatus.RUNNING" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="simfire.enums.FuelConstants">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simfire.enums.</span></span><span class="sig-name descname"><span class="pre">FuelConstants</span></span><a class="headerlink" href="#simfire.enums.FuelConstants" title="Permalink to this definition">#</a></dt>
+<dd><p>Constants to be used in the file and can be imported for reference.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>W_0_MIN</strong> – Oven-dry Fuel Load (lb/ft^2) minimum.</p></li>
+<li><p><strong>W_0_MAX</strong> – Oven-dry Fuel Load (lb/ft^2) maximum.</p></li>
+<li><p><strong>DELTA</strong> – Fuel bed depth (ft) min and max.</p></li>
+<li><p><strong>M_X</strong> – Dead fuel moisture of extinction min and max.</p></li>
+<li><p><strong>SIGMA</strong> – Surface-area-to-volume ratio (ft^2/ft^3) min and max.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.enums.FuelConstants.W_0_MIN">
+<span class="sig-name descname"><span class="pre">W_0_MIN</span></span><em class="property"><span class="w"> </span><span class="pre">:float</span> <span class="pre">=</span> <span class="pre">0.2</span></em><a class="headerlink" href="#simfire.enums.FuelConstants.W_0_MIN" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.enums.FuelConstants.W_0_MAX">
+<span class="sig-name descname"><span class="pre">W_0_MAX</span></span><em class="property"><span class="w"> </span><span class="pre">:float</span> <span class="pre">=</span> <span class="pre">0.6</span></em><a class="headerlink" href="#simfire.enums.FuelConstants.W_0_MAX" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.enums.FuelConstants.DELTA">
+<span class="sig-name descname"><span class="pre">DELTA</span></span><em class="property"><span class="w"> </span><span class="pre">:float</span> <span class="pre">=</span> <span class="pre">6.0</span></em><a class="headerlink" href="#simfire.enums.FuelConstants.DELTA" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.enums.FuelConstants.M_X">
+<span class="sig-name descname"><span class="pre">M_X</span></span><em class="property"><span class="w"> </span><span class="pre">:float</span> <span class="pre">=</span> <span class="pre">0.2</span></em><a class="headerlink" href="#simfire.enums.FuelConstants.M_X" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.enums.FuelConstants.SIGMA">
+<span class="sig-name descname"><span class="pre">SIGMA</span></span><em class="property"><span class="w"> </span><span class="pre">:int</span> <span class="pre">=</span> <span class="pre">1739</span></em><a class="headerlink" href="#simfire.enums.FuelConstants.SIGMA" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="simfire.enums.ElevationConstants">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simfire.enums.</span></span><span class="sig-name descname"><span class="pre">ElevationConstants</span></span><a class="headerlink" href="#simfire.enums.ElevationConstants" title="Permalink to this definition">#</a></dt>
+<dd><p>Constants to be used in the file and can be imported for reference.</p>
+<dl class="simple">
+<dt>Paremeters:</dt><dd><dl class="simple">
+<dt>MIN_ELEVATION: Minimum elevation (ft). Based on the elevation of Death Valley,</dt><dd><p>the lowest point in California and the US in general.</p>
+</dd>
+<dt>MAX_ELEVATION: Maximum elevation (ft). Based on the elevation of the treeline in</dt><dd><p>California.</p>
+</dd>
+<dt>MEAN_ELEVATION: Mean elevation (ft). Based on the average elevation of California.</dt><dd><p>From <a class="reference external" href="https://www.nrc.gov/docs/ML1408/ML14086A640.pdf">NRC.gov</a>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.enums.ElevationConstants.MIN_ELEVATION">
+<span class="sig-name descname"><span class="pre">MIN_ELEVATION</span></span><em class="property"><span class="w"> </span><span class="pre">:int</span></em><a class="headerlink" href="#simfire.enums.ElevationConstants.MIN_ELEVATION" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.enums.ElevationConstants.MAX_ELEVATION">
+<span class="sig-name descname"><span class="pre">MAX_ELEVATION</span></span><em class="property"><span class="w"> </span><span class="pre">:int</span> <span class="pre">=</span> <span class="pre">11000</span></em><a class="headerlink" href="#simfire.enums.ElevationConstants.MAX_ELEVATION" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.enums.ElevationConstants.MEAN_ELEVATION">
+<span class="sig-name descname"><span class="pre">MEAN_ELEVATION</span></span><em class="property"><span class="w"> </span><span class="pre">:int</span> <span class="pre">=</span> <span class="pre">2500</span></em><a class="headerlink" href="#simfire.enums.ElevationConstants.MEAN_ELEVATION" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="simfire.enums.WindConstants">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simfire.enums.</span></span><span class="sig-name descname"><span class="pre">WindConstants</span></span><a class="headerlink" href="#simfire.enums.WindConstants" title="Permalink to this definition">#</a></dt>
+<dd><p>Constants to be used in the file and can be imported for reference.</p>
+<dl>
+<dt>Paremeters:</dt><dd><p>MIN_SPEED: Minimum wind speed (mph).
+MAX_SPEED: Maximum wind speed (mph). The maximum recorded wind speed in CA is 209</p>
+<blockquote>
+<div><p>mph, so to be safe, let’s set it to 250. You never know with climate
+change.</p>
+</div></blockquote>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.enums.WindConstants.MIN_SPEED">
+<span class="sig-name descname"><span class="pre">MIN_SPEED</span></span><em class="property"><span class="w"> </span><span class="pre">:int</span> <span class="pre">=</span> <span class="pre">0</span></em><a class="headerlink" href="#simfire.enums.WindConstants.MIN_SPEED" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.enums.WindConstants.MAX_SPEED">
+<span class="sig-name descname"><span class="pre">MAX_SPEED</span></span><em class="property"><span class="w"> </span><span class="pre">:int</span> <span class="pre">=</span> <span class="pre">250</span></em><a class="headerlink" href="#simfire.enums.WindConstants.MAX_SPEED" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="simfire.enums.FuelModelToFuel">
+<span class="sig-prename descclassname"><span class="pre">simfire.enums.</span></span><span class="sig-name descname"><span class="pre">FuelModelToFuel</span></span><a class="headerlink" href="#simfire.enums.FuelModelToFuel" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="simfire.enums.FuelModelRGB13">
+<span class="sig-prename descclassname"><span class="pre">simfire.enums.</span></span><span class="sig-name descname"><span class="pre">FuelModelRGB13</span></span><a class="headerlink" href="#simfire.enums.FuelModelRGB13" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="simfire.enums.HandLineRate">
+<span class="sig-prename descclassname"><span class="pre">simfire.enums.</span></span><span class="sig-name descname"><span class="pre">HandLineRate</span></span><a class="headerlink" href="#simfire.enums.HandLineRate" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="simfire.enums.DozerType">
+<span class="sig-prename descclassname"><span class="pre">simfire.enums.</span></span><span class="sig-name descname"><span class="pre">DozerType</span></span><a class="headerlink" href="#simfire.enums.DozerType" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="simfire.enums.DozerLineRates">
+<span class="sig-prename descclassname"><span class="pre">simfire.enums.</span></span><span class="sig-name descname"><span class="pre">DozerLineRates</span></span><a class="headerlink" href="#simfire.enums.DozerLineRates" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="simfire.enums.AirTankerType">
+<span class="sig-prename descclassname"><span class="pre">simfire.enums.</span></span><span class="sig-name descname"><span class="pre">AirTankerType</span></span><a class="headerlink" href="#simfire.enums.AirTankerType" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="simfire.enums.AirTankerRates">
+<span class="sig-prename descclassname"><span class="pre">simfire.enums.</span></span><span class="sig-name descname"><span class="pre">AirTankerRates</span></span><a class="headerlink" href="#simfire.enums.AirTankerRates" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="simfire.enums.HelicopterTypes">
+<span class="sig-prename descclassname"><span class="pre">simfire.enums.</span></span><span class="sig-name descname"><span class="pre">HelicopterTypes</span></span><a class="headerlink" href="#simfire.enums.HelicopterTypes" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="simfire.enums.HelicopterRates">
+<span class="sig-prename descclassname"><span class="pre">simfire.enums.</span></span><span class="sig-name descname"><span class="pre">HelicopterRates</span></span><a class="headerlink" href="#simfire.enums.HelicopterRates" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+</section>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          <a class="prev-page" href="../world/rothermel/index.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world.rothermel</span></code></div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2022, fiReLine
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            <div class="icons">
+              
+            </div>
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.enums</span></code></a><ul>
+<li><a class="reference internal" href="#enums">Contains many enumeration classes for use throughout <cite>rothermel_model</cite> that depict pixel
+burn status, the ordering of sprite layers, how much to attenuate the rate of spread on
+different types of control lines, and the current game status.</a></li>
+<li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li><a class="reference internal" href="#classes">Classes</a></li>
+<li><a class="reference internal" href="#attributes">Attributes</a><ul>
+<li><a class="reference internal" href="#simfire.enums.TERRAIN_TEXTURE_PATH"><code class="docutils literal notranslate"><span class="pre">TERRAIN_TEXTURE_PATH</span></code></a></li>
+<li><a class="reference internal" href="#simfire.enums.DRY_TERRAIN_BROWN_IMG"><code class="docutils literal notranslate"><span class="pre">DRY_TERRAIN_BROWN_IMG</span></code></a></li>
+<li><a class="reference internal" href="#simfire.enums.BURNED_RGB_COLOR"><code class="docutils literal notranslate"><span class="pre">BURNED_RGB_COLOR</span></code></a></li>
+<li><a class="reference internal" href="#simfire.enums.BurnStatus"><code class="docutils literal notranslate"><span class="pre">BurnStatus</span></code></a><ul>
+<li><a class="reference internal" href="#simfire.enums.BurnStatus.UNBURNED"><code class="docutils literal notranslate"><span class="pre">BurnStatus.UNBURNED</span></code></a></li>
+<li><a class="reference internal" href="#simfire.enums.BurnStatus.BURNING"><code class="docutils literal notranslate"><span class="pre">BurnStatus.BURNING</span></code></a></li>
+<li><a class="reference internal" href="#simfire.enums.BurnStatus.BURNED"><code class="docutils literal notranslate"><span class="pre">BurnStatus.BURNED</span></code></a></li>
+<li><a class="reference internal" href="#simfire.enums.BurnStatus.FIRELINE"><code class="docutils literal notranslate"><span class="pre">BurnStatus.FIRELINE</span></code></a></li>
+<li><a class="reference internal" href="#simfire.enums.BurnStatus.SCRATCHLINE"><code class="docutils literal notranslate"><span class="pre">BurnStatus.SCRATCHLINE</span></code></a></li>
+<li><a class="reference internal" href="#simfire.enums.BurnStatus.WETLINE"><code class="docutils literal notranslate"><span class="pre">BurnStatus.WETLINE</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#simfire.enums.RoSAttenuation"><code class="docutils literal notranslate"><span class="pre">RoSAttenuation</span></code></a><ul>
+<li><a class="reference internal" href="#simfire.enums.RoSAttenuation.FIRELINE"><code class="docutils literal notranslate"><span class="pre">RoSAttenuation.FIRELINE</span></code></a></li>
+<li><a class="reference internal" href="#simfire.enums.RoSAttenuation.SCRATCHLINE"><code class="docutils literal notranslate"><span class="pre">RoSAttenuation.SCRATCHLINE</span></code></a></li>
+<li><a class="reference internal" href="#simfire.enums.RoSAttenuation.WETLINE"><code class="docutils literal notranslate"><span class="pre">RoSAttenuation.WETLINE</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#simfire.enums.SpriteLayer"><code class="docutils literal notranslate"><span class="pre">SpriteLayer</span></code></a><ul>
+<li><a class="reference internal" href="#simfire.enums.SpriteLayer.TERRAIN"><code class="docutils literal notranslate"><span class="pre">SpriteLayer.TERRAIN</span></code></a></li>
+<li><a class="reference internal" href="#simfire.enums.SpriteLayer.FIRE"><code class="docutils literal notranslate"><span class="pre">SpriteLayer.FIRE</span></code></a></li>
+<li><a class="reference internal" href="#simfire.enums.SpriteLayer.LINE"><code class="docutils literal notranslate"><span class="pre">SpriteLayer.LINE</span></code></a></li>
+<li><a class="reference internal" href="#simfire.enums.SpriteLayer.AGENT"><code class="docutils literal notranslate"><span class="pre">SpriteLayer.AGENT</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#simfire.enums.GameStatus"><code class="docutils literal notranslate"><span class="pre">GameStatus</span></code></a><ul>
+<li><a class="reference internal" href="#simfire.enums.GameStatus.QUIT"><code class="docutils literal notranslate"><span class="pre">GameStatus.QUIT</span></code></a></li>
+<li><a class="reference internal" href="#simfire.enums.GameStatus.RUNNING"><code class="docutils literal notranslate"><span class="pre">GameStatus.RUNNING</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#simfire.enums.FuelConstants"><code class="docutils literal notranslate"><span class="pre">FuelConstants</span></code></a><ul>
+<li><a class="reference internal" href="#simfire.enums.FuelConstants.W_0_MIN"><code class="docutils literal notranslate"><span class="pre">FuelConstants.W_0_MIN</span></code></a></li>
+<li><a class="reference internal" href="#simfire.enums.FuelConstants.W_0_MAX"><code class="docutils literal notranslate"><span class="pre">FuelConstants.W_0_MAX</span></code></a></li>
+<li><a class="reference internal" href="#simfire.enums.FuelConstants.DELTA"><code class="docutils literal notranslate"><span class="pre">FuelConstants.DELTA</span></code></a></li>
+<li><a class="reference internal" href="#simfire.enums.FuelConstants.M_X"><code class="docutils literal notranslate"><span class="pre">FuelConstants.M_X</span></code></a></li>
+<li><a class="reference internal" href="#simfire.enums.FuelConstants.SIGMA"><code class="docutils literal notranslate"><span class="pre">FuelConstants.SIGMA</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#simfire.enums.ElevationConstants"><code class="docutils literal notranslate"><span class="pre">ElevationConstants</span></code></a><ul>
+<li><a class="reference internal" href="#simfire.enums.ElevationConstants.MIN_ELEVATION"><code class="docutils literal notranslate"><span class="pre">ElevationConstants.MIN_ELEVATION</span></code></a></li>
+<li><a class="reference internal" href="#simfire.enums.ElevationConstants.MAX_ELEVATION"><code class="docutils literal notranslate"><span class="pre">ElevationConstants.MAX_ELEVATION</span></code></a></li>
+<li><a class="reference internal" href="#simfire.enums.ElevationConstants.MEAN_ELEVATION"><code class="docutils literal notranslate"><span class="pre">ElevationConstants.MEAN_ELEVATION</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#simfire.enums.WindConstants"><code class="docutils literal notranslate"><span class="pre">WindConstants</span></code></a><ul>
+<li><a class="reference internal" href="#simfire.enums.WindConstants.MIN_SPEED"><code class="docutils literal notranslate"><span class="pre">WindConstants.MIN_SPEED</span></code></a></li>
+<li><a class="reference internal" href="#simfire.enums.WindConstants.MAX_SPEED"><code class="docutils literal notranslate"><span class="pre">WindConstants.MAX_SPEED</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#simfire.enums.FuelModelToFuel"><code class="docutils literal notranslate"><span class="pre">FuelModelToFuel</span></code></a></li>
+<li><a class="reference internal" href="#simfire.enums.FuelModelRGB13"><code class="docutils literal notranslate"><span class="pre">FuelModelRGB13</span></code></a></li>
+<li><a class="reference internal" href="#simfire.enums.HandLineRate"><code class="docutils literal notranslate"><span class="pre">HandLineRate</span></code></a></li>
+<li><a class="reference internal" href="#simfire.enums.DozerType"><code class="docutils literal notranslate"><span class="pre">DozerType</span></code></a></li>
+<li><a class="reference internal" href="#simfire.enums.DozerLineRates"><code class="docutils literal notranslate"><span class="pre">DozerLineRates</span></code></a></li>
+<li><a class="reference internal" href="#simfire.enums.AirTankerType"><code class="docutils literal notranslate"><span class="pre">AirTankerType</span></code></a></li>
+<li><a class="reference internal" href="#simfire.enums.AirTankerRates"><code class="docutils literal notranslate"><span class="pre">AirTankerRates</span></code></a></li>
+<li><a class="reference internal" href="#simfire.enums.HelicopterTypes"><code class="docutils literal notranslate"><span class="pre">HelicopterTypes</span></code></a></li>
+<li><a class="reference internal" href="#simfire.enums.HelicopterRates"><code class="docutils literal notranslate"><span class="pre">HelicopterRates</span></code></a></li>
+<li><a class="reference internal" href="#simfire.enums.TERRAIN_TEXTURE_PATH">TERRAIN_TEXTURE_PATH</a></li>
+<li><a class="reference internal" href="#simfire.enums.DRY_TERRAIN_BROWN_IMG">DRY_TERRAIN_BROWN_IMG</a></li>
+<li><a class="reference internal" href="#simfire.enums.BURNED_RGB_COLOR">BURNED_RGB_COLOR</a></li>
+<li><a class="reference internal" href="#simfire.enums.BurnStatus">BurnStatus</a><ul>
+<li><a class="reference internal" href="#simfire.enums.BurnStatus.UNBURNED">UNBURNED</a></li>
+<li><a class="reference internal" href="#simfire.enums.BurnStatus.BURNING">BURNING</a></li>
+<li><a class="reference internal" href="#simfire.enums.BurnStatus.BURNED">BURNED</a></li>
+<li><a class="reference internal" href="#simfire.enums.BurnStatus.FIRELINE">FIRELINE</a></li>
+<li><a class="reference internal" href="#simfire.enums.BurnStatus.SCRATCHLINE">SCRATCHLINE</a></li>
+<li><a class="reference internal" href="#simfire.enums.BurnStatus.WETLINE">WETLINE</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#simfire.enums.RoSAttenuation">RoSAttenuation</a><ul>
+<li><a class="reference internal" href="#simfire.enums.RoSAttenuation.FIRELINE">FIRELINE</a></li>
+<li><a class="reference internal" href="#simfire.enums.RoSAttenuation.SCRATCHLINE">SCRATCHLINE</a></li>
+<li><a class="reference internal" href="#simfire.enums.RoSAttenuation.WETLINE">WETLINE</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#simfire.enums.SpriteLayer">SpriteLayer</a><ul>
+<li><a class="reference internal" href="#simfire.enums.SpriteLayer.TERRAIN">TERRAIN</a></li>
+<li><a class="reference internal" href="#simfire.enums.SpriteLayer.FIRE">FIRE</a></li>
+<li><a class="reference internal" href="#simfire.enums.SpriteLayer.LINE">LINE</a></li>
+<li><a class="reference internal" href="#simfire.enums.SpriteLayer.AGENT">AGENT</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#simfire.enums.GameStatus">GameStatus</a><ul>
+<li><a class="reference internal" href="#simfire.enums.GameStatus.QUIT">QUIT</a></li>
+<li><a class="reference internal" href="#simfire.enums.GameStatus.RUNNING">RUNNING</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#simfire.enums.FuelConstants">FuelConstants</a><ul>
+<li><a class="reference internal" href="#simfire.enums.FuelConstants.W_0_MIN">W_0_MIN</a></li>
+<li><a class="reference internal" href="#simfire.enums.FuelConstants.W_0_MAX">W_0_MAX</a></li>
+<li><a class="reference internal" href="#simfire.enums.FuelConstants.DELTA">DELTA</a></li>
+<li><a class="reference internal" href="#simfire.enums.FuelConstants.M_X">M_X</a></li>
+<li><a class="reference internal" href="#simfire.enums.FuelConstants.SIGMA">SIGMA</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#simfire.enums.ElevationConstants">ElevationConstants</a><ul>
+<li><a class="reference internal" href="#simfire.enums.ElevationConstants.MIN_ELEVATION">MIN_ELEVATION</a></li>
+<li><a class="reference internal" href="#simfire.enums.ElevationConstants.MAX_ELEVATION">MAX_ELEVATION</a></li>
+<li><a class="reference internal" href="#simfire.enums.ElevationConstants.MEAN_ELEVATION">MEAN_ELEVATION</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#simfire.enums.WindConstants">WindConstants</a><ul>
+<li><a class="reference internal" href="#simfire.enums.WindConstants.MIN_SPEED">MIN_SPEED</a></li>
+<li><a class="reference internal" href="#simfire.enums.WindConstants.MAX_SPEED">MAX_SPEED</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#simfire.enums.FuelModelToFuel">FuelModelToFuel</a></li>
+<li><a class="reference internal" href="#simfire.enums.FuelModelRGB13">FuelModelRGB13</a></li>
+<li><a class="reference internal" href="#simfire.enums.HandLineRate">HandLineRate</a></li>
+<li><a class="reference internal" href="#simfire.enums.DozerType">DozerType</a></li>
+<li><a class="reference internal" href="#simfire.enums.DozerLineRates">DozerLineRates</a></li>
+<li><a class="reference internal" href="#simfire.enums.AirTankerType">AirTankerType</a></li>
+<li><a class="reference internal" href="#simfire.enums.AirTankerRates">AirTankerRates</a></li>
+<li><a class="reference internal" href="#simfire.enums.HelicopterTypes">HelicopterTypes</a></li>
+<li><a class="reference internal" href="#simfire.enums.HelicopterRates">HelicopterRates</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/scripts/furo.js"></script>
+    </body>
+</html>

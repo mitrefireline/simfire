@@ -1,0 +1,16 @@
+:py:mod:`simfire.game.managers`
+===============================
+
+.. py:module:: simfire.game.managers
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   fire/index.rst
+   mitigation/index.rst
+
+

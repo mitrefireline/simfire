@@ -1,0 +1,82 @@
+:py:mod:`simfire.utils.graph`
+=============================
+
+.. py:module:: simfire.utils.graph
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   simfire.utils.graph.FireSpreadGraph
+
+
+
+
+.. py:class:: FireSpreadGraph(screen_size)
+
+   Class that stores the direction of fire spread from pixel to pixel.
+   Each pixel is a node in the graph, with pixels/nodes connected by directed
+   vertices based on the fire spread in that direction.
+
+   Store the screen size and initialize a graph with a node for each pixel.
+   Each node is referenced by its (x, y) location on the screen.
+   The graph will have no vertices to start.
+
+   :param screen_size: The size of the simulation in pixels
+
+   :returns: None
+
+   .. py:method:: get_descendant_heatmap(flat = False)
+
+      Create a heatmap array showing which nodes have the most descendants.
+      This will show which nodes cause the most spread (but beware that nodes
+      close to the starting location will inherently be more impactful.
+      The heatmap can be flat for use with self.draw(), or reshaped for creating
+      an image that aligns with the game screen.
+
+      :param flat: Flag indicating whether the returned value should remain as a
+                   flat array where each index in the array aligns with the node
+                   in self.graph.nodes, or the returned value should be reshaped
+                   to represent an image using the (x, y) coordinates of the nodes
+
+      :returns: A numpy array of shape (len(self.graph.nodes),) if flat==True
+                A numpy array of shape (Y, X), where Y is the largest y-coordinate
+                in self.nodes, and X is the largest x-coordinate in self.nodes
+
+
+   .. py:method:: add_edges_from_manager(x_coords, y_coords, fire_map)
+
+      Update the graph to include edges to newly burning nodes/pixels in
+      coordinates (x_coords[i], y_coords[i]) from any adjacent node/pixel in
+      fire_map that is currently burning.
+
+      :param x_coords: The x coordinates of the newly burning nodes/pixels
+      :param y_coords: The y coordinates of the newly burning nodes/pixels
+      :param fire_map: fire_map: The numpy array that tracks the fire's burn
+                       status for each pixel in the simulation
+
+      :returns: None
+
+
+   .. py:method:: draw(background_image = None, show_longest_path = True, use_heatmap = True)
+
+      Draw the graph with the nodes/pixels in the correct locations and the
+      edges shown as arrows connecting the nodes/pixels.
+
+      Arguemnts:
+          background_image: A numpy array containing the background image on
+                            which to overlay the graph. If not specified,
+                            then no background image will be used
+          show_longest_path: Flag to draw/highlight the longest path in the graph
+          use_heatmap: Flag to color the nodes using a heatmap based on
+                          node descendants
+
+      :returns: A matplotlib.pyplot.Figure of the drawn graph
+
+
+

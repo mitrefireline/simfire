@@ -1,0 +1,46 @@
+:py:mod:`simfire.world.wind_mechanics.perlin_wind`
+==================================================
+
+.. py:module:: simfire.world.wind_mechanics.perlin_wind
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   simfire.world.wind_mechanics.perlin_wind.WindNoise
+
+
+
+
+.. py:class:: WindNoise(seed = None, scale = 100, octaves = 2, persistence = 0.5, lacunarity = 1.0)
+
+   Class for controlling and fine tuning wind noise generation with the Simplex noise
+   algorithm
+
+   Class that handles and creates the wind layer which specifies the magnitude
+   and direction of wind a a given location.  Uses python noise library
+
+   :param seed: The value to seed the noise generator
+   :param scale: The "altitude" from which to see the noise
+   :param octaves: number of passes/layers of the algorithm.  Each pass adds more detail
+   :param persistence: How much each pass affects the overall shape
+                       High values means each pass is less important on shape.
+                       Lower values mean each pass has greater effect on shape.
+                       Best to keep between 0-1
+   :param lacunarity: Controls increase in frequency of octaves per pass.
+                      Frequency = lacunarity & (pass number).
+                      Higher lacunarity, higher frequency per pass.
+   :param screen_size: Size of screen (both heigh and width) MUST BE SQUARE
+
+   .. py:method:: set_noise_parameters(seed, scale, octaves, persistence, lacunarity, range_min, range_max)
+
+
+   .. py:method:: generate_map_array(screen_size)
+
+
+

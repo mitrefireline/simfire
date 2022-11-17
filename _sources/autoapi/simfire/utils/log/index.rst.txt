@@ -1,0 +1,78 @@
+:py:mod:`simfire.utils.log`
+===========================
+
+.. py:module:: simfire.utils.log
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   simfire.utils.log.LoggerWriter
+   simfire.utils.log.LogFilter
+
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   simfire.utils.log.create_logger
+
+
+
+.. py:class:: LoggerWriter(logger, level)
+
+   Taken from https://docs.python.org/3.11/howto/logging-cookbook.html
+
+   .. py:method:: write(message)
+
+
+   .. py:method:: flush()
+
+
+   .. py:method:: close()
+
+
+
+.. py:class:: LogFilter(name='')
+
+   Bases: :py:obj:`logging.Filter`
+
+   Print all messages that do not include "dealloc" (GPU warning message).
+
+   Initialize a filter.
+
+   Initialize with the name of the logger which, together with its
+   children, will have its events allowed through the filter. If no
+   name is specified, allow every event.
+
+   .. py:method:: filter(record)
+
+      Determine if the specified record is to be logged.
+
+      Returns True if the record should be logged, or False otherwise.
+      If deemed appropriate, the record may be modified in-place.
+
+
+
+.. py:function:: create_logger(name)
+
+   Create a `Logger` to be used in different modules
+
+   Parameters:
+   -----------
+   name: str
+       The name of the logger. Will usually be passed in from the module as `__name__`.
+
+   Returns:
+   --------
+   log: logging.Logger
+       The `Logger` object that will be used to create log statements in the terminal.
+
+

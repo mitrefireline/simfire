@@ -1,0 +1,35 @@
+:py:mod:`simfire.game.image`
+============================
+
+.. py:module:: simfire.game.image
+
+
+Module Contents
+---------------
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   simfire.game.image.load_image
+   simfire.game.image.make_surface_rgba
+
+
+
+.. py:function:: load_image(name)
+
+   Load an image as a pygame.Surface.
+
+   :param name: The name/path to the image
+
+   :returns: The image loaded as a pygame.Surface
+   :rtype: surf
+
+
+.. py:function:: make_surface_rgba(array)
+
+   Returns a surface made from a [w, h, 4] numpy array with per-pixel alpha
+
+

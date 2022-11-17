@@ -1,0 +1,1400 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="#" /><link rel="search" title="Search" href="search.html" />
+
+    <link rel="shortcut icon" href="_static/favicon.ico"/><meta name="generator" content="sphinx-5.3.0, furo 2022.09.29"/><title>Index - SimFire latest documentation</title>
+<link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=d81277517bee4d6b0349d71bb2661d4890b5617c" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">SimFire latest documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand centered" href="index.html">
+  
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo" src="_static/rl_logo.png" alt="Logo"/>
+  </div>
+  
+  <span class="sidebar-brand-text">SimFire latest documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Running the Simulation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configuring the Simulation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="autoapi/index.html">API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="autoapi/simfire/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="autoapi/simfire/game/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.game</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4 has-children"><a class="reference internal" href="autoapi/simfire/game/managers/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.game.managers</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l5"><a class="reference internal" href="autoapi/simfire/game/managers/fire/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.game.managers.fire</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="autoapi/simfire/game/managers/mitigation/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.game.managers.mitigation</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/simfire/game/game/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.game.game</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/simfire/game/image/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.game.image</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/simfire/game/sprites/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.game.sprites</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="autoapi/simfire/sim/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.sim</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/simfire/sim/simulation/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.sim.simulation</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="autoapi/simfire/utils/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/simfire/utils/assets/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.assets</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/simfire/utils/textures/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.textures</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/simfire/utils/config/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/simfire/utils/decorators/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.decorators</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/simfire/utils/generate_cfd_wind_layer/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.generate_cfd_wind_layer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/simfire/utils/graph/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.graph</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/simfire/utils/layers/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.layers</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/simfire/utils/log/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.log</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/simfire/utils/terrain/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.terrain</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/simfire/utils/units/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.units</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="autoapi/simfire/world/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4 has-children"><a class="reference internal" href="autoapi/simfire/world/wind_mechanics/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world.wind_mechanics</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" role="switch" type="checkbox"/><label for="toctree-checkbox-8"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l5"><a class="reference internal" href="autoapi/simfire/world/wind_mechanics/cfd_wind/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world.wind_mechanics.cfd_wind</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="autoapi/simfire/world/wind_mechanics/perlin_wind/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world.wind_mechanics.perlin_wind</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="autoapi/simfire/world/wind_mechanics/wind_controller/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world.wind_mechanics.wind_controller</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/simfire/world/elevation_functions/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world.elevation_functions</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/simfire/world/fuel_array_functions/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world.fuel_array_functions</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/simfire/world/parameters/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world.parameters</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/simfire/world/presets/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world.presets</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/simfire/world/rothermel/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world.rothermel</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="autoapi/simfire/enums/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.enums</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          <div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          
+<section class="genindex-section">
+  <h1 id="index">Index</h1>
+  <div class="genindex-jumpbox"><a href="#A"><strong>A</strong></a> | <a href="#B"><strong>B</strong></a> | <a href="#C"><strong>C</strong></a> | <a href="#D"><strong>D</strong></a> | <a href="#E"><strong>E</strong></a> | <a href="#F"><strong>F</strong></a> | <a href="#G"><strong>G</strong></a> | <a href="#H"><strong>H</strong></a> | <a href="#I"><strong>I</strong></a> | <a href="#K"><strong>K</strong></a> | <a href="#L"><strong>L</strong></a> | <a href="#M"><strong>M</strong></a> | <a href="#N"><strong>N</strong></a> | <a href="#O"><strong>O</strong></a> | <a href="#P"><strong>P</strong></a> | <a href="#Q"><strong>Q</strong></a> | <a href="#R"><strong>R</strong></a> | <a href="#S"><strong>S</strong></a> | <a href="#T"><strong>T</strong></a> | <a href="#U"><strong>U</strong></a> | <a href="#W"><strong>W</strong></a> | <a href="#Y"><strong>Y</strong></a></div>
+</section>
+<section id="A" class="genindex-section">
+  <h2>A</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="autoapi/simfire/utils/graph/index.html#simfire.utils.graph.FireSpreadGraph.add_edges_from_manager">add_edges_from_manager() (simfire.utils.graph.FireSpreadGraph method)</a>
+</li>
+        <li><a href="autoapi/simfire/world/wind_mechanics/cfd_wind/index.html#simfire.world.wind_mechanics.cfd_wind.Fluid.addDensity">addDensity() (simfire.world.wind_mechanics.cfd_wind.Fluid method)</a>
+</li>
+        <li><a href="autoapi/simfire/world/wind_mechanics/cfd_wind/index.html#simfire.world.wind_mechanics.cfd_wind.Fluid.addVelocity">addVelocity() (simfire.world.wind_mechanics.cfd_wind.Fluid method)</a>
+</li>
+        <li><a href="autoapi/simfire/world/wind_mechanics/cfd_wind/index.html#simfire.world.wind_mechanics.cfd_wind.advect">advect() (in module simfire.world.wind_mechanics.cfd_wind)</a>
+</li>
+        <li><a href="autoapi/simfire/game/sprites/index.html#simfire.game.sprites.Agent">Agent (class in simfire.game.sprites)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="autoapi/simfire/enums/index.html#simfire.enums.SpriteLayer.AGENT">AGENT (simfire.enums.SpriteLayer attribute)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/config/index.html#simfire.utils.config.DisplayConfig.agent_size">agent_size (simfire.utils.config.DisplayConfig attribute)</a>
+</li>
+        <li><a href="autoapi/simfire/enums/index.html#simfire.enums.AirTankerRates">AirTankerRates (in module simfire.enums)</a>
+</li>
+        <li><a href="autoapi/simfire/enums/index.html#simfire.enums.AirTankerType">AirTankerType (in module simfire.enums)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/config/index.html#simfire.utils.config.AreaConfig">AreaConfig (class in simfire.utils.config)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="B" class="genindex-section">
+  <h2>B</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="autoapi/simfire/world/presets/index.html#simfire.world.presets.Brush">Brush (in module simfire.world.presets)</a>
+</li>
+        <li><a href="autoapi/simfire/enums/index.html#simfire.enums.BurnStatus.BURNED">BURNED (simfire.enums.BurnStatus attribute)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="autoapi/simfire/enums/index.html#simfire.enums.BURNED_RGB_COLOR">BURNED_RGB_COLOR (in module simfire.enums)</a>
+</li>
+        <li><a href="autoapi/simfire/enums/index.html#simfire.enums.BurnStatus.BURNING">BURNING (simfire.enums.BurnStatus attribute)</a>
+</li>
+        <li><a href="autoapi/simfire/enums/index.html#simfire.enums.BurnStatus">BurnStatus (class in simfire.enums)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="C" class="genindex-section">
+  <h2>C</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="autoapi/simfire/utils/units/index.html#simfire.utils.units.chains_to_feet_dozerline">chains_to_feet_dozerline() (in module simfire.utils.units)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/units/index.html#simfire.utils.units.chains_to_feet_handline">chains_to_feet_handline() (in module simfire.utils.units)</a>
+</li>
+        <li><a href="autoapi/simfire/world/presets/index.html#simfire.world.presets.Chaparral">Chaparral (in module simfire.world.presets)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/terrain/index.html#simfire.utils.terrain.chaparral">chaparral() (in module simfire.utils.terrain)</a>
+</li>
+        <li><a href="autoapi/simfire/world/fuel_array_functions/index.html#simfire.world.fuel_array_functions.chaparral_fn">chaparral_fn() (in module simfire.world.fuel_array_functions)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/log/index.html#simfire.utils.log.LoggerWriter.close">close() (simfire.utils.log.LoggerWriter method)</a>
+</li>
+        <li><a href="autoapi/simfire/world/presets/index.html#simfire.world.presets.ClosedShortNeedleTimberLitter">ClosedShortNeedleTimberLitter (in module simfire.world.presets)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="autoapi/simfire/world/rothermel/index.html#simfire.world.rothermel.compute_rate_of_spread">compute_rate_of_spread() (in module simfire.world.rothermel)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/config/index.html#simfire.utils.config.Config">Config (class in simfire.utils.config)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/config/index.html#simfire.utils.config.ConfigError">ConfigError</a>
+</li>
+        <li><a href="autoapi/simfire/game/managers/fire/index.html#simfire.game.managers.fire.ConstantSpreadFireManager">ConstantSpreadFireManager (class in simfire.game.managers.fire)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/config/index.html#simfire.utils.config.DisplayConfig.control_line_size">control_line_size (simfire.utils.config.DisplayConfig attribute)</a>
+</li>
+        <li><a href="autoapi/simfire/game/managers/mitigation/index.html#simfire.game.managers.mitigation.ControlLineManager">ControlLineManager (class in simfire.game.managers.mitigation)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/log/index.html#simfire.utils.log.create_logger">create_logger() (in module simfire.utils.log)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="D" class="genindex-section">
+  <h2>D</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="autoapi/simfire/utils/layers/index.html#simfire.utils.layers.DataLayer">DataLayer (class in simfire.utils.layers)</a>
+</li>
+        <li><a href="autoapi/simfire/enums/index.html#simfire.enums.FuelConstants.DELTA">DELTA (simfire.enums.FuelConstants attribute)</a>
+</li>
+        <li><a href="autoapi/simfire/world/parameters/index.html#simfire.world.parameters.Fuel.delta">delta (simfire.world.parameters.Fuel attribute)</a>
+</li>
+        <li><a href="autoapi/simfire/world/rothermel/index.html#simfire.world.rothermel.device">device (in module simfire.world.rothermel)</a>
+</li>
+        <li><a href="autoapi/simfire/world/wind_mechanics/cfd_wind/index.html#simfire.world.wind_mechanics.cfd_wind.diffuse">diffuse() (in module simfire.world.wind_mechanics.cfd_wind)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/config/index.html#simfire.utils.config.WindConfig.direction">direction (simfire.utils.config.WindConfig attribute)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/config/index.html#simfire.utils.config.WindConfig.direction_function">direction_function (simfire.utils.config.WindConfig attribute)</a>
+</li>
+        <li><a href="autoapi/simfire/sim/simulation/index.html#simfire.sim.simulation.FireSimulation.disaster_categories">disaster_categories (simfire.sim.simulation.FireSimulation property)</a>
+
+        <ul>
+          <li><a href="autoapi/simfire/sim/simulation/index.html#simfire.sim.simulation.Simulation.disaster_categories">(simfire.sim.simulation.Simulation property)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="autoapi/simfire/utils/config/index.html#simfire.utils.config.DisplayConfig">DisplayConfig (class in simfire.utils.config)</a>
+</li>
+        <li><a href="autoapi/simfire/world/presets/index.html#simfire.world.presets.DormantBrushHardwoodSlash">DormantBrushHardwoodSlash (in module simfire.world.presets)</a>
+</li>
+        <li><a href="autoapi/simfire/enums/index.html#simfire.enums.DozerLineRates">DozerLineRates (in module simfire.enums)</a>
+</li>
+        <li><a href="autoapi/simfire/enums/index.html#simfire.enums.DozerType">DozerType (in module simfire.enums)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/graph/index.html#simfire.utils.graph.FireSpreadGraph.draw">draw() (simfire.utils.graph.FireSpreadGraph method)</a>
+</li>
+        <li><a href="autoapi/simfire/game/managers/fire/index.html#simfire.game.managers.fire.RothermelFireManager.draw_spread_graph">draw_spread_graph() (simfire.game.managers.fire.RothermelFireManager method)</a>
+</li>
+        <li><a href="autoapi/simfire/enums/index.html#simfire.enums.DRY_TERRAIN_BROWN_IMG">DRY_TERRAIN_BROWN_IMG (in module simfire.enums)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="E" class="genindex-section">
+  <h2>E</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="autoapi/simfire/enums/index.html#simfire.enums.ElevationConstants">ElevationConstants (class in simfire.enums)</a>
+</li>
+        <li><a href="autoapi/simfire/world/elevation_functions/index.html#simfire.world.elevation_functions.ElevationFn">ElevationFn (in module simfire.world.elevation_functions)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="autoapi/simfire/world/parameters/index.html#simfire.world.parameters.Environment">Environment (class in simfire.world.parameters)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/config/index.html#simfire.utils.config.EnvironmentConfig">EnvironmentConfig (class in simfire.utils.config)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="F" class="genindex-section">
+  <h2>F</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="autoapi/simfire/utils/log/index.html#simfire.utils.log.LogFilter.filter">filter() (simfire.utils.log.LogFilter method)</a>
+</li>
+        <li><a href="autoapi/simfire/game/sprites/index.html#simfire.game.sprites.Fire">Fire (class in simfire.game.sprites)</a>
+</li>
+        <li><a href="autoapi/simfire/enums/index.html#simfire.enums.SpriteLayer.FIRE">FIRE (simfire.enums.SpriteLayer attribute)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/config/index.html#simfire.utils.config.HistoricalConfig.fire_init_pos_lat">fire_init_pos_lat (simfire.utils.config.HistoricalConfig attribute)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/config/index.html#simfire.utils.config.HistoricalConfig.fire_init_pos_long">fire_init_pos_long (simfire.utils.config.HistoricalConfig attribute)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/config/index.html#simfire.utils.config.FireConfig.fire_initial_position">fire_initial_position (simfire.utils.config.FireConfig attribute)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/config/index.html#simfire.utils.config.DisplayConfig.fire_size">fire_size (simfire.utils.config.DisplayConfig attribute)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/config/index.html#simfire.utils.config.FireConfig">FireConfig (class in simfire.utils.config)</a>
+</li>
+        <li><a href="autoapi/simfire/game/sprites/index.html#simfire.game.sprites.FireLine">FireLine (class in simfire.game.sprites)</a>
+</li>
+        <li><a href="autoapi/simfire/enums/index.html#simfire.enums.BurnStatus.FIRELINE">FIRELINE (simfire.enums.BurnStatus attribute)</a>
+
+        <ul>
+          <li><a href="autoapi/simfire/enums/index.html#simfire.enums.RoSAttenuation.FIRELINE">(simfire.enums.RoSAttenuation attribute)</a>
+</li>
+        </ul></li>
+        <li><a href="autoapi/simfire/game/managers/mitigation/index.html#simfire.game.managers.mitigation.FireLineManager">FireLineManager (class in simfire.game.managers.mitigation)</a>
+</li>
+        <li><a href="autoapi/simfire/game/managers/fire/index.html#simfire.game.managers.fire.FireManager">FireManager (class in simfire.game.managers.fire)</a>
+</li>
+        <li><a href="autoapi/simfire/sim/simulation/index.html#simfire.sim.simulation.FireSimulation">FireSimulation (class in simfire.sim.simulation)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/graph/index.html#simfire.utils.graph.FireSpreadGraph">FireSpreadGraph (class in simfire.utils.graph)</a>
+</li>
+        <li><a href="autoapi/simfire/world/elevation_functions/index.html#simfire.world.elevation_functions.flat">flat() (in module simfire.world.elevation_functions)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="autoapi/simfire/world/wind_mechanics/cfd_wind/index.html#simfire.world.wind_mechanics.cfd_wind.Fluid">Fluid (class in simfire.world.wind_mechanics.cfd_wind)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/log/index.html#simfire.utils.log.LoggerWriter.flush">flush() (simfire.utils.log.LoggerWriter method)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/units/index.html#simfire.utils.units.ftpm_to_mph">ftpm_to_mph() (in module simfire.utils.units)</a>
+</li>
+        <li><a href="autoapi/simfire/world/parameters/index.html#simfire.world.parameters.Fuel">Fuel (class in simfire.world.parameters)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/terrain/index.html#simfire.utils.terrain.fuel">fuel() (in module simfire.utils.terrain)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/config/index.html#simfire.utils.config.TerrainConfig.fuel_function">fuel_function (simfire.utils.config.TerrainConfig attribute)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/config/index.html#simfire.utils.config.TerrainConfig.fuel_layer">fuel_layer (simfire.utils.config.TerrainConfig attribute)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/config/index.html#simfire.utils.config.TerrainConfig.fuel_type">fuel_type (simfire.utils.config.TerrainConfig attribute)</a>
+</li>
+        <li><a href="autoapi/simfire/world/fuel_array_functions/index.html#simfire.world.fuel_array_functions.FuelArrayFn">FuelArrayFn (in module simfire.world.fuel_array_functions)</a>
+</li>
+        <li><a href="autoapi/simfire/enums/index.html#simfire.enums.FuelConstants">FuelConstants (class in simfire.enums)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/layers/index.html#simfire.utils.layers.FuelLayer">FuelLayer (class in simfire.utils.layers)</a>
+</li>
+        <li><a href="autoapi/simfire/enums/index.html#simfire.enums.FuelModelRGB13">FuelModelRGB13 (in module simfire.enums)</a>
+</li>
+        <li><a href="autoapi/simfire/enums/index.html#simfire.enums.FuelModelToFuel">FuelModelToFuel (in module simfire.enums)</a>
+</li>
+        <li><a href="autoapi/simfire/world/parameters/index.html#simfire.world.parameters.FuelParticle">FuelParticle (class in simfire.world.parameters)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/config/index.html#simfire.utils.config.FunctionalConfig">FunctionalConfig (class in simfire.utils.config)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/layers/index.html#simfire.utils.layers.FunctionalFuelLayer">FunctionalFuelLayer (class in simfire.utils.layers)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/layers/index.html#simfire.utils.layers.FunctionalTopographyLayer">FunctionalTopographyLayer (class in simfire.utils.layers)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="G" class="genindex-section">
+  <h2>G</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="autoapi/simfire/game/game/index.html#simfire.game.game.Game">Game (class in simfire.game.game)</a>
+</li>
+        <li><a href="autoapi/simfire/enums/index.html#simfire.enums.GameStatus">GameStatus (class in simfire.enums)</a>
+</li>
+        <li><a href="autoapi/simfire/world/elevation_functions/index.html#simfire.world.elevation_functions.gaussian">gaussian() (in module simfire.world.elevation_functions)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/generate_cfd_wind_layer/index.html#simfire.utils.generate_cfd_wind_layer.generate_cfd_wind_layer">generate_cfd_wind_layer() (in module simfire.utils.generate_cfd_wind_layer)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/generate_cfd_wind_layer/index.html#simfire.utils.generate_cfd_wind_layer.generate_direction_array">generate_direction_array() (in module simfire.utils.generate_cfd_wind_layer)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/generate_cfd_wind_layer/index.html#simfire.utils.generate_cfd_wind_layer.generate_magnitude_array">generate_magnitude_array() (in module simfire.utils.generate_cfd_wind_layer)</a>
+</li>
+        <li><a href="autoapi/simfire/world/wind_mechanics/perlin_wind/index.html#simfire.world.wind_mechanics.perlin_wind.WindNoise.generate_map_array">generate_map_array() (simfire.world.wind_mechanics.perlin_wind.WindNoise method)</a>
+</li>
+        <li><a href="autoapi/simfire/sim/simulation/index.html#simfire.sim.simulation.FireSimulation.get_actions">get_actions() (simfire.sim.simulation.FireSimulation method)</a>
+
+        <ul>
+          <li><a href="autoapi/simfire/sim/simulation/index.html#simfire.sim.simulation.Simulation.get_actions">(simfire.sim.simulation.Simulation method)</a>
+</li>
+        </ul></li>
+        <li><a href="autoapi/simfire/sim/simulation/index.html#simfire.sim.simulation.FireSimulation.get_attribute_bounds">get_attribute_bounds() (simfire.sim.simulation.FireSimulation method)</a>
+
+        <ul>
+          <li><a href="autoapi/simfire/sim/simulation/index.html#simfire.sim.simulation.Simulation.get_attribute_bounds">(simfire.sim.simulation.Simulation method)</a>
+</li>
+        </ul></li>
+        <li><a href="autoapi/simfire/sim/simulation/index.html#simfire.sim.simulation.FireSimulation.get_attribute_data">get_attribute_data() (simfire.sim.simulation.FireSimulation method)</a>
+
+        <ul>
+          <li><a href="autoapi/simfire/sim/simulation/index.html#simfire.sim.simulation.Simulation.get_attribute_data">(simfire.sim.simulation.Simulation method)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="autoapi/simfire/utils/graph/index.html#simfire.utils.graph.FireSpreadGraph.get_descendant_heatmap">get_descendant_heatmap() (simfire.utils.graph.FireSpreadGraph method)</a>
+</li>
+        <li><a href="autoapi/simfire/sim/simulation/index.html#simfire.sim.simulation.Simulation.get_disaster_categories">get_disaster_categories() (simfire.sim.simulation.Simulation method)</a>
+</li>
+        <li><a href="autoapi/simfire/sim/simulation/index.html#simfire.sim.simulation.FireSimulation.get_layer_types">get_layer_types() (simfire.sim.simulation.FireSimulation method)</a>
+</li>
+        <li><a href="autoapi/simfire/world/wind_mechanics/wind_controller/index.html#simfire.world.wind_mechanics.wind_controller.WindControllerCFD.get_screen_size">get_screen_size() (simfire.world.wind_mechanics.wind_controller.WindControllerCFD method)</a>
+</li>
+        <li><a href="autoapi/simfire/sim/simulation/index.html#simfire.sim.simulation.FireSimulation.get_seeds">get_seeds() (simfire.sim.simulation.FireSimulation method)</a>
+
+        <ul>
+          <li><a href="autoapi/simfire/sim/simulation/index.html#simfire.sim.simulation.Simulation.get_seeds">(simfire.sim.simulation.Simulation method)</a>
+</li>
+        </ul></li>
+        <li><a href="autoapi/simfire/world/wind_mechanics/wind_controller/index.html#simfire.world.wind_mechanics.wind_controller.WindControllerCFD.get_wind_density_field">get_wind_density_field() (simfire.world.wind_mechanics.wind_controller.WindControllerCFD method)</a>
+</li>
+        <li><a href="autoapi/simfire/world/wind_mechanics/wind_controller/index.html#simfire.world.wind_mechanics.wind_controller.WindControllerCFD.get_wind_scale">get_wind_scale() (simfire.world.wind_mechanics.wind_controller.WindControllerCFD method)</a>
+</li>
+        <li><a href="autoapi/simfire/world/wind_mechanics/wind_controller/index.html#simfire.world.wind_mechanics.wind_controller.WindControllerCFD.get_wind_velocity_field_x">get_wind_velocity_field_x() (simfire.world.wind_mechanics.wind_controller.WindControllerCFD method)</a>
+</li>
+        <li><a href="autoapi/simfire/world/wind_mechanics/wind_controller/index.html#simfire.world.wind_mechanics.wind_controller.WindControllerCFD.get_wind_velocity_field_y">get_wind_velocity_field_y() (simfire.world.wind_mechanics.wind_controller.WindControllerCFD method)</a>
+</li>
+        <li><a href="autoapi/simfire/world/presets/index.html#simfire.world.presets.GrassTimberShrubOverstory">GrassTimberShrubOverstory (in module simfire.world.presets)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="H" class="genindex-section">
+  <h2>H</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="autoapi/simfire/world/parameters/index.html#simfire.world.parameters.FuelParticle.h">h (simfire.world.parameters.FuelParticle attribute)</a>
+</li>
+        <li><a href="autoapi/simfire/enums/index.html#simfire.enums.HandLineRate">HandLineRate (in module simfire.enums)</a>
+</li>
+        <li><a href="autoapi/simfire/world/presets/index.html#simfire.world.presets.HardwoodLongNeedlePineTimber">HardwoodLongNeedlePineTimber (in module simfire.world.presets)</a>
+</li>
+        <li><a href="autoapi/simfire/world/presets/index.html#simfire.world.presets.HeavyLoggingSlash">HeavyLoggingSlash (in module simfire.world.presets)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/config/index.html#simfire.utils.config.OperationalConfig.height">height (simfire.utils.config.OperationalConfig attribute)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="autoapi/simfire/enums/index.html#simfire.enums.HelicopterRates">HelicopterRates (in module simfire.enums)</a>
+</li>
+        <li><a href="autoapi/simfire/enums/index.html#simfire.enums.HelicopterTypes">HelicopterTypes (in module simfire.enums)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/config/index.html#simfire.utils.config.HistoricalConfig.historical_layer">historical_layer (simfire.utils.config.HistoricalConfig attribute)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/config/index.html#simfire.utils.config.HistoricalConfig">HistoricalConfig (class in simfire.utils.config)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/layers/index.html#simfire.utils.layers.HistoricalLayer">HistoricalLayer (class in simfire.utils.layers)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="I" class="genindex-section">
+  <h2>I</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="autoapi/simfire/world/wind_mechanics/wind_controller/index.html#simfire.world.wind_mechanics.wind_controller.WindController.init_wind_direction_generator">init_wind_direction_generator() (simfire.world.wind_mechanics.wind_controller.WindController method)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="autoapi/simfire/world/wind_mechanics/wind_controller/index.html#simfire.world.wind_mechanics.wind_controller.WindController.init_wind_speed_generator">init_wind_speed_generator() (simfire.world.wind_mechanics.wind_controller.WindController method)</a>
+</li>
+        <li><a href="autoapi/simfire/world/wind_mechanics/wind_controller/index.html#simfire.world.wind_mechanics.wind_controller.WindControllerCFD.iterate_wind_step">iterate_wind_step() (simfire.world.wind_mechanics.wind_controller.WindControllerCFD method)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="K" class="genindex-section">
+  <h2>K</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="autoapi/simfire/utils/config/index.html#simfire.utils.config.FunctionalConfig.kwargs">kwargs (simfire.utils.config.FunctionalConfig attribute)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="L" class="genindex-section">
+  <h2>L</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="autoapi/simfire/utils/config/index.html#simfire.utils.config.OperationalConfig.latitude">latitude (simfire.utils.config.OperationalConfig attribute)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/layers/index.html#simfire.utils.layers.LatLongBox">LatLongBox (class in simfire.utils.layers)</a>
+</li>
+        <li><a href="autoapi/simfire/world/presets/index.html#simfire.world.presets.LightLoggingSlash">LightLoggingSlash (in module simfire.world.presets)</a>
+</li>
+        <li><a href="autoapi/simfire/world/wind_mechanics/cfd_wind/index.html#simfire.world.wind_mechanics.cfd_wind.lin_solve">lin_solve() (in module simfire.world.wind_mechanics.cfd_wind)</a>
+</li>
+        <li><a href="autoapi/simfire/enums/index.html#simfire.enums.SpriteLayer.LINE">LINE (simfire.enums.SpriteLayer attribute)</a>
+</li>
+        <li><a href="autoapi/simfire/game/image/index.html#simfire.game.image.load_image">load_image() (in module simfire.game.image)</a>
+</li>
+        <li><a href="autoapi/simfire/sim/simulation/index.html#simfire.sim.simulation.FireSimulation.load_mitigation">load_mitigation() (simfire.sim.simulation.FireSimulation method)</a>
+
+        <ul>
+          <li><a href="autoapi/simfire/sim/simulation/index.html#simfire.sim.simulation.Simulation.load_mitigation">(simfire.sim.simulation.Simulation method)</a>
+</li>
+        </ul></li>
+        <li><a href="autoapi/simfire/game/game/index.html#simfire.game.game.log">log (in module simfire.game.game)</a>
+
+        <ul>
+          <li><a href="autoapi/simfire/game/managers/fire/index.html#simfire.game.managers.fire.log">(in module simfire.game.managers.fire)</a>
+</li>
+          <li><a href="autoapi/simfire/game/sprites/index.html#simfire.game.sprites.log">(in module simfire.game.sprites)</a>
+</li>
+          <li><a href="autoapi/simfire/sim/simulation/index.html#simfire.sim.simulation.log">(in module simfire.sim.simulation)</a>
+</li>
+          <li><a href="autoapi/simfire/utils/config/index.html#simfire.utils.config.log">(in module simfire.utils.config)</a>
+</li>
+          <li><a href="autoapi/simfire/utils/decorators/index.html#simfire.utils.decorators.log">(in module simfire.utils.decorators)</a>
+</li>
+          <li><a href="autoapi/simfire/utils/generate_cfd_wind_layer/index.html#simfire.utils.generate_cfd_wind_layer.log">(in module simfire.utils.generate_cfd_wind_layer)</a>
+</li>
+          <li><a href="autoapi/simfire/utils/layers/index.html#simfire.utils.layers.log">(in module simfire.utils.layers)</a>
+</li>
+          <li><a href="autoapi/simfire/utils/units/index.html#simfire.utils.units.log">(in module simfire.utils.units)</a>
+</li>
+          <li><a href="autoapi/simfire/world/wind_mechanics/wind_controller/index.html#simfire.world.wind_mechanics.wind_controller.log">(in module simfire.world.wind_mechanics.wind_controller)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="autoapi/simfire/utils/log/index.html#simfire.utils.log.LogFilter">LogFilter (class in simfire.utils.log)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/log/index.html#simfire.utils.log.LoggerWriter">LoggerWriter (class in simfire.utils.log)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/config/index.html#simfire.utils.config.OperationalConfig.longitude">longitude (simfire.utils.config.OperationalConfig attribute)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="M" class="genindex-section">
+  <h2>M</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="autoapi/simfire/world/parameters/index.html#simfire.world.parameters.Environment.M_f">M_f (simfire.world.parameters.Environment attribute)</a>
+</li>
+        <li><a href="autoapi/simfire/enums/index.html#simfire.enums.FuelConstants.M_X">M_X (simfire.enums.FuelConstants attribute)</a>
+</li>
+        <li><a href="autoapi/simfire/world/parameters/index.html#simfire.world.parameters.Fuel.M_x">M_x (simfire.world.parameters.Fuel attribute)</a>
+</li>
+        <li><a href="autoapi/simfire/game/image/index.html#simfire.game.image.make_surface_rgba">make_surface_rgba() (in module simfire.game.image)</a>
+</li>
+        <li><a href="autoapi/simfire/enums/index.html#simfire.enums.ElevationConstants.MAX_ELEVATION">MAX_ELEVATION (simfire.enums.ElevationConstants attribute)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/config/index.html#simfire.utils.config.FireConfig.max_fire_duration">max_fire_duration (simfire.utils.config.FireConfig attribute)</a>
+</li>
+        <li><a href="autoapi/simfire/enums/index.html#simfire.enums.WindConstants.MAX_SPEED">MAX_SPEED (simfire.enums.WindConstants attribute)</a>
+</li>
+        <li><a href="autoapi/simfire/enums/index.html#simfire.enums.ElevationConstants.MEAN_ELEVATION">MEAN_ELEVATION (simfire.enums.ElevationConstants attribute)</a>
+</li>
+        <li><a href="autoapi/simfire/world/presets/index.html#simfire.world.presets.MediumLoggingSlash">MediumLoggingSlash (in module simfire.world.presets)</a>
+</li>
+        <li><a href="autoapi/simfire/enums/index.html#simfire.enums.ElevationConstants.MIN_ELEVATION">MIN_ELEVATION (simfire.enums.ElevationConstants attribute)</a>
+</li>
+        <li><a href="autoapi/simfire/enums/index.html#simfire.enums.WindConstants.MIN_SPEED">MIN_SPEED (simfire.enums.WindConstants attribute)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/config/index.html#simfire.utils.config.MitigationConfig">MitigationConfig (class in simfire.utils.config)</a>
+</li>
+        <li>
+    module
+
+        <ul>
+          <li><a href="autoapi/simfire/index.html#module-simfire">simfire</a>
+</li>
+          <li><a href="autoapi/simfire/enums/index.html#module-simfire.enums">simfire.enums</a>
+</li>
+          <li><a href="autoapi/simfire/game/index.html#module-simfire.game">simfire.game</a>
+</li>
+          <li><a href="autoapi/simfire/game/game/index.html#module-simfire.game.game">simfire.game.game</a>
+</li>
+          <li><a href="autoapi/simfire/game/image/index.html#module-simfire.game.image">simfire.game.image</a>
+</li>
+          <li><a href="autoapi/simfire/game/managers/index.html#module-simfire.game.managers">simfire.game.managers</a>
+</li>
+          <li><a href="autoapi/simfire/game/managers/fire/index.html#module-simfire.game.managers.fire">simfire.game.managers.fire</a>
+</li>
+          <li><a href="autoapi/simfire/game/managers/mitigation/index.html#module-simfire.game.managers.mitigation">simfire.game.managers.mitigation</a>
+</li>
+          <li><a href="autoapi/simfire/game/sprites/index.html#module-simfire.game.sprites">simfire.game.sprites</a>
+</li>
+          <li><a href="autoapi/simfire/sim/index.html#module-simfire.sim">simfire.sim</a>
+</li>
+          <li><a href="autoapi/simfire/sim/simulation/index.html#module-simfire.sim.simulation">simfire.sim.simulation</a>
+</li>
+          <li><a href="autoapi/simfire/utils/index.html#module-simfire.utils">simfire.utils</a>
+</li>
+          <li><a href="autoapi/simfire/utils/assets/index.html#module-simfire.utils.assets">simfire.utils.assets</a>
+</li>
+          <li><a href="autoapi/simfire/utils/config/index.html#module-simfire.utils.config">simfire.utils.config</a>
+</li>
+          <li><a href="autoapi/simfire/utils/decorators/index.html#module-simfire.utils.decorators">simfire.utils.decorators</a>
+</li>
+          <li><a href="autoapi/simfire/utils/generate_cfd_wind_layer/index.html#module-simfire.utils.generate_cfd_wind_layer">simfire.utils.generate_cfd_wind_layer</a>
+</li>
+          <li><a href="autoapi/simfire/utils/graph/index.html#module-simfire.utils.graph">simfire.utils.graph</a>
+</li>
+          <li><a href="autoapi/simfire/utils/layers/index.html#module-simfire.utils.layers">simfire.utils.layers</a>
+</li>
+          <li><a href="autoapi/simfire/utils/log/index.html#module-simfire.utils.log">simfire.utils.log</a>
+</li>
+          <li><a href="autoapi/simfire/utils/terrain/index.html#module-simfire.utils.terrain">simfire.utils.terrain</a>
+</li>
+          <li><a href="autoapi/simfire/utils/textures/index.html#module-simfire.utils.textures">simfire.utils.textures</a>
+</li>
+          <li><a href="autoapi/simfire/utils/units/index.html#module-simfire.utils.units">simfire.utils.units</a>
+</li>
+          <li><a href="autoapi/simfire/world/index.html#module-simfire.world">simfire.world</a>
+</li>
+          <li><a href="autoapi/simfire/world/elevation_functions/index.html#module-simfire.world.elevation_functions">simfire.world.elevation_functions</a>
+</li>
+          <li><a href="autoapi/simfire/world/fuel_array_functions/index.html#module-simfire.world.fuel_array_functions">simfire.world.fuel_array_functions</a>
+</li>
+          <li><a href="autoapi/simfire/world/parameters/index.html#module-simfire.world.parameters">simfire.world.parameters</a>
+</li>
+          <li><a href="autoapi/simfire/world/presets/index.html#module-simfire.world.presets">simfire.world.presets</a>
+</li>
+          <li><a href="autoapi/simfire/world/rothermel/index.html#module-simfire.world.rothermel">simfire.world.rothermel</a>
+</li>
+          <li><a href="autoapi/simfire/world/wind_mechanics/index.html#module-simfire.world.wind_mechanics">simfire.world.wind_mechanics</a>
+</li>
+          <li><a href="autoapi/simfire/world/wind_mechanics/cfd_wind/index.html#module-simfire.world.wind_mechanics.cfd_wind">simfire.world.wind_mechanics.cfd_wind</a>
+</li>
+          <li><a href="autoapi/simfire/world/wind_mechanics/perlin_wind/index.html#module-simfire.world.wind_mechanics.perlin_wind">simfire.world.wind_mechanics.perlin_wind</a>
+</li>
+          <li><a href="autoapi/simfire/world/wind_mechanics/wind_controller/index.html#module-simfire.world.wind_mechanics.wind_controller">simfire.world.wind_mechanics.wind_controller</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="autoapi/simfire/utils/config/index.html#simfire.utils.config.EnvironmentConfig.moisture">moisture (simfire.utils.config.EnvironmentConfig attribute)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/units/index.html#simfire.utils.units.mph_to_ftpm">mph_to_ftpm() (in module simfire.utils.units)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/units/index.html#simfire.utils.units.mph_to_ms">mph_to_ms() (in module simfire.utils.units)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="N" class="genindex-section">
+  <h2>N</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="autoapi/simfire/utils/config/index.html#simfire.utils.config.FunctionalConfig.name">name (simfire.utils.config.FunctionalConfig attribute)</a>
+
+        <ul>
+          <li><a href="autoapi/simfire/utils/config/index.html#simfire.utils.config.HistoricalConfig.name">(simfire.utils.config.HistoricalConfig attribute)</a>
+</li>
+        </ul></li>
+        <li><a href="autoapi/simfire/world/presets/index.html#simfire.world.presets.NBAgriculture">NBAgriculture (in module simfire.world.presets)</a>
+</li>
+        <li><a href="autoapi/simfire/world/presets/index.html#simfire.world.presets.NBBarren">NBBarren (in module simfire.world.presets)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="autoapi/simfire/world/presets/index.html#simfire.world.presets.NBNoData">NBNoData (in module simfire.world.presets)</a>
+</li>
+        <li><a href="autoapi/simfire/world/presets/index.html#simfire.world.presets.NBSnowIce">NBSnowIce (in module simfire.world.presets)</a>
+</li>
+        <li><a href="autoapi/simfire/world/presets/index.html#simfire.world.presets.NBUrban">NBUrban (in module simfire.world.presets)</a>
+</li>
+        <li><a href="autoapi/simfire/world/presets/index.html#simfire.world.presets.NBWater">NBWater (in module simfire.world.presets)</a>
+</li>
+        <li><a href="autoapi/simfire/game/managers/fire/index.html#simfire.game.managers.fire.NewLocsType">NewLocsType (in module simfire.game.managers.fire)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="O" class="genindex-section">
+  <h2>O</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="autoapi/simfire/utils/config/index.html#simfire.utils.config.OperationalConfig">OperationalConfig (class in simfire.utils.config)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="autoapi/simfire/utils/layers/index.html#simfire.utils.layers.OperationalFuelLayer">OperationalFuelLayer (class in simfire.utils.layers)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/layers/index.html#simfire.utils.layers.OperationalTopographyLayer">OperationalTopographyLayer (class in simfire.utils.layers)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="P" class="genindex-section">
+  <h2>P</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="autoapi/simfire/world/parameters/index.html#simfire.world.parameters.FuelParticle.p_p">p_p (simfire.world.parameters.FuelParticle attribute)</a>
+</li>
+        <li><a href="autoapi/simfire/world/elevation_functions/index.html#simfire.world.elevation_functions.perlin">perlin() (in module simfire.world.elevation_functions)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/config/index.html#simfire.utils.config.AreaConfig.pixel_scale">pixel_scale (simfire.utils.config.AreaConfig attribute)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="autoapi/simfire/game/managers/mitigation/index.html#simfire.game.managers.mitigation.PointsType">PointsType (in module simfire.game.managers.mitigation)</a>
+</li>
+        <li><a href="autoapi/simfire/game/managers/mitigation/index.html#simfire.game.managers.mitigation.PointType">PointType (in module simfire.game.managers.mitigation)</a>
+</li>
+        <li><a href="autoapi/simfire/game/sprites/index.html#simfire.game.sprites.Agent.pos">pos (simfire.game.sprites.Agent property)</a>
+</li>
+        <li><a href="autoapi/simfire/world/wind_mechanics/cfd_wind/index.html#simfire.world.wind_mechanics.cfd_wind.project">project() (in module simfire.world.wind_mechanics.cfd_wind)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="Q" class="genindex-section">
+  <h2>Q</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="autoapi/simfire/enums/index.html#simfire.enums.GameStatus.QUIT">QUIT (simfire.enums.GameStatus attribute)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="autoapi/simfire/game/game/index.html#simfire.game.game.Game.quit">quit() (simfire.game.game.Game method)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="R" class="genindex-section">
+  <h2>R</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="autoapi/simfire/utils/terrain/index.html#simfire.utils.terrain.random_seed_list">random_seed_list() (in module simfire.utils.terrain)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/generate_cfd_wind_layer/index.html#simfire.utils.generate_cfd_wind_layer.renderD">renderD() (in module simfire.utils.generate_cfd_wind_layer)</a>
+
+        <ul>
+          <li><a href="autoapi/simfire/world/wind_mechanics/cfd_wind/index.html#simfire.world.wind_mechanics.cfd_wind.Fluid.renderD">(simfire.world.wind_mechanics.cfd_wind.Fluid method)</a>
+</li>
+        </ul></li>
+        <li><a href="autoapi/simfire/sim/simulation/index.html#simfire.sim.simulation.FireSimulation.rendering">rendering (simfire.sim.simulation.FireSimulation property)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/generate_cfd_wind_layer/index.html#simfire.utils.generate_cfd_wind_layer.renderV">renderV() (in module simfire.utils.generate_cfd_wind_layer)</a>
+
+        <ul>
+          <li><a href="autoapi/simfire/world/wind_mechanics/cfd_wind/index.html#simfire.world.wind_mechanics.cfd_wind.Fluid.renderV">(simfire.world.wind_mechanics.cfd_wind.Fluid method)</a>
+</li>
+        </ul></li>
+        <li><a href="autoapi/simfire/utils/config/index.html#simfire.utils.config.DisplayConfig.rescale_size">rescale_size (simfire.utils.config.DisplayConfig attribute)</a>
+</li>
+        <li><a href="autoapi/simfire/sim/simulation/index.html#simfire.sim.simulation.FireSimulation.reset">reset() (simfire.sim.simulation.FireSimulation method)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/config/index.html#simfire.utils.config.Config.reset_fire">reset_fire() (simfire.utils.config.Config method)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/config/index.html#simfire.utils.config.Config.reset_terrain">reset_terrain() (simfire.utils.config.Config method)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="autoapi/simfire/utils/config/index.html#simfire.utils.config.Config.reset_wind">reset_wind() (simfire.utils.config.Config method)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/config/index.html#simfire.utils.config.OperationalConfig.resolution">resolution (simfire.utils.config.OperationalConfig attribute)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/config/index.html#simfire.utils.config.MitigationConfig.ros_attenuation">ros_attenuation (simfire.utils.config.MitigationConfig attribute)</a>
+</li>
+        <li><a href="autoapi/simfire/enums/index.html#simfire.enums.RoSAttenuation">RoSAttenuation (class in simfire.enums)</a>
+</li>
+        <li><a href="autoapi/simfire/game/managers/fire/index.html#simfire.game.managers.fire.RothermelFireManager">RothermelFireManager (class in simfire.game.managers.fire)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/layers/index.html#simfire.utils.layers.round_down_to_multiple">round_down_to_multiple() (in module simfire.utils.layers)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/layers/index.html#simfire.utils.layers.round_up_to_multiple">round_up_to_multiple() (in module simfire.utils.layers)</a>
+</li>
+        <li><a href="autoapi/simfire/sim/simulation/index.html#simfire.sim.simulation.FireSimulation.run">run() (simfire.sim.simulation.FireSimulation method)</a>
+
+        <ul>
+          <li><a href="autoapi/simfire/sim/simulation/index.html#simfire.sim.simulation.Simulation.run">(simfire.sim.simulation.Simulation method)</a>
+</li>
+        </ul></li>
+        <li><a href="autoapi/simfire/enums/index.html#simfire.enums.GameStatus.RUNNING">RUNNING (simfire.enums.GameStatus attribute)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="S" class="genindex-section">
+  <h2>S</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="autoapi/simfire/world/parameters/index.html#simfire.world.parameters.FuelParticle.S_e">S_e (simfire.world.parameters.FuelParticle attribute)</a>
+</li>
+        <li><a href="autoapi/simfire/world/parameters/index.html#simfire.world.parameters.FuelParticle.S_T">S_T (simfire.world.parameters.FuelParticle attribute)</a>
+</li>
+        <li><a href="autoapi/simfire/game/game/index.html#simfire.game.game.Game.save">save() (simfire.game.game.Game method)</a>
+
+        <ul>
+          <li><a href="autoapi/simfire/utils/config/index.html#simfire.utils.config.Config.save">(simfire.utils.config.Config method)</a>
+</li>
+        </ul></li>
+        <li><a href="autoapi/simfire/sim/simulation/index.html#simfire.sim.simulation.FireSimulation.save_gif">save_gif() (simfire.sim.simulation.FireSimulation method)</a>
+</li>
+        <li><a href="autoapi/simfire/sim/simulation/index.html#simfire.sim.simulation.FireSimulation.save_spread_graph">save_spread_graph() (simfire.sim.simulation.FireSimulation method)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/units/index.html#simfire.utils.units.scale_ms_to_ftpm">scale_ms_to_ftpm() (in module simfire.utils.units)</a>
+</li>
+        <li><a href="autoapi/simfire/game/sprites/index.html#simfire.game.sprites.ScratchLine">ScratchLine (class in simfire.game.sprites)</a>
+</li>
+        <li><a href="autoapi/simfire/enums/index.html#simfire.enums.BurnStatus.SCRATCHLINE">SCRATCHLINE (simfire.enums.BurnStatus attribute)</a>
+
+        <ul>
+          <li><a href="autoapi/simfire/enums/index.html#simfire.enums.RoSAttenuation.SCRATCHLINE">(simfire.enums.RoSAttenuation attribute)</a>
+</li>
+        </ul></li>
+        <li><a href="autoapi/simfire/game/managers/mitigation/index.html#simfire.game.managers.mitigation.ScratchLineManager">ScratchLineManager (class in simfire.game.managers.mitigation)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/config/index.html#simfire.utils.config.AreaConfig.screen_size">screen_size (simfire.utils.config.AreaConfig attribute)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/config/index.html#simfire.utils.config.FireConfig.seed">seed (simfire.utils.config.FireConfig attribute)</a>
+
+        <ul>
+          <li><a href="autoapi/simfire/utils/config/index.html#simfire.utils.config.OperationalConfig.seed">(simfire.utils.config.OperationalConfig attribute)</a>
+</li>
+        </ul></li>
+        <li><a href="autoapi/simfire/world/wind_mechanics/cfd_wind/index.html#simfire.world.wind_mechanics.cfd_wind.set_bnd">set_bnd() (in module simfire.world.wind_mechanics.cfd_wind)</a>
+</li>
+        <li><a href="autoapi/simfire/sim/simulation/index.html#simfire.sim.simulation.FireSimulation.set_fire_initial_position">set_fire_initial_position() (simfire.sim.simulation.FireSimulation method)</a>
+</li>
+        <li><a href="autoapi/simfire/sim/simulation/index.html#simfire.sim.simulation.FireSimulation.set_layer_types">set_layer_types() (simfire.sim.simulation.FireSimulation method)</a>
+</li>
+        <li><a href="autoapi/simfire/world/wind_mechanics/perlin_wind/index.html#simfire.world.wind_mechanics.perlin_wind.WindNoise.set_noise_parameters">set_noise_parameters() (simfire.world.wind_mechanics.perlin_wind.WindNoise method)</a>
+</li>
+        <li><a href="autoapi/simfire/sim/simulation/index.html#simfire.sim.simulation.FireSimulation.set_seeds">set_seeds() (simfire.sim.simulation.FireSimulation method)</a>
+
+        <ul>
+          <li><a href="autoapi/simfire/sim/simulation/index.html#simfire.sim.simulation.Simulation.set_seeds">(simfire.sim.simulation.Simulation method)</a>
+</li>
+        </ul></li>
+        <li><a href="autoapi/simfire/world/presets/index.html#simfire.world.presets.ShortGrass">ShortGrass (in module simfire.world.presets)</a>
+</li>
+        <li><a href="autoapi/simfire/world/presets/index.html#simfire.world.presets.ShortSparseDryClimateGrass">ShortSparseDryClimateGrass (in module simfire.world.presets)</a>
+</li>
+        <li><a href="autoapi/simfire/enums/index.html#simfire.enums.FuelConstants.SIGMA">SIGMA (simfire.enums.FuelConstants attribute)</a>
+</li>
+        <li><a href="autoapi/simfire/world/parameters/index.html#simfire.world.parameters.Fuel.sigma">sigma (simfire.world.parameters.Fuel attribute)</a>
+</li>
+        <li>
+    simfire
+
+        <ul>
+          <li><a href="autoapi/simfire/index.html#module-simfire">module</a>
+</li>
+        </ul></li>
+        <li>
+    simfire.enums
+
+        <ul>
+          <li><a href="autoapi/simfire/enums/index.html#module-simfire.enums">module</a>
+</li>
+        </ul></li>
+        <li>
+    simfire.game
+
+        <ul>
+          <li><a href="autoapi/simfire/game/index.html#module-simfire.game">module</a>
+</li>
+        </ul></li>
+        <li>
+    simfire.game.game
+
+        <ul>
+          <li><a href="autoapi/simfire/game/game/index.html#module-simfire.game.game">module</a>
+</li>
+        </ul></li>
+        <li>
+    simfire.game.image
+
+        <ul>
+          <li><a href="autoapi/simfire/game/image/index.html#module-simfire.game.image">module</a>
+</li>
+        </ul></li>
+        <li>
+    simfire.game.managers
+
+        <ul>
+          <li><a href="autoapi/simfire/game/managers/index.html#module-simfire.game.managers">module</a>
+</li>
+        </ul></li>
+        <li>
+    simfire.game.managers.fire
+
+        <ul>
+          <li><a href="autoapi/simfire/game/managers/fire/index.html#module-simfire.game.managers.fire">module</a>
+</li>
+        </ul></li>
+        <li>
+    simfire.game.managers.mitigation
+
+        <ul>
+          <li><a href="autoapi/simfire/game/managers/mitigation/index.html#module-simfire.game.managers.mitigation">module</a>
+</li>
+        </ul></li>
+        <li>
+    simfire.game.sprites
+
+        <ul>
+          <li><a href="autoapi/simfire/game/sprites/index.html#module-simfire.game.sprites">module</a>
+</li>
+        </ul></li>
+        <li>
+    simfire.sim
+
+        <ul>
+          <li><a href="autoapi/simfire/sim/index.html#module-simfire.sim">module</a>
+</li>
+        </ul></li>
+        <li>
+    simfire.sim.simulation
+
+        <ul>
+          <li><a href="autoapi/simfire/sim/simulation/index.html#module-simfire.sim.simulation">module</a>
+</li>
+        </ul></li>
+        <li>
+    simfire.utils
+
+        <ul>
+          <li><a href="autoapi/simfire/utils/index.html#module-simfire.utils">module</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li>
+    simfire.utils.assets
+
+        <ul>
+          <li><a href="autoapi/simfire/utils/assets/index.html#module-simfire.utils.assets">module</a>
+</li>
+        </ul></li>
+        <li>
+    simfire.utils.config
+
+        <ul>
+          <li><a href="autoapi/simfire/utils/config/index.html#module-simfire.utils.config">module</a>
+</li>
+        </ul></li>
+        <li>
+    simfire.utils.decorators
+
+        <ul>
+          <li><a href="autoapi/simfire/utils/decorators/index.html#module-simfire.utils.decorators">module</a>
+</li>
+        </ul></li>
+        <li>
+    simfire.utils.generate_cfd_wind_layer
+
+        <ul>
+          <li><a href="autoapi/simfire/utils/generate_cfd_wind_layer/index.html#module-simfire.utils.generate_cfd_wind_layer">module</a>
+</li>
+        </ul></li>
+        <li>
+    simfire.utils.graph
+
+        <ul>
+          <li><a href="autoapi/simfire/utils/graph/index.html#module-simfire.utils.graph">module</a>
+</li>
+        </ul></li>
+        <li>
+    simfire.utils.layers
+
+        <ul>
+          <li><a href="autoapi/simfire/utils/layers/index.html#module-simfire.utils.layers">module</a>
+</li>
+        </ul></li>
+        <li>
+    simfire.utils.log
+
+        <ul>
+          <li><a href="autoapi/simfire/utils/log/index.html#module-simfire.utils.log">module</a>
+</li>
+        </ul></li>
+        <li>
+    simfire.utils.terrain
+
+        <ul>
+          <li><a href="autoapi/simfire/utils/terrain/index.html#module-simfire.utils.terrain">module</a>
+</li>
+        </ul></li>
+        <li>
+    simfire.utils.textures
+
+        <ul>
+          <li><a href="autoapi/simfire/utils/textures/index.html#module-simfire.utils.textures">module</a>
+</li>
+        </ul></li>
+        <li>
+    simfire.utils.units
+
+        <ul>
+          <li><a href="autoapi/simfire/utils/units/index.html#module-simfire.utils.units">module</a>
+</li>
+        </ul></li>
+        <li>
+    simfire.world
+
+        <ul>
+          <li><a href="autoapi/simfire/world/index.html#module-simfire.world">module</a>
+</li>
+        </ul></li>
+        <li>
+    simfire.world.elevation_functions
+
+        <ul>
+          <li><a href="autoapi/simfire/world/elevation_functions/index.html#module-simfire.world.elevation_functions">module</a>
+</li>
+        </ul></li>
+        <li>
+    simfire.world.fuel_array_functions
+
+        <ul>
+          <li><a href="autoapi/simfire/world/fuel_array_functions/index.html#module-simfire.world.fuel_array_functions">module</a>
+</li>
+        </ul></li>
+        <li>
+    simfire.world.parameters
+
+        <ul>
+          <li><a href="autoapi/simfire/world/parameters/index.html#module-simfire.world.parameters">module</a>
+</li>
+        </ul></li>
+        <li>
+    simfire.world.presets
+
+        <ul>
+          <li><a href="autoapi/simfire/world/presets/index.html#module-simfire.world.presets">module</a>
+</li>
+        </ul></li>
+        <li>
+    simfire.world.rothermel
+
+        <ul>
+          <li><a href="autoapi/simfire/world/rothermel/index.html#module-simfire.world.rothermel">module</a>
+</li>
+        </ul></li>
+        <li>
+    simfire.world.wind_mechanics
+
+        <ul>
+          <li><a href="autoapi/simfire/world/wind_mechanics/index.html#module-simfire.world.wind_mechanics">module</a>
+</li>
+        </ul></li>
+        <li>
+    simfire.world.wind_mechanics.cfd_wind
+
+        <ul>
+          <li><a href="autoapi/simfire/world/wind_mechanics/cfd_wind/index.html#module-simfire.world.wind_mechanics.cfd_wind">module</a>
+</li>
+        </ul></li>
+        <li>
+    simfire.world.wind_mechanics.perlin_wind
+
+        <ul>
+          <li><a href="autoapi/simfire/world/wind_mechanics/perlin_wind/index.html#module-simfire.world.wind_mechanics.perlin_wind">module</a>
+</li>
+        </ul></li>
+        <li>
+    simfire.world.wind_mechanics.wind_controller
+
+        <ul>
+          <li><a href="autoapi/simfire/world/wind_mechanics/wind_controller/index.html#module-simfire.world.wind_mechanics.wind_controller">module</a>
+</li>
+        </ul></li>
+        <li><a href="autoapi/simfire/sim/simulation/index.html#simfire.sim.simulation.Simulation">Simulation (class in simfire.sim.simulation)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/config/index.html#simfire.utils.config.SimulationConfig">SimulationConfig (class in simfire.utils.config)</a>
+</li>
+        <li><a href="autoapi/simfire/world/presets/index.html#simfire.world.presets.SouthernRough">SouthernRough (in module simfire.world.presets)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/config/index.html#simfire.utils.config.WindConfig.speed">speed (simfire.utils.config.WindConfig attribute)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/config/index.html#simfire.utils.config.WindConfig.speed_function">speed_function (simfire.utils.config.WindConfig attribute)</a>
+</li>
+        <li><a href="autoapi/simfire/enums/index.html#simfire.enums.SpriteLayer">SpriteLayer (class in simfire.enums)</a>
+</li>
+        <li><a href="autoapi/simfire/game/managers/fire/index.html#simfire.game.managers.fire.SpriteParamsType">SpriteParamsType (in module simfire.game.managers.fire)</a>
+</li>
+        <li><a href="autoapi/simfire/world/wind_mechanics/cfd_wind/index.html#simfire.world.wind_mechanics.cfd_wind.Fluid.step">step() (simfire.world.wind_mechanics.cfd_wind.Fluid method)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/units/index.html#simfire.utils.units.str_to_minutes">str_to_minutes() (in module simfire.utils.units)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="T" class="genindex-section">
+  <h2>T</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="autoapi/simfire/world/presets/index.html#simfire.world.presets.TallGrass">TallGrass (in module simfire.world.presets)</a>
+</li>
+        <li><a href="autoapi/simfire/game/sprites/index.html#simfire.game.sprites.Terrain">Terrain (class in simfire.game.sprites)</a>
+</li>
+        <li><a href="autoapi/simfire/enums/index.html#simfire.enums.SpriteLayer.TERRAIN">TERRAIN (simfire.enums.SpriteLayer attribute)</a>
+</li>
+        <li><a href="autoapi/simfire/world/wind_mechanics/cfd_wind/index.html#simfire.world.wind_mechanics.cfd_wind.terrain_features">terrain_features (in module simfire.world.wind_mechanics.cfd_wind)</a>
+</li>
+        <li><a href="autoapi/simfire/enums/index.html#simfire.enums.TERRAIN_TEXTURE_PATH">TERRAIN_TEXTURE_PATH (in module simfire.enums)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/config/index.html#simfire.utils.config.TerrainConfig">TerrainConfig (class in simfire.utils.config)</a>
+</li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="autoapi/simfire/world/presets/index.html#simfire.world.presets.TimberLitterUnderstory">TimberLitterUnderstory (in module simfire.world.presets)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/decorators/index.html#simfire.utils.decorators.timeit">timeit() (in module simfire.utils.decorators)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/config/index.html#simfire.utils.config.TerrainConfig.topography_function">topography_function (simfire.utils.config.TerrainConfig attribute)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/config/index.html#simfire.utils.config.TerrainConfig.topography_layer">topography_layer (simfire.utils.config.TerrainConfig attribute)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/config/index.html#simfire.utils.config.TerrainConfig.topography_type">topography_type (simfire.utils.config.TerrainConfig attribute)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/layers/index.html#simfire.utils.layers.TopographyLayer">TopographyLayer (class in simfire.utils.layers)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="U" class="genindex-section">
+  <h2>U</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="autoapi/simfire/world/parameters/index.html#simfire.world.parameters.Environment.U">U (simfire.world.parameters.Environment attribute)</a>
+</li>
+        <li><a href="autoapi/simfire/world/parameters/index.html#simfire.world.parameters.Environment.U_dir">U_dir (simfire.world.parameters.Environment attribute)</a>
+</li>
+        <li><a href="autoapi/simfire/enums/index.html#simfire.enums.BurnStatus.UNBURNED">UNBURNED (simfire.enums.BurnStatus attribute)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/units/index.html#simfire.utils.units.UNITS">UNITS (in module simfire.utils.units)</a>
+</li>
+        <li><a href="autoapi/simfire/game/game/index.html#simfire.game.game.Game.update">update() (simfire.game.game.Game method)</a>
+
+        <ul>
+          <li><a href="autoapi/simfire/game/managers/fire/index.html#simfire.game.managers.fire.ConstantSpreadFireManager.update">(simfire.game.managers.fire.ConstantSpreadFireManager method)</a>
+</li>
+          <li><a href="autoapi/simfire/game/managers/fire/index.html#simfire.game.managers.fire.FireManager.update">(simfire.game.managers.fire.FireManager method)</a>
+</li>
+          <li><a href="autoapi/simfire/game/managers/fire/index.html#simfire.game.managers.fire.RothermelFireManager.update">(simfire.game.managers.fire.RothermelFireManager method)</a>
+</li>
+          <li><a href="autoapi/simfire/game/managers/mitigation/index.html#simfire.game.managers.mitigation.ControlLineManager.update">(simfire.game.managers.mitigation.ControlLineManager method)</a>
+</li>
+          <li><a href="autoapi/simfire/game/sprites/index.html#simfire.game.sprites.Agent.update">(simfire.game.sprites.Agent method)</a>
+</li>
+          <li><a href="autoapi/simfire/game/sprites/index.html#simfire.game.sprites.Fire.update">(simfire.game.sprites.Fire method)</a>
+</li>
+          <li><a href="autoapi/simfire/game/sprites/index.html#simfire.game.sprites.FireLine.update">(simfire.game.sprites.FireLine method)</a>
+</li>
+          <li><a href="autoapi/simfire/game/sprites/index.html#simfire.game.sprites.ScratchLine.update">(simfire.game.sprites.ScratchLine method)</a>
+</li>
+          <li><a href="autoapi/simfire/game/sprites/index.html#simfire.game.sprites.Terrain.update">(simfire.game.sprites.Terrain method)</a>
+</li>
+          <li><a href="autoapi/simfire/game/sprites/index.html#simfire.game.sprites.WetLine.update">(simfire.game.sprites.WetLine method)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="autoapi/simfire/sim/simulation/index.html#simfire.sim.simulation.FireSimulation.update_agent_positions">update_agent_positions() (simfire.sim.simulation.FireSimulation method)</a>
+</li>
+        <li><a href="autoapi/simfire/sim/simulation/index.html#simfire.sim.simulation.FireSimulation.update_mitigation">update_mitigation() (simfire.sim.simulation.FireSimulation method)</a>
+
+        <ul>
+          <li><a href="autoapi/simfire/sim/simulation/index.html#simfire.sim.simulation.Simulation.update_mitigation">(simfire.sim.simulation.Simulation method)</a>
+</li>
+        </ul></li>
+        <li><a href="autoapi/simfire/utils/config/index.html#simfire.utils.config.HistoricalConfig.use">use (simfire.utils.config.HistoricalConfig attribute)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="W" class="genindex-section">
+  <h2>W</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="autoapi/simfire/world/parameters/index.html#simfire.world.parameters.Fuel.w_0">w_0 (simfire.world.parameters.Fuel attribute)</a>
+</li>
+        <li><a href="autoapi/simfire/enums/index.html#simfire.enums.FuelConstants.W_0_MAX">W_0_MAX (simfire.enums.FuelConstants attribute)</a>
+</li>
+        <li><a href="autoapi/simfire/enums/index.html#simfire.enums.FuelConstants.W_0_MIN">W_0_MIN (simfire.enums.FuelConstants attribute)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/terrain/index.html#simfire.utils.terrain.w_0_seed">w_0_seed() (in module simfire.utils.terrain)</a>
+</li>
+        <li><a href="autoapi/simfire/game/sprites/index.html#simfire.game.sprites.WetLine">WetLine (class in simfire.game.sprites)</a>
+</li>
+        <li><a href="autoapi/simfire/enums/index.html#simfire.enums.BurnStatus.WETLINE">WETLINE (simfire.enums.BurnStatus attribute)</a>
+
+        <ul>
+          <li><a href="autoapi/simfire/enums/index.html#simfire.enums.RoSAttenuation.WETLINE">(simfire.enums.RoSAttenuation attribute)</a>
+</li>
+        </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="autoapi/simfire/game/managers/mitigation/index.html#simfire.game.managers.mitigation.WetLineManager">WetLineManager (class in simfire.game.managers.mitigation)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/config/index.html#simfire.utils.config.OperationalConfig.width">width (simfire.utils.config.OperationalConfig attribute)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/config/index.html#simfire.utils.config.WindConfig">WindConfig (class in simfire.utils.config)</a>
+</li>
+        <li><a href="autoapi/simfire/enums/index.html#simfire.enums.WindConstants">WindConstants (class in simfire.enums)</a>
+</li>
+        <li><a href="autoapi/simfire/world/wind_mechanics/wind_controller/index.html#simfire.world.wind_mechanics.wind_controller.WindController">WindController (class in simfire.world.wind_mechanics.wind_controller)</a>
+</li>
+        <li><a href="autoapi/simfire/world/wind_mechanics/wind_controller/index.html#simfire.world.wind_mechanics.wind_controller.WindControllerCFD">WindControllerCFD (class in simfire.world.wind_mechanics.wind_controller)</a>
+</li>
+        <li><a href="autoapi/simfire/world/wind_mechanics/perlin_wind/index.html#simfire.world.wind_mechanics.perlin_wind.WindNoise">WindNoise (class in simfire.world.wind_mechanics.perlin_wind)</a>
+</li>
+        <li><a href="autoapi/simfire/utils/log/index.html#simfire.utils.log.LoggerWriter.write">write() (simfire.utils.log.LoggerWriter method)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+<section id="Y" class="genindex-section">
+  <h2>Y</h2>
+  <table style="width: 100%" class="indextable genindextable"><tr>
+    <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="autoapi/simfire/utils/config/index.html#simfire.utils.config.HistoricalConfig.year">year (simfire.utils.config.HistoricalConfig attribute)</a>
+</li>
+    </ul></td>
+  </tr></table>
+</section>
+
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2022, fiReLine
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            <div class="icons">
+              
+            </div>
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer no-toc">
+      
+      
+      
+    </aside>
+  </div>
+</div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/scripts/furo.js"></script>
+    </body>
+</html>

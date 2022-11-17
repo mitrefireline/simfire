@@ -1,0 +1,107 @@
+:py:mod:`simfire.utils.units`
+=============================
+
+.. py:module:: simfire.utils.units
+
+
+Module Contents
+---------------
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   simfire.utils.units.scale_ms_to_ftpm
+   simfire.utils.units.mph_to_ms
+   simfire.utils.units.mph_to_ftpm
+   simfire.utils.units.ftpm_to_mph
+   simfire.utils.units.str_to_minutes
+   simfire.utils.units.chains_to_feet_handline
+   simfire.utils.units.chains_to_feet_dozerline
+
+
+
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   simfire.utils.units.log
+   simfire.utils.units.UNITS
+
+
+.. py:data:: log
+   
+
+   
+
+.. py:data:: UNITS
+   
+
+   
+
+.. py:function:: scale_ms_to_ftpm(ms)
+
+
+.. py:function:: mph_to_ms(mph)
+
+   Convert mph to m/s
+
+   :param mph: The speed in mph.
+
+   :returns: The speed in meters per second
+
+
+.. py:function:: mph_to_ftpm(mph)
+
+   Convert mph to ft/min
+
+   :param mph: The speed in mph.
+
+   :returns: The speed in feet per minute.
+
+
+.. py:function:: ftpm_to_mph(ftpm)
+
+   Convert ft/min to mph
+
+   :param ftpm: The speed in ft/min.
+
+   :returns: The speed in mph.
+
+
+.. py:function:: str_to_minutes(string)
+
+   Convert any string representation of time ('1d 2h 3m') into a number of minutes
+
+   :param string: The input string represented in any of the following ways and more: `2d`,
+   :param `2days`:
+   :param `24h`:
+   :param `1d 23h 60m`.:
+
+   :returns: The number of minutes represented by the string.
+
+
+.. py:function:: chains_to_feet_handline(chains)
+
+   Convert "chains" to (width x hieght) / hour per individual firefighters.
+
+   Calculated by averaging from a 20-person hand-crew.
+   https://www.nifc.gov/nicc/logistics/references/Wildland%20Fire%20Incident%20Management%20Field%20Guide.pdf
+   pgs: 110-113
+
+   Chains are defined as 66 ft x 3 ft
+
+
+.. py:function:: chains_to_feet_dozerline(chains)
+
+   Convert "chains" to (width x hieght) / hour per dozer.
+
+   https://www.nifc.gov/nicc/logistics/references/Wildland%20Fire%20Incident%20Management%20Field%20Guide.pdf
+   pgs: 114-116
+
+   Chains are defined as 66 ft x 30 ft
+
+

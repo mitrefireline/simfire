@@ -1,0 +1,38 @@
+:py:mod:`simfire.utils.decorators`
+==================================
+
+.. py:module:: simfire.utils.decorators
+
+
+Module Contents
+---------------
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   simfire.utils.decorators.timeit
+
+
+
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   simfire.utils.decorators.log
+
+
+.. py:data:: log
+   
+
+   
+
+.. py:function:: timeit(func)
+
+   :param func: Decorated function
+   :return: Execution time for the decorated function
+
+

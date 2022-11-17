@@ -1,0 +1,523 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="API Reference" href="autoapi/index.html" /><link rel="prev" title="Configuring the Simulation" href="config.html" />
+
+    <link rel="shortcut icon" href="_static/favicon.ico"/><meta name="generator" content="sphinx-5.3.0, furo 2022.09.29"/>
+        <title>Contributing - SimFire latest documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=d81277517bee4d6b0349d71bb2661d4890b5617c" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">SimFire latest documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand centered" href="index.html">
+  
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo" src="_static/rl_logo.png" alt="Logo"/>
+  </div>
+  
+  <span class="sidebar-brand-text">SimFire latest documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html" role="search">
+  <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Running the Simulation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="config.html">Configuring the Simulation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul class="current">
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Contributing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="autoapi/index.html">API Reference</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="autoapi/simfire/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="autoapi/simfire/game/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.game</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4 has-children"><a class="reference internal" href="autoapi/simfire/game/managers/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.game.managers</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l5"><a class="reference internal" href="autoapi/simfire/game/managers/fire/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.game.managers.fire</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="autoapi/simfire/game/managers/mitigation/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.game.managers.mitigation</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/simfire/game/game/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.game.game</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/simfire/game/image/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.game.image</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/simfire/game/sprites/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.game.sprites</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="autoapi/simfire/sim/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.sim</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/simfire/sim/simulation/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.sim.simulation</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="autoapi/simfire/utils/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/simfire/utils/assets/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.assets</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/simfire/utils/textures/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.textures</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/simfire/utils/config/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/simfire/utils/decorators/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.decorators</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/simfire/utils/generate_cfd_wind_layer/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.generate_cfd_wind_layer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/simfire/utils/graph/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.graph</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/simfire/utils/layers/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.layers</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/simfire/utils/log/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.log</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/simfire/utils/terrain/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.terrain</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/simfire/utils/units/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.units</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="autoapi/simfire/world/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4 has-children"><a class="reference internal" href="autoapi/simfire/world/wind_mechanics/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world.wind_mechanics</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" role="switch" type="checkbox"/><label for="toctree-checkbox-8"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l5"><a class="reference internal" href="autoapi/simfire/world/wind_mechanics/cfd_wind/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world.wind_mechanics.cfd_wind</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="autoapi/simfire/world/wind_mechanics/perlin_wind/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world.wind_mechanics.perlin_wind</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="autoapi/simfire/world/wind_mechanics/wind_controller/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world.wind_mechanics.wind_controller</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/simfire/world/elevation_functions/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world.elevation_functions</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/simfire/world/fuel_array_functions/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world.fuel_array_functions</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/simfire/world/parameters/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world.parameters</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/simfire/world/presets/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world.presets</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="autoapi/simfire/world/rothermel/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world.rothermel</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="autoapi/simfire/enums/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.enums</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <section id="contributing">
+<h1>Contributing<a class="headerlink" href="#contributing" title="Permalink to this heading">#</a></h1>
+<p>Contributing to the SimFire codebase (<a class="reference external" href="https://gitlab.mitre.org/fireline/simfire">GitLab</a>) requires a process to be followed. This page will explain how to follow that process and will provide some tools to make local development easier.</p>
+<p><strong>Some guidlines</strong>:</p>
+<ol class="arabic simple">
+<li><p>Nobody can commit directly to <code class="docutils literal notranslate"><span class="pre">main</span></code>.</p></li>
+<li><p>You must create a merge request in order to publish changes to <code class="docutils literal notranslate"><span class="pre">main</span></code>.</p></li>
+<li><p>Before merging, all stages of the GitLab CI pipeline must pass. This includes linting with <a class="reference external" href="https://flake8.pycqa.org/en/latest/"><code class="docutils literal notranslate"><span class="pre">flake8</span></code></a> (<a class="reference external" href="https://gitlab.mitre.org/fireline/simfire/-/blob/main/.flake8">config</a>), code-formatting with <a class="reference external" href="https://github.com/psf/black"><code class="docutils literal notranslate"><span class="pre">black</span></code></a> (<a class="reference external" href="https://gitlab.mitre.org/fireline/simfire/-/blob/main/pyproject.toml">config</a>), passing the Python unit tests, and creating the documentation.</p></li>
+<li><p>Once all pipeline stages have passed, then the branch can be merged into main.</p></li>
+<li><p>These pipeline stages can be tested locally to ensure that they are passed on the remote side (explained in <span class="xref myst">Using Pre-commit</span>)</p></li>
+</ol>
+<section id="important-docstring-information">
+<h2>Important Docstring Information<a class="headerlink" href="#important-docstring-information" title="Permalink to this heading">#</a></h2>
+<p>Do your best to make sure that all docstrings adhere to the following Google format found in <code class="docutils literal notranslate"><span class="pre">fire.py</span></code> <a class="reference external" href="https://gitlab.mitre.org/fireline/simfire/-/blob/main/simfire/game/managers/fire.py">here</a>. The reasoning can be found <a class="reference external" href="https://www.sphinx-doc.org/en/main/usage/extensions/napoleon.html">here</a>. We’re using double quotes for docstrings and strings per the formatting requirements of <a class="reference external" href="https://github.com/psf/black"><code class="docutils literal notranslate"><span class="pre">black</span></code></a>.</p>
+<p>If you are editing a file and see that a docstring doesn’t adhere to the Python3 Google Style Guide exemplified in <a class="reference external" href="https://gitlab.mitre.org/fireline/simfire/-/blob/main/simfire/game/managers/fire.py"><code class="docutils literal notranslate"><span class="pre">fire.py</span></code></a>, please be a good steward and fix it so that it does.</p>
+</section>
+<section id="issue-merge-request-creation">
+<h2>Issue &amp; Merge Request Creation<a class="headerlink" href="#issue-merge-request-creation" title="Permalink to this heading">#</a></h2>
+<p>Create or assign an issue to yourself at the <a class="reference external" href="https://gitlab.mitre.org/groups/fireline/-/boards">Group Issue Board Page</a>, add the label <code class="docutils literal notranslate"><span class="pre">SimFire</span></code>, and move it to “Doing”.</p>
+<p>Create a merge request based on that issue using the “Create Merge Request” button on the issue page.</p>
+</section>
+<section id="environment-setup">
+<h2>Environment Setup<a class="headerlink" href="#environment-setup" title="Permalink to this heading">#</a></h2>
+<p>First, clone the repository:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>git clone git@gitlab.mitre.org:fireline/simfire.git
+</pre></div>
+</div>
+<p>Create a conda environment (preferred):</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>conda create -n sf <span class="nv">python</span><span class="o">=</span><span class="m">3</span>.9
+</pre></div>
+</div>
+<p>Install <a class="reference external" href="https://python-poetry.org/">poetry</a> and activate the conda environment:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>curl -sSL https://install.python-poetry.org <span class="p">|</span> python -
+<span class="nb">echo</span> <span class="s2">&quot;export PATH=</span><span class="nv">$PATH</span><span class="s2">:</span><span class="nv">$HOME</span><span class="s2">/.local/bin&quot;</span> &gt;&gt; <span class="nv">$HOME</span>/.bashrc
+<span class="nb">source</span> <span class="nv">$HOME</span>/.bashrc
+conda activate sf
+</pre></div>
+</div>
+<p>Then, install the <strong>developer</strong> requirements:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>poetry install
+</pre></div>
+</div>
+</section>
+<section id="using-pre-commit-highly-recommended">
+<h2>Using Pre-commit (<strong>Highly Recommended</strong>)<a class="headerlink" href="#using-pre-commit-highly-recommended" title="Permalink to this heading">#</a></h2>
+<p>If you’d like, you can install <a class="reference external" href="https://pre-commit.com/">pre-commit</a> to run linting and code-formatting before you are able to commit. This will ensure that you pass this portion of the remote pipelines when you push to your merge request.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>pre-commit install
+</pre></div>
+</div>
+<p>Now, every time you try to commit, your code that you have staged will be linted by <code class="docutils literal notranslate"><span class="pre">flake8</span></code> and auto-formatted by <code class="docutils literal notranslate"><span class="pre">black</span></code>. If the linting doesn’t pass pre-commit, it will tell you, and you’ll have to make those changes before committing those files. If <code class="docutils literal notranslate"><span class="pre">black</span></code> autoformats your code during pre-commit, you can view those changes and then you’ll have to stage them. Then you can commit and push.</p>
+<p>Pre-commit can also be run manually on all files without having to commit.</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>pre-commit run --all-files
+</pre></div>
+</div>
+</section>
+<section id="running-unit-tests">
+<h2>Running Unit Tests<a class="headerlink" href="#running-unit-tests" title="Permalink to this heading">#</a></h2>
+<p>There are also unit tests that need to be passed, and to make sure you are passing those locally (before pushing to your remote branch and running the pipeline) you can run the following command in the root directory:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>poetry run pytest
+</pre></div>
+</div>
+<p>This will search for all <code class="docutils literal notranslate"><span class="pre">test_*.py</span></code> files and run the tests held in those files.</p>
+</section>
+<section id="adding-packages-modules">
+<h2>Adding Packages &amp; Modules<a class="headerlink" href="#adding-packages-modules" title="Permalink to this heading">#</a></h2>
+<p>If you add a package or module, make sure to create a unit test for it and preferably all classes and functions within it. When creating a package (directory with Python modules), add a <code class="docutils literal notranslate"><span class="pre">_tests</span></code> directory that mirrors the package directory. See the example below:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>simfire
+├── game
+│   ├── managers
+│   │   ├── __init__.py
+│   │   ├── _tests
+│   │   │   ├── __init__.py
+│   │   │   ├── test_fire.py
+│   │   │   └── test_mitigation.py
+│   │   ├── fire.py
+│   │   └── mitigation.py
+</pre></div>
+</div>
+<p>In the <code class="docutils literal notranslate"><span class="pre">managers</span></code> package, there are two modules, <code class="docutils literal notranslate"><span class="pre">fire</span></code> and <code class="docutils literal notranslate"><span class="pre">mitigation</span></code>. These are mirrored in the <code class="docutils literal notranslate"><span class="pre">_tests</span></code> directory as <code class="docutils literal notranslate"><span class="pre">test_fire.py</span></code> and <code class="docutils literal notranslate"><span class="pre">test_mitigation.py</span></code>. And inside each of those, there is a mirrored <code class="docutils literal notranslate"><span class="pre">Test</span></code> class for every class in each module:</p>
+<section id="fire-py">
+<h3>fire.py<a class="headerlink" href="#fire-py" title="Permalink to this heading">#</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">FireManager</span><span class="p">():</span>
+</pre></div>
+</div>
+</section>
+<section id="test-fire-py">
+<h3>test_fire.py<a class="headerlink" href="#test-fire-py" title="Permalink to this heading">#</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">TestFireManager</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+</pre></div>
+</div>
+<p>And <em>usually</em>, there is a test for every testable function in that class. Try to adhere to this standard when creating new packages, modules, classes, and functions.</p>
+</section>
+</section>
+<section id="adding-documentation">
+<h2>Adding Documentation<a class="headerlink" href="#adding-documentation" title="Permalink to this heading">#</a></h2>
+<p>API documentation is autogenerated by <a class="reference external" href="https://sphinx-autoapi.readthedocs.io/en/latest/">Sphinx AutoAPI</a>.</p>
+<p>If you’d like to add to this documentation, you can create markdown or <code class="docutils literal notranslate"><span class="pre">.rst</span></code> files in the <code class="docutils literal notranslate"><span class="pre">docs/source</span></code> directory, and <strong>add them to the <code class="docutils literal notranslate"><span class="pre">index.rst</span></code></strong> under the <code class="docutils literal notranslate"><span class="pre">toctree</span></code>:</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span><span class="gh">fiReLine SimFire Fire Simulator</span>
+<span class="gh">===============================</span>
+
+<span class="gh">Running The Simulation</span>
+<span class="gh">----------------------</span>
+<span class="na">:doc:</span><span class="nv">`intro`</span>
+   Introduction to installing and running the simulation.
+
+<span class="na">:doc:</span><span class="nv">`config`</span>
+   The different configuration parameters to set for the simulation and their defaults.
+
+<span class="gh">Development</span>
+<span class="gh">-----------</span>
+
+<span class="na">:doc:</span><span class="nv">`contributing`</span>
+   How to contribute changes to the codebase or to documentation.
+
+<span class="gh">API</span>
+<span class="gh">---</span>
+
+<span class="na">:doc:</span><span class="nv">`autoapi/index`</span>
+
+<span class="cp">.. Hidden TOCs</span>
+
+<span class="p">..</span> <span class="ow">toctree</span><span class="p">::</span>
+   <span class="nc">:maxdepth:</span> 2
+   <span class="nc">:caption:</span> Running the Simulation
+   <span class="nc">:hidden:</span>
+
+   intro
+   config
+
+<span class="p">..</span> <span class="ow">toctree</span><span class="p">::</span>
+   <span class="nc">:maxdepth:</span> 2
+   <span class="nc">:caption:</span> Development
+   <span class="nc">:hidden:</span>
+
+   contributing
+
+<span class="p">..</span> <span class="ow">toctree</span><span class="p">::</span>
+   <span class="nc">:maxdepth:</span> 1
+   <span class="nc">:caption:</span> API Reference
+   <span class="nc">:hidden:</span>
+
+   autoapi/index
+
+<span class="gh">Indices and tables</span>
+<span class="gh">------------------</span>
+
+<span class="m">*</span> <span class="na">:ref:</span><span class="nv">`genindex`</span>
+<span class="m">*</span> <span class="na">:ref:</span><span class="nv">`modindex`</span>
+<span class="m">*</span> <span class="na">:ref:</span><span class="nv">`search`</span>
+</pre></div>
+</div>
+<p>Where your file is located in that <code class="docutils literal notranslate"><span class="pre">toctree</span></code> (Table of Contents Tree) is where the page will exist in the sidebar and on the homepage.</p>
+<section id="pushing-doc-changes-to-mrs">
+<h3>Pushing Doc Changes to MRs<a class="headerlink" href="#pushing-doc-changes-to-mrs" title="Permalink to this heading">#</a></h3>
+<p>Every time changes are pushed to a merge request, artifacts will be created that will allow you to view the hosted version of the GitLab Pages documentation, seen if you click on <em>HTML Documentation</em> (see below) and navigate to <code class="docutils literal notranslate"><span class="pre">public/index.html</span></code>.</p>
+<p><img alt="view_artifacts" src="_images/html_documentation.png" /></p>
+</section>
+<section id="testing-documentation-locally">
+<h3>Testing Documentation Locally<a class="headerlink" href="#testing-documentation-locally" title="Permalink to this heading">#</a></h3>
+<p>In order test documentation locally, you’ll first have to install all the necessary packages that are left out of the <code class="docutils literal notranslate"><span class="pre">poetry</span> <span class="pre">install</span></code> command (this is installed automatically during CI):</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>poetry install --with docs
+</pre></div>
+</div>
+<p>Then, you can build the documentation:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>poetry run sphinx-build -d docs/build/doctrees docs/source docs/build/html
+</pre></div>
+</div>
+<p>And view it by opening the <code class="docutils literal notranslate"><span class="pre">index.html</span></code> file located at:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docs</span><span class="o">/</span><span class="n">build</span><span class="o">/</span><span class="n">html</span><span class="o">/</span><span class="n">index</span><span class="o">.</span><span class="n">html</span>
+</pre></div>
+</div>
+<p>If you’re working locally, just find the file location, and open the file in a browser by copying the path.</p>
+</section>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="autoapi/index.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">API Reference</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="config.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Configuring the Simulation</div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2022, fiReLine
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            <div class="icons">
+              
+            </div>
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Contributing</a><ul>
+<li><a class="reference internal" href="#important-docstring-information">Important Docstring Information</a></li>
+<li><a class="reference internal" href="#issue-merge-request-creation">Issue &amp; Merge Request Creation</a></li>
+<li><a class="reference internal" href="#environment-setup">Environment Setup</a></li>
+<li><a class="reference internal" href="#using-pre-commit-highly-recommended">Using Pre-commit (<strong>Highly Recommended</strong>)</a></li>
+<li><a class="reference internal" href="#running-unit-tests">Running Unit Tests</a></li>
+<li><a class="reference internal" href="#adding-packages-modules">Adding Packages &amp; Modules</a><ul>
+<li><a class="reference internal" href="#fire-py">fire.py</a></li>
+<li><a class="reference internal" href="#test-fire-py">test_fire.py</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#adding-documentation">Adding Documentation</a><ul>
+<li><a class="reference internal" href="#pushing-doc-changes-to-mrs">Pushing Doc Changes to MRs</a></li>
+<li><a class="reference internal" href="#testing-documentation-locally">Testing Documentation Locally</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/scripts/furo.js"></script>
+    </body>
+</html>

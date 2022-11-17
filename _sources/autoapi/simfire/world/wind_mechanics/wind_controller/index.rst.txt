@@ -1,0 +1,100 @@
+:py:mod:`simfire.world.wind_mechanics.wind_controller`
+======================================================
+
+.. py:module:: simfire.world.wind_mechanics.wind_controller
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   simfire.world.wind_mechanics.wind_controller.WindController
+   simfire.world.wind_mechanics.wind_controller.WindControllerCFD
+
+
+
+
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   simfire.world.wind_mechanics.wind_controller.log
+
+
+.. py:data:: log
+   
+
+   
+
+.. py:class:: WindController(screen_size = 225)
+
+   Generates and tracks objects that dictate wind magnitude and wind direction for map
+   given size of the screen
+
+   .. py:method:: init_wind_speed_generator(seed, scale, octaves, persistence, lacunarity, range_min, range_max, screen_size)
+
+      Set simplex noise values for wind speeds
+
+      :param seed: The value to seed the noise generator
+      :param scale: The "altitude" from which to see the noise
+      :param octaves: number of passes/layers of the algorithm.  Each pass adds more detail
+      :param persistence: How much each pass affects the overall shape
+                          High values means each pass is less important on shape.
+                          Lower values mean each pass has greater effect on shape.
+                          Best to keep between 0-1
+      :param lacunarity: Controls increase in frequency of octaves per pass.
+                         Frequency = lacunarity & (pass number).
+                         Higher lacunarity, higher frequency per pass.
+      :param range_min: The minimum speed of the wind in ft/min.
+      :param range_max: The maximum speed of the wind in ft/min.
+      :param screen_size: Size of screen (both heigh and width) MUST BE SQUARE
+
+
+   .. py:method:: init_wind_direction_generator(seed, scale, octaves, persistence, lacunarity, range_min, range_max, screen_size)
+
+      Set simplex noise values for wind directions
+      :param seed: The value to seed the noise generator
+      :param scale: The "altitude" from which to see the noise
+      :param octaves: number of passes/layers of the algorithm.  Each pass adds more detail
+      :param persistence: How much each pass affects the overall shape
+                          High values means each pass is less important on shape.
+                          Lower values mean each pass has greater effect on shape.
+                          Best to keep between 0-1
+      :param lacunarity: Controls increase in frequency of octaves per pass.
+                         Frequency = lacunarity & (pass number).
+                         Higher lacunarity, higher frequency per pass.
+      :param range_min: The minimum angle of wind in degrees clockwise.
+      :param range_min: The maximum angle of wind in degrees clockwise.
+      :param screen_size: Size of screen (both heigh and width) MUST BE SQUARE
+
+
+
+.. py:class:: WindControllerCFD(screen_size = 225, result_accuracy = 1, scale = 1, timestep = 1.0, diffusion = 0.0, viscosity = 1e-07, terrain_features = None, wind_speed = 27.0, wind_direction = 'north', time_to_train = 1000)
+
+   This is a PRECOMPUTE wind controller.  It generates and tracks objects that dictate
+   wind magnitude and wind direction for map given size of the screen.
+
+   .. py:method:: iterate_wind_step()
+
+
+   .. py:method:: get_wind_density_field()
+
+
+   .. py:method:: get_wind_velocity_field_x()
+
+
+   .. py:method:: get_wind_velocity_field_y()
+
+
+   .. py:method:: get_wind_scale()
+
+
+   .. py:method:: get_screen_size()
+
+
+

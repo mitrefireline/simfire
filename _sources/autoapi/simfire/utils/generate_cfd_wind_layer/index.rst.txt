@@ -1,0 +1,59 @@
+:py:mod:`simfire.utils.generate_cfd_wind_layer`
+===============================================
+
+.. py:module:: simfire.utils.generate_cfd_wind_layer
+
+.. autoapi-nested-parse::
+
+   Generate CFD Wind Layer
+   =======================
+   Seperate file to precompute wind layer, currently using wind with a single time slice
+   due to processing limitations.
+
+
+
+Module Contents
+---------------
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   simfire.utils.generate_cfd_wind_layer.renderD
+   simfire.utils.generate_cfd_wind_layer.renderV
+   simfire.utils.generate_cfd_wind_layer.generate_magnitude_array
+   simfire.utils.generate_cfd_wind_layer.generate_direction_array
+   simfire.utils.generate_cfd_wind_layer.generate_cfd_wind_layer
+
+
+
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   simfire.utils.generate_cfd_wind_layer.log
+
+
+.. py:data:: log
+   
+
+   
+
+.. py:function:: renderD(surface, screen_size, scale, density)
+
+
+.. py:function:: renderV(surface, screen_size, scale, velocity_x, velocity_y)
+
+
+.. py:function:: generate_magnitude_array(velocity_x, velocity_y)
+
+
+.. py:function:: generate_direction_array(velocity_x, velocity_y)
+
+
+.. py:function:: generate_cfd_wind_layer(display = False)
+
+

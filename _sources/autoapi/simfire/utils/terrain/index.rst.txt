@@ -1,0 +1,63 @@
+:py:mod:`simfire.utils.terrain`
+===============================
+
+.. py:module:: simfire.utils.terrain
+
+
+Module Contents
+---------------
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   simfire.utils.terrain.random_seed_list
+   simfire.utils.terrain.w_0_seed
+   simfire.utils.terrain.chaparral
+   simfire.utils.terrain.fuel
+
+
+
+.. py:function:: random_seed_list(length, seed = None)
+
+   Create a tuple of tuples  of random integers (to be used as seeds) based on `length`
+   and initial input `seed`
+
+   :param length: Length of each of the nested tuples.
+   :param seed: Initial random seed for generating seeds.
+
+   :returns: A tuple of tuples containing random integers ranging from 0 to 99_999
+
+
+.. py:function:: w_0_seed(seed)
+
+   Create a `w_0` between `0.2` and `0.6` based on an initial `seed` parameter
+
+   :param seed: Initial seed.
+
+   :returns: The oven-dry fuel load value of the fuel.
+
+
+.. py:function:: chaparral(seed = None)
+
+   Create a chaparral fuel object using an optional input seed
+
+   The seed only affects the input to `w_0`, the oven-dry fuel load value.
+
+   :param seed: Initial seed.
+
+   :returns: A fuel with randomized `w_0`, `delta == 6.0`, `M_x == 0.2`, and `sigma == 1739`.
+
+
+.. py:function:: fuel(seed = None)
+
+   Functionailty to use a random seed to define a center point.
+   To be used with operational data layers
+
+   Predefine CA latitude / longitude bounds (N, W, S, E)
+
+   :returns: A tuple of latitude and longitude.
+
+

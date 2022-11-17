@@ -1,0 +1,906 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+<link rel="index" title="Index" href="../../../../genindex.html" /><link rel="search" title="Search" href="../../../../search.html" /><link rel="next" title="simfire.utils.decorators" href="../decorators/index.html" /><link rel="prev" title="simfire.utils.textures" href="../textures/index.html" />
+
+    <link rel="shortcut icon" href="../../../../_static/favicon.ico"/><meta name="generator" content="sphinx-5.3.0, furo 2022.09.29"/>
+        <title>simfire.utils.config - SimFire latest documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo.css?digest=d81277517bee4d6b0349d71bb2661d4890b5617c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../../../index.html"><div class="brand">SimFire latest documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand centered" href="../../../../index.html">
+  
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo" src="../../../../_static/rl_logo.png" alt="Logo"/>
+  </div>
+  
+  <span class="sidebar-brand-text">SimFire latest documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../../../search.html" role="search">
+  <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Running the Simulation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../config.html">Configuring the Simulation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../../../index.html">API Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2 current has-children"><a class="reference internal" href="../../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire</span></code></a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../game/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.game</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../game/managers/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.game.managers</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../game/managers/fire/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.game.managers.fire</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../game/managers/mitigation/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.game.managers.mitigation</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../game/game/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.game.game</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../game/image/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.game.image</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../game/sprites/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.game.sprites</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../sim/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.sim</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../sim/simulation/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.sim.simulation</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3 current has-children"><a class="reference internal" href="../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils</span></code></a><input checked="" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="../assets/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.assets</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../textures/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.textures</span></code></a></li>
+<li class="toctree-l4 current current-page"><a class="current reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../decorators/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.decorators</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../generate_cfd_wind_layer/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.generate_cfd_wind_layer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../graph/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.graph</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../layers/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.layers</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../log/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.log</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../terrain/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.terrain</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../units/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.units</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../world/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../world/wind_mechanics/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world.wind_mechanics</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" role="switch" type="checkbox"/><label for="toctree-checkbox-8"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../world/wind_mechanics/cfd_wind/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world.wind_mechanics.cfd_wind</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../world/wind_mechanics/perlin_wind/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world.wind_mechanics.perlin_wind</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../world/wind_mechanics/wind_controller/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world.wind_mechanics.wind_controller</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../world/elevation_functions/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world.elevation_functions</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../world/fuel_array_functions/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world.fuel_array_functions</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../world/parameters/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world.parameters</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../world/presets/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world.presets</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../world/rothermel/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world.rothermel</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../enums/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.enums</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <section id="module-simfire.utils.config">
+<span id="simfire-utils-config"></span><h1><a class="reference internal" href="#module-simfire.utils.config" title="simfire.utils.config"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.config</span></code></a><a class="headerlink" href="#module-simfire.utils.config" title="Permalink to this heading">#</a></h1>
+<p>Module containing all config parsing and dataclass logic.</p>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this heading">#</a></h2>
+<section id="classes">
+<h3>Classes<a class="headerlink" href="#classes" title="Permalink to this heading">#</a></h3>
+<div class="table-wrapper autosummary longtable docutils container">
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#simfire.utils.config.AreaConfig" title="simfire.utils.config.AreaConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AreaConfig</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#simfire.utils.config.DisplayConfig" title="simfire.utils.config.DisplayConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DisplayConfig</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#simfire.utils.config.SimulationConfig" title="simfire.utils.config.SimulationConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SimulationConfig</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#simfire.utils.config.MitigationConfig" title="simfire.utils.config.MitigationConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MitigationConfig</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#simfire.utils.config.OperationalConfig" title="simfire.utils.config.OperationalConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalConfig</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#simfire.utils.config.HistoricalConfig" title="simfire.utils.config.HistoricalConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HistoricalConfig</span></code></a></p></td>
+<td><p>Class that tracks historical layer.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#simfire.utils.config.FunctionalConfig" title="simfire.utils.config.FunctionalConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FunctionalConfig</span></code></a></p></td>
+<td><p>Class that tracks functional layer names and keyword arguments.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#simfire.utils.config.TerrainConfig" title="simfire.utils.config.TerrainConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TerrainConfig</span></code></a></p></td>
+<td><p>Class that tracks the terrain topography and fuel layers.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#simfire.utils.config.FireConfig" title="simfire.utils.config.FireConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FireConfig</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#simfire.utils.config.EnvironmentConfig" title="simfire.utils.config.EnvironmentConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EnvironmentConfig</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#simfire.utils.config.WindConfig" title="simfire.utils.config.WindConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WindConfig</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#simfire.utils.config.Config" title="simfire.utils.config.Config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Config</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="attributes">
+<h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this heading">#</a></h3>
+<div class="table-wrapper autosummary longtable docutils container">
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#simfire.utils.config.log" title="simfire.utils.config.log"><code class="xref py py-obj docutils literal notranslate"><span class="pre">log</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="py data">
+<dt class="sig sig-object py" id="simfire.utils.config.log">
+<span class="sig-prename descclassname"><span class="pre">simfire.utils.config.</span></span><span class="sig-name descname"><span class="pre">log</span></span><a class="headerlink" href="#simfire.utils.config.log" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="simfire.utils.config.ConfigError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simfire.utils.config.</span></span><span class="sig-name descname"><span class="pre">ConfigError</span></span><a class="headerlink" href="#simfire.utils.config.ConfigError" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<p>Exception class for Config class</p>
+<p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="simfire.utils.config.AreaConfig">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simfire.utils.config.</span></span><span class="sig-name descname"><span class="pre">AreaConfig</span></span><a class="headerlink" href="#simfire.utils.config.AreaConfig" title="Permalink to this definition">#</a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.utils.config.AreaConfig.screen_size">
+<span class="sig-name descname"><span class="pre">screen_size</span></span><em class="property"><span class="w"> </span><span class="pre">:int</span></em><a class="headerlink" href="#simfire.utils.config.AreaConfig.screen_size" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.utils.config.AreaConfig.pixel_scale">
+<span class="sig-name descname"><span class="pre">pixel_scale</span></span><em class="property"><span class="w"> </span><span class="pre">:float</span></em><a class="headerlink" href="#simfire.utils.config.AreaConfig.pixel_scale" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="simfire.utils.config.DisplayConfig">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simfire.utils.config.</span></span><span class="sig-name descname"><span class="pre">DisplayConfig</span></span><a class="headerlink" href="#simfire.utils.config.DisplayConfig" title="Permalink to this definition">#</a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.utils.config.DisplayConfig.fire_size">
+<span class="sig-name descname"><span class="pre">fire_size</span></span><em class="property"><span class="w"> </span><span class="pre">:int</span></em><a class="headerlink" href="#simfire.utils.config.DisplayConfig.fire_size" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.utils.config.DisplayConfig.control_line_size">
+<span class="sig-name descname"><span class="pre">control_line_size</span></span><em class="property"><span class="w"> </span><span class="pre">:int</span></em><a class="headerlink" href="#simfire.utils.config.DisplayConfig.control_line_size" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.utils.config.DisplayConfig.agent_size">
+<span class="sig-name descname"><span class="pre">agent_size</span></span><em class="property"><span class="w"> </span><span class="pre">:int</span></em><a class="headerlink" href="#simfire.utils.config.DisplayConfig.agent_size" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.utils.config.DisplayConfig.rescale_size">
+<span class="sig-name descname"><span class="pre">rescale_size</span></span><em class="property"><span class="w"> </span><span class="pre">:Optional[int]</span></em><a class="headerlink" href="#simfire.utils.config.DisplayConfig.rescale_size" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="simfire.utils.config.SimulationConfig">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simfire.utils.config.</span></span><span class="sig-name descname"><span class="pre">SimulationConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">update_rate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runtime</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headless</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">draw_spread_graph</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.utils.config.SimulationConfig" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>update_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – </p></li>
+<li><p><strong>runtime</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – </p></li>
+<li><p><strong>headless</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a>) – </p></li>
+<li><p><strong>draw_spread_graph</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a>) – </p></li>
+<li><p><strong>record</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a>) – </p></li>
+<li><p><strong>save_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="simfire.utils.config.MitigationConfig">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simfire.utils.config.</span></span><span class="sig-name descname"><span class="pre">MitigationConfig</span></span><a class="headerlink" href="#simfire.utils.config.MitigationConfig" title="Permalink to this definition">#</a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.utils.config.MitigationConfig.ros_attenuation">
+<span class="sig-name descname"><span class="pre">ros_attenuation</span></span><em class="property"><span class="w"> </span><span class="pre">:bool</span></em><a class="headerlink" href="#simfire.utils.config.MitigationConfig.ros_attenuation" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="simfire.utils.config.OperationalConfig">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simfire.utils.config.</span></span><span class="sig-name descname"><span class="pre">OperationalConfig</span></span><a class="headerlink" href="#simfire.utils.config.OperationalConfig" title="Permalink to this definition">#</a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.utils.config.OperationalConfig.seed">
+<span class="sig-name descname"><span class="pre">seed</span></span><em class="property"><span class="w"> </span><span class="pre">:Optional[int]</span></em><a class="headerlink" href="#simfire.utils.config.OperationalConfig.seed" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.utils.config.OperationalConfig.latitude">
+<span class="sig-name descname"><span class="pre">latitude</span></span><em class="property"><span class="w"> </span><span class="pre">:float</span></em><a class="headerlink" href="#simfire.utils.config.OperationalConfig.latitude" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.utils.config.OperationalConfig.longitude">
+<span class="sig-name descname"><span class="pre">longitude</span></span><em class="property"><span class="w"> </span><span class="pre">:float</span></em><a class="headerlink" href="#simfire.utils.config.OperationalConfig.longitude" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.utils.config.OperationalConfig.height">
+<span class="sig-name descname"><span class="pre">height</span></span><em class="property"><span class="w"> </span><span class="pre">:float</span></em><a class="headerlink" href="#simfire.utils.config.OperationalConfig.height" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.utils.config.OperationalConfig.width">
+<span class="sig-name descname"><span class="pre">width</span></span><em class="property"><span class="w"> </span><span class="pre">:float</span></em><a class="headerlink" href="#simfire.utils.config.OperationalConfig.width" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.utils.config.OperationalConfig.resolution">
+<span class="sig-name descname"><span class="pre">resolution</span></span><em class="property"><span class="w"> </span><span class="pre">:float</span></em><a class="headerlink" href="#simfire.utils.config.OperationalConfig.resolution" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="simfire.utils.config.HistoricalConfig">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simfire.utils.config.</span></span><span class="sig-name descname"><span class="pre">HistoricalConfig</span></span><a class="headerlink" href="#simfire.utils.config.HistoricalConfig" title="Permalink to this definition">#</a></dt>
+<dd><p>Class that tracks historical layer.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.utils.config.HistoricalConfig.use">
+<span class="sig-name descname"><span class="pre">use</span></span><em class="property"><span class="w"> </span><span class="pre">:bool</span></em><a class="headerlink" href="#simfire.utils.config.HistoricalConfig.use" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.utils.config.HistoricalConfig.fire_init_pos_lat">
+<span class="sig-name descname"><span class="pre">fire_init_pos_lat</span></span><em class="property"><span class="w"> </span><span class="pre">:float</span></em><a class="headerlink" href="#simfire.utils.config.HistoricalConfig.fire_init_pos_lat" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.utils.config.HistoricalConfig.fire_init_pos_long">
+<span class="sig-name descname"><span class="pre">fire_init_pos_long</span></span><em class="property"><span class="w"> </span><span class="pre">:float</span></em><a class="headerlink" href="#simfire.utils.config.HistoricalConfig.fire_init_pos_long" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.utils.config.HistoricalConfig.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="w"> </span><span class="pre">:str</span></em><a class="headerlink" href="#simfire.utils.config.HistoricalConfig.name" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.utils.config.HistoricalConfig.year">
+<span class="sig-name descname"><span class="pre">year</span></span><em class="property"><span class="w"> </span><span class="pre">:str</span></em><a class="headerlink" href="#simfire.utils.config.HistoricalConfig.year" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.utils.config.HistoricalConfig.historical_layer">
+<span class="sig-name descname"><span class="pre">historical_layer</span></span><a class="headerlink" href="#simfire.utils.config.HistoricalConfig.historical_layer" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="simfire.utils.config.FunctionalConfig">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simfire.utils.config.</span></span><span class="sig-name descname"><span class="pre">FunctionalConfig</span></span><a class="headerlink" href="#simfire.utils.config.FunctionalConfig" title="Permalink to this definition">#</a></dt>
+<dd><p>Class that tracks functional layer names and keyword arguments.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.utils.config.FunctionalConfig.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="w"> </span><span class="pre">:str</span></em><a class="headerlink" href="#simfire.utils.config.FunctionalConfig.name" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.utils.config.FunctionalConfig.kwargs">
+<span class="sig-name descname"><span class="pre">kwargs</span></span><em class="property"><span class="w"> </span><span class="pre">:Dict[str,</span> <span class="pre">Any]</span></em><a class="headerlink" href="#simfire.utils.config.FunctionalConfig.kwargs" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="simfire.utils.config.TerrainConfig">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simfire.utils.config.</span></span><span class="sig-name descname"><span class="pre">TerrainConfig</span></span><a class="headerlink" href="#simfire.utils.config.TerrainConfig" title="Permalink to this definition">#</a></dt>
+<dd><p>Class that tracks the terrain topography and fuel layers.
+The fuel and terrain function fields are optional. They are used for
+functional layers and ignored for operational layers.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.utils.config.TerrainConfig.topography_type">
+<span class="sig-name descname"><span class="pre">topography_type</span></span><em class="property"><span class="w"> </span><span class="pre">:str</span></em><a class="headerlink" href="#simfire.utils.config.TerrainConfig.topography_type" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.utils.config.TerrainConfig.topography_layer">
+<span class="sig-name descname"><span class="pre">topography_layer</span></span><em class="property"><span class="w"> </span><span class="pre">:simfire.utils.layers.TopographyLayer</span></em><a class="headerlink" href="#simfire.utils.config.TerrainConfig.topography_layer" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.utils.config.TerrainConfig.fuel_type">
+<span class="sig-name descname"><span class="pre">fuel_type</span></span><em class="property"><span class="w"> </span><span class="pre">:str</span></em><a class="headerlink" href="#simfire.utils.config.TerrainConfig.fuel_type" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.utils.config.TerrainConfig.fuel_layer">
+<span class="sig-name descname"><span class="pre">fuel_layer</span></span><em class="property"><span class="w"> </span><span class="pre">:simfire.utils.layers.FuelLayer</span></em><a class="headerlink" href="#simfire.utils.config.TerrainConfig.fuel_layer" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.utils.config.TerrainConfig.topography_function">
+<span class="sig-name descname"><span class="pre">topography_function</span></span><em class="property"><span class="w"> </span><span class="pre">:Optional[FunctionalConfig]</span></em><a class="headerlink" href="#simfire.utils.config.TerrainConfig.topography_function" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.utils.config.TerrainConfig.fuel_function">
+<span class="sig-name descname"><span class="pre">fuel_function</span></span><em class="property"><span class="w"> </span><span class="pre">:Optional[FunctionalConfig]</span></em><a class="headerlink" href="#simfire.utils.config.TerrainConfig.fuel_function" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="simfire.utils.config.FireConfig">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simfire.utils.config.</span></span><span class="sig-name descname"><span class="pre">FireConfig</span></span><a class="headerlink" href="#simfire.utils.config.FireConfig" title="Permalink to this definition">#</a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.utils.config.FireConfig.fire_initial_position">
+<span class="sig-name descname"><span class="pre">fire_initial_position</span></span><em class="property"><span class="w"> </span><span class="pre">:Tuple[int,</span> <span class="pre">int]</span></em><a class="headerlink" href="#simfire.utils.config.FireConfig.fire_initial_position" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.utils.config.FireConfig.max_fire_duration">
+<span class="sig-name descname"><span class="pre">max_fire_duration</span></span><em class="property"><span class="w"> </span><span class="pre">:int</span></em><a class="headerlink" href="#simfire.utils.config.FireConfig.max_fire_duration" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.utils.config.FireConfig.seed">
+<span class="sig-name descname"><span class="pre">seed</span></span><em class="property"><span class="w"> </span><span class="pre">:Optional[int]</span></em><a class="headerlink" href="#simfire.utils.config.FireConfig.seed" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="simfire.utils.config.EnvironmentConfig">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simfire.utils.config.</span></span><span class="sig-name descname"><span class="pre">EnvironmentConfig</span></span><a class="headerlink" href="#simfire.utils.config.EnvironmentConfig" title="Permalink to this definition">#</a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.utils.config.EnvironmentConfig.moisture">
+<span class="sig-name descname"><span class="pre">moisture</span></span><em class="property"><span class="w"> </span><span class="pre">:float</span></em><a class="headerlink" href="#simfire.utils.config.EnvironmentConfig.moisture" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="simfire.utils.config.WindConfig">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simfire.utils.config.</span></span><span class="sig-name descname"><span class="pre">WindConfig</span></span><a class="headerlink" href="#simfire.utils.config.WindConfig" title="Permalink to this definition">#</a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.utils.config.WindConfig.speed">
+<span class="sig-name descname"><span class="pre">speed</span></span><em class="property"><span class="w"> </span><span class="pre">:numpy.ndarray</span></em><a class="headerlink" href="#simfire.utils.config.WindConfig.speed" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.utils.config.WindConfig.direction">
+<span class="sig-name descname"><span class="pre">direction</span></span><em class="property"><span class="w"> </span><span class="pre">:numpy.ndarray</span></em><a class="headerlink" href="#simfire.utils.config.WindConfig.direction" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.utils.config.WindConfig.speed_function">
+<span class="sig-name descname"><span class="pre">speed_function</span></span><em class="property"><span class="w"> </span><span class="pre">:Optional[FunctionalConfig]</span></em><a class="headerlink" href="#simfire.utils.config.WindConfig.speed_function" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="simfire.utils.config.WindConfig.direction_function">
+<span class="sig-name descname"><span class="pre">direction_function</span></span><em class="property"><span class="w"> </span><span class="pre">:Optional[FunctionalConfig]</span></em><a class="headerlink" href="#simfire.utils.config.WindConfig.direction_function" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="simfire.utils.config.Config">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simfire.utils.config.</span></span><span class="sig-name descname"><span class="pre">Config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfd_precompute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.utils.config.Config" title="Permalink to this definition">#</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.11)"><em>pathlib.Path</em></a><em>]</em>) – </p></li>
+<li><p><strong>cfd_precompute</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a>) – </p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="simfire.utils.config.Config.reset_terrain">
+<span class="sig-name descname"><span class="pre">reset_terrain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">topography_seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">topography_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fuel_seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fuel_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">location</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.utils.config.Config.reset_terrain" title="Permalink to this definition">#</a></dt>
+<dd><p>Reset the terrain functional generation seeds if using functional data,
+or reset the terrain lat/long location if using operational data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>topography_seed</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>]</em>) – The seed used to randomize functional topography generation</p></li>
+<li><p><strong>fuel_seed</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>]</em>) – The seed used to randomize functional fuel generation</p></li>
+<li><p><strong>location</strong> (<em>Optional</em><em>[</em><em>Tuple</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a><em>]</em><em>]</em>) – A new center-point for the operational topography and fuel data</p></li>
+<li><p><strong>topography_type</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>]</em>) – </p></li>
+<li><p><strong>fuel_type</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>]</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simfire.utils.config.Config.reset_wind">
+<span class="sig-name descname"><span class="pre">reset_wind</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">speed_seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction_seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.utils.config.Config.reset_wind" title="Permalink to this definition">#</a></dt>
+<dd><p>Reset the wind speed and direction seeds.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>speed_seed</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>]</em>) – The seed used to randomize wind speed generation</p></li>
+<li><p><strong>direction_seed</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>]</em>) – The seed used to randomize wind direction generation</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simfire.utils.config.Config.reset_fire">
+<span class="sig-name descname"><span class="pre">reset_fire</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.utils.config.Config.reset_fire" title="Permalink to this definition">#</a></dt>
+<dd><p>Reset the fire initial position seed. Note that both <cite>seed</cite> and <cite>pos</cite> cannot
+be specified together since <cite>seed</cite> is used for random/dynamic cases and <cite>pos</cite>
+is used for static cases.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>seed</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>]</em>) – The seed used to randomize fire initial position generation.</p></li>
+<li><p><strong>pos</strong> (<em>Optional</em><em>[</em><em>Tuple</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>]</em><em>]</em>) – The static position to start the fire at</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simfire.utils.config.Config.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.utils.config.Config.save" title="Permalink to this definition">#</a></dt>
+<dd><p>Save the current config to the specified path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>path</strong> (<em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.11)"><em>pathlib.Path</em></a><em>]</em>) – The path and filename of the output YAML file</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="../decorators/index.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.decorators</span></code></div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="../textures/index.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.textures</span></code></div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2022, fiReLine
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            <div class="icons">
+              
+            </div>
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.config</span></code></a><ul>
+<li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li><a class="reference internal" href="#classes">Classes</a></li>
+<li><a class="reference internal" href="#attributes">Attributes</a><ul>
+<li><a class="reference internal" href="#simfire.utils.config.log"><code class="docutils literal notranslate"><span class="pre">log</span></code></a></li>
+<li><a class="reference internal" href="#simfire.utils.config.ConfigError"><code class="docutils literal notranslate"><span class="pre">ConfigError</span></code></a></li>
+<li><a class="reference internal" href="#simfire.utils.config.AreaConfig"><code class="docutils literal notranslate"><span class="pre">AreaConfig</span></code></a><ul>
+<li><a class="reference internal" href="#simfire.utils.config.AreaConfig.screen_size"><code class="docutils literal notranslate"><span class="pre">AreaConfig.screen_size</span></code></a></li>
+<li><a class="reference internal" href="#simfire.utils.config.AreaConfig.pixel_scale"><code class="docutils literal notranslate"><span class="pre">AreaConfig.pixel_scale</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#simfire.utils.config.DisplayConfig"><code class="docutils literal notranslate"><span class="pre">DisplayConfig</span></code></a><ul>
+<li><a class="reference internal" href="#simfire.utils.config.DisplayConfig.fire_size"><code class="docutils literal notranslate"><span class="pre">DisplayConfig.fire_size</span></code></a></li>
+<li><a class="reference internal" href="#simfire.utils.config.DisplayConfig.control_line_size"><code class="docutils literal notranslate"><span class="pre">DisplayConfig.control_line_size</span></code></a></li>
+<li><a class="reference internal" href="#simfire.utils.config.DisplayConfig.agent_size"><code class="docutils literal notranslate"><span class="pre">DisplayConfig.agent_size</span></code></a></li>
+<li><a class="reference internal" href="#simfire.utils.config.DisplayConfig.rescale_size"><code class="docutils literal notranslate"><span class="pre">DisplayConfig.rescale_size</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#simfire.utils.config.SimulationConfig"><code class="docutils literal notranslate"><span class="pre">SimulationConfig</span></code></a></li>
+<li><a class="reference internal" href="#simfire.utils.config.MitigationConfig"><code class="docutils literal notranslate"><span class="pre">MitigationConfig</span></code></a><ul>
+<li><a class="reference internal" href="#simfire.utils.config.MitigationConfig.ros_attenuation"><code class="docutils literal notranslate"><span class="pre">MitigationConfig.ros_attenuation</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#simfire.utils.config.OperationalConfig"><code class="docutils literal notranslate"><span class="pre">OperationalConfig</span></code></a><ul>
+<li><a class="reference internal" href="#simfire.utils.config.OperationalConfig.seed"><code class="docutils literal notranslate"><span class="pre">OperationalConfig.seed</span></code></a></li>
+<li><a class="reference internal" href="#simfire.utils.config.OperationalConfig.latitude"><code class="docutils literal notranslate"><span class="pre">OperationalConfig.latitude</span></code></a></li>
+<li><a class="reference internal" href="#simfire.utils.config.OperationalConfig.longitude"><code class="docutils literal notranslate"><span class="pre">OperationalConfig.longitude</span></code></a></li>
+<li><a class="reference internal" href="#simfire.utils.config.OperationalConfig.height"><code class="docutils literal notranslate"><span class="pre">OperationalConfig.height</span></code></a></li>
+<li><a class="reference internal" href="#simfire.utils.config.OperationalConfig.width"><code class="docutils literal notranslate"><span class="pre">OperationalConfig.width</span></code></a></li>
+<li><a class="reference internal" href="#simfire.utils.config.OperationalConfig.resolution"><code class="docutils literal notranslate"><span class="pre">OperationalConfig.resolution</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#simfire.utils.config.HistoricalConfig"><code class="docutils literal notranslate"><span class="pre">HistoricalConfig</span></code></a><ul>
+<li><a class="reference internal" href="#simfire.utils.config.HistoricalConfig.use"><code class="docutils literal notranslate"><span class="pre">HistoricalConfig.use</span></code></a></li>
+<li><a class="reference internal" href="#simfire.utils.config.HistoricalConfig.fire_init_pos_lat"><code class="docutils literal notranslate"><span class="pre">HistoricalConfig.fire_init_pos_lat</span></code></a></li>
+<li><a class="reference internal" href="#simfire.utils.config.HistoricalConfig.fire_init_pos_long"><code class="docutils literal notranslate"><span class="pre">HistoricalConfig.fire_init_pos_long</span></code></a></li>
+<li><a class="reference internal" href="#simfire.utils.config.HistoricalConfig.name"><code class="docutils literal notranslate"><span class="pre">HistoricalConfig.name</span></code></a></li>
+<li><a class="reference internal" href="#simfire.utils.config.HistoricalConfig.year"><code class="docutils literal notranslate"><span class="pre">HistoricalConfig.year</span></code></a></li>
+<li><a class="reference internal" href="#simfire.utils.config.HistoricalConfig.historical_layer"><code class="docutils literal notranslate"><span class="pre">HistoricalConfig.historical_layer</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#simfire.utils.config.FunctionalConfig"><code class="docutils literal notranslate"><span class="pre">FunctionalConfig</span></code></a><ul>
+<li><a class="reference internal" href="#simfire.utils.config.FunctionalConfig.name"><code class="docutils literal notranslate"><span class="pre">FunctionalConfig.name</span></code></a></li>
+<li><a class="reference internal" href="#simfire.utils.config.FunctionalConfig.kwargs"><code class="docutils literal notranslate"><span class="pre">FunctionalConfig.kwargs</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#simfire.utils.config.TerrainConfig"><code class="docutils literal notranslate"><span class="pre">TerrainConfig</span></code></a><ul>
+<li><a class="reference internal" href="#simfire.utils.config.TerrainConfig.topography_type"><code class="docutils literal notranslate"><span class="pre">TerrainConfig.topography_type</span></code></a></li>
+<li><a class="reference internal" href="#simfire.utils.config.TerrainConfig.topography_layer"><code class="docutils literal notranslate"><span class="pre">TerrainConfig.topography_layer</span></code></a></li>
+<li><a class="reference internal" href="#simfire.utils.config.TerrainConfig.fuel_type"><code class="docutils literal notranslate"><span class="pre">TerrainConfig.fuel_type</span></code></a></li>
+<li><a class="reference internal" href="#simfire.utils.config.TerrainConfig.fuel_layer"><code class="docutils literal notranslate"><span class="pre">TerrainConfig.fuel_layer</span></code></a></li>
+<li><a class="reference internal" href="#simfire.utils.config.TerrainConfig.topography_function"><code class="docutils literal notranslate"><span class="pre">TerrainConfig.topography_function</span></code></a></li>
+<li><a class="reference internal" href="#simfire.utils.config.TerrainConfig.fuel_function"><code class="docutils literal notranslate"><span class="pre">TerrainConfig.fuel_function</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#simfire.utils.config.FireConfig"><code class="docutils literal notranslate"><span class="pre">FireConfig</span></code></a><ul>
+<li><a class="reference internal" href="#simfire.utils.config.FireConfig.fire_initial_position"><code class="docutils literal notranslate"><span class="pre">FireConfig.fire_initial_position</span></code></a></li>
+<li><a class="reference internal" href="#simfire.utils.config.FireConfig.max_fire_duration"><code class="docutils literal notranslate"><span class="pre">FireConfig.max_fire_duration</span></code></a></li>
+<li><a class="reference internal" href="#simfire.utils.config.FireConfig.seed"><code class="docutils literal notranslate"><span class="pre">FireConfig.seed</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#simfire.utils.config.EnvironmentConfig"><code class="docutils literal notranslate"><span class="pre">EnvironmentConfig</span></code></a><ul>
+<li><a class="reference internal" href="#simfire.utils.config.EnvironmentConfig.moisture"><code class="docutils literal notranslate"><span class="pre">EnvironmentConfig.moisture</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#simfire.utils.config.WindConfig"><code class="docutils literal notranslate"><span class="pre">WindConfig</span></code></a><ul>
+<li><a class="reference internal" href="#simfire.utils.config.WindConfig.speed"><code class="docutils literal notranslate"><span class="pre">WindConfig.speed</span></code></a></li>
+<li><a class="reference internal" href="#simfire.utils.config.WindConfig.direction"><code class="docutils literal notranslate"><span class="pre">WindConfig.direction</span></code></a></li>
+<li><a class="reference internal" href="#simfire.utils.config.WindConfig.speed_function"><code class="docutils literal notranslate"><span class="pre">WindConfig.speed_function</span></code></a></li>
+<li><a class="reference internal" href="#simfire.utils.config.WindConfig.direction_function"><code class="docutils literal notranslate"><span class="pre">WindConfig.direction_function</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#simfire.utils.config.Config"><code class="docutils literal notranslate"><span class="pre">Config</span></code></a><ul>
+<li><a class="reference internal" href="#simfire.utils.config.Config.reset_terrain"><code class="docutils literal notranslate"><span class="pre">Config.reset_terrain()</span></code></a></li>
+<li><a class="reference internal" href="#simfire.utils.config.Config.reset_wind"><code class="docutils literal notranslate"><span class="pre">Config.reset_wind()</span></code></a></li>
+<li><a class="reference internal" href="#simfire.utils.config.Config.reset_fire"><code class="docutils literal notranslate"><span class="pre">Config.reset_fire()</span></code></a></li>
+<li><a class="reference internal" href="#simfire.utils.config.Config.save"><code class="docutils literal notranslate"><span class="pre">Config.save()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#simfire.utils.config.log">log</a></li>
+<li><a class="reference internal" href="#simfire.utils.config.ConfigError">ConfigError</a></li>
+<li><a class="reference internal" href="#simfire.utils.config.AreaConfig">AreaConfig</a><ul>
+<li><a class="reference internal" href="#simfire.utils.config.AreaConfig.screen_size">screen_size</a></li>
+<li><a class="reference internal" href="#simfire.utils.config.AreaConfig.pixel_scale">pixel_scale</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#simfire.utils.config.DisplayConfig">DisplayConfig</a><ul>
+<li><a class="reference internal" href="#simfire.utils.config.DisplayConfig.fire_size">fire_size</a></li>
+<li><a class="reference internal" href="#simfire.utils.config.DisplayConfig.control_line_size">control_line_size</a></li>
+<li><a class="reference internal" href="#simfire.utils.config.DisplayConfig.agent_size">agent_size</a></li>
+<li><a class="reference internal" href="#simfire.utils.config.DisplayConfig.rescale_size">rescale_size</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#simfire.utils.config.SimulationConfig">SimulationConfig</a></li>
+<li><a class="reference internal" href="#simfire.utils.config.MitigationConfig">MitigationConfig</a><ul>
+<li><a class="reference internal" href="#simfire.utils.config.MitigationConfig.ros_attenuation">ros_attenuation</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#simfire.utils.config.OperationalConfig">OperationalConfig</a><ul>
+<li><a class="reference internal" href="#simfire.utils.config.OperationalConfig.seed">seed</a></li>
+<li><a class="reference internal" href="#simfire.utils.config.OperationalConfig.latitude">latitude</a></li>
+<li><a class="reference internal" href="#simfire.utils.config.OperationalConfig.longitude">longitude</a></li>
+<li><a class="reference internal" href="#simfire.utils.config.OperationalConfig.height">height</a></li>
+<li><a class="reference internal" href="#simfire.utils.config.OperationalConfig.width">width</a></li>
+<li><a class="reference internal" href="#simfire.utils.config.OperationalConfig.resolution">resolution</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#simfire.utils.config.HistoricalConfig">HistoricalConfig</a><ul>
+<li><a class="reference internal" href="#simfire.utils.config.HistoricalConfig.use">use</a></li>
+<li><a class="reference internal" href="#simfire.utils.config.HistoricalConfig.fire_init_pos_lat">fire_init_pos_lat</a></li>
+<li><a class="reference internal" href="#simfire.utils.config.HistoricalConfig.fire_init_pos_long">fire_init_pos_long</a></li>
+<li><a class="reference internal" href="#simfire.utils.config.HistoricalConfig.name">name</a></li>
+<li><a class="reference internal" href="#simfire.utils.config.HistoricalConfig.year">year</a></li>
+<li><a class="reference internal" href="#simfire.utils.config.HistoricalConfig.historical_layer">historical_layer</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#simfire.utils.config.FunctionalConfig">FunctionalConfig</a><ul>
+<li><a class="reference internal" href="#simfire.utils.config.FunctionalConfig.name">name</a></li>
+<li><a class="reference internal" href="#simfire.utils.config.FunctionalConfig.kwargs">kwargs</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#simfire.utils.config.TerrainConfig">TerrainConfig</a><ul>
+<li><a class="reference internal" href="#simfire.utils.config.TerrainConfig.topography_type">topography_type</a></li>
+<li><a class="reference internal" href="#simfire.utils.config.TerrainConfig.topography_layer">topography_layer</a></li>
+<li><a class="reference internal" href="#simfire.utils.config.TerrainConfig.fuel_type">fuel_type</a></li>
+<li><a class="reference internal" href="#simfire.utils.config.TerrainConfig.fuel_layer">fuel_layer</a></li>
+<li><a class="reference internal" href="#simfire.utils.config.TerrainConfig.topography_function">topography_function</a></li>
+<li><a class="reference internal" href="#simfire.utils.config.TerrainConfig.fuel_function">fuel_function</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#simfire.utils.config.FireConfig">FireConfig</a><ul>
+<li><a class="reference internal" href="#simfire.utils.config.FireConfig.fire_initial_position">fire_initial_position</a></li>
+<li><a class="reference internal" href="#simfire.utils.config.FireConfig.max_fire_duration">max_fire_duration</a></li>
+<li><a class="reference internal" href="#simfire.utils.config.FireConfig.seed">seed</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#simfire.utils.config.EnvironmentConfig">EnvironmentConfig</a><ul>
+<li><a class="reference internal" href="#simfire.utils.config.EnvironmentConfig.moisture">moisture</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#simfire.utils.config.WindConfig">WindConfig</a><ul>
+<li><a class="reference internal" href="#simfire.utils.config.WindConfig.speed">speed</a></li>
+<li><a class="reference internal" href="#simfire.utils.config.WindConfig.direction">direction</a></li>
+<li><a class="reference internal" href="#simfire.utils.config.WindConfig.speed_function">speed_function</a></li>
+<li><a class="reference internal" href="#simfire.utils.config.WindConfig.direction_function">direction_function</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#simfire.utils.config.Config">Config</a><ul>
+<li><a class="reference internal" href="#simfire.utils.config.Config.reset_terrain">reset_terrain</a></li>
+<li><a class="reference internal" href="#simfire.utils.config.Config.reset_wind">reset_wind</a></li>
+<li><a class="reference internal" href="#simfire.utils.config.Config.reset_fire">reset_fire</a></li>
+<li><a class="reference internal" href="#simfire.utils.config.Config.save">save</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../../_static/scripts/furo.js"></script>
+    </body>
+</html>

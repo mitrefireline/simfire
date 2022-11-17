@@ -1,0 +1,931 @@
+<!doctype html>
+<html class="no-js" lang="en">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+<link rel="index" title="Index" href="../../../../genindex.html" /><link rel="search" title="Search" href="../../../../search.html" /><link rel="next" title="simfire.utils" href="../../utils/index.html" /><link rel="prev" title="simfire.sim" href="../index.html" />
+
+    <link rel="shortcut icon" href="../../../../_static/favicon.ico"/><meta name="generator" content="sphinx-5.3.0, furo 2022.09.29"/>
+        <title>simfire.sim.simulation - SimFire latest documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo.css?digest=d81277517bee4d6b0349d71bb2661d4890b5617c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
+    
+    
+
+
+<style>
+  body {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media not print {
+    body[data-theme="dark"] {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+    @media (prefers-color-scheme: dark) {
+      body:not([data-theme="light"]) {
+        --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+      }
+    }
+  }
+</style></head>
+  <body>
+    
+    <script>
+      document.body.dataset.theme = localStorage.getItem("theme") || "auto";
+    </script>
+    
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 1024 1024">
+      <path d="M408 442h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8zm-8 204c0 4.4 3.6 8 8 8h480c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8H408c-4.4 0-8 3.6-8 8v56zm504-486H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zm0 632H120c-4.4 0-8 3.6-8 8v56c0 4.4 3.6 8 8 8h784c4.4 0 8-3.6 8-8v-56c0-4.4-3.6-8-8-8zM115.4 518.9L271.7 642c5.8 4.6 14.4.5 14.4-6.9V388.9c0-7.4-8.5-11.5-14.4-6.9L115.4 505.1a8.74 8.74 0 0 0 0 13.8z"/>
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+  <symbol id="svg-sun" viewBox="0 0 24 24">
+    <title>Light mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="feather-sun">
+      <circle cx="12" cy="12" r="5"></circle>
+      <line x1="12" y1="1" x2="12" y2="3"></line>
+      <line x1="12" y1="21" x2="12" y2="23"></line>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+      <line x1="1" y1="12" x2="3" y2="12"></line>
+      <line x1="21" y1="12" x2="23" y2="12"></line>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-moon" viewBox="0 0 24 24">
+    <title>Dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-moon">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+      <path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454z" />
+    </svg>
+  </symbol>
+  <symbol id="svg-sun-half" viewBox="0 0 24 24">
+    <title>Auto light/dark mode</title>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon-tabler-shadow">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M13 12h5" />
+      <path d="M13 15h4" />
+      <path d="M13 18h1" />
+      <path d="M13 9h4" />
+      <path d="M13 6h1" />
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation">
+  <div class="visually-hidden">Hide navigation sidebar</div>
+</label>
+<label class="overlay toc-overlay" for="__toc">
+  <div class="visually-hidden">Hide table of contents sidebar</div>
+</label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <div class="visually-hidden">Toggle site navigation sidebar</div>
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../../../index.html"><div class="brand">SimFire latest documentation</div></a>
+    </div>
+    <div class="header-right">
+      <div class="theme-toggle-container theme-toggle-header">
+        <button class="theme-toggle">
+          <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+          <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+          <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+          <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+        </button>
+      </div>
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <div class="visually-hidden">Toggle table of contents sidebar</div>
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand centered" href="../../../../index.html">
+  
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo" src="../../../../_static/rl_logo.png" alt="Logo"/>
+  </div>
+  
+  <span class="sidebar-brand-text">SimFire latest documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../../../search.html" role="search">
+  <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form>
+<div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
+  <p class="caption" role="heading"><span class="caption-text">Running the Simulation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../config.html">Configuring the Simulation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Development</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../../../index.html">API Reference</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2 current has-children"><a class="reference internal" href="../../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire</span></code></a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../game/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.game</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../game/managers/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.game.managers</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../game/managers/fire/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.game.managers.fire</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../game/managers/mitigation/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.game.managers.mitigation</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../game/game/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.game.game</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../game/image/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.game.image</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../game/sprites/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.game.sprites</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3 current has-children"><a class="reference internal" href="../index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.sim</span></code></a><input checked="" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" role="switch" type="checkbox"/><label for="toctree-checkbox-5"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l4 current current-page"><a class="current reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.sim.simulation</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../utils/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" role="switch" type="checkbox"/><label for="toctree-checkbox-6"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../utils/assets/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.assets</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../utils/textures/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.textures</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../utils/config/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../utils/decorators/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.decorators</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../utils/generate_cfd_wind_layer/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.generate_cfd_wind_layer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../utils/graph/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.graph</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../utils/layers/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.layers</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../utils/log/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.log</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../utils/terrain/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.terrain</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../utils/units/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.units</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="../../world/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" role="switch" type="checkbox"/><label for="toctree-checkbox-7"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4 has-children"><a class="reference internal" href="../../world/wind_mechanics/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world.wind_mechanics</span></code></a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" role="switch" type="checkbox"/><label for="toctree-checkbox-8"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l5"><a class="reference internal" href="../../world/wind_mechanics/cfd_wind/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world.wind_mechanics.cfd_wind</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../world/wind_mechanics/perlin_wind/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world.wind_mechanics.perlin_wind</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="../../world/wind_mechanics/wind_controller/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world.wind_mechanics.wind_controller</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="../../world/elevation_functions/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world.elevation_functions</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../world/fuel_array_functions/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world.fuel_array_functions</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../world/parameters/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world.parameters</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../world/presets/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world.presets</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../world/rothermel/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world.rothermel</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../enums/index.html"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.enums</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+</div>
+</div>
+
+      </div>
+      
+    </div>
+  </aside>
+  <div class="main">
+    <div class="content">
+      <div class="article-container">
+        <a href="#" class="back-to-top muted-link">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"></path>
+          </svg>
+          <span>Back to top</span>
+        </a>
+        <div class="content-icon-container">
+          
+<div class="theme-toggle-container theme-toggle-content">
+            <button class="theme-toggle">
+              <div class="visually-hidden">Toggle Light / Dark / Auto color theme</div>
+              <svg class="theme-icon-when-auto"><use href="#svg-sun-half"></use></svg>
+              <svg class="theme-icon-when-dark"><use href="#svg-moon"></use></svg>
+              <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
+            </button>
+          </div>
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+            <div class="visually-hidden">Toggle table of contents sidebar</div>
+            <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+          </label>
+        </div>
+        <article role="main">
+          <section id="module-simfire.sim.simulation">
+<span id="simfire-sim-simulation"></span><h1><a class="reference internal" href="#module-simfire.sim.simulation" title="simfire.sim.simulation"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.sim.simulation</span></code></a><a class="headerlink" href="#module-simfire.sim.simulation" title="Permalink to this heading">#</a></h1>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Permalink to this heading">#</a></h2>
+<section id="classes">
+<h3>Classes<a class="headerlink" href="#classes" title="Permalink to this heading">#</a></h3>
+<div class="table-wrapper autosummary longtable docutils container">
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#simfire.sim.simulation.Simulation" title="simfire.sim.simulation.Simulation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Simulation</span></code></a></p></td>
+<td><p>Base class with several built in methods for interacting with different simulators.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#simfire.sim.simulation.FireSimulation" title="simfire.sim.simulation.FireSimulation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FireSimulation</span></code></a></p></td>
+<td><p>Base class with several built in methods for interacting with different simulators.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="attributes">
+<h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this heading">#</a></h3>
+<div class="table-wrapper autosummary longtable docutils container">
+<table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 90%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#simfire.sim.simulation.log" title="simfire.sim.simulation.log"><code class="xref py py-obj docutils literal notranslate"><span class="pre">log</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="py data">
+<dt class="sig sig-object py" id="simfire.sim.simulation.log">
+<span class="sig-prename descclassname"><span class="pre">simfire.sim.simulation.</span></span><span class="sig-name descname"><span class="pre">log</span></span><a class="headerlink" href="#simfire.sim.simulation.log" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="simfire.sim.simulation.Simulation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simfire.sim.simulation.</span></span><span class="sig-name descname"><span class="pre">Simulation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.sim.simulation.Simulation" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/abc.html#abc.ABC" title="(in Python v3.11)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">abc.ABC</span></code></a></p>
+<p>Base class with several built in methods for interacting with different simulators.</p>
+<dl class="simple">
+<dt>Current simulators using this API:</dt><dd><ul class="simple">
+<li><p><a class="reference external" href="https://gitlab.mitre.org/fireline/simfire">SimFire</a></p></li>
+</ul>
+</dd>
+</dl>
+<p>Initialize the Simulation object for interacting with the RL harness.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>config</strong> (<a class="reference internal" href="../../utils/config/index.html#simfire.utils.config.Config" title="simfire.utils.config.Config"><em>simfire.utils.config.Config</em></a>) – The <cite>Config</cite> that specifies simulation parameters, read in from a
+YAML file.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="simfire.sim.simulation.Simulation.run">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.sim.simulation.Simulation.run" title="Permalink to this definition">#</a></dt>
+<dd><p>Runs the simulation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>time</strong> (<em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>]</em>) – Either how many updates to run the simulation, based on the config
+value, <cite>config.simulation.update_rate</cite>, or a length of time expressed
+as a string (e.g. <cite>120m</cite>, <cite>2h</cite>, <cite>2hour</cite>, <cite>2hours</cite>, <cite>1h 60m</cite>, etc.)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>The Burned/Unburned/ControlLine pixel map (<cite>self.fire_map</cite>). Values
+range from [0, 6] (see simfire/enums.py:BurnStatus).</p></li>
+<li><p>A boolean indicating whether the simulation has reached the end.</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>A tuple of the following</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simfire.sim.simulation.Simulation.get_actions">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_actions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#simfire.sim.simulation.Simulation.get_actions" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the action space for the simulation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Dict[str, int]</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>The action / mitgiation strategies available</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simfire.sim.simulation.Simulation.get_attribute_data">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_attribute_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#simfire.sim.simulation.Simulation.get_attribute_data" title="Permalink to this definition">#</a></dt>
+<dd><p>Initialize and return the observation space for the simulation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The dictionary of observations containing NumPy arrays.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>Dict[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.23)">numpy.ndarray</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simfire.sim.simulation.Simulation.get_attribute_bounds">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_attribute_bounds</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#simfire.sim.simulation.Simulation.get_attribute_bounds" title="Permalink to this definition">#</a></dt>
+<dd><p>Initialize and return the observation space bounds for the simulation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The dictionary of observation space bounds containing NumPy arrays.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>Dict[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)">object</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simfire.sim.simulation.Simulation.get_seeds">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_seeds</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#simfire.sim.simulation.Simulation.get_seeds" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the available randomization seeds for the simulation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The dictionary with all available seeds to change and their values.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>Dict[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a>, Optional[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)">int</a>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simfire.sim.simulation.Simulation.set_seeds">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set_seeds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seeds</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.sim.simulation.Simulation.set_seeds" title="Permalink to this definition">#</a></dt>
+<dd><p>Sets the seeds for different available randomization parameters.</p>
+<p>Which randomization parameters can be  set depends on the simulator being used.
+Available seeds can be retreived by calling the <cite>self.get_seeds</cite> method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>seeds</strong> (<em>Dict</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>]</em>) – The dictionary of seed names and their current seed values.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Whether or not the method successfully set a seed value.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simfire.sim.simulation.Simulation.update_mitigation">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">update_mitigation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">points</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.sim.simulation.Simulation.update_mitigation" title="Permalink to this definition">#</a></dt>
+<dd><p>Update the <cite>self.fire_map</cite> with new mitigation points</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>points</strong> (<em>Iterable</em><em>[</em><em>Tuple</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>]</em><em>]</em>) – A list of <cite>(x, y, mitigation)</cite> tuples. These will be added to
+<cite>self.fire_map</cite>.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simfire.sim.simulation.Simulation.load_mitigation">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">load_mitigation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mitigation_map</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.sim.simulation.Simulation.load_mitigation" title="Permalink to this definition">#</a></dt>
+<dd><p>Set the ‘self.fire_map’ to the new mitigation map</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>mitigation_map</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.23)"><em>numpy.ndarray</em></a>) – A numpy array of mitigations to be set as ‘self.fire_map’</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simfire.sim.simulation.Simulation.get_disaster_categories">
+<span class="sig-name descname"><span class="pre">get_disaster_categories</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#simfire.sim.simulation.Simulation.get_disaster_categories" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns all possible categories that a location in the map can be in.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A dictionary of enum name to enum value.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>Dict[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)">int</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simfire.sim.simulation.Simulation.disaster_categories">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">disaster_categories</span></span><a class="headerlink" href="#simfire.sim.simulation.Simulation.disaster_categories" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the possible categories that a location in the map can be in.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>An enum of possible categories.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>Iterable[<a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.IntEnum" title="(in Python v3.11)">enum.IntEnum</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="simfire.sim.simulation.FireSimulation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simfire.sim.simulation.</span></span><span class="sig-name descname"><span class="pre">FireSimulation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.sim.simulation.FireSimulation" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#simfire.sim.simulation.Simulation" title="simfire.sim.simulation.Simulation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Simulation</span></code></a></p>
+<p>Base class with several built in methods for interacting with different simulators.</p>
+<dl class="simple">
+<dt>Current simulators using this API:</dt><dd><ul class="simple">
+<li><p><a class="reference external" href="https://gitlab.mitre.org/fireline/simfire">SimFire</a></p></li>
+</ul>
+</dd>
+</dl>
+<p>Initialize the <cite>FireSimulation</cite> object for interacting with the RL harness.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>config</strong> (<a class="reference internal" href="../../utils/config/index.html#simfire.utils.config.Config" title="simfire.utils.config.Config"><em>simfire.utils.config.Config</em></a>) – The <cite>Config</cite> that specifies simulation parameters, read in from a
+YAML file.</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="simfire.sim.simulation.FireSimulation.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#simfire.sim.simulation.FireSimulation.reset" title="Permalink to this definition">#</a></dt>
+<dd><p>Reset the <cite>self.fire_map</cite>, <cite>self.terrain</cite>, <cite>self.fire_manager</cite>,
+and all mitigations to initial conditions</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simfire.sim.simulation.FireSimulation.get_actions">
+<span class="sig-name descname"><span class="pre">get_actions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#simfire.sim.simulation.FireSimulation.get_actions" title="Permalink to this definition">#</a></dt>
+<dd><p>Return the action space for the fire simulation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Dict[str, int]</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>The action / mitigation strategies available</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simfire.sim.simulation.FireSimulation.disaster_categories">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">disaster_categories</span></span><a class="headerlink" href="#simfire.sim.simulation.FireSimulation.disaster_categories" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns all possible categories that a location in the map can be in.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A dictionary of enum name to enum value.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>Iterable[<a class="reference internal" href="../../enums/index.html#simfire.enums.BurnStatus" title="simfire.enums.BurnStatus">simfire.enums.BurnStatus</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simfire.sim.simulation.FireSimulation.get_attribute_bounds">
+<span class="sig-name descname"><span class="pre">get_attribute_bounds</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#simfire.sim.simulation.FireSimulation.get_attribute_bounds" title="Permalink to this definition">#</a></dt>
+<dd><p>Return the observation space bounds for the fire simulation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The dictionary of observation space bounds containing NumPy arrays.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>Dict[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)">object</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simfire.sim.simulation.FireSimulation.get_attribute_data">
+<span class="sig-name descname"><span class="pre">get_attribute_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#simfire.sim.simulation.FireSimulation.get_attribute_data" title="Permalink to this definition">#</a></dt>
+<dd><p>Initialize and return the observation space for the simulation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The dictionary of observation data containing NumPy arrays.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>Dict[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.23)">numpy.ndarray</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simfire.sim.simulation.FireSimulation.load_mitigation">
+<span class="sig-name descname"><span class="pre">load_mitigation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mitigation_map</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.sim.simulation.FireSimulation.load_mitigation" title="Permalink to this definition">#</a></dt>
+<dd><p>Set the ‘self.fire_map’ to the new mitigation map</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>mitigation_map</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.23)"><em>numpy.ndarray</em></a>) – A numpy array of mitigations to be set as ‘self.fire_map’</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simfire.sim.simulation.FireSimulation.update_mitigation">
+<span class="sig-name descname"><span class="pre">update_mitigation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">points</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.sim.simulation.FireSimulation.update_mitigation" title="Permalink to this definition">#</a></dt>
+<dd><p>Update the <cite>self.fire_map</cite> with new mitigation points</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>points</strong> (<em>Iterable</em><em>[</em><em>Tuple</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>]</em><em>]</em>) – A list of <cite>(column, row, mitigation)</cite> tuples. These will be added to
+<cite>self.fire_map</cite>.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simfire.sim.simulation.FireSimulation.update_agent_positions">
+<span class="sig-name descname"><span class="pre">update_agent_positions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">points</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.sim.simulation.FireSimulation.update_agent_positions" title="Permalink to this definition">#</a></dt>
+<dd><p>Update the <cite>self.agent_positions</cite> with new agent positions</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>points</strong> (<em>Iterable</em><em>[</em><em>Tuple</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>]</em><em>]</em>) – A list of <cite>(column, row, agent_id)</cite> tuples. These will be added to
+<cite>self.agent_positions</cite>.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simfire.sim.simulation.FireSimulation.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.sim.simulation.FireSimulation.run" title="Permalink to this definition">#</a></dt>
+<dd><p>Runs the simulation with or without mitigation lines.</p>
+<p>Use <cite>self.terrain</cite> to either:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>Place agent’s mitigation lines and then spread fire</p></li>
+<li><dl class="simple">
+<dt>Only spread fire, with no mitigation line</dt><dd><p>(to compare for reward calculation)</p>
+</dd>
+</dl>
+</li>
+</ol>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>time</strong> (<em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>]</em>) – Either how many updates to run the simulation, based on the config
+value, <cite>config.simulation.update_rate</cite>, or a length of time expressed
+as a string (e.g. <cite>120m</cite>, <cite>2h</cite>, <cite>2hour</cite>, <cite>2hours</cite>, <cite>1h 60m</cite>, etc.)</p></li>
+<li><p><strong>render</strong> – Whether or not to render the simulation during the current <cite>run</cite>.</p></li>
+<li><p><strong>record</strong> – Whether or not to record the simulation’s run in a GIF. Will be output
+to the location specified in the config section:
+<cite>simulation.save_path</cite>
+(<a class="reference external" href="fireline.pages.mitre.org/simfire/config.html#save_path">docs</a>)</p></li>
+<li><p><strong>spread_graph</strong> – Whether or not to save the spread graph of the simulation.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p>The Burned/Unburned/ControlLine pixel map (<cite>self.fire_map</cite>). Values
+range from [0, 6] (see simfire/enums.py:BurnStatus).</p></li>
+<li><p>A boolean indicating whether the simulation has reached the end.</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>A tuple of the following</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simfire.sim.simulation.FireSimulation.get_seeds">
+<span class="sig-name descname"><span class="pre">get_seeds</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#simfire.sim.simulation.FireSimulation.get_seeds" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the available randomization seeds for the simulation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>The dictionary with all available seeds to change and their values.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>Dict[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a>, Optional[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)">int</a>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simfire.sim.simulation.FireSimulation.set_seeds">
+<span class="sig-name descname"><span class="pre">set_seeds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seeds</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.sim.simulation.FireSimulation.set_seeds" title="Permalink to this definition">#</a></dt>
+<dd><p>Sets the seeds for different available randomization parameters.</p>
+<p>Which randomization parameters can be  set depends on the simulator being used.
+Available seeds can be retreived by calling the <cite>self.get_seeds</cite> method.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>seeds</strong> (<em>Dict</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>]</em>) – The dictionary of seed names and the values they will be set to.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Whether or not the method successfully set a seed value.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simfire.sim.simulation.FireSimulation.set_fire_initial_position">
+<span class="sig-name descname"><span class="pre">set_fire_initial_position</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.sim.simulation.FireSimulation.set_fire_initial_position" title="Permalink to this definition">#</a></dt>
+<dd><p>Manually set the fire intial position for a static fire.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>pos</strong> (<em>Tuple</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>]</em>) – The (x, y) coordinates to start the fire at</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simfire.sim.simulation.FireSimulation.get_layer_types">
+<span class="sig-name descname"><span class="pre">get_layer_types</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#simfire.sim.simulation.FireSimulation.get_layer_types" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the current layer types for the simulation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A dictionary of the current layer type.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>Dict[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simfire.sim.simulation.FireSimulation.set_layer_types">
+<span class="sig-name descname"><span class="pre">set_layer_types</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">types</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.sim.simulation.FireSimulation.set_layer_types" title="Permalink to this definition">#</a></dt>
+<dd><p>Set the type of layers to be used in the simulation</p>
+<p>Available keys are ‘elevation’ and ‘fuel’ and available values are ‘functional’
+and ‘operational’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>types</strong> (<em>Dict</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>]</em>) – The dictionary of layer names and the data type they will be set to.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Whether or not the method successfully set a data type.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simfire.sim.simulation.FireSimulation.save_gif">
+<span class="sig-name descname"><span class="pre">save_gif</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.sim.simulation.FireSimulation.save_gif" title="Permalink to this definition">#</a></dt>
+<dd><p>Saves the most recent simulation as a GIF.</p>
+<p>Will save a GIF of all calls to <cite>run</cite> from the last time <cite>self.rendering</cite> was set
+to <cite>True</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>filename</strong> (<em>Optional</em><em>[</em><em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.11)"><em>pathlib.Path</em></a><em>]</em><em>]</em>) – </p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simfire.sim.simulation.FireSimulation.save_spread_graph">
+<span class="sig-name descname"><span class="pre">save_spread_graph</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.sim.simulation.FireSimulation.save_spread_graph" title="Permalink to this definition">#</a></dt>
+<dd><p>Saves the most recent simulation as a PNG.</p>
+<p>Will save a PNG of the spread graph from the last time <cite>self.rendering</cite> was set
+to <cite>True</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>filename</strong> (<em>Optional</em><em>[</em><em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.11)"><em>pathlib.Path</em></a><em>]</em><em>]</em>) – </p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simfire.sim.simulation.FireSimulation.rendering">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rendering</span></span><a class="headerlink" href="#simfire.sim.simulation.FireSimulation.rendering" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns whether or not the simulator is currently rendering.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Whether or not the simulator is currently rendering.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+</section>
+
+        </article>
+      </div>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="../../utils/index.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils</span></code></div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="../index.html">
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.sim</span></code></div>
+                
+              </div>
+            </a>
+        </div>
+        <div class="bottom-of-page">
+          <div class="left-details">
+            <div class="copyright">
+                Copyright &#169; 2022, fiReLine
+            </div>
+            Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+            
+            <a href="https://github.com/pradyunsg/furo">Furo</a>
+            
+          </div>
+          <div class="right-details">
+            <div class="icons">
+              
+            </div>
+          </div>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.sim.simulation</span></code></a><ul>
+<li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
+<li><a class="reference internal" href="#classes">Classes</a></li>
+<li><a class="reference internal" href="#attributes">Attributes</a><ul>
+<li><a class="reference internal" href="#simfire.sim.simulation.log"><code class="docutils literal notranslate"><span class="pre">log</span></code></a></li>
+<li><a class="reference internal" href="#simfire.sim.simulation.Simulation"><code class="docutils literal notranslate"><span class="pre">Simulation</span></code></a><ul>
+<li><a class="reference internal" href="#simfire.sim.simulation.Simulation.run"><code class="docutils literal notranslate"><span class="pre">Simulation.run()</span></code></a></li>
+<li><a class="reference internal" href="#simfire.sim.simulation.Simulation.get_actions"><code class="docutils literal notranslate"><span class="pre">Simulation.get_actions()</span></code></a></li>
+<li><a class="reference internal" href="#simfire.sim.simulation.Simulation.get_attribute_data"><code class="docutils literal notranslate"><span class="pre">Simulation.get_attribute_data()</span></code></a></li>
+<li><a class="reference internal" href="#simfire.sim.simulation.Simulation.get_attribute_bounds"><code class="docutils literal notranslate"><span class="pre">Simulation.get_attribute_bounds()</span></code></a></li>
+<li><a class="reference internal" href="#simfire.sim.simulation.Simulation.get_seeds"><code class="docutils literal notranslate"><span class="pre">Simulation.get_seeds()</span></code></a></li>
+<li><a class="reference internal" href="#simfire.sim.simulation.Simulation.set_seeds"><code class="docutils literal notranslate"><span class="pre">Simulation.set_seeds()</span></code></a></li>
+<li><a class="reference internal" href="#simfire.sim.simulation.Simulation.update_mitigation"><code class="docutils literal notranslate"><span class="pre">Simulation.update_mitigation()</span></code></a></li>
+<li><a class="reference internal" href="#simfire.sim.simulation.Simulation.load_mitigation"><code class="docutils literal notranslate"><span class="pre">Simulation.load_mitigation()</span></code></a></li>
+<li><a class="reference internal" href="#simfire.sim.simulation.Simulation.get_disaster_categories"><code class="docutils literal notranslate"><span class="pre">Simulation.get_disaster_categories()</span></code></a></li>
+<li><a class="reference internal" href="#simfire.sim.simulation.Simulation.disaster_categories"><code class="docutils literal notranslate"><span class="pre">Simulation.disaster_categories()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#simfire.sim.simulation.FireSimulation"><code class="docutils literal notranslate"><span class="pre">FireSimulation</span></code></a><ul>
+<li><a class="reference internal" href="#simfire.sim.simulation.FireSimulation.reset"><code class="docutils literal notranslate"><span class="pre">FireSimulation.reset()</span></code></a></li>
+<li><a class="reference internal" href="#simfire.sim.simulation.FireSimulation.get_actions"><code class="docutils literal notranslate"><span class="pre">FireSimulation.get_actions()</span></code></a></li>
+<li><a class="reference internal" href="#simfire.sim.simulation.FireSimulation.disaster_categories"><code class="docutils literal notranslate"><span class="pre">FireSimulation.disaster_categories()</span></code></a></li>
+<li><a class="reference internal" href="#simfire.sim.simulation.FireSimulation.get_attribute_bounds"><code class="docutils literal notranslate"><span class="pre">FireSimulation.get_attribute_bounds()</span></code></a></li>
+<li><a class="reference internal" href="#simfire.sim.simulation.FireSimulation.get_attribute_data"><code class="docutils literal notranslate"><span class="pre">FireSimulation.get_attribute_data()</span></code></a></li>
+<li><a class="reference internal" href="#simfire.sim.simulation.FireSimulation.load_mitigation"><code class="docutils literal notranslate"><span class="pre">FireSimulation.load_mitigation()</span></code></a></li>
+<li><a class="reference internal" href="#simfire.sim.simulation.FireSimulation.update_mitigation"><code class="docutils literal notranslate"><span class="pre">FireSimulation.update_mitigation()</span></code></a></li>
+<li><a class="reference internal" href="#simfire.sim.simulation.FireSimulation.update_agent_positions"><code class="docutils literal notranslate"><span class="pre">FireSimulation.update_agent_positions()</span></code></a></li>
+<li><a class="reference internal" href="#simfire.sim.simulation.FireSimulation.run"><code class="docutils literal notranslate"><span class="pre">FireSimulation.run()</span></code></a></li>
+<li><a class="reference internal" href="#simfire.sim.simulation.FireSimulation.get_seeds"><code class="docutils literal notranslate"><span class="pre">FireSimulation.get_seeds()</span></code></a></li>
+<li><a class="reference internal" href="#simfire.sim.simulation.FireSimulation.set_seeds"><code class="docutils literal notranslate"><span class="pre">FireSimulation.set_seeds()</span></code></a></li>
+<li><a class="reference internal" href="#simfire.sim.simulation.FireSimulation.set_fire_initial_position"><code class="docutils literal notranslate"><span class="pre">FireSimulation.set_fire_initial_position()</span></code></a></li>
+<li><a class="reference internal" href="#simfire.sim.simulation.FireSimulation.get_layer_types"><code class="docutils literal notranslate"><span class="pre">FireSimulation.get_layer_types()</span></code></a></li>
+<li><a class="reference internal" href="#simfire.sim.simulation.FireSimulation.set_layer_types"><code class="docutils literal notranslate"><span class="pre">FireSimulation.set_layer_types()</span></code></a></li>
+<li><a class="reference internal" href="#simfire.sim.simulation.FireSimulation.save_gif"><code class="docutils literal notranslate"><span class="pre">FireSimulation.save_gif()</span></code></a></li>
+<li><a class="reference internal" href="#simfire.sim.simulation.FireSimulation.save_spread_graph"><code class="docutils literal notranslate"><span class="pre">FireSimulation.save_spread_graph()</span></code></a></li>
+<li><a class="reference internal" href="#simfire.sim.simulation.FireSimulation.rendering"><code class="docutils literal notranslate"><span class="pre">FireSimulation.rendering()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#simfire.sim.simulation.log">log</a></li>
+<li><a class="reference internal" href="#simfire.sim.simulation.Simulation">Simulation</a><ul>
+<li><a class="reference internal" href="#simfire.sim.simulation.Simulation.run">run</a></li>
+<li><a class="reference internal" href="#simfire.sim.simulation.Simulation.get_actions">get_actions</a></li>
+<li><a class="reference internal" href="#simfire.sim.simulation.Simulation.get_attribute_data">get_attribute_data</a></li>
+<li><a class="reference internal" href="#simfire.sim.simulation.Simulation.get_attribute_bounds">get_attribute_bounds</a></li>
+<li><a class="reference internal" href="#simfire.sim.simulation.Simulation.get_seeds">get_seeds</a></li>
+<li><a class="reference internal" href="#simfire.sim.simulation.Simulation.set_seeds">set_seeds</a></li>
+<li><a class="reference internal" href="#simfire.sim.simulation.Simulation.update_mitigation">update_mitigation</a></li>
+<li><a class="reference internal" href="#simfire.sim.simulation.Simulation.load_mitigation">load_mitigation</a></li>
+<li><a class="reference internal" href="#simfire.sim.simulation.Simulation.get_disaster_categories">get_disaster_categories</a></li>
+<li><a class="reference internal" href="#simfire.sim.simulation.Simulation.disaster_categories">disaster_categories</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#simfire.sim.simulation.FireSimulation">FireSimulation</a><ul>
+<li><a class="reference internal" href="#simfire.sim.simulation.FireSimulation.reset">reset</a></li>
+<li><a class="reference internal" href="#simfire.sim.simulation.FireSimulation.get_actions">get_actions</a></li>
+<li><a class="reference internal" href="#simfire.sim.simulation.FireSimulation.disaster_categories">disaster_categories</a></li>
+<li><a class="reference internal" href="#simfire.sim.simulation.FireSimulation.get_attribute_bounds">get_attribute_bounds</a></li>
+<li><a class="reference internal" href="#simfire.sim.simulation.FireSimulation.get_attribute_data">get_attribute_data</a></li>
+<li><a class="reference internal" href="#simfire.sim.simulation.FireSimulation.load_mitigation">load_mitigation</a></li>
+<li><a class="reference internal" href="#simfire.sim.simulation.FireSimulation.update_mitigation">update_mitigation</a></li>
+<li><a class="reference internal" href="#simfire.sim.simulation.FireSimulation.update_agent_positions">update_agent_positions</a></li>
+<li><a class="reference internal" href="#simfire.sim.simulation.FireSimulation.run">run</a></li>
+<li><a class="reference internal" href="#simfire.sim.simulation.FireSimulation.get_seeds">get_seeds</a></li>
+<li><a class="reference internal" href="#simfire.sim.simulation.FireSimulation.set_seeds">set_seeds</a></li>
+<li><a class="reference internal" href="#simfire.sim.simulation.FireSimulation.set_fire_initial_position">set_fire_initial_position</a></li>
+<li><a class="reference internal" href="#simfire.sim.simulation.FireSimulation.get_layer_types">get_layer_types</a></li>
+<li><a class="reference internal" href="#simfire.sim.simulation.FireSimulation.set_layer_types">set_layer_types</a></li>
+<li><a class="reference internal" href="#simfire.sim.simulation.FireSimulation.save_gif">save_gif</a></li>
+<li><a class="reference internal" href="#simfire.sim.simulation.FireSimulation.save_spread_graph">save_spread_graph</a></li>
+<li><a class="reference internal" href="#simfire.sim.simulation.FireSimulation.rendering">rendering</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </div>
+</div><script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+    <script src="../../../../_static/jquery.js"></script>
+    <script src="../../../../_static/underscore.js"></script>
+    <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../../_static/doctools.js"></script>
+    <script src="../../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../../_static/scripts/furo.js"></script>
+    </body>
+</html>

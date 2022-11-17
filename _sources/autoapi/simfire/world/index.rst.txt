@@ -1,0 +1,28 @@
+:py:mod:`simfire.world`
+=======================
+
+.. py:module:: simfire.world
+
+
+Subpackages
+-----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 3
+
+   wind_mechanics/index.rst
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   elevation_functions/index.rst
+   fuel_array_functions/index.rst
+   parameters/index.rst
+   presets/index.rst
+   rothermel/index.rst
+
+

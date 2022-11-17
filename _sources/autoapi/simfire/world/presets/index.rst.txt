@@ -1,0 +1,124 @@
+:py:mod:`simfire.world.presets`
+===============================
+
+.. py:module:: simfire.world.presets
+
+.. autoapi-nested-parse::
+
+   This module contains preset FuelArray tile values for various terrain/fuel.
+   Four significant figures were used for rounding
+   For fuel load (w_0), the 1-hour fuel load is used
+   For surface-area-to-volume (SAV) ratio (sigma), the characteristic SAV is used
+   For M-x, the Dead fuel moisture of extinction is used
+   Fir delta, the Fuel bed depth is used
+
+   As specified in: https://www.fs.fed.us/rm/pubs_series/rmrs/gtr/rmrs_gtr371.pdf
+
+   Urban, Snow/Ice, Agricutlture, Water, Barren are Non-Burnable fuel types as described in:
+   https://gacc.nifc.gov/oncc/docs/40-Standard%20Fire%20Behavior%20Fuel%20Models.pdf
+
+
+
+Module Contents
+---------------
+
+.. py:data:: ShortGrass
+   
+
+   
+
+.. py:data:: GrassTimberShrubOverstory
+   
+
+   
+
+.. py:data:: TallGrass
+   
+
+   
+
+.. py:data:: Chaparral
+   
+
+   
+
+.. py:data:: Brush
+   
+
+   
+
+.. py:data:: DormantBrushHardwoodSlash
+   
+
+   
+
+.. py:data:: SouthernRough
+   
+
+   
+
+.. py:data:: ClosedShortNeedleTimberLitter
+   
+
+   
+
+.. py:data:: HardwoodLongNeedlePineTimber
+   
+
+   
+
+.. py:data:: TimberLitterUnderstory
+   
+
+   
+
+.. py:data:: LightLoggingSlash
+   
+
+   
+
+.. py:data:: MediumLoggingSlash
+   
+
+   
+
+.. py:data:: HeavyLoggingSlash
+   
+
+   
+
+.. py:data:: ShortSparseDryClimateGrass
+   
+
+   
+
+.. py:data:: NBUrban
+   
+
+   
+
+.. py:data:: NBSnowIce
+   
+
+   
+
+.. py:data:: NBWater
+   
+
+   
+
+.. py:data:: NBAgriculture
+   
+
+   
+
+.. py:data:: NBBarren
+   
+
+   
+
+.. py:data:: NBNoData
+   
+
+   
+

@@ -1,0 +1,73 @@
+:py:mod:`simfire.game.game`
+===========================
+
+.. py:module:: simfire.game.game
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   simfire.game.game.Game
+
+
+
+
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   simfire.game.game.log
+
+
+.. py:data:: log
+   
+
+   
+
+.. py:class:: Game(screen_size, rescale_size = None, headless = False, record = False, show_wind_magnitude = False, show_wind_direction = False, mw_speed_min = 0.0, mw_speed_max = mph_to_ftpm(150.0), dw_deg_min = 0.0, dw_deg_max = 360.0)
+
+   Class that controls the game. This class will initalize the game and allow for
+   terrain, fire, and other sprites to be rendered and interact.
+
+   Initalize the class by creating the game display and background.
+
+   :param screen_size: The (n,n) size of the game screen/display in pixels.
+   :param rescale_size: The (s, s) size of the display to resize to
+   :param headless: Flag to run in a headless state.
+   :param record: Flag to save a recording of the simulation game screen
+
+   .. py:method:: quit()
+
+      Close the PyGame window and stop the `Game`
+
+
+   .. py:method:: save(path, duration = 100)
+
+      Save a GIF of the simulation to a specified path
+
+      :param path: The path to save the GIF to with filename.
+      :param duration: The time to display the current frame of the GIF, in milliseconds.
+
+
+   .. py:method:: update(terrain, fire_sprites, fireline_sprites, agent_sprites, wind_magnitude_map, wind_direction_map)
+
+      Update the game display using the provided terrain, sprites, and
+      environment data. Most of the logic for the game is handled within
+      each sprite/manager, so this is mostly just calls to update everything.
+
+      :param terrain: The Terrain class that comprises the burnable area.
+      :param fire_sprites: A list of all Fire sprites that are actively burning.
+      :param fireline_sprites: A list of all FireLine sprites that are dug.
+      :param wind_magnitude_map: The map/array containing wind magnitudes at each pixel
+                                 location
+      :param wind_direction_map: The map/array containing wind directions at each pixel
+                                 location
+
+
+

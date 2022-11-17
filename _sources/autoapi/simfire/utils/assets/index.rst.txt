@@ -1,0 +1,6 @@
+:py:mod:`simfire.utils.assets`
+==============================
+
+.. py:module:: simfire.utils.assets
+
+

@@ -1,0 +1,311 @@
+:py:mod:`simfire.utils.config`
+==============================
+
+.. py:module:: simfire.utils.config
+
+.. autoapi-nested-parse::
+
+   Module containing all config parsing and dataclass logic.
+
+
+
+Module Contents
+---------------
+
+Classes
+~~~~~~~
+
+.. autoapisummary::
+
+   simfire.utils.config.AreaConfig
+   simfire.utils.config.DisplayConfig
+   simfire.utils.config.SimulationConfig
+   simfire.utils.config.MitigationConfig
+   simfire.utils.config.OperationalConfig
+   simfire.utils.config.HistoricalConfig
+   simfire.utils.config.FunctionalConfig
+   simfire.utils.config.TerrainConfig
+   simfire.utils.config.FireConfig
+   simfire.utils.config.EnvironmentConfig
+   simfire.utils.config.WindConfig
+   simfire.utils.config.Config
+
+
+
+
+Attributes
+~~~~~~~~~~
+
+.. autoapisummary::
+
+   simfire.utils.config.log
+
+
+.. py:data:: log
+   
+
+   
+
+.. py:exception:: ConfigError
+
+   Bases: :py:obj:`Exception`
+
+   Exception class for Config class
+
+   Initialize self.  See help(type(self)) for accurate signature.
+
+
+.. py:class:: AreaConfig
+
+   .. py:attribute:: screen_size
+      :annotation: :int
+
+      
+
+   .. py:attribute:: pixel_scale
+      :annotation: :float
+
+      
+
+
+.. py:class:: DisplayConfig
+
+   .. py:attribute:: fire_size
+      :annotation: :int
+
+      
+
+   .. py:attribute:: control_line_size
+      :annotation: :int
+
+      
+
+   .. py:attribute:: agent_size
+      :annotation: :int
+
+      
+
+   .. py:attribute:: rescale_size
+      :annotation: :Optional[int]
+
+      
+
+
+.. py:class:: SimulationConfig(update_rate, runtime, headless, draw_spread_graph, record, save_path)
+
+
+.. py:class:: MitigationConfig
+
+   .. py:attribute:: ros_attenuation
+      :annotation: :bool
+
+      
+
+
+.. py:class:: OperationalConfig
+
+   .. py:attribute:: seed
+      :annotation: :Optional[int]
+
+      
+
+   .. py:attribute:: latitude
+      :annotation: :float
+
+      
+
+   .. py:attribute:: longitude
+      :annotation: :float
+
+      
+
+   .. py:attribute:: height
+      :annotation: :float
+
+      
+
+   .. py:attribute:: width
+      :annotation: :float
+
+      
+
+   .. py:attribute:: resolution
+      :annotation: :float
+
+      
+
+
+.. py:class:: HistoricalConfig
+
+   Class that tracks historical layer.
+
+   .. py:attribute:: use
+      :annotation: :bool
+
+      
+
+   .. py:attribute:: fire_init_pos_lat
+      :annotation: :float
+
+      
+
+   .. py:attribute:: fire_init_pos_long
+      :annotation: :float
+
+      
+
+   .. py:attribute:: name
+      :annotation: :str
+
+      
+
+   .. py:attribute:: year
+      :annotation: :str
+
+      
+
+   .. py:attribute:: historical_layer
+      
+
+      
+
+
+.. py:class:: FunctionalConfig
+
+   Class that tracks functional layer names and keyword arguments.
+
+   .. py:attribute:: name
+      :annotation: :str
+
+      
+
+   .. py:attribute:: kwargs
+      :annotation: :Dict[str, Any]
+
+      
+
+
+.. py:class:: TerrainConfig
+
+   Class that tracks the terrain topography and fuel layers.
+   The fuel and terrain function fields are optional. They are used for
+   functional layers and ignored for operational layers.
+
+   .. py:attribute:: topography_type
+      :annotation: :str
+
+      
+
+   .. py:attribute:: topography_layer
+      :annotation: :simfire.utils.layers.TopographyLayer
+
+      
+
+   .. py:attribute:: fuel_type
+      :annotation: :str
+
+      
+
+   .. py:attribute:: fuel_layer
+      :annotation: :simfire.utils.layers.FuelLayer
+
+      
+
+   .. py:attribute:: topography_function
+      :annotation: :Optional[FunctionalConfig]
+
+      
+
+   .. py:attribute:: fuel_function
+      :annotation: :Optional[FunctionalConfig]
+
+      
+
+
+.. py:class:: FireConfig
+
+   .. py:attribute:: fire_initial_position
+      :annotation: :Tuple[int, int]
+
+      
+
+   .. py:attribute:: max_fire_duration
+      :annotation: :int
+
+      
+
+   .. py:attribute:: seed
+      :annotation: :Optional[int]
+
+      
+
+
+.. py:class:: EnvironmentConfig
+
+   .. py:attribute:: moisture
+      :annotation: :float
+
+      
+
+
+.. py:class:: WindConfig
+
+   .. py:attribute:: speed
+      :annotation: :numpy.ndarray
+
+      
+
+   .. py:attribute:: direction
+      :annotation: :numpy.ndarray
+
+      
+
+   .. py:attribute:: speed_function
+      :annotation: :Optional[FunctionalConfig]
+
+      
+
+   .. py:attribute:: direction_function
+      :annotation: :Optional[FunctionalConfig]
+
+      
+
+
+.. py:class:: Config(path, cfd_precompute = False)
+
+   .. py:method:: reset_terrain(topography_seed = None, topography_type = None, fuel_seed = None, fuel_type = None, location = None)
+
+      Reset the terrain functional generation seeds if using functional data,
+      or reset the terrain lat/long location if using operational data.
+
+      :param topography_seed: The seed used to randomize functional topography generation
+      :param fuel_seed: The seed used to randomize functional fuel generation
+      :param location: A new center-point for the operational topography and fuel data
+
+
+   .. py:method:: reset_wind(speed_seed = None, direction_seed = None)
+
+      Reset the wind speed and direction seeds.
+
+      :param speed_seed: The seed used to randomize wind speed generation
+      :param direction_seed: The seed used to randomize wind direction generation
+
+
+   .. py:method:: reset_fire(seed = None, pos = None)
+
+      Reset the fire initial position seed. Note that both `seed` and `pos` cannot
+      be specified together since `seed` is used for random/dynamic cases and `pos`
+      is used for static cases.
+
+      :param seed: The seed used to randomize fire initial position generation.
+      :param pos: The static position to start the fire at
+
+
+   .. py:method:: save(path)
+
+      Save the current config to the specified path.
+
+      :param path: The path and filename of the output YAML file
+
+
+

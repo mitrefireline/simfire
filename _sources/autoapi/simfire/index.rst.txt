@@ -1,0 +1,27 @@
+:py:mod:`simfire`
+=================
+
+.. py:module:: simfire
+
+
+Subpackages
+-----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 3
+
+   game/index.rst
+   sim/index.rst
+   utils/index.rst
+   world/index.rst
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   enums/index.rst
+
+

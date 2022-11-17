@@ -1,0 +1,26 @@
+:py:mod:`simfire.game`
+======================
+
+.. py:module:: simfire.game
+
+
+Subpackages
+-----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 3
+
+   managers/index.rst
+
+
+Submodules
+----------
+.. toctree::
+   :titlesonly:
+   :maxdepth: 1
+
+   game/index.rst
+   image/index.rst
+   sprites/index.rst
+
+

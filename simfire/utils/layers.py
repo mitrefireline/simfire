@@ -862,6 +862,7 @@ class FuelLayer(DataLayer):
             A numpy array of the terrain representing an RGB image
 
         """
+        return np.array([])
         pass
 
 
@@ -899,6 +900,7 @@ class OperationalFuelLayer(FuelLayer):
         """
         Use the fuel data in self.data to make an RGB background image.
         """
+        return np.array([])
         pass
 
     def _make_data(self, filename: List) -> np.ndarray:

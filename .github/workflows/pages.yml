@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  release_sphinx:
+  deploy-pages:
     runs-on: ubuntu-latest
     container:
       image: python:3.9

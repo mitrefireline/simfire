@@ -400,8 +400,9 @@ class TestOperationalBurnProbabilityLayer(unittest.TestCase):
         center = (33.4, 115.04)
         height, width = 3200, 3200
         lat_long_box = LatLongBox(center, height, width, resolution)
-        OperationalBurnProbabilityLayer(lat_long_box)
         self.assertTrue(True)  # Remove after burn probability data is fixed to
+        OperationalBurnProbabilityLayer(lat_long_box)
+
         # match 3612, 3612 (pixel x pixel per image)
         # self.assertEqual(
         #     burnprobabilityGen.data.shape[0], burnprobabilityGen.data.shape[1]

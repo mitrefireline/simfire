@@ -1,0 +1,39 @@
+name: GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release_sphinx:
+    runs-on: ubuntu-latest
+    container:
+      image: python:3.9
+      volumes:
+        - public:/public
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v1
+
+      - name: Install Prerequisites 🖥️
+        run: |
+          apt update
+          apt install rsync -y
+
+      - name: Build 🛠️
+        run: |
+          python --version
+          curl -sSkL https://install.python-poetry.org | python -
+          export PATH=$PATH:$HOME/.local/bin
+          poetry --version
+          poetry install --only docs
+          poetry run sphinx-build -d docs/build/doctrees docs/source docs/build/html
+          mv docs/build/html public/
+          touch public/.nojekyll
+
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: public
+

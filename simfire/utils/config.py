@@ -18,12 +18,15 @@ from ..world.wind_mechanics.wind_controller import (
     WindControllerCFD,
 )
 from .layers import (
+    BurnProbabilityLayer,
     DataLayer,
     FuelLayer,
+    FunctionalBurnProbabilityLayer,
     FunctionalFuelLayer,
     FunctionalTopographyLayer,
     HistoricalLayer,
     LatLongBox,
+    OperationalBurnProbabilityLayer,
     OperationalFuelLayer,
     OperationalTopographyLayer,
     TopographyLayer,
@@ -423,6 +426,75 @@ class Config:
             )
 
         return topo_type, topo_layer, fn_name, kwargs
+
+    def _create_burn_probability_layer(
+        self, init: bool = False, seed: Optional[int] = None
+    ) -> Tuple[str, BurnProbabilityLayer, Optional[str], Optional[Dict[str, Any]]]:
+        """
+        Create a BurnProbabilityLayer given the config parameters.
+        This is used for initalization and after resetting the layer seeds.
+
+        Arguments:
+            seed: A randomization seed used by
+
+        Returns:
+            A tuple containing:
+                A string representing the `type` of the layer (`operational`,
+                    `functional`, etc.)
+                A FunctionalTopographyLayer that utilizes the fuction specified by
+                    fn_name and the keyword arguments in kwargs
+                The function name if a functional layer is used. Otherwise None
+                The keyword arguments for the function if a functinoal layer is used.
+                    Otherwise None
+        """
+        burn_prob_layer: BurnProbabilityLayer
+        bp_type = self.yaml_data["terrain"]["burn_probability"]["type"]
+        if bp_type == "operational":
+            if self.lat_long_box is not None:
+                burn_prob_layer = OperationalBurnProbabilityLayer(self.lat_long_box)
+            else:
+                raise ConfigError(
+                    "The burn probability layer type is `operational`, "
+                    "but self.lat_long_box is None"
+                )
+            fn_name = None
+            kwargs = None
+        elif bp_type == "functional":
+            fn_name = self.yaml_data["terrain"]["burn_probability"]["functional"][
+                "function"
+            ]
+            try:
+                kwargs = self.yaml_data["terrain"]["burn_probability"]["functional"][
+                    fn_name
+                ]
+            # No kwargs found (flat is an example of this)
+            except KeyError:
+                kwargs = {}
+            # Reset the seed if this isn't the inital creation
+            if "seed" in kwargs and not init:
+                kwargs["seed"] = seed
+            if fn_name == "perlin":
+                fn = perlin(**kwargs)
+            elif fn_name == "gaussian":
+                fn = gaussian(**kwargs)
+            elif fn_name == "flat":
+                fn = flat()
+            else:
+                raise ConfigError(
+                    f"The specified topography function ({fn_name}) " "is not valid."
+                )
+            burn_prob_layer = FunctionalBurnProbabilityLayer(
+                self.yaml_data["area"]["screen_size"],
+                self.yaml_data["area"]["screen_size"],
+                fn,
+                fn_name,
+            )
+        else:
+            raise ConfigError(
+                f"The specified topography type ({bp_type}) " "is not supported"
+            )
+
+        return bp_type, burn_prob_layer, fn_name, kwargs
 
     def _create_fuel_layer(
         self, init: bool = False, seed: Optional[int] = None

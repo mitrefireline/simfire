@@ -508,6 +508,168 @@ class DataLayer:
         self.data: Optional[np.ndarray] = None
 
 
+class BurnProbabilityLayer(DataLayer):
+    """
+    Base class for use with operational and procedurally generated
+    fuel data. This class implements the code needed to
+    create the terrain image to use with the display.
+    """
+
+    def __init__(self) -> None:
+        """
+        Simple call to the parent DataLayer class.
+
+        Arguments:
+            None
+
+        Returns:
+            None
+        """
+        super().__init__()
+        self.data: np.ndarray
+        self.image: np.ndarray
+
+    def _make_contours(self) -> QuadContourSet:
+        """
+        Use the data in self.data to compute the contour lines.
+
+        Arguments:
+            None
+
+        Returns:
+            contours: The matplotlib contour set used for plotting
+        """
+        contours = plt.contour(self.data.squeeze(), origin="upper")
+        plt.close()
+        return contours
+
+
+class OperationalBurnProbabilityLayer(BurnProbabilityLayer):
+    def __init__(self, lat_long_box: LatLongBox) -> None:
+        """
+        Initialize the elevation layer by retrieving the correct topograpchic data
+        and computing the area
+
+        Arguments:
+            center: The lat/long coordinates of the center point of the screen.
+            height: The height of the screen size (meters).
+            width: The width of the screen size (meters).
+            resolution: The resolution to get data (meters).
+        """
+        super().__init__()
+        self.lat_long_box = lat_long_box
+        self.path = Path("/nfs/lslab2/fireline/data/risk/")
+        res = str(self.lat_long_box.resolution) + "m"
+        self.datapath = self.path / res
+
+        # TODO: Add check here if resolution isnt available
+
+        self.data = self._make_data()
+        self.contours = self._make_contours()
+
+    def _make_data(self) -> np.ndarray:
+        self._get_dems()
+        data = Image.open(self.tif_filenames[0])
+        data = np.array(data, dtype=np.float32)
+        # flip axis because latitude goes up but numpy will read it down
+        data = np.flip(data, 0)
+        data = np.expand_dims(data, axis=-1)
+
+        for key, _ in self.lat_long_box.tiles.items():
+
+            if key == "single":
+                # simple case
+                tr = (self.lat_long_box.bl[0][0], self.lat_long_box.tr[1][0])
+                bl = (self.lat_long_box.tr[0][0], self.lat_long_box.bl[1][0])
+                return data[tr[0] : bl[0], tr[1] : bl[1]]
+            tmp_array = data
+            for idx, dem in enumerate(self.tif_filenames[1:]):
+                tif_data = Image.open(dem)
+                tif_data = np.array(tif_data, dtype=np.float32)
+                # flip axis because latitude goes up but numpy will read it down
+                tif_data = np.flip(tif_data, 0)
+                tif_data = np.expand_dims(tif_data, axis=-1)
+
+                if key == "north":
+                    # stack tiles along axis = 0 -> leftmost: bottom, rightmost: top
+                    data = np.concatenate((data, tif_data), axis=0)
+                elif key == "east":
+                    # stack tiles along axis = 2 -> leftmost, rightmost
+                    data = np.concatenate((data, tif_data), axis=1)
+                elif key == "square":
+                    if idx + 1 == 1:
+                        data = np.concatenate((data, tif_data), axis=1)
+                    elif idx + 1 == 2:
+                        tmp_array = tif_data
+                    elif idx + 1 == 3:
+                        tmp_array = np.concatenate((tif_data, tmp_array), axis=1)
+                        data = np.concatenate((data, tmp_array), axis=0)
+
+        tr = (self.lat_long_box.bl[0][0], self.lat_long_box.tr[1][0])
+        bl = (self.lat_long_box.tr[0][0], self.lat_long_box.bl[1][0])
+        data_array = data[tr[0] : bl[0], tr[1] : bl[1]]
+        # Convert from meters to feet for use with Rothermel
+        data_array = 3.28084 * data_array
+        return data_array
+
+    def _get_dems(self) -> None:
+        """
+        Uses the outputed tiles and sets `self.tif_filenames`
+        """
+        self.tif_filenames = []
+
+        for _, ranges in self.lat_long_box.tiles.items():
+            for range in ranges:
+                (five_deg_n, five_deg_w) = range
+                tif_data_region = Path(f"n{five_deg_n}w{five_deg_w}.tif")
+                tif_file = self.datapath / tif_data_region
+                self.tif_filenames.append(tif_file)
+
+
+class FunctionalBurnProbabilityLayer(BurnProbabilityLayer):
+    """
+    Layer that stores elevation data computed from a function.
+    """
+
+    def __init__(self, height, width, elevation_fn: ElevationFn, name: str) -> None:
+        """
+        Initialize the elvation layer by computing the elevations and contours.
+
+        Arguments:
+            height: The height of the data layer
+            width: The width of the data layer
+            elevation_fn: A callable function that converts (x, y) coorindates to
+                          elevations.
+        """
+        super().__init__()
+        self.height = height
+        self.width = width
+        self.name = name
+
+        self.data = self._make_data(elevation_fn)
+        self.contours = self._make_contours()
+
+    def _make_data(self, elevation_fn: ElevationFn) -> np.ndarray:
+        """
+        Use self.elevation_fn to make the elevation data layer.
+
+        Arguments:
+            elevation_fn: The function that maps (x, y) points to elevations
+
+        Returns:
+            A numpy array containing the elevation data
+        """
+        x = np.arange(self.width)
+        y = np.arange(self.height)
+        X, Y = np.meshgrid(x, y)
+        elevation_fn_vect = np.vectorize(elevation_fn)
+        elevations = elevation_fn_vect(X, Y)
+        # Expand third dimension to align with data layers
+        elevations = np.expand_dims(elevations, axis=-1)
+
+        return elevations
+
+
 class TopographyLayer(DataLayer):
     """
     Base class for use with operational and procedurally generated
@@ -700,6 +862,7 @@ class FuelLayer(DataLayer):
             A numpy array of the terrain representing an RGB image
 
         """
+        return np.array([])
         pass
 
 
@@ -737,6 +900,7 @@ class OperationalFuelLayer(FuelLayer):
         """
         Use the fuel data in self.data to make an RGB background image.
         """
+        return np.array([])
         pass
 
     def _make_data(self, filename: List) -> np.ndarray:

@@ -8,9 +8,11 @@ import numpy as np
 from ...world.fuel_array_functions import chaparral_fn
 from ..layers import (
     DataLayer,
+    FunctionalBurnProbabilityLayer,
     FunctionalFuelLayer,
     FunctionalTopographyLayer,
     LatLongBox,
+    OperationalBurnProbabilityLayer,
     OperationalFuelLayer,
     OperationalTopographyLayer,
     TopographyLayer,
@@ -368,4 +370,94 @@ class TestFunctionalFuelLayer(unittest.TestCase):
                 f"{image.shape}, but should have "
                 f"shape {correct_data_shape}"
             ),
+        )
+
+
+class TestBurnProbabilityLayer(unittest.TestCase):
+    def setUp(self) -> None:
+        return super().setUp()
+
+
+# Need to tweak the gdal outputs for Burn Probability, incorrect pixel size
+class TestOperationalBurnProbabilityLayer(unittest.TestCase):
+    def setUp(self) -> None:
+        """
+        Each test requires a new layer, so nothing is done in setUp.
+        """
+        return super().setUp()
+
+    def test__make_data(self) -> None:
+        """
+        Test that the internal call to _make_data() runs properly.
+        This method returns the data array containing the elevations within the
+            specified bounding box region of the given latitudes and longitudes.
+
+        NOTE: This method should always return a square
+        """
+
+        resolution = 30
+        # 2 Tiles (easternly)
+        center = (33.4, 115.04)
+        height, width = 3200, 3200
+        lat_long_box = LatLongBox(center, height, width, resolution)
+        self.assertTrue(True)  # Remove after burn probability data is fixed to
+        return
+        OperationalBurnProbabilityLayer(lat_long_box)
+
+        # match 3612, 3612 (pixel x pixel per image)
+        # self.assertEqual(
+        #     burnprobabilityGen.data.shape[0], burnprobabilityGen.data.shape[1]
+        # )
+
+    def test__get_dems(self) -> None:
+        """
+        Test that the call to _get_dems() runs properly.
+        This method will generate a list of the DEMs in the fireline /nfs/
+        """
+        self.assertTrue(True)
+
+        # resolution = 30
+        # # Single Tile
+        # center = (35.2, 115.6)
+        # height, width = 1600, 1600
+        # lat_long_box = LatLongBox(center, height, width, resolution)
+        # burnprobabilityGen = OperationalBurnProbabilityLayer(lat_long_box)
+        # self.assertEqual(1, len(burnprobabilityGen.tif_filenames))
+
+        # # 2 Tiles
+        # center = (38.4, 115.0)
+        # height, width = 1600, 1600
+        # lat_long_box = LatLongBox(center, height, width, resolution)
+        # burnprobabilityGen = OperationalBurnProbabilityLayer(lat_long_box)
+        # self.assertEqual(2, len(burnprobabilityGen.tif_filenames))
+
+        # # 4 Tiles
+        # center = (34.001, 116.008)
+        # height, width = 3200, 3200
+        # lat_long_box = LatLongBox(center, height, width, resolution)
+        # burnprobabilityGen = OperationalBurnProbabilityLayer(lat_long_box)
+        # self.assertEqual(4, len(burnprobabilityGen.tif_filenames))
+
+
+class TestFunctionalBurnProbabilityLayer(unittest.TestCase):
+    def setUp(self) -> None:
+        # Create arbitrary function to test
+        self.fn = lambda x, y: x + y
+        # Set arbitrary screen size
+        self.screen_size = (32, 32)
+        return super().setUp()
+
+    def test_data(self) -> None:
+        """
+        Test that the FuncitonalElevationLayer creates the correct data
+        """
+        height = self.screen_size[0]
+        width = self.screen_size[1]
+        layer = FunctionalBurnProbabilityLayer(height, width, self.fn, name="test")
+        correct_data_shape = self.screen_size + (1,)
+        self.assertTupleEqual(
+            correct_data_shape,
+            layer.data.shape,
+            msg=f"The layer data has shape {layer.data.shape}, "
+            f"but should have shape {correct_data_shape}",
         )

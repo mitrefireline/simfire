@@ -14,6 +14,9 @@ Classes
 
    simfire.utils.layers.LatLongBox
    simfire.utils.layers.DataLayer
+   simfire.utils.layers.BurnProbabilityLayer
+   simfire.utils.layers.OperationalBurnProbabilityLayer
+   simfire.utils.layers.FunctionalBurnProbabilityLayer
    simfire.utils.layers.TopographyLayer
    simfire.utils.layers.OperationalTopographyLayer
    simfire.utils.layers.FunctionalTopographyLayer
@@ -104,6 +107,52 @@ Attributes
    The data in this class should have a value for every pixel in the terrain.
 
    This parent class only exists to set a base value for self.data
+
+
+.. py:class:: BurnProbabilityLayer
+
+   Bases: :py:obj:`DataLayer`
+
+   Base class for use with operational and procedurally generated
+   fuel data. This class implements the code needed to
+   create the terrain image to use with the display.
+
+   Simple call to the parent DataLayer class.
+
+   :param None:
+
+   :returns: None
+
+
+.. py:class:: OperationalBurnProbabilityLayer(lat_long_box)
+
+   Bases: :py:obj:`BurnProbabilityLayer`
+
+   Base class for use with operational and procedurally generated
+   fuel data. This class implements the code needed to
+   create the terrain image to use with the display.
+
+   Initialize the elevation layer by retrieving the correct topograpchic data
+   and computing the area
+
+   :param center: The lat/long coordinates of the center point of the screen.
+   :param height: The height of the screen size (meters).
+   :param width: The width of the screen size (meters).
+   :param resolution: The resolution to get data (meters).
+
+
+.. py:class:: FunctionalBurnProbabilityLayer(height, width, elevation_fn, name)
+
+   Bases: :py:obj:`BurnProbabilityLayer`
+
+   Layer that stores elevation data computed from a function.
+
+   Initialize the elvation layer by computing the elevations and contours.
+
+   :param height: The height of the data layer
+   :param width: The width of the data layer
+   :param elevation_fn: A callable function that converts (x, y) coorindates to
+                        elevations.
 
 
 .. py:class:: TopographyLayer

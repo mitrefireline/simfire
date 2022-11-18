@@ -271,25 +271,34 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#simfire.utils.layers.DataLayer" title="simfire.utils.layers.DataLayer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataLayer</span></code></a></p></td>
 <td><p>Base class for any data that affects the terrain.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#simfire.utils.layers.TopographyLayer" title="simfire.utils.layers.TopographyLayer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TopographyLayer</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#simfire.utils.layers.BurnProbabilityLayer" title="simfire.utils.layers.BurnProbabilityLayer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BurnProbabilityLayer</span></code></a></p></td>
 <td><p>Base class for use with operational and procedurally generated</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#simfire.utils.layers.OperationalTopographyLayer" title="simfire.utils.layers.OperationalTopographyLayer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalTopographyLayer</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#simfire.utils.layers.OperationalBurnProbabilityLayer" title="simfire.utils.layers.OperationalBurnProbabilityLayer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalBurnProbabilityLayer</span></code></a></p></td>
 <td><p>Base class for use with operational and procedurally generated</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#simfire.utils.layers.FunctionalTopographyLayer" title="simfire.utils.layers.FunctionalTopographyLayer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FunctionalTopographyLayer</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#simfire.utils.layers.FunctionalBurnProbabilityLayer" title="simfire.utils.layers.FunctionalBurnProbabilityLayer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FunctionalBurnProbabilityLayer</span></code></a></p></td>
 <td><p>Layer that stores elevation data computed from a function.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#simfire.utils.layers.FuelLayer" title="simfire.utils.layers.FuelLayer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FuelLayer</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#simfire.utils.layers.TopographyLayer" title="simfire.utils.layers.TopographyLayer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TopographyLayer</span></code></a></p></td>
 <td><p>Base class for use with operational and procedurally generated</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#simfire.utils.layers.OperationalFuelLayer" title="simfire.utils.layers.OperationalFuelLayer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalFuelLayer</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#simfire.utils.layers.OperationalTopographyLayer" title="simfire.utils.layers.OperationalTopographyLayer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalTopographyLayer</span></code></a></p></td>
 <td><p>Base class for use with operational and procedurally generated</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#simfire.utils.layers.FunctionalFuelLayer" title="simfire.utils.layers.FunctionalFuelLayer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FunctionalFuelLayer</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#simfire.utils.layers.FunctionalTopographyLayer" title="simfire.utils.layers.FunctionalTopographyLayer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FunctionalTopographyLayer</span></code></a></p></td>
+<td><p>Layer that stores elevation data computed from a function.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#simfire.utils.layers.FuelLayer" title="simfire.utils.layers.FuelLayer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FuelLayer</span></code></a></p></td>
+<td><p>Base class for use with operational and procedurally generated</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#simfire.utils.layers.OperationalFuelLayer" title="simfire.utils.layers.OperationalFuelLayer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalFuelLayer</span></code></a></p></td>
+<td><p>Base class for use with operational and procedurally generated</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#simfire.utils.layers.FunctionalFuelLayer" title="simfire.utils.layers.FunctionalFuelLayer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FunctionalFuelLayer</span></code></a></p></td>
 <td><p>Layer that stores fuel data computed from a function.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#simfire.utils.layers.HistoricalLayer" title="simfire.utils.layers.HistoricalLayer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HistoricalLayer</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#simfire.utils.layers.HistoricalLayer" title="simfire.utils.layers.HistoricalLayer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HistoricalLayer</span></code></a></p></td>
 <td><p>Base class for use with operational and procedurally generated</p></td>
 </tr>
 </tbody>
@@ -414,6 +423,65 @@ Data is measured in pixels corresponding to the resolution</p>
 <dd><p>Base class for any data that affects the terrain.
 The data in this class should have a value for every pixel in the terrain.</p>
 <p>This parent class only exists to set a base value for self.data</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="simfire.utils.layers.BurnProbabilityLayer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simfire.utils.layers.</span></span><span class="sig-name descname"><span class="pre">BurnProbabilityLayer</span></span><a class="headerlink" href="#simfire.utils.layers.BurnProbabilityLayer" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#simfire.utils.layers.DataLayer" title="simfire.utils.layers.DataLayer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataLayer</span></code></a></p>
+<p>Base class for use with operational and procedurally generated
+fuel data. This class implements the code needed to
+create the terrain image to use with the display.</p>
+<p>Simple call to the parent DataLayer class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>None</strong> – </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="simfire.utils.layers.OperationalBurnProbabilityLayer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simfire.utils.layers.</span></span><span class="sig-name descname"><span class="pre">OperationalBurnProbabilityLayer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lat_long_box</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.utils.layers.OperationalBurnProbabilityLayer" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#simfire.utils.layers.BurnProbabilityLayer" title="simfire.utils.layers.BurnProbabilityLayer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BurnProbabilityLayer</span></code></a></p>
+<p>Base class for use with operational and procedurally generated
+fuel data. This class implements the code needed to
+create the terrain image to use with the display.</p>
+<p>Initialize the elevation layer by retrieving the correct topograpchic data
+and computing the area</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>center</strong> – The lat/long coordinates of the center point of the screen.</p></li>
+<li><p><strong>height</strong> – The height of the screen size (meters).</p></li>
+<li><p><strong>width</strong> – The width of the screen size (meters).</p></li>
+<li><p><strong>resolution</strong> – The resolution to get data (meters).</p></li>
+<li><p><strong>lat_long_box</strong> (<a class="reference internal" href="#simfire.utils.layers.LatLongBox" title="simfire.utils.layers.LatLongBox"><em>LatLongBox</em></a>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="simfire.utils.layers.FunctionalBurnProbabilityLayer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simfire.utils.layers.</span></span><span class="sig-name descname"><span class="pre">FunctionalBurnProbabilityLayer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">height</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">elevation_fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.utils.layers.FunctionalBurnProbabilityLayer" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#simfire.utils.layers.BurnProbabilityLayer" title="simfire.utils.layers.BurnProbabilityLayer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BurnProbabilityLayer</span></code></a></p>
+<p>Layer that stores elevation data computed from a function.</p>
+<p>Initialize the elvation layer by computing the elevations and contours.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>height</strong> – The height of the data layer</p></li>
+<li><p><strong>width</strong> – The width of the data layer</p></li>
+<li><p><strong>elevation_fn</strong> (<em>simfire.world.elevation_functions.ElevationFn</em>) – A callable function that converts (x, y) coorindates to
+elevations.</p></li>
+<li><p><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – </p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py class">
@@ -643,6 +711,9 @@ TODO: Add wind shapefile</p>
 <li><a class="reference internal" href="#simfire.utils.layers.round_down_to_multiple"><code class="docutils literal notranslate"><span class="pre">round_down_to_multiple()</span></code></a></li>
 <li><a class="reference internal" href="#simfire.utils.layers.LatLongBox"><code class="docutils literal notranslate"><span class="pre">LatLongBox</span></code></a></li>
 <li><a class="reference internal" href="#simfire.utils.layers.DataLayer"><code class="docutils literal notranslate"><span class="pre">DataLayer</span></code></a></li>
+<li><a class="reference internal" href="#simfire.utils.layers.BurnProbabilityLayer"><code class="docutils literal notranslate"><span class="pre">BurnProbabilityLayer</span></code></a></li>
+<li><a class="reference internal" href="#simfire.utils.layers.OperationalBurnProbabilityLayer"><code class="docutils literal notranslate"><span class="pre">OperationalBurnProbabilityLayer</span></code></a></li>
+<li><a class="reference internal" href="#simfire.utils.layers.FunctionalBurnProbabilityLayer"><code class="docutils literal notranslate"><span class="pre">FunctionalBurnProbabilityLayer</span></code></a></li>
 <li><a class="reference internal" href="#simfire.utils.layers.TopographyLayer"><code class="docutils literal notranslate"><span class="pre">TopographyLayer</span></code></a></li>
 <li><a class="reference internal" href="#simfire.utils.layers.OperationalTopographyLayer"><code class="docutils literal notranslate"><span class="pre">OperationalTopographyLayer</span></code></a></li>
 <li><a class="reference internal" href="#simfire.utils.layers.FunctionalTopographyLayer"><code class="docutils literal notranslate"><span class="pre">FunctionalTopographyLayer</span></code></a></li>
@@ -655,6 +726,9 @@ TODO: Add wind shapefile</p>
 <li><a class="reference internal" href="#simfire.utils.layers.round_down_to_multiple">round_down_to_multiple</a></li>
 <li><a class="reference internal" href="#simfire.utils.layers.LatLongBox">LatLongBox</a></li>
 <li><a class="reference internal" href="#simfire.utils.layers.DataLayer">DataLayer</a></li>
+<li><a class="reference internal" href="#simfire.utils.layers.BurnProbabilityLayer">BurnProbabilityLayer</a></li>
+<li><a class="reference internal" href="#simfire.utils.layers.OperationalBurnProbabilityLayer">OperationalBurnProbabilityLayer</a></li>
+<li><a class="reference internal" href="#simfire.utils.layers.FunctionalBurnProbabilityLayer">FunctionalBurnProbabilityLayer</a></li>
 <li><a class="reference internal" href="#simfire.utils.layers.TopographyLayer">TopographyLayer</a></li>
 <li><a class="reference internal" href="#simfire.utils.layers.OperationalTopographyLayer">OperationalTopographyLayer</a></li>
 <li><a class="reference internal" href="#simfire.utils.layers.FunctionalTopographyLayer">FunctionalTopographyLayer</a></li>

@@ -34,10 +34,12 @@ def main():
     else:
         rescale_size = None
     log.info(f"Creating game with screen size: {cfg.area.screen_size}")
+    log.info(f"Headless: {bool(cfg.simulation.headless)}")
     log.info(f"Recording: {bool(cfg.simulation.record)}")
     game = Game(
         (cfg.area.screen_size, cfg.area.screen_size),
         rescale_size=rescale_size,
+        headless=cfg.simulation.headless,
         record=cfg.simulation.record,
     )
 

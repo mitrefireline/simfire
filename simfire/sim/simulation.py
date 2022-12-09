@@ -1,10 +1,12 @@
+import json
 import warnings
 from abc import ABC, abstractmethod
 from datetime import datetime
 from enum import IntEnum
 from pathlib import Path
-from typing import Dict, Iterable, List, Optional, Tuple, Union
+from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 
+import h5py
 import numpy as np
 
 from ..enums import (
@@ -49,7 +51,7 @@ class Simulation(ABC):
         self.config = config
         # Create a _now time to use for the simulation object. This is used to
         # create folders based on individual simulation runs.
-        self._now = datetime.now().strftime("%m-%d-%Y_%H-%M-%S")
+        self.start_time = datetime.now().strftime("%m-%d-%Y_%H-%M-%S")
 
     @abstractmethod
     def run(self, time: Union[str, int]) -> Tuple[np.ndarray, bool]:
@@ -348,10 +350,10 @@ class FireSimulation(Simulation):
                 M_x[y][x] = fuel.M_x
 
         return {
-            "w_0": w_0,
-            "sigma": sigma,
-            "delta": delta,
-            "M_x": M_x,
+            "w_0": w_0.astype(np.float32),
+            "sigma": sigma.astype(np.uint32),
+            "delta": delta.astype(np.float32),
+            "M_x": M_x.astype(np.float32),
             "elevation": self.terrain.elevations,
             "wind_speed": self.config.wind.speed,
             "wind_direction": self.config.wind.direction,
@@ -469,12 +471,6 @@ class FireSimulation(Simulation):
             time: Either how many updates to run the simulation, based on the config
                   value, `config.simulation.update_rate`, or a length of time expressed
                   as a string (e.g. `120m`, `2h`, `2hour`, `2hours`, `1h 60m`, etc.)
-            render: Whether or not to render the simulation during the current `run`.
-            record: Whether or not to record the simulation's run in a GIF. Will be output
-                    to the location specified in the config section:
-                    `simulation.save_path`
-                    (`docs <fireline.pages.mitre.org/simfire/config.html#save_path>`_)
-            spread_graph: Whether or not to save the spread graph of the simulation.
 
         Returns:
             A tuple of the following:
@@ -502,8 +498,14 @@ class FireSimulation(Simulation):
             if self._rendering:
                 self._render()
             num_updates += 1
-            # elapsed_time is in minutes
+
+            # lapsed_time is in minutes
             self.elapsed_time = self.fire_manager.elapsed_time
+
+            # If we're saving data, make sure to append the data to the output JSON after
+            # each update
+            if self.config.simulation.save_data:
+                self._save_data()
 
         self.active = True if self.fire_status == GameStatus.RUNNING else False
 
@@ -752,6 +754,7 @@ class FireSimulation(Simulation):
             Whether or not the method successfully set a data type.
         """
         keys = list(types.keys())
+        success = False
         if "elevation" in keys:
             self.config.reset_terrain(topography_type=types["elevation"])
             success = True
@@ -826,6 +829,60 @@ class FireSimulation(Simulation):
         fig.savefig(fig_out_path)
         log.info("Done saving fire spread graph")
 
+    def _save_data(self) -> None:
+        """
+        Save the data into a JSON file.
+        """
+        # Create the output path if it doesn't exist
+        out_path = self._create_out_path()
+        # Create the data directory if it doesn't exist
+        datapath = out_path / "data"
+        datapath.mkdir(parents=True, exist_ok=True)
+
+        # Get the filepath, depending on the data type
+        dtype = self.config.simulation.data_type
+        ext = "npy" if dtype == "npy" else "h5"
+        fire_map_path = datapath / f"fire_map.{ext}"
+
+        # Binarize the static data layers
+        static = self._load_static_data(datapath)
+
+        # Create the metadata
+        metadata = {
+            "config": self.config.yaml_data,
+            "seeds": self.get_seeds(),
+            "layer_types": self.get_layer_types(),
+            "shape": static["shape"],
+            "static_data": static,
+            "fire_map": fire_map_path.name,
+        }
+
+        # Save the metadata
+        with open(datapath / "metadata.json", "w") as f:
+            json.dump(metadata, f, indent=2)
+
+        # Load the previous fire map if it's already been saved
+        loaded_fire_map = self._load_fire_map(fire_map_path)
+
+        # Load the current fire map
+        current_fire_map = self.fire_map
+        current_fire_map = np.expand_dims(current_fire_map, axis=0)
+
+        # Append to the loaded fire map
+        if loaded_fire_map is not None:
+            if len(loaded_fire_map.shape) == 2:
+                loaded_fire_map = np.expand_dims(loaded_fire_map, axis=0)
+            fire_map = np.append(loaded_fire_map, current_fire_map, axis=0)
+        else:
+            fire_map = current_fire_map
+
+        # Save the fire map data
+        if dtype == "npy":
+            np.save(fire_map_path, fire_map)
+        else:
+            with h5py.File(fire_map_path, "w") as f:
+                f.create_dataset("data", data=fire_map)
+
     @property
     def rendering(self) -> bool:
         """
@@ -855,8 +912,6 @@ class FireSimulation(Simulation):
         else:
             self._game.quit()
 
-        # Save the spread graph
-
     def _render(self) -> None:
         """
         Render `self._game` frame with `self._game.update`
@@ -877,7 +932,7 @@ class FireSimulation(Simulation):
         """
         Creates the output path if it does not exist.
         """
-        out_path = Path(self.config.simulation.save_path).expanduser() / self._now
+        out_path = Path(self.config.simulation.save_path).expanduser()
         if not out_path.parent.is_dir():
             log.warning(
                 "Designated save path from the config does not exist, "
@@ -888,6 +943,72 @@ class FireSimulation(Simulation):
             parents = False
 
         if not out_path.is_dir():
-            log.info(f"Creating directory {out_path}")
+            log.info(f"Creating directory '{out_path}'")
             out_path.mkdir(parents=parents) if not out_path.is_dir() else None
         return out_path
+
+    def _load_fire_map(self, filepath: Path) -> Optional[np.ndarray]:
+        """
+        Load the fire map from the data directory.
+
+        Arguments:
+            filepath: The path to the fire map in the data directory.
+
+        Returns:
+            The fire map if it exists, otherwise None.
+        """
+        # Check if the file exists, if not return None
+        if not filepath.is_file():
+            return None
+
+        # Load the fire map, depending on the data type
+        if filepath.suffix == ".npy":
+            fire_map = np.load(filepath)
+        else:
+            fire_map = h5py.File(filepath)["data"]
+
+        # Make sure the fire map is a numpy array
+        fire_map = np.array(fire_map)
+        return fire_map
+
+    def _load_static_data(self, datapath: Path) -> Dict[str, Any]:
+        """
+        Load the static data from `self.get_attribute_data` and save it to the
+        data directory if it does not exist.
+
+        Arguments:
+            datapath: The path to the data directory.
+
+        Returns:
+            The static data.
+        """
+        # Get the static data
+        data = self.get_attribute_data()
+
+        # Create the data locations based on the keys
+        data_locs = {k: "" for k in data.keys()}
+
+        # Get the shape of the data (can get it from any key)
+        shape = data[list(data.keys())[0]].shape
+
+        # Create the data locations based on the data type
+        for key in data.keys():
+            if self.config.simulation.data_type == "npy":
+                filename = f"{key}.npy"
+            else:
+                filename = f"{key}.h5"
+            data_locs[key] = filename
+
+        # Save the static data if it does not exist
+        for key, loc in data_locs.items():
+            path = datapath / loc
+            if not path.is_file():
+                log.info(f"Creating static data file '{path}'")
+                if self.config.simulation.data_type == "npy":
+                    np.save(path, data[key])
+                else:
+                    with h5py.File(path, "w") as f:
+                        f.create_dataset("data", data=data[key])
+
+        static_dict = {"data": data_locs, "shape": shape}
+        return static_dict

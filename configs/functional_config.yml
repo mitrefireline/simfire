@@ -17,7 +17,7 @@ simulation:
   record: false
   save_data: false
   data_type: "npy"
-  save_path: "simulation_outputs_npy"
+  save_path: "simulation_outputs"
 
 mitigation:
   ros_attenuation: true

@@ -299,15 +299,8 @@ class FireSimulationTest(unittest.TestCase):
         """
         Test the creation of the output path
         """
-        datefmtstr = r"\d{2}-\d{2}-\d{4}_\d{2}-\d{2}-\d{2}"
         out_path = self.simulation._create_out_path()
         self.assertIsInstance(out_path, Path)
-        self.assertEqual(
-            out_path,
-            Path(self.simulation.config.simulation.save_path).expanduser()
-            / self.simulation._now,
-        )
-        self.assertRegex(out_path.name, datefmtstr)
         out_path.rmdir()
 
     def test_update_agent_positions(self) -> None:

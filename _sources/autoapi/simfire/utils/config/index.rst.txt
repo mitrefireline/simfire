@@ -91,7 +91,7 @@ Attributes
       
 
 
-.. py:class:: SimulationConfig(update_rate, runtime, headless, draw_spread_graph, record, save_path)
+.. py:class:: SimulationConfig(update_rate, runtime, headless, draw_spread_graph, record, save_data, data_type, save_path)
 
 
 .. py:class:: MitigationConfig

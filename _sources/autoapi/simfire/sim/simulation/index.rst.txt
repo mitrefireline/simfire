@@ -227,12 +227,6 @@ Attributes
       :param time: Either how many updates to run the simulation, based on the config
                    value, `config.simulation.update_rate`, or a length of time expressed
                    as a string (e.g. `120m`, `2h`, `2hour`, `2hours`, `1h 60m`, etc.)
-      :param render: Whether or not to render the simulation during the current `run`.
-      :param record: Whether or not to record the simulation's run in a GIF. Will be output
-                     to the location specified in the config section:
-                     `simulation.save_path`
-                     (`docs <fireline.pages.mitre.org/simfire/config.html#save_path>`_)
-      :param spread_graph: Whether or not to save the spread graph of the simulation.
 
       :returns:
 

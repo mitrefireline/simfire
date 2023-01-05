@@ -360,7 +360,7 @@ range from [0, 6] (see simfire/enums.py:BurnStatus).</p></li>
 <dd class="field-odd"><p>The dictionary of observations containing NumPy arrays.</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p>Dict[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.23)">numpy.ndarray</a>]</p>
+<dd class="field-even"><p>Dict[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)">numpy.ndarray</a>]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -433,7 +433,7 @@ Available seeds can be retreived by calling the <cite>self.get_seeds</cite> meth
 <dd><p>Set the ‘self.fire_map’ to the new mitigation map</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>mitigation_map</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.23)"><em>numpy.ndarray</em></a>) – A numpy array of mitigations to be set as ‘self.fire_map’</p>
+<dd class="field-odd"><p><strong>mitigation_map</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>numpy.ndarray</em></a>) – A numpy array of mitigations to be set as ‘self.fire_map’</p>
 </dd>
 <dt class="field-even">Return type</dt>
 <dd class="field-even"><p>None</p>
@@ -552,7 +552,7 @@ and all mitigations to initial conditions</p>
 <dd class="field-odd"><p>The dictionary of observation data containing NumPy arrays.</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p>Dict[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.23)">numpy.ndarray</a>]</p>
+<dd class="field-even"><p>Dict[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)">numpy.ndarray</a>]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -563,7 +563,7 @@ and all mitigations to initial conditions</p>
 <dd><p>Set the ‘self.fire_map’ to the new mitigation map</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>mitigation_map</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.23)"><em>numpy.ndarray</em></a>) – A numpy array of mitigations to be set as ‘self.fire_map’</p>
+<dd class="field-odd"><p><strong>mitigation_map</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>numpy.ndarray</em></a>) – A numpy array of mitigations to be set as ‘self.fire_map’</p>
 </dd>
 <dt class="field-even">Return type</dt>
 <dd class="field-even"><p>None</p>
@@ -618,17 +618,9 @@ and all mitigations to initial conditions</p>
 </div></blockquote>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>time</strong> (<em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>]</em>) – Either how many updates to run the simulation, based on the config
+<dd class="field-odd"><p><strong>time</strong> (<em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>]</em>) – Either how many updates to run the simulation, based on the config
 value, <cite>config.simulation.update_rate</cite>, or a length of time expressed
-as a string (e.g. <cite>120m</cite>, <cite>2h</cite>, <cite>2hour</cite>, <cite>2hours</cite>, <cite>1h 60m</cite>, etc.)</p></li>
-<li><p><strong>render</strong> – Whether or not to render the simulation during the current <cite>run</cite>.</p></li>
-<li><p><strong>record</strong> – Whether or not to record the simulation’s run in a GIF. Will be output
-to the location specified in the config section:
-<cite>simulation.save_path</cite>
-(<a class="reference external" href="fireline.pages.mitre.org/simfire/config.html#save_path">docs</a>)</p></li>
-<li><p><strong>spread_graph</strong> – Whether or not to save the spread graph of the simulation.</p></li>
-</ul>
+as a string (e.g. <cite>120m</cite>, <cite>2h</cite>, <cite>2hour</cite>, <cite>2hours</cite>, <cite>1h 60m</cite>, etc.)</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><ul class="simple">
@@ -805,7 +797,7 @@ to <cite>True</cite>.</p>
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 2022, fiReLine
+                Copyright &#169; 2023, fiReLine
             </div>
             Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
             

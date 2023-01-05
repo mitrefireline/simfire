@@ -291,7 +291,7 @@ class Config:
             # Overwite the screen_size since operational data will determine
             # its own screen_size based on lat/long input
             # Height and width are the same since we assume square input
-            height = self.lat_long_box.tr[0][0] - self.lat_long_box.bl[0][0]
+            height = int(self.lat_long_box.tr[0][0] - self.lat_long_box.bl[0][0])
             self.yaml_data["area"]["screen_size"] = height
         return AreaConfig(**self.yaml_data["area"])
 

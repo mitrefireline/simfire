@@ -15,7 +15,9 @@ simulation:
   headless: false
   draw_spread_graph: false
   record: true
-  save_path: "/tmp"
+  save_data: false
+  data_type: "npy"
+  save_path: "/tmp/test"
 
 mitigation:
   ros_attenuation: true

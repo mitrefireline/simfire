@@ -13,9 +13,11 @@ display:
 simulation:
   update_rate: 1
   runtime: 15m
-  headless: false
+  headless: true
   draw_spread_graph: false
-  record: true
+  record: false
+  save_data: false
+  data_type: "npy"
   save_path: "~/.simfire/simulation_outputs"
 
 mitigation:

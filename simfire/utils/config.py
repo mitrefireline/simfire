@@ -97,6 +97,8 @@ class SimulationConfig:
         headless: bool,
         draw_spread_graph: bool,
         record: bool,
+        save_data: bool,
+        data_type: str,
         save_path: str,
     ) -> None:
         self.update_rate = float(update_rate)
@@ -104,6 +106,14 @@ class SimulationConfig:
         self.headless = headless
         self.draw_spread_graph = draw_spread_graph
         self.record = record
+        self.save_data = save_data
+        data_type = data_type.lower()
+        if data_type not in ["npy", "h5"]:
+            raise ConfigError(
+                f"Specified data_type {data_type} is not valid. "
+                "Specify either 'npy' or 'h5'."
+            )
+        self.data_type = data_type
         self.save_path = Path(save_path)
 
 

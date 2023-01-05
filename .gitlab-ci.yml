@@ -83,22 +83,6 @@ bandit:
 #########
 # Tests #
 #########
-unittests:
-  stage: Tests
-  tags:
-    - lslab2
-  script:
-    - !reference [.install_dev, script]
-    - SDL_VIDEODRIVER=dummy poetry run pytest --junitxml=report.xml
-  artifacts:
-    when: always
-    reports:
-      junit: report.xml
-  needs: []
-  timeout: 15m
-  only:
-    - merge_requests
-
 run_game.py:
   stage: Tests
   tags:

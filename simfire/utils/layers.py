@@ -102,6 +102,8 @@ class LatLongBox:
             log.error("The height and width must be equal for the LatLongBox")
             raise AssertionError
 
+        self.height = height
+        self.width = width
         self.area = height * width
         self.center = center
         self.resolution = resolution
@@ -781,7 +783,7 @@ class OperationalTopographyLayer(TopographyLayer):
         for _, ranges in self.lat_long_box.tiles.items():
             for range in ranges:
                 (five_deg_n, five_deg_w) = range
-                tif_data_region = Path(f"n{five_deg_n}w{five_deg_w}.tif")
+                tif_data_region = Path(f"n{five_deg_n + 1}w{five_deg_w}.tif")
                 tif_file = self.datapath / tif_data_region
                 self.tif_filenames.append(tif_file)
 
@@ -906,6 +908,8 @@ class OperationalFuelLayer(FuelLayer):
     def _make_data(self, filename: List) -> np.ndarray:
 
         data = np.load(filename[0])
+        # Flip the data over a horizontal axis
+        data = np.flip(data, axis=0)
         data = np.array(data, dtype=np.float32)
         data = np.expand_dims(data, axis=-1)
 
@@ -924,6 +928,8 @@ class OperationalFuelLayer(FuelLayer):
 
                 if key == "north":
                     # stack tiles along axis = 0 -> leftmost: bottom, rightmost: top
+                    # Flip the tif data over a horizontal axis
+                    tif_data = np.flip(tif_data, axis=0)
                     data = np.concatenate((data, tif_data), axis=0)
                 elif key == "east":
                     # stack tiles along axis = 2 -> leftmost, rightmost
@@ -957,11 +963,11 @@ class OperationalFuelLayer(FuelLayer):
                 (five_deg_n, five_deg_w) = range
 
                 int_data_region = Path(
-                    f"n{five_deg_n+1}w{five_deg_w}/{fuel_model}/{fuel_data_fm}"
+                    f"n{five_deg_n}w{five_deg_w}/{fuel_model}/{fuel_data_fm}"
                 )
 
                 rgb_data_region = Path(
-                    f"n{five_deg_n+1}w{five_deg_w}/{fuel_model}/{fuel_data_rgb}"
+                    f"n{five_deg_n}w{five_deg_w}/{fuel_model}/{fuel_data_rgb}"
                 )
 
                 int_npy_file = self.datapath / int_data_region

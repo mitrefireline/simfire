@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 
 import h5py
+import jsonlines
 import numpy as np
 
 from ..enums import (
@@ -196,6 +197,7 @@ class FireSimulation(Simulation):
         self._create_terrain()
         self._create_fire()
         self._create_mitigations()
+        self.elapsed_steps = 0
 
     def _create_terrain(self) -> None:
         """
@@ -499,8 +501,11 @@ class FireSimulation(Simulation):
                 self._render()
             num_updates += 1
 
-            # lapsed_time is in minutes
+            # elapsed_time is in minutes
             self.elapsed_time = self.fire_manager.elapsed_time
+
+            # elapsed steps
+            self.elapsed_steps += 1
 
             # If we're saving data, make sure to append the data to the output JSON after
             # each update
@@ -841,7 +846,17 @@ class FireSimulation(Simulation):
 
         # Get the filepath, depending on the data type
         dtype = self.config.simulation.data_type
-        ext = "npy" if dtype == "npy" else "h5"
+        if dtype == "npy":
+            ext = "npy"
+        elif dtype == "h5":
+            ext = "h5"
+        elif dtype in ["json", "jsonl"]:
+            ext = "jsonl"
+        else:
+            raise ValueError(
+                f"Invalid data type '{dtype}' given. Valid types are 'npy', 'h5', "
+                f"'json', and 'jsonl'."
+            )
         fire_map_path = datapath / f"fire_map.{ext}"
 
         # Binarize the static data layers
@@ -862,26 +877,36 @@ class FireSimulation(Simulation):
             json.dump(metadata, f, indent=2)
 
         # Load the previous fire map if it's already been saved
-        loaded_fire_map = self._load_fire_map(fire_map_path)
+        # This would be the case
+        if dtype in ["npy", "h5"]:
+            loaded_fire_map = self._load_fire_map(fire_map_path)
 
-        # Load the current fire map
-        current_fire_map = self.fire_map
-        current_fire_map = np.expand_dims(current_fire_map, axis=0)
+            # Load the current fire map
+            current_fire_map = self.fire_map
+            current_fire_map = np.expand_dims(current_fire_map, axis=0)
 
-        # Append to the loaded fire map
-        if loaded_fire_map is not None:
-            if len(loaded_fire_map.shape) == 2:
-                loaded_fire_map = np.expand_dims(loaded_fire_map, axis=0)
-            fire_map = np.append(loaded_fire_map, current_fire_map, axis=0)
+            # Append to the loaded fire map
+            if loaded_fire_map is not None:
+                if len(loaded_fire_map.shape) == 2:
+                    loaded_fire_map = np.expand_dims(loaded_fire_map, axis=0)
+                fire_map = np.append(loaded_fire_map, current_fire_map, axis=0)
+            else:
+                fire_map = current_fire_map
+        # If we're saving JSON Lines files, we don't need to load the previous fire map
         else:
-            fire_map = current_fire_map
+            fire_map = self.fire_map
 
         # Save the fire map data
         if dtype == "npy":
-            np.save(fire_map_path, fire_map)
-        else:
+            np.save(fire_map_path, fire_map.astype(np.int8))
+        elif dtype == "h5":
             with h5py.File(fire_map_path, "w") as f:
                 f.create_dataset("data", data=fire_map)
+        elif dtype in ["json", "jsonl"]:
+            # Convert the fire map to a list of lists
+            fire_map = fire_map.tolist()
+            with jsonlines.open(fire_map_path, "a") as writer:
+                writer.write({self.elapsed_steps: fire_map})
 
     @property
     def rendering(self) -> bool:
@@ -995,8 +1020,15 @@ class FireSimulation(Simulation):
         for key in data.keys():
             if self.config.simulation.data_type == "npy":
                 filename = f"{key}.npy"
-            else:
+            elif self.config.simulation.data_type == "h5":
                 filename = f"{key}.h5"
+            elif self.config.simulation.data_type in ["json", "jsonl"]:
+                filename = f"{key}.json"
+            else:
+                raise ValueError(
+                    f"Invalid data type '{self.config.simulation.data_type}' given. "
+                    "Valid types are 'npy', 'h5', 'json', and 'jsonl'."
+                )
             data_locs[key] = filename
 
         # Save the static data if it does not exist
@@ -1006,9 +1038,12 @@ class FireSimulation(Simulation):
                 log.info(f"Creating static data file '{path}'")
                 if self.config.simulation.data_type == "npy":
                     np.save(path, data[key])
-                else:
+                elif self.config.simulation.data_type == "h5":
                     with h5py.File(path, "w") as f:
                         f.create_dataset("data", data=data[key])
+                else:
+                    with open(path, "w") as f:
+                        json.dump({"data": data[key].tolist()}, f)
 
         static_dict = {"data": data_locs, "shape": shape}
         return static_dict

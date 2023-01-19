@@ -895,6 +895,7 @@ class OperationalFuelLayer(FuelLayer):
         fm_int_data = self._make_data(self.fuel_model_filenames)
         self.data = self._make_fuel_data(fm_int_data)
         self.image = self._make_data(self.rgb_filenames)
+        self.image = self.image * 255.0
         self.image = self.image.astype(np.uint8)
 
     def _make_image(self) -> np.ndarray:

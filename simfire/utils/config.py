@@ -273,11 +273,17 @@ class Config:
         ):
             self._set_all_combos()
             if self.yaml_data["operational"]["seed"] is not None:
-                lat_long_box = self._randomly_select_box(
+                lat_long_box: Optional[LatLongBox] = self._randomly_select_box(
                     self.yaml_data["operational"]["seed"]
                 )
                 valid = self._check_lat_long(lat_long_box)
                 if not valid:
+                    if lat_long_box is None:
+                        message = (
+                            "Lat/Long box is not valid and was not created successfully."
+                        )
+                        log.error(message)
+                        raise ConfigError(message)
                     message = (
                         "Lat/Long box is not valid. Data does not "
                         f"exist for latitude {lat_long_box.center[0]} and "
@@ -288,7 +294,7 @@ class Config:
                     )
                     log.warning(message)
                     self.yaml_data["operational"]["seed"] += 1
-                    self._make_lat_long_box()
+                    lat_long_box, _ = self._make_lat_long_box()
             else:
                 lat = self.yaml_data["operational"]["latitude"]
                 lon = self.yaml_data["operational"]["longitude"]
@@ -309,7 +315,7 @@ class Config:
         else:
             return None, None
 
-    def _check_lat_long(self, lat_long_box: LatLongBox) -> bool:
+    def _check_lat_long(self, lat_long_box: Optional[LatLongBox]) -> bool:
         """
         Check that the lat/long box is within the bounds of the data.
 
@@ -319,6 +325,8 @@ class Config:
         Returns:
             True if the LatLongBox is within the bounds of the data
         """
+        if lat_long_box is None:
+            return False
         for tile in lat_long_box.tiles.values():
             for range in tile:
                 if range not in self._all_combos:
@@ -333,7 +341,11 @@ class Config:
         data_path = Path("/nfs/lslab2/fireline/data/fuel/")
         res = str(self.yaml_data["operational"]["resolution"]) + "m"
         data_path = data_path / res
-        all_files = [f.stem for f in data_path.iterdir() if f.is_dir()]
+        all_files = [
+            f.stem
+            for f in data_path.iterdir()
+            if f.is_dir() and "n" in f.stem and "w" in f.stem
+        ]
         self._all_combos = [
             (
                 int(str(f).split(".")[0][1:].split("w")[0]),

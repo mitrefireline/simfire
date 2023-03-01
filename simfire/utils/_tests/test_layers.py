@@ -290,21 +290,21 @@ class TestOperationalFuelLayer(unittest.TestCase):
         height, width = 1600, 1600
         lat_long_box = LatLongBox(center, height, width, resolution)
         FuelGen = OperationalFuelLayer(lat_long_box)
-        self.assertEqual(1, len(FuelGen.tif_filenames))
+        self.assertEqual(1, len(FuelGen.fuel_model_filenames))
 
         # 2 Tiles
         center = (37.4, 118.0)
         height, width = 1600, 1600
         lat_long_box = LatLongBox(center, height, width, resolution)
         FuelGen = OperationalFuelLayer(lat_long_box)
-        self.assertEqual(2, len(FuelGen.tif_filenames))
+        self.assertEqual(2, len(FuelGen.fuel_model_filenames))
 
         # 4 Tiles
-        center = (32.001, 116.008)
+        center = (33.001, 116.008)
         height, width = 3200, 3200
         lat_long_box = LatLongBox(center, height, width, resolution)
         FuelGen = OperationalFuelLayer(lat_long_box)
-        self.assertEqual(4, len(FuelGen.tif_filenames))
+        self.assertEqual(4, len(FuelGen.fuel_model_filenames))
 
     def test_image(self) -> None:
         """

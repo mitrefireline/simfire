@@ -210,7 +210,7 @@ tag:
     - VERSION=$(poetry version -s)
     - LOG=$(git log -1 | grep -Po '(?<=Resolve ")(.*?)(?=")')
     - ISSUE=$(git log -1 | grep -Po '(?<=Closes )(.*?).*')
-    - MR=$(git log -1 | grep -Po '(?<=fireline/simfire)(.*?).*')
+    - MR=$(git log -1 | grep -Po '(?<=fireline/simulators/simfire)(.*?).*')
     - echo -e "# Version ${VERSION}\n\nThis version includes:\n\n* ${LOG} (closed ${ISSUE} with merge request ${MR})" > RELEASE.md
     - MESSAGE="$(php -r "echo json_encode(['name' => '$VERSION', 'tag_name' => '$VERSION', 'description' => file_get_contents('RELEASE.md')]);")"
     - !reference [.commit_version, script]

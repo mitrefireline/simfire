@@ -3,6 +3,7 @@ Module containing all config parsing and dataclass logic.
 """
 import dataclasses
 import os
+import random
 from copy import deepcopy
 from pathlib import Path
 from typing import Any, Dict, Optional, Tuple, Union
@@ -270,14 +271,108 @@ class Config:
             self.yaml_data["terrain"]["topography"]["type"] == "operational"
             or self.yaml_data["terrain"]["fuel"]["type"] == "operational"
         ):
-            lat = self.yaml_data["operational"]["latitude"]
-            lon = self.yaml_data["operational"]["longitude"]
-            height = self.yaml_data["operational"]["height"]
-            width = self.yaml_data["operational"]["width"]
-            resolution = self.yaml_data["operational"]["resolution"]
-            return LatLongBox((lat, lon), height, width, resolution), None
+            self._set_all_combos()
+            if self.yaml_data["operational"]["seed"] is not None:
+                lat_long_box: Optional[LatLongBox] = self._randomly_select_box(
+                    self.yaml_data["operational"]["seed"]
+                )
+                valid = self._check_lat_long(lat_long_box)
+                if not valid:
+                    if lat_long_box is None:
+                        message = (
+                            "Lat/Long box is not valid and was not created successfully."
+                        )
+                        log.error(message)
+                        raise ConfigError(message)
+                    message = (
+                        "Lat/Long box is not valid. Data does not "
+                        f"exist for latitude {lat_long_box.center[0]} and "
+                        f"longitude {lat_long_box.center[1]} with "
+                        f"a height of {lat_long_box.height} and width of "
+                        f"{lat_long_box.width}. Checking another location "
+                        f"with seed {self.yaml_data['operational']['seed'] + 1}."
+                    )
+                    log.warning(message)
+                    self.yaml_data["operational"]["seed"] += 1
+                    lat_long_box, _ = self._make_lat_long_box()
+            else:
+                lat = self.yaml_data["operational"]["latitude"]
+                lon = self.yaml_data["operational"]["longitude"]
+                height = self.yaml_data["operational"]["height"]
+                width = self.yaml_data["operational"]["width"]
+                resolution = self.yaml_data["operational"]["resolution"]
+                lat_long_box = LatLongBox((lat, lon), height, width, resolution)
+                valid = self._check_lat_long(lat_long_box)
+                if not valid:
+                    message = (
+                        "Lat/Long box is not valid. Data does not "
+                        f"exist for latitude {lat} and longitude {lon} with "
+                        f"a height of {height} and width of {width}."
+                    )
+                    log.error(message)
+                    raise ConfigError(message)
+            return lat_long_box, None
         else:
             return None, None
+
+    def _check_lat_long(self, lat_long_box: Optional[LatLongBox]) -> bool:
+        """
+        Check that the lat/long box is within the bounds of the data.
+
+        Args:
+            lat_long_box: The LatLongBox to check
+
+        Returns:
+            True if the LatLongBox is within the bounds of the data
+        """
+        if lat_long_box is None:
+            return False
+        for tile in lat_long_box.tiles.values():
+            for range in tile:
+                if range not in self._all_combos:
+                    return False
+        return True
+
+    def _set_all_combos(self) -> None:
+        """
+        Get all possible combinations of latitude and longitude for the
+        data layers.
+        """
+        data_path = Path("/nfs/lslab2/fireline/data/fuel/")
+        res = str(self.yaml_data["operational"]["resolution"]) + "m"
+        data_path = data_path / res
+        all_files = [
+            f.stem
+            for f in data_path.iterdir()
+            if f.is_dir() and "n" in f.stem and "w" in f.stem
+        ]
+        self._all_combos = [
+            (
+                int(str(f).split(".")[0][1:].split("w")[0]),
+                int(str(f).split(".")[0][1:].split("w")[1]),
+            )
+            for f in all_files
+        ]
+
+    def _randomly_select_box(self, seed: int) -> LatLongBox:
+        """
+        Randomly select a latitude and longitude for the LatLongBox.
+
+        Args:
+            seed: The seed to use for the random number generator
+
+        Returns:
+            A LatLongBox with a random latitude and longitude
+        """
+        random.seed(seed)  # nosec
+        lat, lon = random.choice(self._all_combos)  # nosec
+        lat = round(random.random(), 4) + lat  # nosec
+        lon = round(random.random(), 4) + lon  # nosec
+        height = self.yaml_data["operational"]["height"]
+        width = self.yaml_data["operational"]["width"]
+        resolution = self.yaml_data["operational"]["resolution"]
+        lat_long_box = LatLongBox((lat, lon), height, width, resolution)
+        return lat_long_box
 
     def _load_area(self) -> AreaConfig:
         """

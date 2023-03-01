@@ -102,6 +102,8 @@ class LatLongBox:
             log.error("The height and width must be equal for the LatLongBox")
             raise AssertionError
 
+        self.height = height
+        self.width = width
         self.area = height * width
         self.center = center
         self.resolution = resolution
@@ -781,7 +783,7 @@ class OperationalTopographyLayer(TopographyLayer):
         for _, ranges in self.lat_long_box.tiles.items():
             for range in ranges:
                 (five_deg_n, five_deg_w) = range
-                tif_data_region = Path(f"n{five_deg_n}w{five_deg_w}.tif")
+                tif_data_region = Path(f"n{five_deg_n + 1}w{five_deg_w}.tif")
                 tif_file = self.datapath / tif_data_region
                 self.tif_filenames.append(tif_file)
 
@@ -890,9 +892,9 @@ class OperationalFuelLayer(FuelLayer):
         self.datapath = self.path / res
 
         self._get_fuel_dems()
-        self.int_data = self._make_data(self.fuel_model_filenames)
-        self.data = self._make_fuel_data()
-        self.image = self._make_data(self.tif_filenames)
+        fm_int_data = self._make_data(self.fuel_model_filenames)
+        self.data = self._make_fuel_data(fm_int_data)
+        self.image = self._make_data(self.rgb_filenames)
         self.image = self.image * 255.0
         self.image = self.image.astype(np.uint8)
 
@@ -906,6 +908,8 @@ class OperationalFuelLayer(FuelLayer):
     def _make_data(self, filename: List) -> np.ndarray:
 
         data = np.load(filename[0])
+        # Flip the data over a horizontal axis
+        data = np.flip(data, axis=0)
         data = np.array(data, dtype=np.float32)
         data = np.expand_dims(data, axis=-1)
 
@@ -921,6 +925,8 @@ class OperationalFuelLayer(FuelLayer):
                 tif_data = np.load(dem)
                 tif_data = np.array(tif_data, dtype=np.float32)
                 tif_data = np.expand_dims(tif_data, axis=-1)
+                # Flip the tif data over a horizontal axis
+                tif_data = np.flip(tif_data, axis=0)
 
                 if key == "north":
                     # stack tiles along axis = 0 -> leftmost: bottom, rightmost: top
@@ -947,7 +953,7 @@ class OperationalFuelLayer(FuelLayer):
         This method will use the outputed tiles and return the correct dem files
         for both the RGB fuel model data and the fuel model data.
         """
-        self.tif_filenames = []
+        self.rgb_filenames = []
         self.fuel_model_filenames = []
         fuel_model = f"LF2020_FBFM{self.type}_200_CONUS"
         fuel_data_fm = f"LC20_F{self.type}_200_projected_no_whitespace.npy"
@@ -957,30 +963,30 @@ class OperationalFuelLayer(FuelLayer):
                 (five_deg_n, five_deg_w) = range
 
                 int_data_region = Path(
-                    f"n{five_deg_n+1}w{five_deg_w}/{fuel_model}/{fuel_data_fm}"
+                    f"n{five_deg_n}w{five_deg_w}/{fuel_model}/{fuel_data_fm}"
                 )
 
                 rgb_data_region = Path(
-                    f"n{five_deg_n+1}w{five_deg_w}/{fuel_model}/{fuel_data_rgb}"
+                    f"n{five_deg_n}w{five_deg_w}/{fuel_model}/{fuel_data_rgb}"
                 )
 
                 int_npy_file = self.datapath / int_data_region
                 rgb_npy_file = self.datapath / rgb_data_region
-                self.tif_filenames.append(rgb_npy_file)
+                self.rgb_filenames.append(rgb_npy_file)
                 self.fuel_model_filenames.append(int_npy_file)
 
-    def _make_fuel_data(self) -> np.ndarray:
+    def _make_fuel_data(self, data: np.ndarray) -> np.ndarray:
         """
         Map Fire Behavior Fuel Model data to the Fuel type that the fire simulator expects
 
         Arguments:
-            None
+            np.ndarray: the array containing integer representations of Fuel Model
 
         Returns:
-            np.ndarray: Fuel
+            np.ndarray: Fuel (as strings)
         """
         func = np.vectorize(lambda x: FuelModelToFuel[x])
-        data_array = func(self.int_data)
+        data_array = func(data)
         return data_array
 
 

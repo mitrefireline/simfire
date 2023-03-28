@@ -340,7 +340,7 @@ class Config:
         """
         data_path = Path("/nfs/lslab2/fireline/data/fuel/")
         res = str(self.yaml_data["operational"]["resolution"]) + "m"
-        data_path = data_path / res
+        data_path = data_path / res / "old_2020"
         all_files = [
             f.stem
             for f in data_path.iterdir()

@@ -49,7 +49,6 @@ intersphinx_mapping = {
     "numpy": ("https://numpy.org/doc/stable/", None),
     "scikit-image": ("https://scikit-image.org/docs/stable/", None),
     "matplotlib": ("https://matplotlib.org/stable/", None),
-    "numba": ("https://numba.pydata.org/numba-doc/latest/", None),
     "PIL": ("https://pillow.readthedocs.io/en/stable/", None),
     "pygame": ("https://www.pygame.org/docs/", None),
 }

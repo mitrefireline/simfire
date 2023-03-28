@@ -15,7 +15,6 @@ repository = "https://gitlab.mitre.org/fireline/simfire"
 
 [tool.poetry.dependencies]
 python = "~3.9"
-GPUtil = "^1.4.0"
 matplotlib = "^3.5.2"
 noise = "^1.2.2"
 numpy = "^1.22.4"

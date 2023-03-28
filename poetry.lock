@@ -707,17 +707,6 @@ files = [
 gitdb = ">=4.0.1,<5"
 
 [[package]]
-name = "gputil"
-version = "1.4.0"
-description = "GPUtil is a Python module for getting the GPU status from NVIDA GPUs using nvidia-smi."
-category = "main"
-optional = false
-python-versions = "*"
-files = [
-    {file = "GPUtil-1.4.0.tar.gz", hash = "sha256:099e52c65e512cdfa8c8763fca67f5a5c2afb63469602d5dcb4d296b3661efb9"},
-]
-
-[[package]]
 name = "h5py"
 version = "3.8.0"
 description = "Read and write HDF5 files from Python"
@@ -2998,4 +2987,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.9"
-content-hash = "1746fc271b9a80348678e2c3712acd2490368e11241fd3a96aab9b29eeb43d58"
+content-hash = "5cc1b90187c9a5ba41bc4787028020b6be793275cf96c6bafb76347a77759ae2"

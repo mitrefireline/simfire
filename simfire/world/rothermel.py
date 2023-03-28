@@ -1,5 +1,3 @@
-from math import atan2, cos, exp, radians
-
 import numpy as np
 
 
@@ -69,7 +67,7 @@ def compute_rate_of_spread(
     gamma_prime_max = sigma**1.5 / (495 + 0.0594 * sigma**1.5)
     A = 133 * sigma**-0.7913
     # Optimum Reaction Velocity (1/min)
-    gamma_prime = gamma_prime_max * (B / B_op) ** A * exp(A * (1 - B / B_op))
+    gamma_prime = gamma_prime_max * (B / B_op) ** A * np.exp(A * (1 - B / B_op))
     # Reaction Intensity (BTU/ft^2-min)
     I_R = gamma_prime * w_n * h * eta_M * eta_S
     # Propagating Flux Ratio
@@ -82,10 +80,10 @@ def compute_rate_of_spread(
     # Need to find wind component in direction of travel
     # Switch order of y-component subtraction since image y coordintates
     # increase from top to bottom
-    angle_of_travel = atan2(loc_y - new_loc_y, new_loc_x - loc_x)
+    angle_of_travel = np.arctan2(loc_y - new_loc_y, new_loc_x - loc_x)
     # Subtract 90 degrees because this angle is North-oriented
-    wind_angle_radians = radians(90 - U_dir)
-    wind_along_angle_of_travel = U * cos(wind_angle_radians - angle_of_travel)
+    wind_angle_radians = np.radians(90 - U_dir)
+    wind_along_angle_of_travel = U * np.cos(wind_angle_radians - angle_of_travel)
     # This is the wind speed in in this direction
     U = wind_along_angle_of_travel
     # Negative wind leads to trouble with calculation and doesn't

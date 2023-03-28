@@ -2,6 +2,8 @@ image: "python:3.9"
 
 before_script:
   - python --version
+  # Adding this because furo gets a wheel validation error for the 1.4.1 install
+  - export POETRY_VERSION=1.4.0
   - curl -sSkL https://install.python-poetry.org | python -
   - export PATH=$PATH:$HOME/.local/bin
   - poetry --version

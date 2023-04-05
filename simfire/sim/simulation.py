@@ -787,7 +787,7 @@ class FireSimulation(Simulation):
 
         return success
 
-    def save_gif(self, filename: Optional[Union[str, Path]] = None) -> None:
+    def save_gif(self, path: Optional[Union[str, Path]] = None) -> None:
         """
         Saves the most recent simulation as a GIF.
 
@@ -795,19 +795,39 @@ class FireSimulation(Simulation):
         to `True`.
         """
         # Convert to a Path object for easy manipulation
-        if not isinstance(filename, Path) and filename is not None:
-            filename = Path(filename)
-        out_path = self._create_out_path()
-        log.info("Saving GIF...")
-        # Save the GIF created by self._game
-        if filename is None:
+        if not isinstance(path, Path) and path is not None:
+            path = Path(path).expanduser()
+
+        if path is None:
+            path = self._create_out_path() / "simulation.gif"
+
+        # If the path is only a filename, create a default out_path from the config
+        if path is not None and path.parent == Path("."):
+            out_path = self._create_out_path()
+            path = out_path / path
+
+        # If the path does not end in a filename, create a default filename
+        if path is not None and path.suffix == "":
             now = datetime.now().strftime("%H-%M-%S")
             filename = f"simulation_{now}.gif"
-        else:
-            if filename.suffix != ".gif":
-                filename = filename.with_suffix(".gif")
-        gif_out_path = out_path / filename
-        self._game.save(gif_out_path, duration=100)  # 0.1s
+            path = path / filename
+            # If the path does not exist, create it
+            if not path.parent.is_dir():
+                log.warning(
+                    "Designated save path from the config does not exist, "
+                    "creating parent directories"
+                )
+                parents = True
+            else:
+                parents = False
+                log.info(f"Creating directory '{path}'")
+                path.parent.mkdir(parents=parents)
+
+        log.info(f"Saving GIF to {path}...")
+
+        if path.suffix != ".gif":
+            path = path.with_suffix(".gif")
+        self._game.save(path, duration=100)  # 0.1s
         log.info("Finished saving GIF")
 
     def save_spread_graph(self, filename: Optional[Union[str, Path]] = None) -> None:

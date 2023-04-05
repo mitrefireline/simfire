@@ -799,7 +799,7 @@ class FireSimulation(Simulation):
             path = Path(path).expanduser()
 
         if path is None:
-            path = self._create_out_path() / "simulation.gif"
+            path = self._create_out_path()
 
         # If the path is only a filename, create a default out_path from the config
         if path is not None and path.parent == Path("."):

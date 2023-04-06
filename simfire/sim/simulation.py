@@ -794,34 +794,28 @@ class FireSimulation(Simulation):
         Will save a GIF of all calls to `run` from the last time `self.rendering` was set
         to `True`.
         """
+        if path is None:
+            path = self._create_out_path()
+
         # Convert to a Path object for easy manipulation
         if not isinstance(path, Path) and path is not None:
             path = Path(path).expanduser()
 
-        if path is None:
-            path = self._create_out_path()
-
         # If the path is only a filename, create a default out_path from the config
-        if path is not None and path.parent == Path("."):
+        if path.parent == Path(".") and path.suffix != "":
             out_path = self._create_out_path()
             path = out_path / path
 
         # If the path does not end in a filename, create a default filename
-        if path is not None and path.suffix == "":
+        if path.suffix == "":
             now = datetime.now().strftime("%H-%M-%S")
             filename = f"simulation_{now}.gif"
             path = path / filename
-            # If the path does not exist, create it
-            if not path.parent.is_dir():
-                log.warning(
-                    "Designated save path from the config does not exist, "
-                    "creating parent directories"
-                )
-                parents = True
-            else:
-                parents = False
-                log.info(f"Creating directory '{path}'")
-                path.parent.mkdir(parents=parents)
+
+        # If the path does not exist, create it
+        if not path.parent.is_dir() and not path.parent.exists():
+            log.warning(f"Creating directory '{path}'")
+            path.parent.mkdir(parents=True)
 
         log.info(f"Saving GIF to {path}...")
 

@@ -2,13 +2,13 @@
 <html class="no-js" lang="en">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="API Reference" href="autoapi/index.html" /><link rel="prev" title="Configuring the Simulation" href="config.html" />
 
-    <link rel="shortcut icon" href="_static/favicon.ico"/><meta name="generator" content="sphinx-5.3.0, furo 2022.09.29"/>
+    <link rel="shortcut icon" href="_static/favicon.ico"/><!-- Generated with Sphinx 5.3.0 and Furo 2022.12.07 -->
         <title>Contributing - SimFire latest documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=d81277517bee4d6b0349d71bb2661d4890b5617c" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=91d0f0d1c444bdcb17a68e833c7a53903343c195" />
     <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
     
@@ -153,7 +153,7 @@
   <span class="sidebar-brand-text">SimFire latest documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
-  <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
   <input type="hidden" name="check_keywords" value="yes">
   <input type="hidden" name="area" value="default">
 </form>
@@ -276,41 +276,41 @@
 <section id="environment-setup">
 <h2>Environment Setup<a class="headerlink" href="#environment-setup" title="Permalink to this heading">#</a></h2>
 <p>First, clone the repository:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>git clone git@gitlab.mitre.org:fireline/simfire.git
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>git@gitlab.mitre.org:fireline/simfire.git
 </pre></div>
 </div>
 <p>Create a conda environment (preferred):</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>conda create -n sf <span class="nv">python</span><span class="o">=</span><span class="m">3</span>.9
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>create<span class="w"> </span>-n<span class="w"> </span>sf<span class="w"> </span><span class="nv">python</span><span class="o">=</span><span class="m">3</span>.9
 </pre></div>
 </div>
 <p>Install <a class="reference external" href="https://python-poetry.org/">poetry</a> and activate the conda environment:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>curl -sSL https://install.python-poetry.org <span class="p">|</span> python -
-<span class="nb">echo</span> <span class="s2">&quot;export PATH=</span><span class="nv">$PATH</span><span class="s2">:</span><span class="nv">$HOME</span><span class="s2">/.local/bin&quot;</span> &gt;&gt; <span class="nv">$HOME</span>/.bashrc
-<span class="nb">source</span> <span class="nv">$HOME</span>/.bashrc
-conda activate sf
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>-sSL<span class="w"> </span>https://install.python-poetry.org<span class="w"> </span><span class="p">|</span><span class="w"> </span>python<span class="w"> </span>-
+<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;export PATH=</span><span class="nv">$PATH</span><span class="s2">:</span><span class="nv">$HOME</span><span class="s2">/.local/bin&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span><span class="nv">$HOME</span>/.bashrc
+<span class="nb">source</span><span class="w"> </span><span class="nv">$HOME</span>/.bashrc
+conda<span class="w"> </span>activate<span class="w"> </span>sf
 </pre></div>
 </div>
 <p>Then, install the <strong>developer</strong> requirements:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>poetry install
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>poetry<span class="w"> </span>install
 </pre></div>
 </div>
 </section>
 <section id="using-pre-commit-highly-recommended">
 <h2>Using Pre-commit (<strong>Highly Recommended</strong>)<a class="headerlink" href="#using-pre-commit-highly-recommended" title="Permalink to this heading">#</a></h2>
 <p>If you’d like, you can install <a class="reference external" href="https://pre-commit.com/">pre-commit</a> to run linting and code-formatting before you are able to commit. This will ensure that you pass this portion of the remote pipelines when you push to your merge request.</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>pre-commit install
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>pre-commit<span class="w"> </span>install
 </pre></div>
 </div>
 <p>Now, every time you try to commit, your code that you have staged will be linted by <code class="docutils literal notranslate"><span class="pre">flake8</span></code> and auto-formatted by <code class="docutils literal notranslate"><span class="pre">black</span></code>. If the linting doesn’t pass pre-commit, it will tell you, and you’ll have to make those changes before committing those files. If <code class="docutils literal notranslate"><span class="pre">black</span></code> autoformats your code during pre-commit, you can view those changes and then you’ll have to stage them. Then you can commit and push.</p>
 <p>Pre-commit can also be run manually on all files without having to commit.</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>pre-commit run --all-files
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>pre-commit<span class="w"> </span>run<span class="w"> </span>--all-files
 </pre></div>
 </div>
 </section>
 <section id="running-unit-tests">
 <h2>Running Unit Tests<a class="headerlink" href="#running-unit-tests" title="Permalink to this heading">#</a></h2>
 <p>There are also unit tests that need to be passed, and to make sure you are passing those locally (before pushing to your remote branch and running the pipeline) you can run the following command in the root directory:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>poetry run pytest
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>poetry<span class="w"> </span>run<span class="w"> </span>pytest
 </pre></div>
 </div>
 <p>This will search for all <code class="docutils literal notranslate"><span class="pre">test_*.py</span></code> files and run the tests held in those files.</p>
@@ -412,11 +412,11 @@ conda activate sf
 <section id="testing-documentation-locally">
 <h3>Testing Documentation Locally<a class="headerlink" href="#testing-documentation-locally" title="Permalink to this heading">#</a></h3>
 <p>In order test documentation locally, you’ll first have to install all the necessary packages that are left out of the <code class="docutils literal notranslate"><span class="pre">poetry</span> <span class="pre">install</span></code> command (this is installed automatically during CI):</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>poetry install --with docs
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>poetry<span class="w"> </span>install<span class="w"> </span>--with<span class="w"> </span>docs
 </pre></div>
 </div>
 <p>Then, you can build the documentation:</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>poetry run sphinx-build -d docs/build/doctrees docs/source docs/build/html
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>poetry<span class="w"> </span>run<span class="w"> </span>sphinx-build<span class="w"> </span>-d<span class="w"> </span>docs/build/doctrees<span class="w"> </span>docs/source<span class="w"> </span>docs/build/html
 </pre></div>
 </div>
 <p>And view it by opening the <code class="docutils literal notranslate"><span class="pre">index.html</span></code> file located at:</p>
@@ -465,9 +465,7 @@ conda activate sf
             
           </div>
           <div class="right-details">
-            <div class="icons">
-              
-            </div>
+            
           </div>
         </div>
         

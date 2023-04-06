@@ -2,13 +2,13 @@
 <html class="no-js" lang="en">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 <link rel="index" title="Index" href="../../../../genindex.html" /><link rel="search" title="Search" href="../../../../search.html" /><link rel="next" title="simfire.game.image" href="../image/index.html" /><link rel="prev" title="simfire.game.managers.mitigation" href="../managers/mitigation/index.html" />
 
-    <link rel="shortcut icon" href="../../../../_static/favicon.ico"/><meta name="generator" content="sphinx-5.3.0, furo 2022.09.29"/>
+    <link rel="shortcut icon" href="../../../../_static/favicon.ico"/><!-- Generated with Sphinx 5.3.0 and Furo 2022.12.07 -->
         <title>simfire.game.game - SimFire latest documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo.css?digest=d81277517bee4d6b0349d71bb2661d4890b5617c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo.css?digest=91d0f0d1c444bdcb17a68e833c7a53903343c195" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
     
@@ -153,7 +153,7 @@
   <span class="sidebar-brand-text">SimFire latest documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../../../search.html" role="search">
-  <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
   <input type="hidden" name="check_keywords" value="yes">
   <input type="hidden" name="area" value="default">
 </form>
@@ -260,10 +260,6 @@
 <h3>Classes<a class="headerlink" href="#classes" title="Permalink to this heading">#</a></h3>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#simfire.game.game.Game" title="simfire.game.game.Game"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Game</span></code></a></p></td>
 <td><p>Class that controls the game. This class will initalize the game and allow for</p></td>
@@ -276,10 +272,6 @@
 <h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this heading">#</a></h3>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#simfire.game.game.log" title="simfire.game.game.log"><code class="xref py py-obj docutils literal notranslate"><span class="pre">log</span></code></a></p></td>
 <td><p></p></td>
@@ -299,7 +291,7 @@
 terrain, fire, and other sprites to be rendered and interact.</p>
 <p>Initalize the class by creating the game display and background.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>screen_size</strong> (<em>Tuple</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>]</em>) – The (n,n) size of the game screen/display in pixels.</p></li>
 <li><p><strong>rescale_size</strong> (<em>Optional</em><em>[</em><em>Tuple</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>]</em><em>]</em>) – The (s, s) size of the display to resize to</p></li>
@@ -319,7 +311,7 @@ terrain, fire, and other sprites to be rendered and interact.</p>
 <span class="sig-name descname"><span class="pre">quit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#simfire.game.game.Game.quit" title="Permalink to this definition">#</a></dt>
 <dd><p>Close the PyGame window and stop the <cite>Game</cite></p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>None</p>
 </dd>
 </dl>
@@ -330,13 +322,13 @@ terrain, fire, and other sprites to be rendered and interact.</p>
 <span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">duration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.game.game.Game.save" title="Permalink to this definition">#</a></dt>
 <dd><p>Save a GIF of the simulation to a specified path</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.11)"><em>pathlib.Path</em></a>) – The path to save the GIF to with filename.</p></li>
 <li><p><strong>duration</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – The time to display the current frame of the GIF, in milliseconds.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
 </dd>
 </dl>
@@ -349,7 +341,7 @@ terrain, fire, and other sprites to be rendered and interact.</p>
 environment data. Most of the logic for the game is handled within
 each sprite/manager, so this is mostly just calls to update everything.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>terrain</strong> (<a class="reference internal" href="../sprites/index.html#simfire.game.sprites.Terrain" title="simfire.game.sprites.Terrain"><em>simfire.game.sprites.Terrain</em></a>) – The Terrain class that comprises the burnable area.</p></li>
 <li><p><strong>fire_sprites</strong> (<em>Sequence</em><em>[</em><a class="reference internal" href="../sprites/index.html#simfire.game.sprites.Fire" title="simfire.game.sprites.Fire"><em>simfire.game.sprites.Fire</em></a><em>]</em>) – A list of all Fire sprites that are actively burning.</p></li>
@@ -361,7 +353,7 @@ location</p></li>
 <li><p><strong>agent_sprites</strong> (<em>Sequence</em><em>[</em><a class="reference internal" href="../sprites/index.html#simfire.game.sprites.Agent" title="simfire.game.sprites.Agent"><em>simfire.game.sprites.Agent</em></a><em>]</em>) – </p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference internal" href="../../enums/index.html#simfire.enums.GameStatus" title="simfire.enums.GameStatus">simfire.enums.GameStatus</a></p>
 </dd>
 </dl>
@@ -410,9 +402,7 @@ location</p></li>
             
           </div>
           <div class="right-details">
-            <div class="icons">
-              
-            </div>
+            
           </div>
         </div>
         

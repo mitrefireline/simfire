@@ -2,13 +2,13 @@
 <html class="no-js" lang="en">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 <link rel="index" title="Index" href="../../../../../genindex.html" /><link rel="search" title="Search" href="../../../../../search.html" /><link rel="next" title="simfire.world.elevation_functions" href="../../elevation_functions/index.html" /><link rel="prev" title="simfire.world.wind_mechanics.perlin_wind" href="../perlin_wind/index.html" />
 
-    <link rel="shortcut icon" href="../../../../../_static/favicon.ico"/><meta name="generator" content="sphinx-5.3.0, furo 2022.09.29"/>
+    <link rel="shortcut icon" href="../../../../../_static/favicon.ico"/><!-- Generated with Sphinx 5.3.0 and Furo 2022.12.07 -->
         <title>simfire.world.wind_mechanics.wind_controller - SimFire latest documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../../_static/styles/furo.css?digest=d81277517bee4d6b0349d71bb2661d4890b5617c" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/styles/furo.css?digest=91d0f0d1c444bdcb17a68e833c7a53903343c195" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
     
@@ -153,7 +153,7 @@
   <span class="sidebar-brand-text">SimFire latest documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../../../../search.html" role="search">
-  <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
   <input type="hidden" name="check_keywords" value="yes">
   <input type="hidden" name="area" value="default">
 </form>
@@ -260,10 +260,6 @@
 <h3>Classes<a class="headerlink" href="#classes" title="Permalink to this heading">#</a></h3>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#simfire.world.wind_mechanics.wind_controller.WindController" title="simfire.world.wind_mechanics.wind_controller.WindController"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WindController</span></code></a></p></td>
 <td><p>Generates and tracks objects that dictate wind magnitude and wind direction for map</p></td>
@@ -279,10 +275,6 @@
 <h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this heading">#</a></h3>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#simfire.world.wind_mechanics.wind_controller.log" title="simfire.world.wind_mechanics.wind_controller.log"><code class="xref py py-obj docutils literal notranslate"><span class="pre">log</span></code></a></p></td>
 <td><p></p></td>
@@ -301,7 +293,7 @@
 <dd><p>Generates and tracks objects that dictate wind magnitude and wind direction for map
 given size of the screen</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>screen_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – </p>
 </dd>
 </dl>
@@ -310,7 +302,7 @@ given size of the screen</p>
 <span class="sig-name descname"><span class="pre">init_wind_speed_generator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">octaves</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">persistence</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lacunarity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">range_min</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">range_max</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">screen_size</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.world.wind_mechanics.wind_controller.WindController.init_wind_speed_generator" title="Permalink to this definition">#</a></dt>
 <dd><p>Set simplex noise values for wind speeds</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – The value to seed the noise generator</p></li>
 <li><p><strong>scale</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – The “altitude” from which to see the noise</p></li>
@@ -327,7 +319,7 @@ Higher lacunarity, higher frequency per pass.</p></li>
 <li><p><strong>screen_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – Size of screen (both heigh and width) MUST BE SQUARE</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
 </dd>
 </dl>
@@ -347,7 +339,7 @@ Lower values mean each pass has greater effect on shape.
 Best to keep between 0-1</p>
 </div></blockquote>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>lacunarity</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – Controls increase in frequency of octaves per pass.
 Frequency = lacunarity &amp; (pass number).
@@ -362,7 +354,7 @@ Higher lacunarity, higher frequency per pass.</p></li>
 <li><p><strong>range_max</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – </p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
 </dd>
 </dl>
@@ -376,7 +368,7 @@ Higher lacunarity, higher frequency per pass.</p></li>
 <dd><p>This is a PRECOMPUTE wind controller.  It generates and tracks objects that dictate
 wind magnitude and wind direction for map given size of the screen.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>screen_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – </p></li>
 <li><p><strong>result_accuracy</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – </p></li>
@@ -395,7 +387,7 @@ wind magnitude and wind direction for map given size of the screen.</p>
 <dt class="sig sig-object py" id="simfire.world.wind_mechanics.wind_controller.WindControllerCFD.iterate_wind_step">
 <span class="sig-name descname"><span class="pre">iterate_wind_step</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#simfire.world.wind_mechanics.wind_controller.WindControllerCFD.iterate_wind_step" title="Permalink to this definition">#</a></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>None</p>
 </dd>
 </dl>
@@ -405,7 +397,7 @@ wind magnitude and wind direction for map given size of the screen.</p>
 <dt class="sig sig-object py" id="simfire.world.wind_mechanics.wind_controller.WindControllerCFD.get_wind_density_field">
 <span class="sig-name descname"><span class="pre">get_wind_density_field</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#simfire.world.wind_mechanics.wind_controller.WindControllerCFD.get_wind_density_field" title="Permalink to this definition">#</a></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)">numpy.ndarray</a></p>
 </dd>
 </dl>
@@ -415,7 +407,7 @@ wind magnitude and wind direction for map given size of the screen.</p>
 <dt class="sig sig-object py" id="simfire.world.wind_mechanics.wind_controller.WindControllerCFD.get_wind_velocity_field_x">
 <span class="sig-name descname"><span class="pre">get_wind_velocity_field_x</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#simfire.world.wind_mechanics.wind_controller.WindControllerCFD.get_wind_velocity_field_x" title="Permalink to this definition">#</a></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)">numpy.ndarray</a></p>
 </dd>
 </dl>
@@ -425,7 +417,7 @@ wind magnitude and wind direction for map given size of the screen.</p>
 <dt class="sig sig-object py" id="simfire.world.wind_mechanics.wind_controller.WindControllerCFD.get_wind_velocity_field_y">
 <span class="sig-name descname"><span class="pre">get_wind_velocity_field_y</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#simfire.world.wind_mechanics.wind_controller.WindControllerCFD.get_wind_velocity_field_y" title="Permalink to this definition">#</a></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)">numpy.ndarray</a></p>
 </dd>
 </dl>
@@ -435,7 +427,7 @@ wind magnitude and wind direction for map given size of the screen.</p>
 <dt class="sig sig-object py" id="simfire.world.wind_mechanics.wind_controller.WindControllerCFD.get_wind_scale">
 <span class="sig-name descname"><span class="pre">get_wind_scale</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#simfire.world.wind_mechanics.wind_controller.WindControllerCFD.get_wind_scale" title="Permalink to this definition">#</a></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)">int</a></p>
 </dd>
 </dl>
@@ -445,7 +437,7 @@ wind magnitude and wind direction for map given size of the screen.</p>
 <dt class="sig sig-object py" id="simfire.world.wind_mechanics.wind_controller.WindControllerCFD.get_screen_size">
 <span class="sig-name descname"><span class="pre">get_screen_size</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#simfire.world.wind_mechanics.wind_controller.WindControllerCFD.get_screen_size" title="Permalink to this definition">#</a></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)">int</a></p>
 </dd>
 </dl>
@@ -494,9 +486,7 @@ wind magnitude and wind direction for map given size of the screen.</p>
             
           </div>
           <div class="right-details">
-            <div class="icons">
-              
-            </div>
+            
           </div>
         </div>
         

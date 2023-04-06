@@ -2,13 +2,13 @@
 <html class="no-js" lang="en">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 <link rel="index" title="Index" href="../../../../../genindex.html" /><link rel="search" title="Search" href="../../../../../search.html" /><link rel="next" title="simfire.game.game" href="../../game/index.html" /><link rel="prev" title="simfire.game.managers.fire" href="../fire/index.html" />
 
-    <link rel="shortcut icon" href="../../../../../_static/favicon.ico"/><meta name="generator" content="sphinx-5.3.0, furo 2022.09.29"/>
+    <link rel="shortcut icon" href="../../../../../_static/favicon.ico"/><!-- Generated with Sphinx 5.3.0 and Furo 2022.12.07 -->
         <title>simfire.game.managers.mitigation - SimFire latest documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../../_static/styles/furo.css?digest=d81277517bee4d6b0349d71bb2661d4890b5617c" />
+    <link rel="stylesheet" type="text/css" href="../../../../../_static/styles/furo.css?digest=91d0f0d1c444bdcb17a68e833c7a53903343c195" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../../../../../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
     
@@ -153,7 +153,7 @@
   <span class="sidebar-brand-text">SimFire latest documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../../../../search.html" role="search">
-  <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
   <input type="hidden" name="check_keywords" value="yes">
   <input type="hidden" name="area" value="default">
 </form>
@@ -260,10 +260,6 @@
 <h3>Classes<a class="headerlink" href="#classes" title="Permalink to this heading">#</a></h3>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#simfire.game.managers.mitigation.ControlLineManager" title="simfire.game.managers.mitigation.ControlLineManager"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ControlLineManager</span></code></a></p></td>
 <td><p>Base class to create and manage control lines and allow for the creation of more</p></td>
@@ -285,10 +281,6 @@
 <h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this heading">#</a></h3>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#simfire.game.managers.mitigation.PointType" title="simfire.game.managers.mitigation.PointType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PointType</span></code></a></p></td>
 <td><p></p></td>
@@ -319,7 +311,7 @@ control lines while the game is running. Child classes will change the <cite>lin
 <p>Initialize the class with the display size of each <cite>ControlLine</cite> sprite,
 the <cite>pixel_scale</cite>, and the <cite>Terrain</cite> that the <a href="#id1"><span class="problematic" id="id2">`</span></a>ControlLine`s will be placed.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – The display size of each <cite>ControlLine</cite> point.</p></li>
 <li><p><strong>pixel_scale</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – The amount of ft each pixel represents. This is needed
@@ -338,16 +330,16 @@ not be initialized.</p></li>
 <span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fire_map</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">points</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.game.managers.mitigation.ControlLineManager.update" title="Permalink to this definition">#</a></dt>
 <dd><p>Updates the passed in <cite>fire_map</cite> with new <cite>ControlLine</cite> <cite>points</cite>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>fire_map</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>numpy.ndarray</em></a>) – The <cite>fire_map</cite> to update with new points</p></li>
 <li><p><strong>points</strong> (<em>Optional</em><em>[</em><em>PointsType</em><em>]</em>) – </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The upadated fire map with the control lines added.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>fire_map</p>
 </dd>
 </dl>
@@ -366,7 +358,7 @@ physical characteristics from <cite>ScratchLines</cite> and <cite>WetLines</cite
 the <cite>pixel_scale</cite>, and the <cite>Terrain</cite> that the <a href="#id3"><span class="problematic" id="id4">`</span></a>FireLine`s will be placed.</p>
 <p>Sets the <cite>line_type</cite> to <cite>BurnStatus.FIRELINE</cite>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – The display size of each <cite>FireLine</cite> point.</p></li>
 <li><p><strong>pixel_scale</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – The amount of ft each pixel represents. This is needed
@@ -393,7 +385,7 @@ physical characteristics from <cite>FireLines</cite> and <cite>WetLines</cite>.<
 the <cite>pixel_scale</cite>, and the <cite>Terrain</cite> that the <a href="#id5"><span class="problematic" id="id6">`</span></a>ScratchLine`s will be placed.</p>
 <p>Sets the <cite>line_type</cite> to <cite>BurnStatus.SCRATCHLINE</cite>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – The display size of each <cite>ScratchLine</cite> point.</p></li>
 <li><p><strong>pixel_scale</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – The amount of ft each pixel represents. This is needed
@@ -421,7 +413,7 @@ physical characteristics from <cite>ScratchLines</cite> and <cite>FireLines</cit
 the <cite>pixel_scale</cite>, and the <cite>Terrain</cite> that the <a href="#id7"><span class="problematic" id="id8">`</span></a>WetLine`s will be placed.</p>
 <p>Sets the <cite>line_type</cite> to <cite>BurnStatus.WETLINE</cite>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – The display size of each <cite>WetLine</cite> point.</p></li>
 <li><p><strong>pixel_scale</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – The amount of ft each pixel represents. This is needed
@@ -479,9 +471,7 @@ between which two points control lines will be drawn.</p></li>
             
           </div>
           <div class="right-details">
-            <div class="icons">
-              
-            </div>
+            
           </div>
         </div>
         

@@ -17,25 +17,10 @@ Functions
 
 
 
-Attributes
-~~~~~~~~~~
-
-.. autoapisummary::
-
-   simfire.world.rothermel.device
-
-
-.. py:data:: device
-   :annotation: = cuda
-
-   
-
 .. py:function:: compute_rate_of_spread(loc_x, loc_y, new_loc_x, new_loc_y, w_0, delta, M_x, sigma, h, S_T, S_e, p_p, M_f, U, U_dir, slope_mag, slope_dir)
 
    Compute the basic Rothermel rate of spread. All measurements are assumed to be in
-   feet, minutes, and pounds, and BTU. This function is vecotrized and compiled by numba
-   for GPU support. The target device (CPU or GPU) is determined in the config based on
-   whether or not a GPU is available.
+   feet, minutes, and pounds, and BTU.
 
    :param loc_x: The current x location
    :param loc_y: The current y location

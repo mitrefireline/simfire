@@ -2,13 +2,13 @@
 <html class="no-js" lang="en">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 <link rel="index" title="Index" href="../../../../genindex.html" /><link rel="search" title="Search" href="../../../../search.html" /><link rel="next" title="simfire.world.fuel_array_functions" href="../fuel_array_functions/index.html" /><link rel="prev" title="simfire.world.wind_mechanics.wind_controller" href="../wind_mechanics/wind_controller/index.html" />
 
-    <link rel="shortcut icon" href="../../../../_static/favicon.ico"/><meta name="generator" content="sphinx-5.3.0, furo 2022.09.29"/>
+    <link rel="shortcut icon" href="../../../../_static/favicon.ico"/><!-- Generated with Sphinx 5.3.0 and Furo 2022.12.07 -->
         <title>simfire.world.elevation_functions - SimFire latest documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo.css?digest=d81277517bee4d6b0349d71bb2661d4890b5617c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo.css?digest=91d0f0d1c444bdcb17a68e833c7a53903343c195" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
     
@@ -153,7 +153,7 @@
   <span class="sidebar-brand-text">SimFire latest documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../../../search.html" role="search">
-  <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
   <input type="hidden" name="check_keywords" value="yes">
   <input type="hidden" name="area" value="default">
 </form>
@@ -260,10 +260,6 @@
 <h3>Functions<a class="headerlink" href="#functions" title="Permalink to this heading">#</a></h3>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#simfire.world.elevation_functions.flat" title="simfire.world.elevation_functions.flat"><code class="xref py py-obj docutils literal notranslate"><span class="pre">flat</span></code></a>()</p></td>
 <td><p>Create a callable that returns 0 for all elevations.</p></td>
@@ -282,10 +278,6 @@
 <h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this heading">#</a></h3>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#simfire.world.elevation_functions.ElevationFn" title="simfire.world.elevation_functions.ElevationFn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ElevationFn</span></code></a></p></td>
 <td><p></p></td>
@@ -303,10 +295,10 @@
 <span class="sig-prename descclassname"><span class="pre">simfire.world.elevation_functions.</span></span><span class="sig-name descname"><span class="pre">flat</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#simfire.world.elevation_functions.flat" title="Permalink to this definition">#</a></dt>
 <dd><p>Create a callable that returns 0 for all elevations.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>A callable that computes z values for (x, y) inputs</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>ElevationFn</p>
 </dd>
 </dl>
@@ -318,7 +310,7 @@
 <dd><p>Create a callable that returns the value of a Gaussian centered at (mu_x, mu_y) with
 variances given by sigma_x and sigma_y. The input A will modify the final amplitude.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>amplitude</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – The Gaussian amplitude</p></li>
 <li><p><strong>mu_x</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – The mean/center in the x direction</p></li>
@@ -327,10 +319,10 @@ variances given by sigma_x and sigma_y. The input A will modify the final amplit
 <li><p><strong>sigma_y</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – The variance in the y direction</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A callabe that computes z values for (x, y) inputs</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>ElevationFn</p>
 </dd>
 </dl>
@@ -341,7 +333,7 @@ variances given by sigma_x and sigma_y. The input A will modify the final amplit
 <span class="sig-prename descclassname"><span class="pre">simfire.world.elevation_functions.</span></span><span class="sig-name descname"><span class="pre">perlin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">octaves</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">persistence</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lacunarity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">range_min</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">range_max</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.world.elevation_functions.perlin" title="Permalink to this definition">#</a></dt>
 <dd><p>Create a callable that returns the value of a 2D Perlin noise function.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>octaves</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – specifies the number of passes, defaults to 1 (simple noise).</p></li>
 <li><p><strong>persistence</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – specifies the amplitude of each successive octave relative
@@ -356,10 +348,10 @@ input (x, y) coordinates to get new terrain</p></li>
 <li><p><strong>range_max</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – The maximum amplitude to scale to</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A callable that computes Perlin Noise z-values for (x, y) inputs</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>ElevationFn</p>
 </dd>
 </dl>
@@ -406,9 +398,7 @@ input (x, y) coordinates to get new terrain</p></li>
             
           </div>
           <div class="right-details">
-            <div class="icons">
-              
-            </div>
+            
           </div>
         </div>
         

@@ -281,7 +281,7 @@ Attributes
       :returns: Whether or not the method successfully set a data type.
 
 
-   .. py:method:: save_gif(filename = None)
+   .. py:method:: save_gif(path = None)
 
       Saves the most recent simulation as a GIF.
 

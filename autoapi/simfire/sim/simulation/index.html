@@ -2,13 +2,13 @@
 <html class="no-js" lang="en">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 <link rel="index" title="Index" href="../../../../genindex.html" /><link rel="search" title="Search" href="../../../../search.html" /><link rel="next" title="simfire.utils" href="../../utils/index.html" /><link rel="prev" title="simfire.sim" href="../index.html" />
 
-    <link rel="shortcut icon" href="../../../../_static/favicon.ico"/><meta name="generator" content="sphinx-5.3.0, furo 2022.09.29"/>
+    <link rel="shortcut icon" href="../../../../_static/favicon.ico"/><!-- Generated with Sphinx 5.3.0 and Furo 2022.12.07 -->
         <title>simfire.sim.simulation - SimFire latest documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo.css?digest=d81277517bee4d6b0349d71bb2661d4890b5617c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo.css?digest=91d0f0d1c444bdcb17a68e833c7a53903343c195" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
     
@@ -153,7 +153,7 @@
   <span class="sidebar-brand-text">SimFire latest documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../../../search.html" role="search">
-  <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
   <input type="hidden" name="check_keywords" value="yes">
   <input type="hidden" name="area" value="default">
 </form>
@@ -260,10 +260,6 @@
 <h3>Classes<a class="headerlink" href="#classes" title="Permalink to this heading">#</a></h3>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#simfire.sim.simulation.Simulation" title="simfire.sim.simulation.Simulation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Simulation</span></code></a></p></td>
 <td><p>Base class with several built in methods for interacting with different simulators.</p></td>
@@ -279,10 +275,6 @@
 <h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this heading">#</a></h3>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#simfire.sim.simulation.log" title="simfire.sim.simulation.log"><code class="xref py py-obj docutils literal notranslate"><span class="pre">log</span></code></a></p></td>
 <td><p></p></td>
@@ -308,7 +300,7 @@
 </dl>
 <p>Initialize the Simulation object for interacting with the RL harness.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>config</strong> (<a class="reference internal" href="../../utils/config/index.html#simfire.utils.config.Config" title="simfire.utils.config.Config"><em>simfire.utils.config.Config</em></a>) – The <cite>Config</cite> that specifies simulation parameters, read in from a
 YAML file.</p>
 </dd>
@@ -318,12 +310,12 @@ YAML file.</p>
 <em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.sim.simulation.Simulation.run" title="Permalink to this definition">#</a></dt>
 <dd><p>Runs the simulation.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>time</strong> (<em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>]</em>) – Either how many updates to run the simulation, based on the config
 value, <cite>config.simulation.update_rate</cite>, or a length of time expressed
 as a string (e.g. <cite>120m</cite>, <cite>2h</cite>, <cite>2hour</cite>, <cite>2hours</cite>, <cite>1h 60m</cite>, etc.)</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><ul class="simple">
 <li><p>The Burned/Unburned/ControlLine pixel map (<cite>self.fire_map</cite>). Values
 range from [0, 6] (see simfire/enums.py:BurnStatus).</p></li>
@@ -331,7 +323,7 @@ range from [0, 6] (see simfire/enums.py:BurnStatus).</p></li>
 </ul>
 </p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>A tuple of the following</p>
 </dd>
 </dl>
@@ -342,10 +334,10 @@ range from [0, 6] (see simfire/enums.py:BurnStatus).</p></li>
 <em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_actions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#simfire.sim.simulation.Simulation.get_actions" title="Permalink to this definition">#</a></dt>
 <dd><p>Returns the action space for the simulation.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Dict[str, int]</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>The action / mitgiation strategies available</p>
 </dd>
 </dl>
@@ -356,10 +348,10 @@ range from [0, 6] (see simfire/enums.py:BurnStatus).</p></li>
 <em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_attribute_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#simfire.sim.simulation.Simulation.get_attribute_data" title="Permalink to this definition">#</a></dt>
 <dd><p>Initialize and return the observation space for the simulation.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The dictionary of observations containing NumPy arrays.</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>Dict[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)">numpy.ndarray</a>]</p>
 </dd>
 </dl>
@@ -370,10 +362,10 @@ range from [0, 6] (see simfire/enums.py:BurnStatus).</p></li>
 <em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_attribute_bounds</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#simfire.sim.simulation.Simulation.get_attribute_bounds" title="Permalink to this definition">#</a></dt>
 <dd><p>Initialize and return the observation space bounds for the simulation.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The dictionary of observation space bounds containing NumPy arrays.</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>Dict[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)">object</a>]</p>
 </dd>
 </dl>
@@ -384,10 +376,10 @@ range from [0, 6] (see simfire/enums.py:BurnStatus).</p></li>
 <em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_seeds</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#simfire.sim.simulation.Simulation.get_seeds" title="Permalink to this definition">#</a></dt>
 <dd><p>Returns the available randomization seeds for the simulation.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The dictionary with all available seeds to change and their values.</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>Dict[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a>, Optional[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)">int</a>]]</p>
 </dd>
 </dl>
@@ -400,13 +392,13 @@ range from [0, 6] (see simfire/enums.py:BurnStatus).</p></li>
 <p>Which randomization parameters can be  set depends on the simulator being used.
 Available seeds can be retreived by calling the <cite>self.get_seeds</cite> method.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>seeds</strong> (<em>Dict</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>]</em>) – The dictionary of seed names and their current seed values.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Whether or not the method successfully set a seed value.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)">bool</a></p>
 </dd>
 </dl>
@@ -417,11 +409,11 @@ Available seeds can be retreived by calling the <cite>self.get_seeds</cite> meth
 <em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">update_mitigation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">points</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.sim.simulation.Simulation.update_mitigation" title="Permalink to this definition">#</a></dt>
 <dd><p>Update the <cite>self.fire_map</cite> with new mitigation points</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>points</strong> (<em>Iterable</em><em>[</em><em>Tuple</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>]</em><em>]</em>) – A list of <cite>(x, y, mitigation)</cite> tuples. These will be added to
 <cite>self.fire_map</cite>.</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
 </dd>
 </dl>
@@ -432,10 +424,10 @@ Available seeds can be retreived by calling the <cite>self.get_seeds</cite> meth
 <em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">load_mitigation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mitigation_map</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.sim.simulation.Simulation.load_mitigation" title="Permalink to this definition">#</a></dt>
 <dd><p>Set the ‘self.fire_map’ to the new mitigation map</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>mitigation_map</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>numpy.ndarray</em></a>) – A numpy array of mitigations to be set as ‘self.fire_map’</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
 </dd>
 </dl>
@@ -446,10 +438,10 @@ Available seeds can be retreived by calling the <cite>self.get_seeds</cite> meth
 <span class="sig-name descname"><span class="pre">get_disaster_categories</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#simfire.sim.simulation.Simulation.get_disaster_categories" title="Permalink to this definition">#</a></dt>
 <dd><p>Returns all possible categories that a location in the map can be in.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>A dictionary of enum name to enum value.</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>Dict[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)">int</a>]</p>
 </dd>
 </dl>
@@ -460,10 +452,10 @@ Available seeds can be retreived by calling the <cite>self.get_seeds</cite> meth
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">disaster_categories</span></span><a class="headerlink" href="#simfire.sim.simulation.Simulation.disaster_categories" title="Permalink to this definition">#</a></dt>
 <dd><p>Returns the possible categories that a location in the map can be in.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>An enum of possible categories.</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>Iterable[<a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.IntEnum" title="(in Python v3.11)">enum.IntEnum</a>]</p>
 </dd>
 </dl>
@@ -484,7 +476,7 @@ Available seeds can be retreived by calling the <cite>self.get_seeds</cite> meth
 </dl>
 <p>Initialize the <cite>FireSimulation</cite> object for interacting with the RL harness.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>config</strong> (<a class="reference internal" href="../../utils/config/index.html#simfire.utils.config.Config" title="simfire.utils.config.Config"><em>simfire.utils.config.Config</em></a>) – The <cite>Config</cite> that specifies simulation parameters, read in from a
 YAML file.</p>
 </dd>
@@ -495,7 +487,7 @@ YAML file.</p>
 <dd><p>Reset the <cite>self.fire_map</cite>, <cite>self.terrain</cite>, <cite>self.fire_manager</cite>,
 and all mitigations to initial conditions</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>None</p>
 </dd>
 </dl>
@@ -506,10 +498,10 @@ and all mitigations to initial conditions</p>
 <span class="sig-name descname"><span class="pre">get_actions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#simfire.sim.simulation.FireSimulation.get_actions" title="Permalink to this definition">#</a></dt>
 <dd><p>Return the action space for the fire simulation.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Dict[str, int]</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>The action / mitigation strategies available</p>
 </dd>
 </dl>
@@ -520,10 +512,10 @@ and all mitigations to initial conditions</p>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">disaster_categories</span></span><a class="headerlink" href="#simfire.sim.simulation.FireSimulation.disaster_categories" title="Permalink to this definition">#</a></dt>
 <dd><p>Returns all possible categories that a location in the map can be in.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>A dictionary of enum name to enum value.</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>Iterable[<a class="reference internal" href="../../enums/index.html#simfire.enums.BurnStatus" title="simfire.enums.BurnStatus">simfire.enums.BurnStatus</a>]</p>
 </dd>
 </dl>
@@ -534,10 +526,10 @@ and all mitigations to initial conditions</p>
 <span class="sig-name descname"><span class="pre">get_attribute_bounds</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#simfire.sim.simulation.FireSimulation.get_attribute_bounds" title="Permalink to this definition">#</a></dt>
 <dd><p>Return the observation space bounds for the fire simulation</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The dictionary of observation space bounds containing NumPy arrays.</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>Dict[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)">object</a>]</p>
 </dd>
 </dl>
@@ -548,10 +540,10 @@ and all mitigations to initial conditions</p>
 <span class="sig-name descname"><span class="pre">get_attribute_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#simfire.sim.simulation.FireSimulation.get_attribute_data" title="Permalink to this definition">#</a></dt>
 <dd><p>Initialize and return the observation space for the simulation.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The dictionary of observation data containing NumPy arrays.</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>Dict[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)">numpy.ndarray</a>]</p>
 </dd>
 </dl>
@@ -562,10 +554,10 @@ and all mitigations to initial conditions</p>
 <span class="sig-name descname"><span class="pre">load_mitigation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mitigation_map</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.sim.simulation.FireSimulation.load_mitigation" title="Permalink to this definition">#</a></dt>
 <dd><p>Set the ‘self.fire_map’ to the new mitigation map</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>mitigation_map</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>numpy.ndarray</em></a>) – A numpy array of mitigations to be set as ‘self.fire_map’</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
 </dd>
 </dl>
@@ -576,11 +568,11 @@ and all mitigations to initial conditions</p>
 <span class="sig-name descname"><span class="pre">update_mitigation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">points</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.sim.simulation.FireSimulation.update_mitigation" title="Permalink to this definition">#</a></dt>
 <dd><p>Update the <cite>self.fire_map</cite> with new mitigation points</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>points</strong> (<em>Iterable</em><em>[</em><em>Tuple</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>]</em><em>]</em>) – A list of <cite>(column, row, mitigation)</cite> tuples. These will be added to
 <cite>self.fire_map</cite>.</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
 </dd>
 </dl>
@@ -591,11 +583,11 @@ and all mitigations to initial conditions</p>
 <span class="sig-name descname"><span class="pre">update_agent_positions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">points</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.sim.simulation.FireSimulation.update_agent_positions" title="Permalink to this definition">#</a></dt>
 <dd><p>Update the <cite>self.agent_positions</cite> with new agent positions</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>points</strong> (<em>Iterable</em><em>[</em><em>Tuple</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>]</em><em>]</em>) – A list of <cite>(column, row, agent_id)</cite> tuples. These will be added to
 <cite>self.agent_positions</cite>.</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
 </dd>
 </dl>
@@ -617,12 +609,12 @@ and all mitigations to initial conditions</p>
 </ol>
 </div></blockquote>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>time</strong> (<em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>]</em>) – Either how many updates to run the simulation, based on the config
 value, <cite>config.simulation.update_rate</cite>, or a length of time expressed
 as a string (e.g. <cite>120m</cite>, <cite>2h</cite>, <cite>2hour</cite>, <cite>2hours</cite>, <cite>1h 60m</cite>, etc.)</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><ul class="simple">
 <li><p>The Burned/Unburned/ControlLine pixel map (<cite>self.fire_map</cite>). Values
 range from [0, 6] (see simfire/enums.py:BurnStatus).</p></li>
@@ -630,7 +622,7 @@ range from [0, 6] (see simfire/enums.py:BurnStatus).</p></li>
 </ul>
 </p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>A tuple of the following</p>
 </dd>
 </dl>
@@ -641,10 +633,10 @@ range from [0, 6] (see simfire/enums.py:BurnStatus).</p></li>
 <span class="sig-name descname"><span class="pre">get_seeds</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#simfire.sim.simulation.FireSimulation.get_seeds" title="Permalink to this definition">#</a></dt>
 <dd><p>Returns the available randomization seeds for the simulation.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The dictionary with all available seeds to change and their values.</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>Dict[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a>, Optional[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)">int</a>]]</p>
 </dd>
 </dl>
@@ -657,13 +649,13 @@ range from [0, 6] (see simfire/enums.py:BurnStatus).</p></li>
 <p>Which randomization parameters can be  set depends on the simulator being used.
 Available seeds can be retreived by calling the <cite>self.get_seeds</cite> method.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>seeds</strong> (<em>Dict</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>]</em>) – The dictionary of seed names and the values they will be set to.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Whether or not the method successfully set a seed value.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)">bool</a></p>
 </dd>
 </dl>
@@ -674,10 +666,10 @@ Available seeds can be retreived by calling the <cite>self.get_seeds</cite> meth
 <span class="sig-name descname"><span class="pre">set_fire_initial_position</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.sim.simulation.FireSimulation.set_fire_initial_position" title="Permalink to this definition">#</a></dt>
 <dd><p>Manually set the fire intial position for a static fire.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>pos</strong> (<em>Tuple</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>]</em>) – The (x, y) coordinates to start the fire at</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
 </dd>
 </dl>
@@ -688,10 +680,10 @@ Available seeds can be retreived by calling the <cite>self.get_seeds</cite> meth
 <span class="sig-name descname"><span class="pre">get_layer_types</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#simfire.sim.simulation.FireSimulation.get_layer_types" title="Permalink to this definition">#</a></dt>
 <dd><p>Returns the current layer types for the simulation</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>A dictionary of the current layer type.</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>Dict[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a>]</p>
 </dd>
 </dl>
@@ -704,13 +696,13 @@ Available seeds can be retreived by calling the <cite>self.get_seeds</cite> meth
 <p>Available keys are ‘elevation’ and ‘fuel’ and available values are ‘functional’
 and ‘operational’.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>types</strong> (<em>Dict</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>]</em>) – The dictionary of layer names and the data type they will be set to.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Whether or not the method successfully set a data type.</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)">bool</a></p>
 </dd>
 </dl>
@@ -718,15 +710,15 @@ and ‘operational’.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="simfire.sim.simulation.FireSimulation.save_gif">
-<span class="sig-name descname"><span class="pre">save_gif</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.sim.simulation.FireSimulation.save_gif" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">save_gif</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.sim.simulation.FireSimulation.save_gif" title="Permalink to this definition">#</a></dt>
 <dd><p>Saves the most recent simulation as a GIF.</p>
 <p>Will save a GIF of all calls to <cite>run</cite> from the last time <cite>self.rendering</cite> was set
 to <cite>True</cite>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>filename</strong> (<em>Optional</em><em>[</em><em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.11)"><em>pathlib.Path</em></a><em>]</em><em>]</em>) – </p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>path</strong> (<em>Optional</em><em>[</em><em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.11)"><em>pathlib.Path</em></a><em>]</em><em>]</em>) – </p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
 </dd>
 </dl>
@@ -739,10 +731,10 @@ to <cite>True</cite>.</p>
 <p>Will save a PNG of the spread graph from the last time <cite>self.rendering</cite> was set
 to <cite>True</cite>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>filename</strong> (<em>Optional</em><em>[</em><em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.11)"><em>pathlib.Path</em></a><em>]</em><em>]</em>) – </p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
 </dd>
 </dl>
@@ -753,10 +745,10 @@ to <cite>True</cite>.</p>
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rendering</span></span><a class="headerlink" href="#simfire.sim.simulation.FireSimulation.rendering" title="Permalink to this definition">#</a></dt>
 <dd><p>Returns whether or not the simulator is currently rendering.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Whether or not the simulator is currently rendering.</p>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)">bool</a></p>
 </dd>
 </dl>
@@ -805,9 +797,7 @@ to <cite>True</cite>.</p>
             
           </div>
           <div class="right-details">
-            <div class="icons">
-              
-            </div>
+            
           </div>
         </div>
         

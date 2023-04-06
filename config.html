@@ -2,13 +2,13 @@
 <html class="no-js" lang="en">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Contributing" href="contributing.html" /><link rel="prev" title="Introduction" href="intro.html" />
 
-    <link rel="shortcut icon" href="_static/favicon.ico"/><meta name="generator" content="sphinx-5.3.0, furo 2022.09.29"/>
+    <link rel="shortcut icon" href="_static/favicon.ico"/><!-- Generated with Sphinx 5.3.0 and Furo 2022.12.07 -->
         <title>Configuring the Simulation - SimFire latest documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=d81277517bee4d6b0349d71bb2661d4890b5617c" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=91d0f0d1c444bdcb17a68e833c7a53903343c195" />
     <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
     
@@ -153,7 +153,7 @@
   <span class="sidebar-brand-text">SimFire latest documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
-  <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
   <input type="hidden" name="check_keywords" value="yes">
   <input type="hidden" name="area" value="default">
 </form>
@@ -593,96 +593,96 @@ Whether or not to render with post agent and fire in place.</p>
 <section id="example-config-file">
 <h2>Example Config File<a class="headerlink" href="#example-config-file" title="Permalink to this heading">#</a></h2>
 <p>Go <a class="reference external" href="https://gitlab.mitre.org/fireline/simfire/-/blob/main/configs">here</a> for more examples.</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">area</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">screen_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">225</span><span class="w"></span>
-<span class="w">  </span><span class="nt">pixel_scale</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span><span class="w"></span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">area</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">screen_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">225</span>
+<span class="w">  </span><span class="nt">pixel_scale</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span>
 
-<span class="nt">display</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">fire_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span><span class="w"></span>
-<span class="w">  </span><span class="nt">control_line_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span><span class="w"></span>
-<span class="w">  </span><span class="nt">agent_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span><span class="w"></span>
-<span class="w">  </span><span class="nt">rescale_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">225</span><span class="w"></span>
+<span class="nt">display</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">fire_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+<span class="w">  </span><span class="nt">control_line_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+<span class="w">  </span><span class="nt">agent_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span>
+<span class="w">  </span><span class="nt">rescale_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">225</span>
 
-<span class="nt">simulation</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">update_rate</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span><span class="w"></span>
-<span class="w">  </span><span class="nt">runtime</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">24h</span><span class="w"></span>
-<span class="w">  </span><span class="nt">headless</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w"></span>
-<span class="w">  </span><span class="nt">record</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"></span>
+<span class="nt">simulation</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">update_rate</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+<span class="w">  </span><span class="nt">runtime</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">24h</span>
+<span class="w">  </span><span class="nt">headless</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="w">  </span><span class="nt">record</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 
-<span class="nt">mitigation</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">ros_attenuation</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w"></span>
+<span class="nt">mitigation</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">ros_attenuation</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 
-<span class="nt">operational</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">seed</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">latitude</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">39.67</span><span class="w"></span>
-<span class="w">  </span><span class="nt">longitude</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">119.8</span><span class="w"></span>
-<span class="w">  </span><span class="nt">height</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4000</span><span class="w"></span>
-<span class="w">  </span><span class="nt">width</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4000</span><span class="w"></span>
-<span class="w">  </span><span class="nt">resolution</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">30</span><span class="w"></span>
+<span class="nt">operational</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">seed</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">latitude</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">39.67</span>
+<span class="w">  </span><span class="nt">longitude</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">119.8</span>
+<span class="w">  </span><span class="nt">height</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4000</span>
+<span class="w">  </span><span class="nt">width</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4000</span>
+<span class="w">  </span><span class="nt">resolution</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">30</span>
 
-<span class="nt">terrain</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">topography</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">functional</span><span class="w"></span>
-<span class="w">    </span><span class="nt">functional</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">perlin</span><span class="w"></span>
-<span class="w">      </span><span class="nt">perlin</span><span class="p">:</span><span class="w"></span>
-<span class="w">        </span><span class="nt">octaves</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span><span class="w"></span>
-<span class="w">        </span><span class="nt">persistence</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.7</span><span class="w"></span>
-<span class="w">        </span><span class="nt">lacunarity</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2.0</span><span class="w"></span>
-<span class="w">        </span><span class="nt">seed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">827</span><span class="w"></span>
-<span class="w">        </span><span class="nt">range_min</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">100.0</span><span class="w"></span>
-<span class="w">        </span><span class="nt">range_max</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">300.0</span><span class="w"></span>
-<span class="w">      </span><span class="nt">gaussian</span><span class="p">:</span><span class="w"></span>
-<span class="w">        </span><span class="nt">amplitude</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">500</span><span class="w"></span>
-<span class="w">        </span><span class="nt">mu_x</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span><span class="w"></span>
-<span class="w">        </span><span class="nt">mu_y</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span><span class="w"></span>
-<span class="w">        </span><span class="nt">sigma_x</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span><span class="w"></span>
-<span class="w">        </span><span class="nt">sigma_y</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span><span class="w"></span>
-<span class="w">  </span><span class="nt">fuel</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">functional</span><span class="w"></span>
-<span class="w">    </span><span class="nt">functional</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">chaparral</span><span class="w"></span>
-<span class="w">      </span><span class="nt">chaparral</span><span class="p">:</span><span class="w"></span>
-<span class="w">        </span><span class="nt">seed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1113</span><span class="w"></span>
+<span class="nt">terrain</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">topography</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">functional</span>
+<span class="w">    </span><span class="nt">functional</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">perlin</span>
+<span class="w">      </span><span class="nt">perlin</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">octaves</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
+<span class="w">        </span><span class="nt">persistence</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.7</span>
+<span class="w">        </span><span class="nt">lacunarity</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2.0</span>
+<span class="w">        </span><span class="nt">seed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">827</span>
+<span class="w">        </span><span class="nt">range_min</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">100.0</span>
+<span class="w">        </span><span class="nt">range_max</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">300.0</span>
+<span class="w">      </span><span class="nt">gaussian</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">amplitude</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">500</span>
+<span class="w">        </span><span class="nt">mu_x</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span>
+<span class="w">        </span><span class="nt">mu_y</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span>
+<span class="w">        </span><span class="nt">sigma_x</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span>
+<span class="w">        </span><span class="nt">sigma_y</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span>
+<span class="w">  </span><span class="nt">fuel</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">functional</span>
+<span class="w">    </span><span class="nt">functional</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">chaparral</span>
+<span class="w">      </span><span class="nt">chaparral</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">seed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1113</span>
 
-<span class="nt">fire</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">fire_initial_position</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">(16, 16)</span><span class="w"></span>
-<span class="w">  </span><span class="nt">max_fire_duration</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span><span class="w"></span>
+<span class="nt">fire</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">fire_initial_position</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">(16, 16)</span>
+<span class="w">  </span><span class="nt">max_fire_duration</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span>
 
-<span class="nt">environment</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">moisture</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.03</span><span class="w"></span>
+<span class="nt">environment</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">moisture</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.03</span>
 
-<span class="nt">wind</span><span class="p">:</span><span class="w"></span>
-<span class="w">  </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">perlin</span><span class="w"></span>
-<span class="w">  </span><span class="nt">cfd</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">time_to_train</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1000</span><span class="w"></span>
-<span class="w">    </span><span class="nt">iterations</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span><span class="w"></span>
-<span class="w">    </span><span class="nt">scale</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span><span class="w"></span>
-<span class="w">    </span><span class="nt">timestep_dt</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0</span><span class="w"></span>
-<span class="w">    </span><span class="nt">diffusion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.0</span><span class="w"></span>
-<span class="w">    </span><span class="nt">viscosity</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.0000001</span><span class="w"></span>
-<span class="w">    </span><span class="nt">speed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">19</span><span class="w"></span>
-<span class="w">    </span><span class="nt">direction</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">north</span><span class="w"></span>
-<span class="w">  </span><span class="nt">simple</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">speed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">7</span><span class="w"></span>
-<span class="w">    </span><span class="nt">direction</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">90.0</span><span class="w"></span>
-<span class="w">  </span><span class="nt">perlin</span><span class="p">:</span><span class="w"></span>
-<span class="w">    </span><span class="nt">speed</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="nt">seed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2345</span><span class="w"></span>
-<span class="w">      </span><span class="nt">scale</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">400</span><span class="w"></span>
-<span class="w">      </span><span class="nt">octaves</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span><span class="w"></span>
-<span class="w">      </span><span class="nt">persistence</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.7</span><span class="w"></span>
-<span class="w">      </span><span class="nt">lacunarity</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2.0</span><span class="w"></span>
-<span class="w">      </span><span class="nt">range_min</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">7</span><span class="w"></span>
-<span class="w">      </span><span class="nt">range_max</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">47</span><span class="w"></span>
-<span class="w">    </span><span class="nt">direction</span><span class="p">:</span><span class="w"></span>
-<span class="w">      </span><span class="nt">seed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">650</span><span class="w"></span>
-<span class="w">      </span><span class="nt">scale</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1500</span><span class="w"></span>
-<span class="w">      </span><span class="nt">octaves</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span><span class="w"></span>
-<span class="w">      </span><span class="nt">persistence</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.9</span><span class="w"></span>
-<span class="w">      </span><span class="nt">lacunarity</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0</span><span class="w"></span>
-<span class="w">      </span><span class="nt">range_min</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.0</span><span class="w"></span>
-<span class="w">      </span><span class="nt">range_max</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">360.0</span><span class="w"></span>
+<span class="nt">wind</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">perlin</span>
+<span class="w">  </span><span class="nt">cfd</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">time_to_train</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1000</span>
+<span class="w">    </span><span class="nt">iterations</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+<span class="w">    </span><span class="nt">scale</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+<span class="w">    </span><span class="nt">timestep_dt</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0</span>
+<span class="w">    </span><span class="nt">diffusion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.0</span>
+<span class="w">    </span><span class="nt">viscosity</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.0000001</span>
+<span class="w">    </span><span class="nt">speed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">19</span>
+<span class="w">    </span><span class="nt">direction</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">north</span>
+<span class="w">  </span><span class="nt">simple</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">speed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">7</span>
+<span class="w">    </span><span class="nt">direction</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">90.0</span>
+<span class="w">  </span><span class="nt">perlin</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">speed</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">seed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2345</span>
+<span class="w">      </span><span class="nt">scale</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">400</span>
+<span class="w">      </span><span class="nt">octaves</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
+<span class="w">      </span><span class="nt">persistence</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.7</span>
+<span class="w">      </span><span class="nt">lacunarity</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2.0</span>
+<span class="w">      </span><span class="nt">range_min</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">7</span>
+<span class="w">      </span><span class="nt">range_max</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">47</span>
+<span class="w">    </span><span class="nt">direction</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">seed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">650</span>
+<span class="w">      </span><span class="nt">scale</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1500</span>
+<span class="w">      </span><span class="nt">octaves</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+<span class="w">      </span><span class="nt">persistence</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.9</span>
+<span class="w">      </span><span class="nt">lacunarity</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0</span>
+<span class="w">      </span><span class="nt">range_min</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.0</span>
+<span class="w">      </span><span class="nt">range_max</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">360.0</span>
 </pre></div>
 </div>
 </section>
@@ -725,9 +725,7 @@ Whether or not to render with post agent and fire in place.</p>
             
           </div>
           <div class="right-details">
-            <div class="icons">
-              
-            </div>
+            
           </div>
         </div>
         

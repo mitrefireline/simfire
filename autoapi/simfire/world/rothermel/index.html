@@ -2,13 +2,13 @@
 <html class="no-js" lang="en">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 <link rel="index" title="Index" href="../../../../genindex.html" /><link rel="search" title="Search" href="../../../../search.html" /><link rel="next" title="simfire.enums" href="../../enums/index.html" /><link rel="prev" title="simfire.world.presets" href="../presets/index.html" />
 
-    <link rel="shortcut icon" href="../../../../_static/favicon.ico"/><meta name="generator" content="sphinx-5.3.0, furo 2022.09.29"/>
+    <link rel="shortcut icon" href="../../../../_static/favicon.ico"/><!-- Generated with Sphinx 5.3.0 and Furo 2022.12.07 -->
         <title>simfire.world.rothermel - SimFire latest documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo.css?digest=d81277517bee4d6b0349d71bb2661d4890b5617c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo.css?digest=91d0f0d1c444bdcb17a68e833c7a53903343c195" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
     
@@ -153,7 +153,7 @@
   <span class="sidebar-brand-text">SimFire latest documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../../../search.html" role="search">
-  <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
   <input type="hidden" name="check_keywords" value="yes">
   <input type="hidden" name="area" value="default">
 </form>
@@ -260,10 +260,6 @@
 <h3>Functions<a class="headerlink" href="#functions" title="Permalink to this heading">#</a></h3>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#simfire.world.rothermel.compute_rate_of_spread" title="simfire.world.rothermel.compute_rate_of_spread"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compute_rate_of_spread</span></code></a>(loc_x, loc_y, new_loc_x, ...)</p></td>
 <td><p>Compute the basic Rothermel rate of spread. All measurements are assumed to be in</p></td>
@@ -271,64 +267,41 @@
 </tbody>
 </table>
 </div>
-</section>
-<section id="attributes">
-<h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this heading">#</a></h3>
-<div class="table-wrapper autosummary longtable docutils container">
-<table class="autosummary longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#simfire.world.rothermel.device" title="simfire.world.rothermel.device"><code class="xref py py-obj docutils literal notranslate"><span class="pre">device</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<dl class="py data">
-<dt class="sig sig-object py" id="simfire.world.rothermel.device">
-<span class="sig-prename descclassname"><span class="pre">simfire.world.rothermel.</span></span><span class="sig-name descname"><span class="pre">device</span></span><em class="property"><span class="w"> </span><span class="pre">=</span> <span class="pre">cuda</span></em><a class="headerlink" href="#simfire.world.rothermel.device" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
-
 <dl class="py function">
 <dt class="sig sig-object py" id="simfire.world.rothermel.compute_rate_of_spread">
 <span class="sig-prename descclassname"><span class="pre">simfire.world.rothermel.</span></span><span class="sig-name descname"><span class="pre">compute_rate_of_spread</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">loc_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loc_y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_loc_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_loc_y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w_0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S_T</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">S_e</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p_p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">M_f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">U</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">U_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slope_mag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slope_dir</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.world.rothermel.compute_rate_of_spread" title="Permalink to this definition">#</a></dt>
 <dd><p>Compute the basic Rothermel rate of spread. All measurements are assumed to be in
-feet, minutes, and pounds, and BTU. This function is vecotrized and compiled by numba
-for GPU support. The target device (CPU or GPU) is determined in the config based on
-whether or not a GPU is available.</p>
+feet, minutes, and pounds, and BTU.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>loc_x</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – The current x location</p></li>
-<li><p><strong>loc_y</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – The current y location</p></li>
+<li><p><strong>loc_x</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>numpy.ndarray</em></a>) – The current x location</p></li>
+<li><p><strong>loc_y</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>numpy.ndarray</em></a>) – The current y location</p></li>
 <li><p><strong>loc_z</strong> – The current z elevation</p></li>
 <li><p><strong>loc_x</strong> – The new x location</p></li>
 <li><p><strong>loc_y</strong> – The new y location</p></li>
 <li><p><strong>loc_z</strong> – The new z elevation</p></li>
-<li><p><strong>w_0</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – The oven-dry fuel load of the fuel at the new location</p></li>
-<li><p><strong>delta</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – The fuel bed depth of the fuel at the new location</p></li>
-<li><p><strong>M_x</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – The dead fuel moisture of extinction of the fuel at the new location</p></li>
-<li><p><strong>sigma</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – The Surface-area-to-volume ratio of the fuel at the new location</p></li>
-<li><p><strong>h</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – The fuel particle low heat content</p></li>
-<li><p><strong>S_T</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – The fuel particle total mineral content</p></li>
-<li><p><strong>S_e</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – The fuel particle effective mineral content</p></li>
-<li><p><strong>p_p</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – The fuel particle oven-dry particle density</p></li>
-<li><p><strong>M_f</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – The envrionment fuel moisture</p></li>
-<li><p><strong>U</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – The envrionment wind speed</p></li>
-<li><p><strong>U_dir</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – The envrionment wind direction (degrees clockwise from North)</p></li>
-<li><p><strong>slope_dir</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – The angle of the steepest ascent at the location</p></li>
-<li><p><strong>new_loc_x</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – </p></li>
-<li><p><strong>new_loc_y</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – </p></li>
-<li><p><strong>slope_mag</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – </p></li>
+<li><p><strong>w_0</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>numpy.ndarray</em></a>) – The oven-dry fuel load of the fuel at the new location</p></li>
+<li><p><strong>delta</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>numpy.ndarray</em></a>) – The fuel bed depth of the fuel at the new location</p></li>
+<li><p><strong>M_x</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>numpy.ndarray</em></a>) – The dead fuel moisture of extinction of the fuel at the new location</p></li>
+<li><p><strong>sigma</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>numpy.ndarray</em></a>) – The Surface-area-to-volume ratio of the fuel at the new location</p></li>
+<li><p><strong>h</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>numpy.ndarray</em></a>) – The fuel particle low heat content</p></li>
+<li><p><strong>S_T</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>numpy.ndarray</em></a>) – The fuel particle total mineral content</p></li>
+<li><p><strong>S_e</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>numpy.ndarray</em></a>) – The fuel particle effective mineral content</p></li>
+<li><p><strong>p_p</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>numpy.ndarray</em></a>) – The fuel particle oven-dry particle density</p></li>
+<li><p><strong>M_f</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>numpy.ndarray</em></a>) – The envrionment fuel moisture</p></li>
+<li><p><strong>U</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>numpy.ndarray</em></a>) – The envrionment wind speed</p></li>
+<li><p><strong>U_dir</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>numpy.ndarray</em></a>) – The envrionment wind direction (degrees clockwise from North)</p></li>
+<li><p><strong>slope_dir</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>numpy.ndarray</em></a>) – The angle of the steepest ascent at the location</p></li>
+<li><p><strong>new_loc_x</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>numpy.ndarray</em></a>) – </p></li>
+<li><p><strong>new_loc_y</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>numpy.ndarray</em></a>) – </p></li>
+<li><p><strong>slope_mag</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.24)"><em>numpy.ndarray</em></a>) – </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The computed rate of spread in ft/min</p>
 </dd>
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>R</p>
 </dd>
 </dl>
@@ -375,9 +348,7 @@ whether or not a GPU is available.</p>
             
           </div>
           <div class="right-details">
-            <div class="icons">
-              
-            </div>
+            
           </div>
         </div>
         
@@ -397,11 +368,8 @@ whether or not a GPU is available.</p>
             <ul>
 <li><a class="reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.world.rothermel</span></code></a><ul>
 <li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
-<li><a class="reference internal" href="#functions">Functions</a></li>
-<li><a class="reference internal" href="#attributes">Attributes</a><ul>
-<li><a class="reference internal" href="#simfire.world.rothermel.device"><code class="docutils literal notranslate"><span class="pre">device</span></code></a></li>
+<li><a class="reference internal" href="#functions">Functions</a><ul>
 <li><a class="reference internal" href="#simfire.world.rothermel.compute_rate_of_spread"><code class="docutils literal notranslate"><span class="pre">compute_rate_of_spread()</span></code></a></li>
-<li><a class="reference internal" href="#simfire.world.rothermel.device">device</a></li>
 <li><a class="reference internal" href="#simfire.world.rothermel.compute_rate_of_spread">compute_rate_of_spread</a></li>
 </ul>
 </li>

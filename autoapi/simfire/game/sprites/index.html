@@ -2,13 +2,13 @@
 <html class="no-js" lang="en">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 <link rel="index" title="Index" href="../../../../genindex.html" /><link rel="search" title="Search" href="../../../../search.html" /><link rel="next" title="simfire.sim" href="../../sim/index.html" /><link rel="prev" title="simfire.game.image" href="../image/index.html" />
 
-    <link rel="shortcut icon" href="../../../../_static/favicon.ico"/><meta name="generator" content="sphinx-5.3.0, furo 2022.09.29"/>
+    <link rel="shortcut icon" href="../../../../_static/favicon.ico"/><!-- Generated with Sphinx 5.3.0 and Furo 2022.12.07 -->
         <title>simfire.game.sprites - SimFire latest documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo.css?digest=d81277517bee4d6b0349d71bb2661d4890b5617c" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo.css?digest=91d0f0d1c444bdcb17a68e833c7a53903343c195" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css" />
     <link rel="stylesheet" type="text/css" href="../../../../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
     
@@ -153,7 +153,7 @@
   <span class="sidebar-brand-text">SimFire latest documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../../../search.html" role="search">
-  <input class="sidebar-search" placeholder=Search name="q" aria-label="Search">
+  <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
   <input type="hidden" name="check_keywords" value="yes">
   <input type="hidden" name="area" value="default">
 </form>
@@ -260,10 +260,6 @@
 <h3>Classes<a class="headerlink" href="#classes" title="Permalink to this heading">#</a></h3>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#simfire.game.sprites.Terrain" title="simfire.game.sprites.Terrain"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Terrain</span></code></a></p></td>
 <td><p>Use a TopographyLayer and a FuelLayer to make terrain. This sprite is just the</p></td>
@@ -291,10 +287,6 @@
 <h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this heading">#</a></h3>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
-<colgroup>
-<col style="width: 10%" />
-<col style="width: 90%" />
-</colgroup>
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#simfire.game.sprites.log" title="simfire.game.sprites.log"><code class="xref py py-obj docutils literal notranslate"><span class="pre">log</span></code></a></p></td>
 <td><p></p></td>
@@ -310,13 +302,13 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="simfire.game.sprites.Terrain">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simfire.game.sprites.</span></span><span class="sig-name descname"><span class="pre">Terrain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fuel_layer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">topo_layer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">screen_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headless</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hist_layer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.game.sprites.Terrain" title="Permalink to this definition">#</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://www.pygame.org/docs/ref/sprite.html#pygame.sprite.Sprite" title="(in pygame v2.1.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pygame.sprite.Sprite</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://www.pygame.org/docs/ref/sprite.html#pygame.sprite.Sprite" title="(in pygame v2.4.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pygame.sprite.Sprite</span></code></a></p>
 <p>Use a TopographyLayer and a FuelLayer to make terrain. This sprite is just the
 entire background that the fire appears on. This sprite changes the color of each
 terrain pixel based on its “dryness/flammability” if it is unburned, or based on
 whether the pixel is a fireline or burned.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>fuel_layer</strong> (<a class="reference internal" href="../../utils/layers/index.html#simfire.utils.layers.FuelLayer" title="simfire.utils.layers.FuelLayer"><em>simfire.utils.layers.FuelLayer</em></a>) – </p></li>
 <li><p><strong>topo_layer</strong> (<a class="reference internal" href="../../utils/layers/index.html#simfire.utils.layers.TopographyLayer" title="simfire.utils.layers.TopographyLayer"><em>simfire.utils.layers.TopographyLayer</em></a>) – </p></li>
@@ -333,7 +325,7 @@ whether the pixel is a fireline or burned.</p>
 contains pixel-wise values for tile burn status.
 The parent class update() expects just args and kwargs, so we</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>a</strong> – </p></li>
 <li><p><strong>fire_map</strong> – A 2-D numpy array containing enumerated values for unburned,
@@ -342,7 +334,7 @@ burning, and burned tile status for the game screen</p></li>
 <li><p><strong>kwargs</strong> (<em>Any</em>) – </p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type</dt>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
 </dd>
 </dl>
@@ -354,14 +346,14 @@ burning, and burned tile status for the game screen</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="simfire.game.sprites.Fire">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simfire.game.sprites.</span></span><span class="sig-name descname"><span class="pre">Fire</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headless</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.game.sprites.Fire" title="Permalink to this definition">#</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://www.pygame.org/docs/ref/sprite.html#pygame.sprite.Sprite" title="(in pygame v2.1.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pygame.sprite.Sprite</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://www.pygame.org/docs/ref/sprite.html#pygame.sprite.Sprite" title="(in pygame v2.4.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pygame.sprite.Sprite</span></code></a></p>
 <p>This sprite represents a fire burning on one pixel of the terrain. Its
 image is generally kept very small to make rendering easier. All fire
 spreading is handled by the FireManager it is attached to.</p>
 <p>Initialize the class by recording the position and size of the sprite
 and creating a solid color texture.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>pos</strong> (<em>Tuple</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>]</em>) – The (x, y) pixel position of the sprite</p></li>
 <li><p><strong>size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – The pixel size of the sprite</p></li>
@@ -375,7 +367,7 @@ not be initialized.</p></li>
 <span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.game.sprites.Fire.update" title="Permalink to this definition">#</a></dt>
 <dd><p>Currently unused.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>None</p>
 </dd>
 </dl>
@@ -386,14 +378,14 @@ not be initialized.</p></li>
 <dl class="py class">
 <dt class="sig sig-object py" id="simfire.game.sprites.FireLine">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simfire.game.sprites.</span></span><span class="sig-name descname"><span class="pre">FireLine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headless</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.game.sprites.FireLine" title="Permalink to this definition">#</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://www.pygame.org/docs/ref/sprite.html#pygame.sprite.Sprite" title="(in pygame v2.1.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pygame.sprite.Sprite</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://www.pygame.org/docs/ref/sprite.html#pygame.sprite.Sprite" title="(in pygame v2.4.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pygame.sprite.Sprite</span></code></a></p>
 <p>This sprite represents a fireline on one pixel of the terrain. Its image is generally
 kept very small to make rendering easier. All fireline placement spreading is handled
 by the FireLineManager it is attached to.</p>
 <p>Initialize the class by recording the position and size of the sprite
 and creating a solid color texture.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>pos</strong> (<em>Tuple</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>]</em>) – The (x, y) pixel position of the sprite</p></li>
 <li><p><strong>size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – The pixel size of the sprite</p></li>
@@ -408,7 +400,7 @@ not be initialized.</p></li>
 <dd><p>This doesn’t require to be updated right now. May change in the future if we
 learn new things about the physics.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>None</p>
 </dd>
 </dl>
@@ -419,14 +411,14 @@ learn new things about the physics.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="simfire.game.sprites.ScratchLine">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simfire.game.sprites.</span></span><span class="sig-name descname"><span class="pre">ScratchLine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headless</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.game.sprites.ScratchLine" title="Permalink to this definition">#</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://www.pygame.org/docs/ref/sprite.html#pygame.sprite.Sprite" title="(in pygame v2.1.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pygame.sprite.Sprite</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://www.pygame.org/docs/ref/sprite.html#pygame.sprite.Sprite" title="(in pygame v2.4.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pygame.sprite.Sprite</span></code></a></p>
 <p>This sprite represents a scratch line on one pixel of the terrain. Its image is
 generally kept very small to make rendering easier. All scratch line placement
 spreading is handled by the ScratchLineManager it is attached to.</p>
 <p>Initialize the class by recording the position and size of the sprite
 and creating a solid color texture.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>pos</strong> (<em>Tuple</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>]</em>) – </p></li>
 <li><p><strong>size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – </p></li>
@@ -440,7 +432,7 @@ and creating a solid color texture.</p>
 <dd><p>This doesn’t require to be updated right now. May change in the future if we
 learn new things about the physics.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>None</p>
 </dd>
 </dl>
@@ -451,14 +443,14 @@ learn new things about the physics.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="simfire.game.sprites.WetLine">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simfire.game.sprites.</span></span><span class="sig-name descname"><span class="pre">WetLine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headless</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.game.sprites.WetLine" title="Permalink to this definition">#</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://www.pygame.org/docs/ref/sprite.html#pygame.sprite.Sprite" title="(in pygame v2.1.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pygame.sprite.Sprite</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://www.pygame.org/docs/ref/sprite.html#pygame.sprite.Sprite" title="(in pygame v2.4.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pygame.sprite.Sprite</span></code></a></p>
 <p>This sprite represents a wet line on one pixel of the terrain. Its image is
 generally kept very small to make rendering easier. All wet line placement
 spreading is handled by the WaterLineManager it is attached to.</p>
 <p>Initialize the class by recording the position and size of the sprite
 and creating a color texture.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>pos</strong> (<em>Tuple</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>]</em>) – </p></li>
 <li><p><strong>size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – </p></li>
@@ -472,7 +464,7 @@ and creating a color texture.</p>
 <dd><p>This doesn’t require to be updated right now. May change in the future if we
 learn new things about the physics.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>None</p>
 </dd>
 </dl>
@@ -483,14 +475,14 @@ learn new things about the physics.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="simfire.game.sprites.Agent">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simfire.game.sprites.</span></span><span class="sig-name descname"><span class="pre">Agent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headless</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.game.sprites.Agent" title="Permalink to this definition">#</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://www.pygame.org/docs/ref/sprite.html#pygame.sprite.Sprite" title="(in pygame v2.1.4)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pygame.sprite.Sprite</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://www.pygame.org/docs/ref/sprite.html#pygame.sprite.Sprite" title="(in pygame v2.4.0)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pygame.sprite.Sprite</span></code></a></p>
 <p>This sprite represents a fire burning on one pixel of the terrain. Its
 image is generally kept very small to make rendering easier. All fire
 spreading is handled by the FireManager it is attached to.</p>
 <p>Initialize the class by recording the position and size of the sprite
 and creating a solid color texture.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>pos</strong> (<em>Tuple</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>]</em>) – The (x, y) pixel position of the sprite</p></li>
 <li><p><strong>size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – The pixel size of the sprite</p></li>
@@ -503,7 +495,7 @@ not be initialized.</p></li>
 <dt class="sig sig-object py" id="simfire.game.sprites.Agent.pos">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">pos</span></span><a class="headerlink" href="#simfire.game.sprites.Agent.pos" title="Permalink to this definition">#</a></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Tuple[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)">int</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)">int</a>]</p>
 </dd>
 </dl>
@@ -514,7 +506,7 @@ not be initialized.</p></li>
 <span class="sig-name descname"><span class="pre">update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.game.sprites.Agent.update" title="Permalink to this definition">#</a></dt>
 <dd><p>Currently unused.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Return type</dt>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>None</p>
 </dd>
 </dl>
@@ -563,9 +555,7 @@ not be initialized.</p></li>
             
           </div>
           <div class="right-details">
-            <div class="icons">
-              
-            </div>
+            
           </div>
         </div>
         

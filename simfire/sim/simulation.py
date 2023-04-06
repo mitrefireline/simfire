@@ -801,23 +801,18 @@ class FireSimulation(Simulation):
         if not isinstance(path, Path) and path is not None:
             path = Path(path).expanduser()
 
-        # If the path is only a filename, create a default out_path from the config
-        if path.parent == Path(".") and path.suffix != "":
-            out_path = self._create_out_path()
-            path = out_path / path
-
         # If the path does not end in a filename, create a default filename
         if path.suffix == "":
             now = datetime.now().strftime("%H-%M-%S")
             filename = f"simulation_{now}.gif"
             path = path / filename
 
-        # If the path does not exist, create it
+        # If the parent path does not exist, create it
         if not path.parent.is_dir() and not path.parent.exists():
-            log.warning(f"Creating directory '{path}'")
+            log.info(f"Creating directory '{path.parent}'")
             path.parent.mkdir(parents=True)
 
-        log.info(f"Saving GIF to {path}...")
+        log.info(f"Saving GIF to '{path}'...")
 
         if path.suffix != ".gif":
             path = path.with_suffix(".gif")

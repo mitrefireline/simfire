@@ -1,7 +1,7 @@
 import os
-import unittest
 from pathlib import Path
 from typing import Dict
+import unittest
 
 import numpy as np
 
@@ -361,10 +361,16 @@ class FireSimulationTest(unittest.TestCase):
         self.simulation_flat.rendering = True
         self.simulation_flat.run(1)
         self.simulation_flat.save_gif("tmp.gif")
-        tmp_file = self.simulation_flat._create_out_path() / "tmp.gif"
+        tmp_file = Path("tmp.gif")
         self.assertTrue(tmp_file.exists(), msg="The GIF was not saved correctly")
         tmp_file.unlink()
         self.simulation_flat.save_gif("tmp")
+        tmp_file = Path("tmp")
+        self.assertTrue(tmp_file.is_dir(), msg="The GIF was not saved correctly")
+        [f.unlink() for f in tmp_file.iterdir()]
+        tmp_file.rmdir()
+        self.simulation_flat.save_gif("tmp/tmp_0.gif")
+        tmp_file = Path("tmp/tmp_0.gif")
         self.assertTrue(tmp_file.exists(), msg="The GIF was not saved correctly")
         tmp_file.unlink()
         tmp_file.parent.rmdir()

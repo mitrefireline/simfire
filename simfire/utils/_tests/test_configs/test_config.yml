@@ -29,6 +29,7 @@ operational:
   height: 400
   width: 400
   resolution: 30
+  year: 2020
 
 historical:
   use: false

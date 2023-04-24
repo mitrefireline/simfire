@@ -80,15 +80,19 @@ The longitude given in decimal degrees.
 
 #### height
 (`int`)<br>
-The height of the screen in meters.
+The height of the screen in meters. This is not randomized if choosing a seed.
 
 #### width
 (`int`)<br>
-The width of the screen in meters.
+The width of the screen in meters. This is not randomized if choosing a seed.
 
 #### resolution
 (`int`)<br>
-The resolution of each pixel in meters. Data is measured in pixels corresponding to the resolution i.e: resolution = 10m = 1 pixel.
+The resolution of each pixel in meters. Data is measured in pixels corresponding to the resolution i.e: resolution = 10m = 1 pixel. This is not randomized if choosing a seed.
+
+#### year
+(`int`)<br>
+The year of the fuel data. Current options are `2019`, `2020`, and `2022`. This is not randomized if choosing a seed.
 
 ---
 
@@ -350,6 +354,7 @@ operational:
   height: 4000
   width: 4000
   resolution: 30
+  year: 2020
 
 terrain:
   topography:

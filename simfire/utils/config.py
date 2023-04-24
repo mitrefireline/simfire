@@ -340,7 +340,16 @@ class Config:
         """
         data_path = Path("/nfs/lslab2/fireline/data/fuel/")
         res = str(self.yaml_data["operational"]["resolution"]) + "m"
-        data_path = data_path / res / "old_2020"
+        year = str(self.yaml_data["operational"]["year"])
+        if res not in ["30m"]:
+            message = "Resolution must be 30m"
+            log.error(message)
+            raise ConfigError(message)
+        if year not in ["2019", "2020", "2022"]:
+            message = "Year must be 2019, 2020, or 2022"
+            log.error(message)
+            raise ConfigError(message)
+        data_path = data_path / res / year
         all_files = [
             f.stem
             for f in data_path.iterdir()

@@ -30,6 +30,7 @@ operational:
   height: 2000
   width: 2000
   resolution: 30
+  year: 2020
 
 historical:
   use: true

@@ -889,7 +889,7 @@ class OperationalFuelLayer(FuelLayer):
         self.path = Path("/nfs/lslab2/fireline/data/fuel/")
         res = str(self.lat_long_box.resolution) + "m"
 
-        self.datapath = self.path / res / "old_2020"
+        self.datapath = self.path / res / "2020"
 
         self._get_fuel_dems()
         fm_int_data = self._make_data(self.fuel_model_filenames)
@@ -956,8 +956,8 @@ class OperationalFuelLayer(FuelLayer):
         self.rgb_filenames = []
         self.fuel_model_filenames = []
         fuel_model = f"LF2020_FBFM{self.type}_200_CONUS"
-        fuel_data_fm = f"LC20_F{self.type}_200_projected_no_whitespace.npy"
-        fuel_data_rgb = f"LC20_F{self.type}_200_projected_rgb.npy"
+        fuel_data_fm = f"LC20_F{self.type}_200_no_whitespace.npy"
+        fuel_data_rgb = f"LC20_F{self.type}_200_rgb.npy"
         for _, ranges in self.lat_long_box.tiles.items():
             for range in ranges:
                 (five_deg_n, five_deg_w) = range

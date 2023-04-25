@@ -134,6 +134,7 @@ class OperationalConfig:
     height: float
     width: float
     resolution: float  # TODO: Make enum for resolution?
+    year: int  # TODO: Make enum for year?
 
     def __post_init__(self) -> None:
         self.latitude = float(self.latitude)

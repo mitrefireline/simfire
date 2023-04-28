@@ -1,6 +1,7 @@
 import os
 import shutil
 import unittest
+from pathlib import Path
 
 import matplotlib as mpl
 import numpy as np
@@ -124,7 +125,8 @@ class TestLatLongBox(unittest.TestCase):
         center = (33.5, 116.8)
         height, width = 1600, 1600
         lat_long_box = LatLongBox(center, height, width, resolution)
-        topo_layer = OperationalTopographyLayer(lat_long_box)
+        path = Path("/nfs/lslab2/fireline/data")
+        topo_layer = OperationalTopographyLayer(lat_long_box, path)
         rmtree = False
         if not os.path.isdir("images/"):
             os.makedirs("images/")
@@ -197,7 +199,8 @@ class TestOperationalTopographyLayer(unittest.TestCase):
         center = (33.4, 115.04)
         height, width = 3200, 3200
         lat_long_box = LatLongBox(center, height, width, resolution)
-        topographyGen = OperationalTopographyLayer(lat_long_box)
+        path = Path("/nfs/lslab2/fireline/data")
+        topographyGen = OperationalTopographyLayer(lat_long_box, path)
         self.assertEqual(topographyGen.data.shape[0], topographyGen.data.shape[1])
 
     def test__get_dems(self) -> None:
@@ -210,21 +213,24 @@ class TestOperationalTopographyLayer(unittest.TestCase):
         center = (35.2, 119.6)
         height, width = 1600, 1600
         lat_long_box = LatLongBox(center, height, width, resolution)
-        topographyGen = OperationalTopographyLayer(lat_long_box)
+        path = Path("/nfs/lslab2/fireline/data")
+        topographyGen = OperationalTopographyLayer(lat_long_box, path)
         self.assertEqual(1, len(topographyGen.tif_filenames))
 
         # 2 Tiles
         center = (37.4, 115.0)
         height, width = 1600, 1600
         lat_long_box = LatLongBox(center, height, width, resolution)
-        topographyGen = OperationalTopographyLayer(lat_long_box)
+        path = Path("/nfs/lslab2/fireline/data")
+        topographyGen = OperationalTopographyLayer(lat_long_box, path)
         self.assertEqual(2, len(topographyGen.tif_filenames))
 
         # 4 Tiles
         center = (34.001, 116.008)
         height, width = 3200, 3200
         lat_long_box = LatLongBox(center, height, width, resolution)
-        topographyGen = OperationalTopographyLayer(lat_long_box)
+        path = Path("/nfs/lslab2/fireline/data")
+        topographyGen = OperationalTopographyLayer(lat_long_box, path)
         self.assertEqual(4, len(topographyGen.tif_filenames))
 
 
@@ -276,7 +282,8 @@ class TestOperationalFuelLayer(unittest.TestCase):
         center = (33.4, 116.04)
         height, width = 3200, 3200
         lat_long_box = LatLongBox(center, height, width, resolution)
-        FuelGen = OperationalFuelLayer(lat_long_box)
+        path = Path("/nfs/lslab2/fireline/data")
+        FuelGen = OperationalFuelLayer(lat_long_box, path)
         self.assertEqual(FuelGen.data.shape[0], FuelGen.data.shape[1])
 
     def test_get_fuel_dems(self) -> None:
@@ -289,21 +296,24 @@ class TestOperationalFuelLayer(unittest.TestCase):
         center = (35.2, 117.6)
         height, width = 1600, 1600
         lat_long_box = LatLongBox(center, height, width, resolution)
-        FuelGen = OperationalFuelLayer(lat_long_box)
+        path = Path("/nfs/lslab2/fireline/data")
+        FuelGen = OperationalFuelLayer(lat_long_box, path)
         self.assertEqual(1, len(FuelGen.fuel_model_filenames))
 
         # 2 Tiles
         center = (37.4, 118.0)
         height, width = 1600, 1600
         lat_long_box = LatLongBox(center, height, width, resolution)
-        FuelGen = OperationalFuelLayer(lat_long_box)
+        path = Path("/nfs/lslab2/fireline/data")
+        FuelGen = OperationalFuelLayer(lat_long_box, path)
         self.assertEqual(2, len(FuelGen.fuel_model_filenames))
 
         # 4 Tiles
-        center = (33.001, 116.008)
+        center = (33.001, 113.008)
         height, width = 3200, 3200
         lat_long_box = LatLongBox(center, height, width, resolution)
-        FuelGen = OperationalFuelLayer(lat_long_box)
+        path = Path("/nfs/lslab2/fireline/data")
+        FuelGen = OperationalFuelLayer(lat_long_box, path)
         self.assertEqual(4, len(FuelGen.fuel_model_filenames))
 
     def test_image(self) -> None:
@@ -316,7 +326,8 @@ class TestOperationalFuelLayer(unittest.TestCase):
         center = (35.2, 117.6)
         height, width = 1600, 1600
         lat_long_box = LatLongBox(center, height, width, resolution)
-        FuelGen = OperationalFuelLayer(lat_long_box)
+        path = Path("/nfs/lslab2/fireline/data")
+        FuelGen = OperationalFuelLayer(lat_long_box, path)
 
         self.assertIsInstance(
             FuelGen.image,

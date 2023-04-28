@@ -29,7 +29,9 @@ operational:
   longitude: 119.8
   height: 4000
   width: 4000
+  path: "/nfs/lslab2/fireline/data/"
   resolution: 30
+  year: 2020
 
 historical:
   use: false

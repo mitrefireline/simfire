@@ -133,14 +133,18 @@ class OperationalConfig:
     longitude: float
     height: float
     width: float
+    path: Union[Path, str]
     resolution: float  # TODO: Make enum for resolution?
+    year: int  # TODO: Make enum for year?
 
     def __post_init__(self) -> None:
         self.latitude = float(self.latitude)
         self.longitude = float(self.longitude)
         self.height = float(self.height)
         self.width = float(self.width)
+        self.path = Path(self.path)
         self.resolution = float(self.resolution)
+        self.year = int(self.year)
 
 
 @dataclasses.dataclass
@@ -338,9 +342,19 @@ class Config:
         Get all possible combinations of latitude and longitude for the
         data layers.
         """
-        data_path = Path("/nfs/lslab2/fireline/data/fuel/")
+        path = self.yaml_data["operational"]["path"]
+        data_path = Path(f"{path}/fuel/")
         res = str(self.yaml_data["operational"]["resolution"]) + "m"
-        data_path = data_path / res / "old_2020"
+        year = str(self.yaml_data["operational"]["year"])
+        if res not in ["30m"]:
+            message = "Resolution must be 30m"
+            log.error(message)
+            raise ConfigError(message)
+        if year not in ["2019", "2020", "2022"]:
+            message = "Year must be 2019, 2020, or 2022"
+            log.error(message)
+            raise ConfigError(message)
+        data_path = data_path / res / year
         all_files = [
             f.stem
             for f in data_path.iterdir()
@@ -491,7 +505,8 @@ class Config:
         topo_type = self.yaml_data["terrain"]["topography"]["type"]
         if topo_type == "operational":
             if self.lat_long_box is not None:
-                topo_layer = OperationalTopographyLayer(self.lat_long_box)
+                path = Path(self.yaml_data["operational"]["path"])
+                topo_layer = OperationalTopographyLayer(self.lat_long_box, path)
             else:
                 raise ConfigError(
                     "The topography layer type is `operational`, "
@@ -556,7 +571,8 @@ class Config:
         bp_type = self.yaml_data["terrain"]["burn_probability"]["type"]
         if bp_type == "operational":
             if self.lat_long_box is not None:
-                burn_prob_layer = OperationalBurnProbabilityLayer(self.lat_long_box)
+                path = Path(self.yaml_data["operational"]["path"])
+                burn_prob_layer = OperationalBurnProbabilityLayer(self.lat_long_box, path)
             else:
                 raise ConfigError(
                     "The burn probability layer type is `operational`, "
@@ -616,7 +632,8 @@ class Config:
         fuel_type = self.yaml_data["terrain"]["fuel"]["type"]
         if fuel_type == "operational":
             if self.lat_long_box is not None:
-                fuel_layer = OperationalFuelLayer(self.lat_long_box)
+                path = Path(self.yaml_data["operational"]["path"])
+                fuel_layer = OperationalFuelLayer(self.lat_long_box, path)
             else:
                 raise ConfigError(
                     "The topography layer type is `operational`, "

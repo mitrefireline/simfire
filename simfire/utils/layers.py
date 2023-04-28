@@ -2,6 +2,7 @@ import math
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
+import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.contour import QuadContourSet
@@ -547,7 +548,7 @@ class BurnProbabilityLayer(DataLayer):
 
 
 class OperationalBurnProbabilityLayer(BurnProbabilityLayer):
-    def __init__(self, lat_long_box: LatLongBox) -> None:
+    def __init__(self, lat_long_box: LatLongBox, path: Path) -> None:
         """
         Initialize the elevation layer by retrieving the correct topograpchic data
         and computing the area
@@ -560,7 +561,7 @@ class OperationalBurnProbabilityLayer(BurnProbabilityLayer):
         """
         super().__init__()
         self.lat_long_box = lat_long_box
-        self.path = Path("/nfs/lslab2/fireline/data/risk/")
+        self.path = Path(path) / "risk"
         res = str(self.lat_long_box.resolution) + "m"
         self.datapath = self.path / res
 
@@ -709,7 +710,7 @@ class TopographyLayer(DataLayer):
 
 
 class OperationalTopographyLayer(TopographyLayer):
-    def __init__(self, lat_long_box: LatLongBox) -> None:
+    def __init__(self, lat_long_box: LatLongBox, path: Path) -> None:
         """
         Initialize the elevation layer by retrieving the correct topograpchic data
         and computing the area
@@ -722,7 +723,7 @@ class OperationalTopographyLayer(TopographyLayer):
         """
         super().__init__()
         self.lat_long_box = lat_long_box
-        self.path = Path("/nfs/lslab2/fireline/data/topographic/")
+        self.path = Path(path) / "topographic"
         res = str(self.lat_long_box.resolution) + "m"
         self.datapath = self.path / res
 
@@ -733,6 +734,7 @@ class OperationalTopographyLayer(TopographyLayer):
         self._get_dems()
         data = Image.open(self.tif_filenames[0])
         data = np.array(data, dtype=np.float32)
+        data = cv2.resize(data, (3612, 3612), interpolation=cv2.INTER_NEAREST)
         # flip axis because latitude goes up but numpy will read it down
         data = np.flip(data, 0)
         data = np.expand_dims(data, axis=-1)
@@ -748,6 +750,9 @@ class OperationalTopographyLayer(TopographyLayer):
             for idx, dem in enumerate(self.tif_filenames[1:]):
                 tif_data = Image.open(dem)
                 tif_data = np.array(tif_data, dtype=np.float32)
+                tif_data = cv2.resize(
+                    tif_data, (3612, 3612), interpolation=cv2.INTER_NEAREST
+                )
                 # flip axis because latitude goes up but numpy will read it down
                 tif_data = np.flip(tif_data, 0)
                 tif_data = np.expand_dims(tif_data, axis=-1)
@@ -869,7 +874,7 @@ class FuelLayer(DataLayer):
 
 
 class OperationalFuelLayer(FuelLayer):
-    def __init__(self, lat_long_box: LatLongBox, type: str = "13") -> None:
+    def __init__(self, lat_long_box: LatLongBox, path: Path, type: str = "13") -> None:
         """
         Initialize the elevation layer by retrieving the correct topograpchic data
         and computing the area.
@@ -886,10 +891,10 @@ class OperationalFuelLayer(FuelLayer):
         self.lat_long_box = lat_long_box
         self.type = type
         # Temporary until we get real fuel data
-        self.path = Path("/nfs/lslab2/fireline/data/fuel/")
+        self.path = Path(path) / "fuel"
         res = str(self.lat_long_box.resolution) + "m"
 
-        self.datapath = self.path / res / "old_2020"
+        self.datapath = self.path / res / "2020"
 
         self._get_fuel_dems()
         fm_int_data = self._make_data(self.fuel_model_filenames)
@@ -903,7 +908,6 @@ class OperationalFuelLayer(FuelLayer):
         Use the fuel data in self.data to make an RGB background image.
         """
         return np.array([])
-        pass
 
     def _make_data(self, filename: List) -> np.ndarray:
 
@@ -911,6 +915,7 @@ class OperationalFuelLayer(FuelLayer):
         # Flip the data over a horizontal axis
         data = np.flip(data, axis=0)
         data = np.array(data, dtype=np.float32)
+        data = cv2.resize(data, (3612, 3612), interpolation=cv2.INTER_NEAREST)
         data = np.expand_dims(data, axis=-1)
 
         for key, _ in self.lat_long_box.tiles.items():
@@ -924,7 +929,11 @@ class OperationalFuelLayer(FuelLayer):
             for idx, dem in enumerate(filename[1:]):
                 tif_data = np.load(dem)
                 tif_data = np.array(tif_data, dtype=np.float32)
+                tif_data = cv2.resize(
+                    tif_data, (3612, 3612), interpolation=cv2.INTER_NEAREST
+                )
                 tif_data = np.expand_dims(tif_data, axis=-1)
+
                 # Flip the tif data over a horizontal axis
                 tif_data = np.flip(tif_data, axis=0)
 
@@ -956,8 +965,8 @@ class OperationalFuelLayer(FuelLayer):
         self.rgb_filenames = []
         self.fuel_model_filenames = []
         fuel_model = f"LF2020_FBFM{self.type}_200_CONUS"
-        fuel_data_fm = f"LC20_F{self.type}_200_projected_no_whitespace.npy"
-        fuel_data_rgb = f"LC20_F{self.type}_200_projected_rgb.npy"
+        fuel_data_fm = f"LC20_F{self.type}_200_no_whitespace.npy"
+        fuel_data_rgb = f"LC20_F{self.type}_200_rgb.npy"
         for _, ranges in self.lat_long_box.tiles.items():
             for range in ranges:
                 (five_deg_n, five_deg_w) = range

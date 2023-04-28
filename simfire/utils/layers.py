@@ -734,6 +734,7 @@ class OperationalTopographyLayer(TopographyLayer):
         self._get_dems()
         data = Image.open(self.tif_filenames[0])
         data = np.array(data, dtype=np.float32)
+        data = cv2.resize(data, (3612, 3612), interpolation=cv2.INTER_NEAREST)
         # flip axis because latitude goes up but numpy will read it down
         data = np.flip(data, 0)
         data = np.expand_dims(data, axis=-1)
@@ -749,6 +750,9 @@ class OperationalTopographyLayer(TopographyLayer):
             for idx, dem in enumerate(self.tif_filenames[1:]):
                 tif_data = Image.open(dem)
                 tif_data = np.array(tif_data, dtype=np.float32)
+                tif_data = cv2.resize(
+                    tif_data, (3612, 3612), interpolation=cv2.INTER_NEAREST
+                )
                 # flip axis because latitude goes up but numpy will read it down
                 tif_data = np.flip(tif_data, 0)
                 tif_data = np.expand_dims(tif_data, axis=-1)

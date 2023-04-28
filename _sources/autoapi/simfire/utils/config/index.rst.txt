@@ -129,8 +129,18 @@ Attributes
 
       
 
+   .. py:attribute:: path
+      :annotation: :Union[pathlib.Path, str]
+
+      
+
    .. py:attribute:: resolution
       :annotation: :float
+
+      
+
+   .. py:attribute:: year
+      :annotation: :int
 
       
 

@@ -124,7 +124,7 @@ Attributes
    :returns: None
 
 
-.. py:class:: OperationalBurnProbabilityLayer(lat_long_box)
+.. py:class:: OperationalBurnProbabilityLayer(lat_long_box, path)
 
    Bases: :py:obj:`BurnProbabilityLayer`
 
@@ -170,7 +170,7 @@ Attributes
    :returns: None
 
 
-.. py:class:: OperationalTopographyLayer(lat_long_box)
+.. py:class:: OperationalTopographyLayer(lat_long_box, path)
 
    Bases: :py:obj:`TopographyLayer`
 
@@ -216,7 +216,7 @@ Attributes
    :returns: None
 
 
-.. py:class:: OperationalFuelLayer(lat_long_box, type = '13')
+.. py:class:: OperationalFuelLayer(lat_long_box, path, type = '13')
 
    Bases: :py:obj:`FuelLayer`
 

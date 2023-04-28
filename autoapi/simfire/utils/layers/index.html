@@ -433,7 +433,7 @@ create the terrain image to use with the display.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="simfire.utils.layers.OperationalBurnProbabilityLayer">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simfire.utils.layers.</span></span><span class="sig-name descname"><span class="pre">OperationalBurnProbabilityLayer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lat_long_box</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.utils.layers.OperationalBurnProbabilityLayer" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simfire.utils.layers.</span></span><span class="sig-name descname"><span class="pre">OperationalBurnProbabilityLayer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lat_long_box</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.utils.layers.OperationalBurnProbabilityLayer" title="Permalink to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#simfire.utils.layers.BurnProbabilityLayer" title="simfire.utils.layers.BurnProbabilityLayer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BurnProbabilityLayer</span></code></a></p>
 <p>Base class for use with operational and procedurally generated
 fuel data. This class implements the code needed to
@@ -448,6 +448,7 @@ and computing the area</p>
 <li><p><strong>width</strong> – The width of the screen size (meters).</p></li>
 <li><p><strong>resolution</strong> – The resolution to get data (meters).</p></li>
 <li><p><strong>lat_long_box</strong> (<a class="reference internal" href="#simfire.utils.layers.LatLongBox" title="simfire.utils.layers.LatLongBox"><em>LatLongBox</em></a>) – </p></li>
+<li><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.11)"><em>pathlib.Path</em></a>) – </p></li>
 </ul>
 </dd>
 </dl>
@@ -492,7 +493,7 @@ create the contour image to use with the display.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="simfire.utils.layers.OperationalTopographyLayer">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simfire.utils.layers.</span></span><span class="sig-name descname"><span class="pre">OperationalTopographyLayer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lat_long_box</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.utils.layers.OperationalTopographyLayer" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simfire.utils.layers.</span></span><span class="sig-name descname"><span class="pre">OperationalTopographyLayer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lat_long_box</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.utils.layers.OperationalTopographyLayer" title="Permalink to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#simfire.utils.layers.TopographyLayer" title="simfire.utils.layers.TopographyLayer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TopographyLayer</span></code></a></p>
 <p>Base class for use with operational and procedurally generated
 topographic/elevation data. This class implements the code needed to
@@ -507,6 +508,7 @@ and computing the area</p>
 <li><p><strong>width</strong> – The width of the screen size (meters).</p></li>
 <li><p><strong>resolution</strong> – The resolution to get data (meters).</p></li>
 <li><p><strong>lat_long_box</strong> (<a class="reference internal" href="#simfire.utils.layers.LatLongBox" title="simfire.utils.layers.LatLongBox"><em>LatLongBox</em></a>) – </p></li>
+<li><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.11)"><em>pathlib.Path</em></a>) – </p></li>
 </ul>
 </dd>
 </dl>
@@ -551,7 +553,7 @@ create the terrain image to use with the display.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="simfire.utils.layers.OperationalFuelLayer">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simfire.utils.layers.</span></span><span class="sig-name descname"><span class="pre">OperationalFuelLayer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lat_long_box</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'13'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.utils.layers.OperationalFuelLayer" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simfire.utils.layers.</span></span><span class="sig-name descname"><span class="pre">OperationalFuelLayer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lat_long_box</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'13'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.utils.layers.OperationalFuelLayer" title="Permalink to this definition">#</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#simfire.utils.layers.FuelLayer" title="simfire.utils.layers.FuelLayer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FuelLayer</span></code></a></p>
 <p>Base class for use with operational and procedurally generated
 fuel data. This class implements the code needed to
@@ -569,6 +571,7 @@ and computing the area.</p>
 display: rgb data for simulator
 simulation: fuel model values for RL Harness/Simulation</p></li>
 <li><p><strong>lat_long_box</strong> (<a class="reference internal" href="#simfire.utils.layers.LatLongBox" title="simfire.utils.layers.LatLongBox"><em>LatLongBox</em></a>) – </p></li>
+<li><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.11)"><em>pathlib.Path</em></a>) – </p></li>
 </ul>
 </dd>
 </dl>

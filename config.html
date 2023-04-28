@@ -346,17 +346,22 @@ The longitude given in decimal degrees.</p>
 <section id="height">
 <h4>height<a class="headerlink" href="#height" title="Permalink to this heading">#</a></h4>
 <p>(<code class="docutils literal notranslate"><span class="pre">int</span></code>)<br>
-The height of the screen in meters.</p>
+The height of the screen in meters. This is not randomized if choosing a seed.</p>
 </section>
 <section id="width">
 <h4>width<a class="headerlink" href="#width" title="Permalink to this heading">#</a></h4>
 <p>(<code class="docutils literal notranslate"><span class="pre">int</span></code>)<br>
-The width of the screen in meters.</p>
+The width of the screen in meters. This is not randomized if choosing a seed.</p>
 </section>
 <section id="resolution">
 <h4>resolution<a class="headerlink" href="#resolution" title="Permalink to this heading">#</a></h4>
 <p>(<code class="docutils literal notranslate"><span class="pre">int</span></code>)<br>
-The resolution of each pixel in meters. Data is measured in pixels corresponding to the resolution i.e: resolution = 10m = 1 pixel.</p>
+The resolution of each pixel in meters. Data is measured in pixels corresponding to the resolution i.e: resolution = 10m = 1 pixel. This is not randomized if choosing a seed.</p>
+</section>
+<section id="year">
+<h4>year<a class="headerlink" href="#year" title="Permalink to this heading">#</a></h4>
+<p>(<code class="docutils literal notranslate"><span class="pre">int</span></code>)<br>
+The year of the fuel data. Current options are <code class="docutils literal notranslate"><span class="pre">2019</span></code>, <code class="docutils literal notranslate"><span class="pre">2020</span></code>, and <code class="docutils literal notranslate"><span class="pre">2022</span></code>. This is not randomized if choosing a seed.</p>
 </section>
 </section>
 <hr class="docutils" />
@@ -619,6 +624,7 @@ Whether or not to render with post agent and fire in place.</p>
 <span class="w">  </span><span class="nt">height</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4000</span>
 <span class="w">  </span><span class="nt">width</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4000</span>
 <span class="w">  </span><span class="nt">resolution</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">30</span>
+<span class="w">  </span><span class="nt">year</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2020</span>
 
 <span class="nt">terrain</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">topography</span><span class="p">:</span>
@@ -774,6 +780,7 @@ Whether or not to render with post agent and fire in place.</p>
 <li><a class="reference internal" href="#height">height</a></li>
 <li><a class="reference internal" href="#width">width</a></li>
 <li><a class="reference internal" href="#resolution">resolution</a></li>
+<li><a class="reference internal" href="#year">year</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#terrain-parameters">Terrain Parameters</a><ul>

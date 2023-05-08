@@ -212,11 +212,22 @@ class WindConfig:
 
 @dataclasses.dataclass
 class Config:
-    def __init__(self, path: Union[str, Path], cfd_precompute: bool = False) -> None:
-        if isinstance(path, str):
-            path = Path(path)
+    def __init__(
+        self,
+        config_dict: Optional[Dict[str, Any]] = None,
+        path: Optional[Union[str, Path]] = None,
+        cfd_precompute: bool = False,
+    ) -> None:
+        if path is not None:
+            if isinstance(path, str):
+                path = Path(path)
         self.path = path
-        self.yaml_data = self._load_yaml()
+        if config_dict is None and path is not None:
+            self.yaml_data = self._load_yaml()
+        elif config_dict is not None and path is None:
+            self.yaml_data = config_dict
+        else:
+            raise ValueError("Either a path or a config dictionary must be specified.")
 
         # Save the original screen size in case the simulation changes from
         # operational to functional
@@ -245,13 +256,14 @@ class Config:
             The YAML data as a dictionary
         """
         try:
-            with open(self.path, "r") as f:
-                try:
-                    yaml_data = yaml.safe_load(f)
-                except ParserError:
-                    message = f"Error parsing YAML file at {self.path}"
-                    log.error(message)
-                    raise ConfigError(message)
+            if self.path is not None:
+                with open(self.path, "r") as f:
+                    try:
+                        yaml_data = yaml.safe_load(f)
+                    except ParserError:
+                        message = f"Error parsing YAML file at {self.path}"
+                        log.error(message)
+                        raise ConfigError(message)
         except FileNotFoundError:
             message = f"Error opening YAML file at {self.path}. Does it exist?"
             log.error(message)

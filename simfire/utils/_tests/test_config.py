@@ -13,7 +13,7 @@ class ConfigTest(unittest.TestCase):
         with open(self.yaml, "r") as f:
             self.true_yaml_data = yaml.safe_load(f)
 
-        self.config_dict = Config(self.true_yaml_data)
+        self.config_dict = Config(config_dict=self.true_yaml_data)
 
     def test_reset_terrain(self) -> None:
         """

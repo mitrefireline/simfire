@@ -214,8 +214,8 @@ class WindConfig:
 class Config:
     def __init__(
         self,
-        config_dict: Optional[Dict[str, Any]] = None,
         path: Optional[Union[str, Path]] = None,
+        config_dict: Optional[Dict[str, Any]] = None,
         cfd_precompute: bool = False,
     ) -> None:
         if path is not None:

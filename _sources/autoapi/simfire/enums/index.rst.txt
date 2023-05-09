@@ -209,27 +209,42 @@ Attributes
    :param SIGMA: Surface-area-to-volume ratio (ft^2/ft^3) min and max.
 
    .. py:attribute:: W_0_MIN
-      :annotation: :float = 0.2
+      :annotation: :float = 0.0
 
       
 
    .. py:attribute:: W_0_MAX
-      :annotation: :float = 0.6
+      :annotation: :float = 1.0
 
       
 
-   .. py:attribute:: DELTA
-      :annotation: :float = 6.0
-
-      
-
-   .. py:attribute:: M_X
+   .. py:attribute:: DELTA_MIN
       :annotation: :float = 0.2
 
       
 
-   .. py:attribute:: SIGMA
-      :annotation: :int = 1739
+   .. py:attribute:: DELTA_MAX
+      :annotation: :float = 6.0
+
+      
+
+   .. py:attribute:: M_X_MIN
+      :annotation: :float = 0.15
+
+      
+
+   .. py:attribute:: M_X_MAX
+      :annotation: :float = 1.0
+
+      
+
+   .. py:attribute:: SIGMA_MIN
+      :annotation: :int = 1
+
+      
+
+   .. py:attribute:: SIGMA_MAX
+      :annotation: :int = 3500
 
       
 

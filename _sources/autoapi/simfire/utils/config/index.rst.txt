@@ -281,7 +281,7 @@ Attributes
       
 
 
-.. py:class:: Config(path, cfd_precompute = False)
+.. py:class:: Config(path = None, config_dict = None, cfd_precompute = False)
 
    .. py:method:: reset_terrain(topography_seed = None, topography_type = None, fuel_seed = None, fuel_type = None, location = None)
 

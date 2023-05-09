@@ -267,10 +267,19 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#simfire.utils.terrain.w_0_seed" title="simfire.utils.terrain.w_0_seed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">w_0_seed</span></code></a>(seed)</p></td>
 <td><p>Create a <cite>w_0</cite> between <cite>0.2</cite> and <cite>0.6</cite> based on an initial <cite>seed</cite> parameter</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#simfire.utils.terrain.chaparral" title="simfire.utils.terrain.chaparral"><code class="xref py py-obj docutils literal notranslate"><span class="pre">chaparral</span></code></a>([seed])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#simfire.utils.terrain.delta_seed" title="simfire.utils.terrain.delta_seed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">delta_seed</span></code></a>(seed)</p></td>
+<td><p>Create a <cite>w_0</cite> between <cite>0.2</cite> and <cite>0.6</cite> based on an initial <cite>seed</cite> parameter</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#simfire.utils.terrain.m_x_seed" title="simfire.utils.terrain.m_x_seed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">m_x_seed</span></code></a>(seed)</p></td>
+<td><p>Create a <cite>w_0</cite> between <cite>0.2</cite> and <cite>0.6</cite> based on an initial <cite>seed</cite> parameter</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#simfire.utils.terrain.sigma_seed" title="simfire.utils.terrain.sigma_seed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sigma_seed</span></code></a>(seed)</p></td>
+<td><p>Create a <cite>w_0</cite> between <cite>0.2</cite> and <cite>0.6</cite> based on an initial <cite>seed</cite> parameter</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#simfire.utils.terrain.chaparral" title="simfire.utils.terrain.chaparral"><code class="xref py py-obj docutils literal notranslate"><span class="pre">chaparral</span></code></a>([seed])</p></td>
 <td><p>Create a chaparral fuel object using an optional input seed</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#simfire.utils.terrain.fuel" title="simfire.utils.terrain.fuel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fuel</span></code></a>([seed])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#simfire.utils.terrain.fuel" title="simfire.utils.terrain.fuel"><code class="xref py py-obj docutils literal notranslate"><span class="pre">fuel</span></code></a>([seed])</p></td>
 <td><p>Functionailty to use a random seed to define a center point.</p></td>
 </tr>
 </tbody>
@@ -300,6 +309,57 @@ and initial input <cite>seed</cite></p>
 <dl class="py function">
 <dt class="sig sig-object py" id="simfire.utils.terrain.w_0_seed">
 <span class="sig-prename descclassname"><span class="pre">simfire.utils.terrain.</span></span><span class="sig-name descname"><span class="pre">w_0_seed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seed</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.utils.terrain.w_0_seed" title="Permalink to this definition">#</a></dt>
+<dd><p>Create a <cite>w_0</cite> between <cite>0.2</cite> and <cite>0.6</cite> based on an initial <cite>seed</cite> parameter</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>seed</strong> (<em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><em>None</em><em>]</em>) – Initial seed.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The oven-dry fuel load value of the fuel.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="simfire.utils.terrain.delta_seed">
+<span class="sig-prename descclassname"><span class="pre">simfire.utils.terrain.</span></span><span class="sig-name descname"><span class="pre">delta_seed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seed</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.utils.terrain.delta_seed" title="Permalink to this definition">#</a></dt>
+<dd><p>Create a <cite>w_0</cite> between <cite>0.2</cite> and <cite>0.6</cite> based on an initial <cite>seed</cite> parameter</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>seed</strong> (<em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><em>None</em><em>]</em>) – Initial seed.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The oven-dry fuel load value of the fuel.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="simfire.utils.terrain.m_x_seed">
+<span class="sig-prename descclassname"><span class="pre">simfire.utils.terrain.</span></span><span class="sig-name descname"><span class="pre">m_x_seed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seed</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.utils.terrain.m_x_seed" title="Permalink to this definition">#</a></dt>
+<dd><p>Create a <cite>w_0</cite> between <cite>0.2</cite> and <cite>0.6</cite> based on an initial <cite>seed</cite> parameter</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>seed</strong> (<em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><em>None</em><em>]</em>) – Initial seed.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The oven-dry fuel load value of the fuel.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)">float</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="simfire.utils.terrain.sigma_seed">
+<span class="sig-prename descclassname"><span class="pre">simfire.utils.terrain.</span></span><span class="sig-name descname"><span class="pre">sigma_seed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seed</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.utils.terrain.sigma_seed" title="Permalink to this definition">#</a></dt>
 <dd><p>Create a <cite>w_0</cite> between <cite>0.2</cite> and <cite>0.6</cite> based on an initial <cite>seed</cite> parameter</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -415,10 +475,16 @@ To be used with operational data layers</p>
 <li><a class="reference internal" href="#functions">Functions</a><ul>
 <li><a class="reference internal" href="#simfire.utils.terrain.random_seed_list"><code class="docutils literal notranslate"><span class="pre">random_seed_list()</span></code></a></li>
 <li><a class="reference internal" href="#simfire.utils.terrain.w_0_seed"><code class="docutils literal notranslate"><span class="pre">w_0_seed()</span></code></a></li>
+<li><a class="reference internal" href="#simfire.utils.terrain.delta_seed"><code class="docutils literal notranslate"><span class="pre">delta_seed()</span></code></a></li>
+<li><a class="reference internal" href="#simfire.utils.terrain.m_x_seed"><code class="docutils literal notranslate"><span class="pre">m_x_seed()</span></code></a></li>
+<li><a class="reference internal" href="#simfire.utils.terrain.sigma_seed"><code class="docutils literal notranslate"><span class="pre">sigma_seed()</span></code></a></li>
 <li><a class="reference internal" href="#simfire.utils.terrain.chaparral"><code class="docutils literal notranslate"><span class="pre">chaparral()</span></code></a></li>
 <li><a class="reference internal" href="#simfire.utils.terrain.fuel"><code class="docutils literal notranslate"><span class="pre">fuel()</span></code></a></li>
 <li><a class="reference internal" href="#simfire.utils.terrain.random_seed_list">random_seed_list</a></li>
 <li><a class="reference internal" href="#simfire.utils.terrain.w_0_seed">w_0_seed</a></li>
+<li><a class="reference internal" href="#simfire.utils.terrain.delta_seed">delta_seed</a></li>
+<li><a class="reference internal" href="#simfire.utils.terrain.m_x_seed">m_x_seed</a></li>
+<li><a class="reference internal" href="#simfire.utils.terrain.sigma_seed">sigma_seed</a></li>
 <li><a class="reference internal" href="#simfire.utils.terrain.chaparral">chaparral</a></li>
 <li><a class="reference internal" href="#simfire.utils.terrain.fuel">fuel</a></li>
 </ul>

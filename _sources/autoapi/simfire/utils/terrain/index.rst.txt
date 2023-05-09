@@ -15,6 +15,9 @@ Functions
 
    simfire.utils.terrain.random_seed_list
    simfire.utils.terrain.w_0_seed
+   simfire.utils.terrain.delta_seed
+   simfire.utils.terrain.m_x_seed
+   simfire.utils.terrain.sigma_seed
    simfire.utils.terrain.chaparral
    simfire.utils.terrain.fuel
 
@@ -32,6 +35,33 @@ Functions
 
 
 .. py:function:: w_0_seed(seed)
+
+   Create a `w_0` between `0.2` and `0.6` based on an initial `seed` parameter
+
+   :param seed: Initial seed.
+
+   :returns: The oven-dry fuel load value of the fuel.
+
+
+.. py:function:: delta_seed(seed)
+
+   Create a `w_0` between `0.2` and `0.6` based on an initial `seed` parameter
+
+   :param seed: Initial seed.
+
+   :returns: The oven-dry fuel load value of the fuel.
+
+
+.. py:function:: m_x_seed(seed)
+
+   Create a `w_0` between `0.2` and `0.6` based on an initial `seed` parameter
+
+   :param seed: Initial seed.
+
+   :returns: The oven-dry fuel load value of the fuel.
+
+
+.. py:function:: sigma_seed(seed)
 
    Create a `w_0` between `0.2` and `0.6` based on an initial `seed` parameter
 

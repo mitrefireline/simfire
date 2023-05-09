@@ -127,11 +127,14 @@ class FuelConstants:
         SIGMA: Surface-area-to-volume ratio (ft^2/ft^3) min and max.
     """
 
-    W_0_MIN: float = 0.2
-    W_0_MAX: float = 0.6
-    DELTA: float = 6.000
-    M_X: float = 0.2000
-    SIGMA: int = 1739
+    W_0_MIN: float = 0.0
+    W_0_MAX: float = 1.0
+    DELTA_MIN: float = 0.2
+    DELTA_MAX: float = 6.0
+    M_X_MIN: float = 0.15
+    M_X_MAX: float = 1.0
+    SIGMA_MIN: int = 1
+    SIGMA_MAX: int = 3500
 
 
 @dataclass

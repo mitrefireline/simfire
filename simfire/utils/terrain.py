@@ -42,6 +42,54 @@ def w_0_seed(seed: Union[int, None]) -> float:
     return w_0
 
 
+def delta_seed(seed: Union[int, None]) -> float:
+    """
+    Create a `w_0` between `0.2` and `0.6` based on an initial `seed` parameter
+
+    Arguments:
+        seed: Initial seed.
+
+    Returns:
+        The oven-dry fuel load value of the fuel.
+    """
+    np.random.seed(seed)
+    # Update the test for this function if this range is changed in the future
+    delta = np.random.uniform(FuelConstants.DELTA_MIN, FuelConstants.DELTA_MAX)
+    return delta
+
+
+def m_x_seed(seed: Union[int, None]) -> float:
+    """
+    Create a `w_0` between `0.2` and `0.6` based on an initial `seed` parameter
+
+    Arguments:
+        seed: Initial seed.
+
+    Returns:
+        The oven-dry fuel load value of the fuel.
+    """
+    np.random.seed(seed)
+    # Update the test for this function if this range is changed in the future
+    m_x = np.random.uniform(FuelConstants.M_X_MIN, FuelConstants.M_X_MAX)
+    return m_x
+
+
+def sigma_seed(seed: Union[int, None]) -> float:
+    """
+    Create a `w_0` between `0.2` and `0.6` based on an initial `seed` parameter
+
+    Arguments:
+        seed: Initial seed.
+
+    Returns:
+        The oven-dry fuel load value of the fuel.
+    """
+    np.random.seed(seed)
+    # Update the test for this function if this range is changed in the future
+    sigma = np.random.uniform(FuelConstants.SIGMA_MIN, FuelConstants.SIGMA_MAX)
+    return sigma
+
+
 def chaparral(seed: Union[int, None] = None) -> Fuel:
     """
     Create a chaparral fuel object using an optional input seed
@@ -55,11 +103,14 @@ def chaparral(seed: Union[int, None] = None) -> Fuel:
         A fuel with randomized `w_0`, `delta == 6.0`, `M_x == 0.2`, and `sigma == 1739`.
     """
     w_0 = w_0_seed(seed)
+    delta = delta_seed(seed)
+    m_x = m_x_seed(seed)
+    sigma = sigma_seed(seed)
     return Fuel(
         w_0=w_0,
-        delta=FuelConstants.DELTA,
-        M_x=FuelConstants.M_X,
-        sigma=FuelConstants.SIGMA,
+        delta=delta,
+        M_x=m_x,
+        sigma=sigma,
     )
 
 

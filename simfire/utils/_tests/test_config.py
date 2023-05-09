@@ -13,6 +13,8 @@ class ConfigTest(unittest.TestCase):
         with open(self.yaml, "r") as f:
             self.true_yaml_data = yaml.safe_load(f)
 
+        self.config_dict = Config(config_dict=self.true_yaml_data)
+
     def test_reset_terrain(self) -> None:
         """
         Test resetting the seed and coordinates for the terrain topography
@@ -44,6 +46,16 @@ class ConfigTest(unittest.TestCase):
             cfg_seed,
             msg=f"The assigned seed of {cfg_seed} does "
             f"not match the test seed of {new_topo_seed}",
+        )
+
+    def test_dict_argument(self) -> None:
+        """
+        Test using the dictionary as an argument to the Config class
+        """
+        self.assertDictEqual(
+            self.true_yaml_data,
+            self.config_dict.yaml_data,
+            msg="The dictionary argument does not match the YAML argument",
         )
 
     def test_reset_wind_function(self) -> None:

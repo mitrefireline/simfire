@@ -37,8 +37,8 @@ flake8:
       - merge_requests
     changes:
       - "**/*.py"
-      - "poetry.lock"
-      - ".flake8"
+      - poetry.lock
+      - .flake8
 
 black:
   stage: Static Analysis
@@ -53,7 +53,7 @@ black:
       - merge_requests
     changes:
       - "**/*.py"
-      - "poetry.lock"
+      - poetry.lock
 
 mypy:
   stage: Static Analysis
@@ -68,7 +68,7 @@ mypy:
       - merge_requests
     changes:
       - "**/*.py"
-      - "poetry.lock"
+      - poetry.lock
 
 isort:
   stage: Static Analysis
@@ -83,7 +83,7 @@ isort:
       - merge_requests
     changes:
       - "**/*.py"
-      - "poetry.lock"
+      - poetry.lock
 
 
 ############
@@ -102,7 +102,7 @@ bandit:
       - merge_requests
     changes:
       - "**/*.py"
-      - "poetry.lock"
+      - poetry.lock
 
 
 #########
@@ -121,7 +121,7 @@ run_game.py:
       - merge_requests
     changes:
       - "**/*.py"
-      - "poetry.lock"
+      - poetry.lock
 
 coverage:
   stage: Tests
@@ -146,7 +146,7 @@ coverage:
       - main
     changes:
       - "**/*.py"
-      - "poetry.lock"
+      - poetry.lock
 
 ################
 # GitLab Pages #
@@ -173,8 +173,8 @@ test-pages:
       - merge_requests
     changes:
       - "**/*.py"
-      - "docs/**/*"
-      - "poetry.lock"
+      - docs/**/*
+      - poetry.lock
 
 pages:
   stage: Documentation
@@ -229,7 +229,11 @@ test_release:
     - SDL_VIDEODRIVER=dummy poetry run python tests/sim.py
   needs: []
   only:
-    - merge_requests
+    refs:
+      - merge_requests
+    changes:
+      - "**/*.py"
+      - poetry.lock
 
 tag:
   stage: Release

@@ -264,7 +264,12 @@ tag:
            --data "$MESSAGE" \
            --request POST https://gitlab.mitre.org/api/v4/projects/${CI_PROJECT_ID}/releases
   only:
-    - main
+    refs:
+      - main
+    changes:
+      - "**/*.py"
+      - poetry.lock
+      - pyproject.toml
 
 release_gitlab:
   stage: Release

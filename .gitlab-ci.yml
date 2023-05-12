@@ -33,7 +33,12 @@ flake8:
     - poetry run flake8 .
   needs: []
   only:
-    - merge_requests
+    refs:
+      - merge_requests
+    changes:
+      - "**/*.py"
+      - poetry.lock
+      - .flake8
 
 black:
   stage: Static Analysis
@@ -44,7 +49,11 @@ black:
     - poetry run black --check ./
   needs: []
   only:
-    - merge_requests
+    refs:
+      - merge_requests
+    changes:
+      - "**/*.py"
+      - poetry.lock
 
 mypy:
   stage: Static Analysis
@@ -55,7 +64,11 @@ mypy:
     - poetry run mypy --config-file pyproject.toml .
   needs: []
   only:
-    - merge_requests
+    refs:
+      - merge_requests
+    changes:
+      - "**/*.py"
+      - poetry.lock
 
 isort:
   stage: Static Analysis
@@ -66,7 +79,11 @@ isort:
     - poetry run isort --check --trailing-comma -m=3 .
   needs: []
   only:
-    - merge_requests
+    refs:
+      - merge_requests
+    changes:
+      - "**/*.py"
+      - poetry.lock
 
 
 ############
@@ -81,7 +98,11 @@ bandit:
     - poetry run bandit -r .
   needs: []
   only:
-    - merge_requests
+    refs:
+      - merge_requests
+    changes:
+      - "**/*.py"
+      - poetry.lock
 
 
 #########
@@ -96,7 +117,11 @@ run_game.py:
     - SDL_VIDEODRIVER="dummy" poetry run python run_game.py
   needs: []
   only:
-    - merge_requests
+    refs:
+      - merge_requests
+    changes:
+      - "**/*.py"
+      - poetry.lock
 
 coverage:
   stage: Tests
@@ -116,8 +141,12 @@ coverage:
   needs: []
   timeout: 20m
   only:
-    - merge_requests
-    - main
+    refs:
+      - merge_requests
+      - main
+    changes:
+      - "**/*.py"
+      - poetry.lock
 
 ################
 # GitLab Pages #
@@ -140,7 +169,12 @@ test-pages:
       - public/
     expire_in: 1 week
   only:
-    - merge_requests
+    refs:
+      - merge_requests
+    changes:
+      - "**/*.py"
+      - docs/**/*
+      - poetry.lock
 
 pages:
   stage: Documentation
@@ -195,7 +229,11 @@ test_release:
     - SDL_VIDEODRIVER=dummy poetry run python tests/sim.py
   needs: []
   only:
-    - merge_requests
+    refs:
+      - merge_requests
+    changes:
+      - "**/*.py"
+      - poetry.lock
 
 tag:
   stage: Release
@@ -226,7 +264,12 @@ tag:
            --data "$MESSAGE" \
            --request POST https://gitlab.mitre.org/api/v4/projects/${CI_PROJECT_ID}/releases
   only:
-    - main
+    refs:
+      - main
+    changes:
+      - "**/*.py"
+      - poetry.lock
+      - pyproject.toml
 
 release_gitlab:
   stage: Release

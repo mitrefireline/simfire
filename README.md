@@ -6,7 +6,7 @@
 
 ## Introduction
 
-SimFire uses [PyGame](https://www.pygame.org/wiki/about) to display and simulate different fire spread models, including the Rothermel Surface fire spread model described in [this](https://www.fs.fed.us/rm/pubs_series/rmrs/gtr/rmrs_gtr371.pdf) paper.
+SimFire uses [PyGame](https://www.pygame.org/wiki/about) to display and simulate different fire spread models, including the Rothermel Surface fire spread model described in [this](https://www.fs.usda.gov/rm/pubs_series/rmrs/gtr/rmrs_gtr371.pdf) paper.
 
 For more comprehensive documentation, go to our [docs page](https://mitrefireline.github.io/simfire).
 
@@ -16,10 +16,10 @@ For more comprehensive documentation, go to our [docs page](https://mitrefirelin
     <p align="center">
         <img src="https://raw.githubusercontent.com/mitrefireline/simfire/main/assets/gifs/simulation_33.06N_116.58W.gif" width="225" />
         <img src="https://raw.githubusercontent.com/mitrefireline/simfire/main/assets/gifs/simulation_39.67N_119.80W.gif" width="225" />
+        <br><b>Left: Fire simulated near Julian, CA. Right: Fire simulated near Reno, NV.
+        <br>Both fires have winds from the east at 20mph<b>
     </p>
-    <figcaption align = "center"><b>Left: Fire simulated near Julian, CA. Right: Fire simulated near Reno, NV.
-                                    <br>Both fires have winds from the east at 20mph<b></figcaption>
-</figure>
+ </figure>
 
 Install `simfire` by following the [installation instructions](#installing-the-package). Then run the `run_game.py` script:
 
@@ -77,6 +77,9 @@ sim.rendering = False
 
 ## Installing the Package
 
+```shell
+pip install simfire
+```
 
 ## Contributing
 

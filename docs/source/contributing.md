@@ -1,5 +1,9 @@
 # Contributing
 
+Right now, submission of [issues](https://github.com/mitrefireline/simfire/issues) and [pull requests](https://github.com/mitrefireline/simfire/pulls) through GitHub is the best way to suggest changes, and those will have to be applied and merged on the internal MITRE GitLab and mirrored to GitHub. This process may change in the future.
+
+## Contributing for MITRE Employees
+
 Contributing to the SimFire codebase ([GitLab](https://gitlab.mitre.org/fireline/simfire)) requires a process to be followed. This page will explain how to follow that process and will provide some tools to make local development easier.
 
 **Some guidlines**:

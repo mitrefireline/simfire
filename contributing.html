@@ -254,6 +254,9 @@
         <article role="main">
           <section id="contributing">
 <h1>Contributing<a class="headerlink" href="#contributing" title="Permalink to this heading">#</a></h1>
+<p>Right now, submission of <a class="reference external" href="https://github.com/mitrefireline/simfire/issues">issues</a> and <a class="reference external" href="https://github.com/mitrefireline/simfire/pulls">pull requests</a> through GitHub is the best way to suggest changes, and those will have to be applied and merged on the internal MITRE GitLab and mirrored to GitHub. This process may change in the future.</p>
+<section id="contributing-for-mitre-employees">
+<h2>Contributing for MITRE Employees<a class="headerlink" href="#contributing-for-mitre-employees" title="Permalink to this heading">#</a></h2>
 <p>Contributing to the SimFire codebase (<a class="reference external" href="https://gitlab.mitre.org/fireline/simfire">GitLab</a>) requires a process to be followed. This page will explain how to follow that process and will provide some tools to make local development easier.</p>
 <p><strong>Some guidlines</strong>:</p>
 <ol class="arabic simple">
@@ -264,9 +267,10 @@
 <li><p>These pipeline stages can be tested locally to ensure that they are passed on the remote side (explained in <span class="xref myst">Using Pre-commit</span>)</p></li>
 </ol>
 <section id="important-docstring-information">
-<h2>Important Docstring Information<a class="headerlink" href="#important-docstring-information" title="Permalink to this heading">#</a></h2>
+<h3>Important Docstring Information<a class="headerlink" href="#important-docstring-information" title="Permalink to this heading">#</a></h3>
 <p>Do your best to make sure that all docstrings adhere to the following Google format found in <code class="docutils literal notranslate"><span class="pre">fire.py</span></code> <a class="reference external" href="https://gitlab.mitre.org/fireline/simfire/-/blob/main/simfire/game/managers/fire.py">here</a>. The reasoning can be found <a class="reference external" href="https://www.sphinx-doc.org/en/main/usage/extensions/napoleon.html">here</a>. We’re using double quotes for docstrings and strings per the formatting requirements of <a class="reference external" href="https://github.com/psf/black"><code class="docutils literal notranslate"><span class="pre">black</span></code></a>.</p>
 <p>If you are editing a file and see that a docstring doesn’t adhere to the Python3 Google Style Guide exemplified in <a class="reference external" href="https://gitlab.mitre.org/fireline/simfire/-/blob/main/simfire/game/managers/fire.py"><code class="docutils literal notranslate"><span class="pre">fire.py</span></code></a>, please be a good steward and fix it so that it does.</p>
+</section>
 </section>
 <section id="issue-merge-request-creation">
 <h2>Issue &amp; Merge Request Creation<a class="headerlink" href="#issue-merge-request-creation" title="Permalink to this heading">#</a></h2>
@@ -484,7 +488,10 @@ conda<span class="w"> </span>activate<span class="w"> </span>sf
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Contributing</a><ul>
+<li><a class="reference internal" href="#contributing-for-mitre-employees">Contributing for MITRE Employees</a><ul>
 <li><a class="reference internal" href="#important-docstring-information">Important Docstring Information</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#issue-merge-request-creation">Issue &amp; Merge Request Creation</a></li>
 <li><a class="reference internal" href="#environment-setup">Environment Setup</a></li>
 <li><a class="reference internal" href="#using-pre-commit-highly-recommended">Using Pre-commit (<strong>Highly Recommended</strong>)</a></li>

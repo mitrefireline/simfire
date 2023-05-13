@@ -229,7 +229,7 @@ Attributes
       
 
    .. py:attribute:: M_X_MIN
-      :annotation: :float = 0.15
+      :annotation: :float = 0.12
 
       
 

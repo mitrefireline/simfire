@@ -697,7 +697,12 @@ class Config:
                 fire_pos = self.yaml_data["fire"]["fire_initial_position"]["static"][
                     "position"
                 ]
-                fire_pos = fire_pos[1:-1].split(",")
+                if isinstance(fire_pos, str):
+                    fire_pos = fire_pos[1:-1].split(",")
+                if len(fire_pos) > 2:
+                    raise ConfigError(
+                        "`fire_initial_position` should only be a Tuple of length 2"
+                    )
                 fire_initial_position = (int(fire_pos[0]), int(fire_pos[1]))
             # Pos is specified, so use that
             else:

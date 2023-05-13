@@ -131,7 +131,7 @@ class FuelConstants:
     W_0_MAX: float = 1.0
     DELTA_MIN: float = 0.2
     DELTA_MAX: float = 6.0
-    M_X_MIN: float = 0.15
+    M_X_MIN: float = 0.12
     M_X_MAX: float = 1.0
     SIGMA_MIN: int = 1
     SIGMA_MAX: int = 3500

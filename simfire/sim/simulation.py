@@ -302,9 +302,9 @@ class FireSimulation(Simulation):
         if True:
             fuel_bounds = {
                 "w_0": {"min": FuelConstants.W_0_MIN, "max": FuelConstants.W_0_MAX},
-                "sigma": {"min": FuelConstants.SIGMA_MAX, "max": FuelConstants.SIGMA_MAX},
-                "delta": {"min": FuelConstants.DELTA_MAX, "max": FuelConstants.DELTA_MAX},
-                "M_x": {"min": FuelConstants.M_X_MAX, "max": FuelConstants.M_X_MAX},
+                "sigma": {"min": FuelConstants.SIGMA_MIN, "max": FuelConstants.SIGMA_MAX},
+                "delta": {"min": FuelConstants.DELTA_MIN, "max": FuelConstants.DELTA_MAX},
+                "M_x": {"min": FuelConstants.M_X_MIN, "max": FuelConstants.M_X_MAX},
             }
             bounds.update(fuel_bounds)
         else:

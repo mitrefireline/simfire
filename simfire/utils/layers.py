@@ -1,19 +1,20 @@
-import math
+import glob
+import os
+import shutil
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
-import cv2
+import landfire
 import matplotlib.pyplot as plt
 import numpy as np
+from geotiff import GeoTiff
+from landfire.product.enums import ProductRegion, ProductTheme, ProductVersion
+from landfire.product.search import ProductSearch
 from matplotlib.contour import QuadContourSet
 from PIL import Image
 from scipy import ndimage
 
-from ..enums import (
-    DRY_TERRAIN_BROWN_IMG,
-    TERRAIN_TEXTURE_PATH,
-    FuelModelToFuel,
-)
+from ..enums import DRY_TERRAIN_BROWN_IMG, TERRAIN_TEXTURE_PATH, FuelModelRGB13
 from ..utils.log import create_logger
 from ..world.elevation_functions import ElevationFn
 from ..world.fuel_array_functions import FuelArrayFn
@@ -22,48 +23,21 @@ from ..world.parameters import Fuel
 log = create_logger(__name__)
 
 
-# Developing a function to round to a multiple
-def round_up_to_multiple(number: float, multiple: int) -> int:
+class LandFireLatLongBox:
     """
-    Round up to the nearest multiple of `multiple`
+    Class that gets all relevant operational data.
 
-    Arguments:
-        number: The number to round up.
-        multiple: The multiple to round up to.
-
-    Returns:
-        The rounded up number.
-    """
-    return multiple * math.ceil(number / multiple)
-
-
-# Developing a function to round to a multiple
-def round_down_to_multiple(num: float, divisor: int) -> int:
-    """
-    Round down to the nearest multiple of `divisor`
-
-    Arguments:
-        num: The number to round down.
-        divisor: The divisor to round down to.
-
-    Returns:
-        The rounded down number.
-    """
-    return divisor * math.floor(num / divisor)
-
-
-class LatLongBox:
-    """
-    Class that creates a square coordinate box using a center lat/long point.
-    This is used by any DataLayer that needs real coordinates to access data.
+    Currently only support using Fuel and Elevation data within SimFire.
     """
 
     def __init__(
         self,
-        center: Tuple[float, float] = (32.1, 115.8),
-        height: int = 1600,
-        width: int = 1600,
-        resolution: int = 30,
+        points: Tuple[Tuple[float, float], Tuple[float, float]] = (
+            (37.45, -120.44),
+            (37.35, -120.22),
+        ),
+        year: str = "2020",
+        layers: Tuple[str, str] = ("fuel", "topographic"),
     ) -> None:
         """
         This class of methods will get initialized with the config using the lat/long
@@ -71,431 +45,186 @@ class LatLongBox:
 
         Real-world is measured in meters
         Data is measured in pixels corresponding to the resolution
-            i.e: resolution = 10m = 1 pixel
+            i.e: resolution = 30m = 1 pixel
 
-        It will get corresponding topographic data from the MERIT DEM:
-        5 x 5 degree tiles
-        3 arc second (90m) resolution
+        In geospatial world:
+            30m == 0.00027777777803598015 degrees in lat/long space
+            caveat: ESPG 4326, WGS84
 
-        It will get corresponding topographic data from the USGS DEM:
-        1 x 1 degree tiles
-        1/ 3 arc second (10m) resolution
-
-        1 x 1 degree tiles
-        1 arc second (30m) resolution
-
-        Arguments:
-            center: The lat/long coordinates of the center point of the screen
-            height: The height of one side of the screen (meters)
-            width: The width of one side of the screen (meters)
-            resolution: The resolution to get data (meters)
-
-        TODO: This method only creates a square, needs re-tooling to create a rectangle
-        """
-        # Changed this from an assert to an if and log error due to bandit report:
-        # Issue: [B101:assert_used] Use of assert detected. The enclosed code will be
-        #        removed when compiling to optimised byte code.
-        #  Severity: Low   Confidence: High
-        #  CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
-        #  Location: simfire/utils/layers.py:90:8
-        #  More Info: https://bandit.readthedocs.io/en/1.7.4/plugins/b101_assert_used.html
-        if height != width:
-            log.error("The height and width must be equal for the LatLongBox")
-            raise AssertionError
-
-        self.height = height
-        self.width = width
-        self.area = height * width
-        self.center = center
-        self.resolution = resolution
-
-        self.BL, self.TR = self._convert_area()
-
-        self.BR = (self.BL[0], self.TR[1])
-        self.TL = (self.TR[0], self.BL[1])
-        try:
-            if resolution == 10:
-                self.degrees = 1
-                self.pixel_width = 10812
-                self.pixel_height = 10812
-            elif resolution == 30:
-                self.degrees = 1
-                self.pixel_width = 3612
-                self.pixel_height = 3612
-            elif resolution == 90:
-                self.degrees = 5
-                self.pixel_width = 6000
-                self.pixel_height = 6000
-        except NameError:
-            log.error(f"{resolution} is not available, please selct from: 10m, 30m, 90m.")
-
-        self._get_nearest_tile()
-        self.tiles = self._stack_tiles()
-        self._update_corners()
-
-    def _convert_area(self) -> Tuple[Tuple[float, float], Tuple[float, float]]:
-        """
-        Functionality to use area to create bounding box around the center point
-        spanning width x height (meters)
-
-        This function will always make a square.
-
-        Values are found from USGS website for arc-seconds to decimal degrees    None
-        """
-        if self.resolution == 10:
-            # convert 5 x 5 degree, 90m resolution into pixel difference
-            dec_degree_length = 9.2593e-5
-        elif self.resolution == 30:
-            # convert 1 x 1 degree, 30m resolution into pixel difference
-            dec_degree_length = 0.00027777777803598015
-        elif self.resolution == 90:
-            # convert 5 x 5 degree, 90m resolution into pixel difference
-            dec_degree_length = 0.000833333
-
-        #  bottom_left = (ℎ+12𝐿,𝑘+12𝐿)
-        dec_deg = ((1 / 2 * (math.sqrt(self.area))) / self.resolution) * dec_degree_length
-        BL = (self.center[0] - dec_deg, self.center[1] + dec_deg)
-        TR = (self.center[0] + dec_deg, self.center[1] - dec_deg)
-
-        return BL, TR
-
-    def _get_nearest_tile(self) -> None:
-        """
-        This method will take the lat/long tuples and retrieve the nearest dem.
-
-        Always want the lowest (closest to equator and furthest from center divide) bound:
-
-        MERIT DEMs are 5 x 5 degrees:
-            n30w120 --> N30-N35, W120-W115
-            N30-N35, W120-W115 --> (N29.99958333-N34.99958333,W120.0004167-W115.0004167)
-
-        USGUS DEMs are 1 x 1 degrees:
-            n34w117 -> (N33 - N34, W116 - W117.00)
-            (N33 - N34, W116 - W117.00) -> (N32.999-N34.000, W117.000-W115.999)
-
-        For simplicity, assume we are in upper hemisphere (N) and left of center
-        divide (W)
-        """
-        # round up on latitdue
-        deg_north_min = self.BL[0]
-        deg_north_min_min = round_up_to_multiple(deg_north_min, self.degrees)
-        if round(deg_north_min_min - deg_north_min, 2) <= 0.0001:
-            min_max = round_up_to_multiple(deg_north_min, self.degrees)
-        else:
-            min_max = round_down_to_multiple(deg_north_min, self.degrees)
-
-        deg_north_max = self.TR[0]
-        deg_north_max_min = round_down_to_multiple(deg_north_max, self.degrees)
-        if round(deg_north_max - deg_north_max_min, 2) <= 0.0001:
-            max_min = round_up_to_multiple(deg_north_max, self.degrees)
-        else:
-            max_min = round_down_to_multiple(deg_north_max, self.degrees)
-
-        self.deg_north_min = min_max
-        self.deg_north_max = max_min
-
-        # round down on longitude (w is negative)
-        deg_west_max = abs(self.BL[1])
-        deg_west_max_min = round_down_to_multiple(deg_west_max, self.degrees)
-        if round(deg_west_max - deg_west_max_min, 2) <= 0.0001:
-            max_min = round_down_to_multiple(deg_west_max, self.degrees)
-        else:
-            max_min = round_up_to_multiple(deg_west_max, self.degrees)
-
-        deg_west_min = abs(self.TR[1])
-        deg_west_min_max = round_up_to_multiple(deg_west_min, self.degrees)
-        if round(deg_west_min_max - deg_west_min, 2) <= 0.0001:
-            min_max = round_down_to_multiple(deg_west_min, self.degrees)
-        else:
-            min_max = round_up_to_multiple(deg_west_min, self.degrees)
-
-        self.deg_west_min = min_max
-        self.deg_west_max = max_min
-
-    def _stack_tiles(self) -> Dict[str, Tuple[Tuple[float, float], ...]]:
-        """
-        Method to stack DEM tiles correctly. TIles can either be stacked
-        starting from bottom left corner:
-            Vertically (northernly)
-            Horizontally (easternly)
-            Square (Mix of easternly and northernly)
-
-        Stacking always follows the standard order:
-            bottom left -> bottom right -> top right -> top left
-
-        Returns:
-            A dictionary containing the order to stack the tiles (str)
-            and a tuple of tuples of the lat/long (n/w) coordinates of DEM
-            tiles (first indice is always bottom left corner).
         """
 
-        if (
-            self.deg_north_min == self.deg_north_max
-            and self.deg_west_max == self.deg_west_min
-        ):
-            # 1 Tile (Simple)
-            return {"single": ((self.deg_north_min, self.deg_west_max),)}
+        self.points = points
+        self.year = year
+        self.layers = layers
 
-        elif self.deg_north_max > self.deg_north_min:
-            if self.deg_north_max - self.deg_north_min > self.degrees * 3:
-                # 3 Tiles northernly
-                return {
-                    "north": (
-                        (self.deg_north_min, self.deg_west_max),
-                        (self.deg_north_max - self.degrees, self.deg_west_max),
-                        (self.deg_north_max, self.deg_west_max),
-                    )
-                }
-            elif self.deg_west_max > self.deg_west_min:
-                # 4 Tiles
-                return {
-                    "square": (
-                        (self.deg_north_min, self.deg_west_max),
-                        (self.deg_north_min, self.deg_west_min),
-                        (self.deg_north_max, self.deg_west_min),
-                        (self.deg_north_max, self.deg_west_max),
-                    )
-                }
-            else:
-                # 2 Tiles northernly
-                return {
-                    "north": (
-                        (self.deg_north_min, self.deg_west_max),
-                        (self.deg_north_max, self.deg_west_max),
-                    )
-                }
-        elif self.deg_north_min == self.deg_north_max:
-            if self.deg_west_max > self.deg_west_min:
-                if self.deg_west_max - self.deg_west_min > self.degrees:
-                    # 3 Tiles easternly
-                    return {
-                        "east": (
-                            (self.deg_north_min, self.deg_west_max),
-                            (
-                                self.deg_north_min,
-                                self.deg_west_max - self.degrees,
-                            ),
-                            (self.deg_north_min, self.deg_west_min),
-                        )
-                    }
-                else:
-                    # 2 Tiles easternly
-                    return {
-                        "east": (
-                            (self.deg_north_min, self.deg_west_max),
-                            (self.deg_north_min, self.deg_west_min),
-                        )
-                    }
-            else:
-                raise ValueError(
-                    "The tile stacking failed for parameters "
-                    f"five_deg_north_min: {self.deg_north_min}, "
-                    f"five_deg_north_max: {self.deg_north_max}, "
-                    f"five_deg_west_min: {self.deg_west_min}, "
-                    f"five_deg_west_max: {self.deg_west_max}"
-                )
-        else:
-            raise ValueError(
-                "The tile stacking failed for parameters "
-                f"five_deg_north_min: {self.deg_north_min}, "
-                f"five_deg_north_max: {self.deg_north_max}, "
-                f"five_deg_west_min: {self.deg_west_min}, "
-                f"five_deg_west_max: {self.deg_west_max}"
-            )
-
-    def _generate_lat_long(self, corners: List[Tuple[float, float]]) -> None:
-        """
-        Use tile name to set bounding box of tile:
-
-        NOTE: We have to manually calculate this because an ArcGIS Pro License is
-              required to convert the *.flt Raster files to correct format.
-
-        Resolution: 3-arcseconds = ~0.0008333*3 = 5 deg / 6000 pixels
-        Resolution: 1/3-arcseconds = ~0.0008333/3 = 1 deg / 10812 pixels
-
-        ```
-            n30w120     n30w115
-        (35, 120)-----------------(35, 110)
-            |------------|------------|
-            |-----x------|----x2y2----|
-            |------------|------------|
-            |------------|------------|
-            |------------|------------|
-            |----x1y1----|------x-----|
-        (30, 120)-----------------(30, 110)
-        ```
-
-        Arguments:
-            corners: A list of the lat/long tuple for each corner in the standard order:
-                     [bottom left, bottom right, top right, top left]
-        """
-        from scipy import spatial
-
-        if corners[0][1] > corners[1][1]:
-            # calculate dimensions (W)
-            if corners[0][1] - corners[1][1] > self.degrees:
-                if corners[0][1] - corners[1][1] > self.degrees * 3:
-                    self.pixel_width = self.pixel_width * 3
-                else:
-                    self.pixel_width = self.pixel_width * 2
-        else:
-            self.pixel_width = self.pixel_width
-
-        if corners[0][0] < corners[2][0]:
-            # calculate dimensions (N)
-            if corners[2][0] - corners[0][0] > self.degrees:
-                if corners[2][0] - corners[0][0] > self.degrees * 3:
-                    self.pixel_height = self.pixel_height * 3
-                else:
-                    self.pixel_height = self.pixel_height * 2
-        else:
-            self.pixel_height = self.pixel_height
-
-        # create list[Tuple[floats]] with width and height
-        y = np.linspace(float(corners[2][0]), float(corners[0][0]), self.pixel_height)
-        x = np.linspace(float(corners[0][1]), float(corners[1][1]), self.pixel_width)
-        # rotate to account for (latitude, longitude) -> (y, x)
-        XX, YY = np.meshgrid(y, x)
-        self.elev_array = np.stack((XX, YY), axis=2)
-
-        # find indices where elevation matches bbox corners
-        # this sorts it on the longitude
-        elev_array_stacked = np.reshape(
-            self.elev_array, (self.elev_array.shape[0] * self.elev_array.shape[1], 2)
+        # sepcify the output paths of the Ladfire python-client query
+        self.product_layers_path = (
+            f"lf_{abs(self.points[0][1])}_{self.points[0][0]}_"
+            f"{abs(self.points[1][1])}_{self.points[1][0]}.zip"
         )
-        pixels_move = int(np.round((1 / 2 * (math.sqrt(self.area))) / self.resolution))
+        self.output_path = (
+            f"./landfire_cache/{self.year}/{self.product_layers_path[:-4]}/"
+        )
 
-        center = elev_array_stacked[
-            spatial.KDTree(elev_array_stacked).query(self.center)[1]
-        ]
-        array_center = np.where((self.elev_array == center).all(axis=-1))
+        # make each a layer a global varibale that we "fill"
+        self.fuel = np.array([])
+        self.topography = np.array([])
 
-        # get tl and br of array indices
-        self.tr = (array_center[1] + pixels_move, array_center[0] - pixels_move)
-        self.bl = (array_center[1] - pixels_move, array_center[0] + pixels_move)
+        # check if we've already pulled this data before
+        exists = self._check_paths()
+        if exists:
+            self.fuel, self.topography = self._make_data()
+        else:
+            self.layer_products = self._get_layer_names()
+            self.query_lat_lon_layer_data()
+            self.fuel, self.topography = self._make_data()
 
-    def _get_lat_long_bbox(
-        self,
-        corners: List[Tuple[float, float]],
-        new_corner: Tuple[float, float],
-        stack: str,
-        idx: int = 0,
-    ) -> List[Tuple[float, float]]:
+    def _check_paths(self):
         """
-        This method will update the corners of the array
+        Check to verify if this exact data has already been pulled.
+            This is unlikely, but could save time if so.
+
+        Assume we always pull at least Fuel and Topography data.
+
+        TODO: Currently we do not have the functionality to find points within an
+                existing LatLongBox that has already been downloaded.
+                This could greatly improve functionality and speed up training interations
+        """
+        if os.path.exists(self.output_path):
+            print("Data for this area already exists. Loading from file.")
+            return True
+        else:
+            return False
+
+    def _get_layer_names(self) -> Dict[str, str]:
+        """
+        Functionality to ge the LandFire Product names for the Layers specified.
+
+        The way this is written is such that you could add other layers
+            of interest that LandFire provides:
+                - Slope (degrees)
+                -  operational roads
+                - fuel vegetation
+                - fuel / canopy height
+                etc.
+
+        TODO: make the ProductSearch less clunky
+
+        Elevation does not really change from year to year, so LandFire only provides
+            one
+
+
+        """
+        # use a dictionary to keep track of the different/possible layers
+        layer_products = {}
+        for layer in self.layers:
+            # check if layer is in the LandFire ProductThemes
+            valid_layer = layer in list(ProductTheme)
+            if valid_layer:
+                if layer == "fuel":
+                    code = "FBFM13"
+                    product_theme = ProductTheme.fuel
+                    if self.year == "2019" or self.year == "2020":
+                        product_version = ProductVersion.lf_2016_remap
+                    else:
+                        product_version = ProductVersion.lf_2020
+                elif layer == "topographic":
+                    code = "ELEV"
+                    layer = "topographic"  # because LandFire has weird naming conventions
+                    product_version = ProductVersion.lf_2020
+                    product_theme = ProductTheme.topographic
+
+                search: ProductSearch = ProductSearch(
+                    codes=[code],
+                    versions=[product_version],
+                    themes=[product_theme],
+                    regions=[ProductRegion.US],
+                )
+
+                layer_search = search.get_layers()
+                # 2019 and 2020 for fuel have the same codes/name/version in LandFire
+                if layer == "fuel":
+                    if self.year == "2019":
+                        layer_products[layer] = layer_search[0]
+                    else:
+                        layer_products[layer] = layer_search[1]
+                else:
+                    layer_products[layer] = layer_search[0]
+
+            else:
+                print(
+                    f"Currently only support the following LandFire Products "
+                    " within SimFire: "
+                    f"{ProductTheme.fuel}, {ProductTheme.topographic}."
+                )
+
+        return layer_products
+
+    def query_lat_lon_layer_data(self):
+        """
+        Functionality to get the indices and values of the layers at a queried point.
+
+        For GIS data you need to calculate the offsets to get the array indice
 
         Arguments:
-            corners: The current corners of the array.
-            new_corner: A new index to compare the current corners against.
-            stack: The order in which to stack the tiles and therefore update the
-                   corner.
-            idx: Only used for the 'square' case, to keep track of which tile we are on
-                 tiles are stacked according to standard order:
-                 [bottom left, bottom right, top right, top left]
+            layer: the gdal layer to query
+            band: the gdal raster band that contains the data
 
-        Returns:
-            The indices/bbox of the corners according to standard order:
-                [bottom left, bottom right, top right, top left]
         """
-        BL = corners[0]
+        if not os.path.exists(self.output_path):
+            os.makedirs(self.output_path)
 
-        BR = corners[1]
-        br = (new_corner[0], new_corner[1] - self.degrees)
-
-        TR = corners[2]
-        tr = (new_corner[0] + self.degrees, new_corner[1] - self.degrees)
-
-        TL = corners[3]
-        tl = (new_corner[0] + self.degrees, new_corner[1])
-
-        if stack == "east":
-            # bottom and top right need to be updated
-            return [BL, br, tr, TL]
-        elif stack == "north":
-            # top left and right need to be updated
-            return [BL, BR, tr, tl]
-        elif stack == "square":
-            # where to stack changes at each step
-            if idx == 1:
-                # Stack the the east
-                return [BL, br, tr, TL]
-            elif idx == 2:
-                # stack to the north
-                return [BL, BR, tr, tl]
-            else:
-                return [BL, BR, TR, tl]
-        else:
-            raise ValueError(
-                "Invalid values for inputs: "
-                f"corners: {corners}, new_corner: {new_corner}, "
-                f"stack: {stack}, idx: {idx}"
+            lf = landfire.Landfire(
+                bbox=f"{self.points[0][1]} {self.points[0][0]} \
+                    {self.points[1][1]} {self.points[1][0]}",
+                output_crs="4326",
+            )
+            # assume the order of data retrieval stays the same
+            lf.request_data(
+                layers=self.layer_products.values(),
+                output_path=f"{self.output_path}/{self.product_layers_path}",
             )
 
-    def _update_corners(self) -> None:
-        """
-        Method to update corners of total area when 1+ tiles is needed
-        """
-
-        for key, val in self.tiles.items():
-            self.corners = [
-                (val[0][0], val[0][1]),
-                (val[0][0], val[0][1] - self.degrees),
-                (val[0][0] + self.degrees, val[0][1] - self.degrees),
-                (val[0][0] + self.degrees, val[0][1]),
-            ]
-            if key == "single":
-                # simple case
-                self._generate_lat_long(self.corners)
-            else:
-                for idx, _ in enumerate(val[1:]):
-                    if key == "north":
-                        # stack tiles along axis = 0 -> leftmost: bottom, rightmost: top
-                        self.corners = self._get_lat_long_bbox(
-                            self.corners, val[idx + 1], key
-                        )
-                    elif key == "east":
-                        # stack tiles along axis = 2 -> leftmost, rightmost
-                        self.corners = self._get_lat_long_bbox(
-                            self.corners, val[idx + 1], key
-                        )
-                    elif key == "square":
-                        # stack tiles into a square ->
-                        # leftmost: bottom-left, rightmost: top-left
-                        self.corners = self._get_lat_long_bbox(
-                            self.corners, val[idx + 1], key, idx + 1
-                        )
-
-        self._generate_lat_long(self.corners)
-
-    def _save_contour_map(self, data_array: np.ndarray, type: str) -> None:
-        """
-        Helper function to generate a contour map of the region
-        specified or of the DEM file and save as `<lat_long>.png`
-
-        Elevation in (m)
-
-        Arguments:
-            data_array: The array to be saved as a contour map PNG.
-        """
-        import matplotlib.pyplot as plt
-
-        data_array = data_array[:, :, 0]
-        # replace missing values if necessary
-        if np.any(data_array == -999999.0):
-            data_array[data_array == -999999.0] = np.nan
-
-        fig = plt.figure(figsize=(12, 8))
-        fig.add_subplot(111)
-        if type == "topo":
-            plt.contour(data_array, cmap="viridis")
+            shutil.unpack_archive(
+                f"{self.output_path}/{self.product_layers_path}", f"{self.output_path}/"
+            )
         else:
-            plt.imshow(data_array)
-        plt.axis("off")
-        plt.title(f"Center: N{self.center[0]}W{self.center[1]}")
-        # cbar = plt.colorbar()
-        plt.gca().set_aspect("equal", adjustable="box")
+            print("data already exists for this bounding box and these layers")
 
-        plt.savefig(f"{type}_n{self.BL[0]}_w{self.BL[1]}_n{self.TR[0]}_w{self.TR[1]}.png")
+    def _make_data(self):
+        """
+        Functionality to read in tif data for layers, and create iamge data.
+
+        """
+        tifs = glob.glob(self.output_path + "*.tif")[0]
+
+        fuel = np.array([])
+        topography = np.array([])
+        # the order the data was requested is the order of the Band in the Tif file
+        # hacky
+        geo_tiff = GeoTiff(tifs, crs_code=4326)
+        self.geotiff_data = geo_tiff.read()
+        for i in range(len(self.layers)):
+            globals()[self.layers[i]] = np.array(self.geotiff_data[:, :, i])
+        return fuel, topography
+
+
+class LatLongBox:
+    """
+    Base class for original LatLongBox functionality.
+
+    Only used for typing purposes or until LadFire provides
+        BurnProbabilty data.
+    """
+
+    def __init__(self) -> None:
+        """
+        Initializes variables/methods that the BurnProbabilty layer types.
+        """
+        self.resolution: str = "30m"
+        self.tiles: dict = {}
+        self.bl: Tuple[Tuple[int, int], Tuple[int, int]] = ((0, 0), (0, 0))
+        self.tr: Tuple[Tuple[int, int], Tuple[int, int]] = ((0, 0), (0, 0))
 
 
 class DataLayer:
@@ -710,87 +439,34 @@ class TopographyLayer(DataLayer):
 
 
 class OperationalTopographyLayer(TopographyLayer):
-    def __init__(self, lat_long_box: LatLongBox, path: Path) -> None:
+    def __init__(self, LandFireLatLongBox: LandFireLatLongBox):
         """
-        Initialize the elevation layer by retrieving the correct topograpchic data
-        and computing the area
+        Initialize the fuel layer by retrieving the correct fuel data
+        by year.
 
         Arguments:
-            center: The lat/long coordinates of the center point of the screen.
-            height: The height of the screen size (meters).
-            width: The width of the screen size (meters).
-            resolution: The resolution to get data (meters).
+            LandFireLatLongBox: the retrieved data from Ladfire's python-client
+
         """
-        super().__init__()
-        self.lat_long_box = lat_long_box
-        self.path = Path(path) / "topographic"
-        res = str(self.lat_long_box.resolution) + "m"
-        self.datapath = self.path / res
+        self.LandFireLatLongBox = LandFireLatLongBox
+        self.data = self._get_data()
+        self.image = self._make_image()
 
-        self.data = self._make_data()
-        self.contours = self._make_contours()
+    def _make_image(self):
+        """
+        Functionality to convert elvation data into topography
+            lines.
+        """
+        return np.array([])
 
-    def _make_data(self) -> np.ndarray:
-        self._get_dems()
-        data = Image.open(self.tif_filenames[0])
-        data = np.array(data, dtype=np.float32)
-        data = cv2.resize(data, (3612, 3612), interpolation=cv2.INTER_NEAREST)
-        # flip axis because latitude goes up but numpy will read it down
-        data = np.flip(data, 0)
-        data = np.expand_dims(data, axis=-1)
+    def _get_data(self):
+        """
+        Functionality to get the raw elevation data for the SimHarness
+        """
 
-        for key, _ in self.lat_long_box.tiles.items():
-
-            if key == "single":
-                # simple case
-                tr = (self.lat_long_box.bl[0][0], self.lat_long_box.tr[1][0])
-                bl = (self.lat_long_box.tr[0][0], self.lat_long_box.bl[1][0])
-                return data[tr[0] : bl[0], tr[1] : bl[1]]
-            tmp_array = data
-            for idx, dem in enumerate(self.tif_filenames[1:]):
-                tif_data = Image.open(dem)
-                tif_data = np.array(tif_data, dtype=np.float32)
-                tif_data = cv2.resize(
-                    tif_data, (3612, 3612), interpolation=cv2.INTER_NEAREST
-                )
-                # flip axis because latitude goes up but numpy will read it down
-                tif_data = np.flip(tif_data, 0)
-                tif_data = np.expand_dims(tif_data, axis=-1)
-
-                if key == "north":
-                    # stack tiles along axis = 0 -> leftmost: bottom, rightmost: top
-                    data = np.concatenate((data, tif_data), axis=0)
-                elif key == "east":
-                    # stack tiles along axis = 2 -> leftmost, rightmost
-                    data = np.concatenate((data, tif_data), axis=1)
-                elif key == "square":
-                    if idx + 1 == 1:
-                        data = np.concatenate((data, tif_data), axis=1)
-                    elif idx + 1 == 2:
-                        tmp_array = tif_data
-                    elif idx + 1 == 3:
-                        tmp_array = np.concatenate((tif_data, tmp_array), axis=1)
-                        data = np.concatenate((data, tmp_array), axis=0)
-
-        tr = (self.lat_long_box.bl[0][0], self.lat_long_box.tr[1][0])
-        bl = (self.lat_long_box.tr[0][0], self.lat_long_box.bl[1][0])
-        data_array = data[tr[0] : bl[0], tr[1] : bl[1]]
         # Convert from meters to feet for use with simulator
-        data_array = 3.28084 * data_array
+        data_array = 3.28084 * self.LandFireLatLongBox.topography
         return data_array
-
-    def _get_dems(self) -> None:
-        """
-        Uses the outputed tiles and sets `self.tif_filenames`
-        """
-        self.tif_filenames = []
-
-        for _, ranges in self.lat_long_box.tiles.items():
-            for range in ranges:
-                (five_deg_n, five_deg_w) = range
-                tif_data_region = Path(f"n{five_deg_n + 1}w{five_deg_w}.tif")
-                tif_file = self.datapath / tif_data_region
-                self.tif_filenames.append(tif_file)
 
 
 class FunctionalTopographyLayer(TopographyLayer):
@@ -874,129 +550,35 @@ class FuelLayer(DataLayer):
 
 
 class OperationalFuelLayer(FuelLayer):
-    def __init__(self, lat_long_box: LatLongBox, path: Path, type: str = "13") -> None:
+    def __init__(self, LandFireLatLongBox: LandFireLatLongBox):
         """
-        Initialize the elevation layer by retrieving the correct topograpchic data
-        and computing the area.
+        Initialize the fuel layer by retrieving the correct fuel data
+        by year.
 
         Arguments:
-            center: The lat/long coordinates of the center point of the screen
-            height: The height of the screen size (meters)
-            width: The width of the screen size (meters)
-            resolution: The resolution to get data (meters)
-            type: The type of data you wnt to load: 'display' or 'simulation'
-                  display: rgb data for simulator
-                  simulation: fuel model values for RL Harness/Simulation
+            LandFireLatLongBox: the retrieved data from Ladfire's python-client
+
         """
-        self.lat_long_box = lat_long_box
-        self.type = type
-        # Temporary until we get real fuel data
-        self.path = Path(path) / "fuel"
-        res = str(self.lat_long_box.resolution) + "m"
+        self.LandFireLatLongBox = LandFireLatLongBox
+        self.data = self._get_data()
+        self.image = self._make_image()
 
-        self.datapath = self.path / res / "2020"
-
-        self._get_fuel_dems()
-        fm_int_data = self._make_data(self.fuel_model_filenames)
-        self.data = self._make_fuel_data(fm_int_data)
-        self.image = self._make_data(self.rgb_filenames)
-        self.image = self.image * 255.0
-        self.image = self.image.astype(np.uint8)
-
-    def _make_image(self) -> np.ndarray:
+    def _make_image(self):
         """
-        Use the fuel data in self.data to make an RGB background image.
+        Functionality to convert the raw Fuel Model data
+            to rgb values for visualization in the simulator.
         """
-        return np.array([])
+        if "fuel" in self.LandFireLatLongBox.layers:
+            func = np.vectorize(lambda x: tuple(FuelModelRGB13[x]))
+            fuel_data_rgb = func(self.LandFireLatLongBox.fuel)
 
-    def _make_data(self, filename: List) -> np.ndarray:
+            fuel_data_rgb = np.stack(fuel_data_rgb, axis=-1)
 
-        data = np.load(filename[0])
-        # Flip the data over a horizontal axis
-        data = np.flip(data, axis=0)
-        data = np.array(data, dtype=np.float32)
-        data = cv2.resize(data, (3612, 3612), interpolation=cv2.INTER_NEAREST)
-        data = np.expand_dims(data, axis=-1)
-
-        for key, _ in self.lat_long_box.tiles.items():
-
-            if key == "single":
-                # simple case
-                tr = (self.lat_long_box.bl[0][0], self.lat_long_box.tr[1][0])
-                bl = (self.lat_long_box.tr[0][0], self.lat_long_box.bl[1][0])
-                return data[tr[0] : bl[0], tr[1] : bl[1]]
-            tmp_array = data
-            for idx, dem in enumerate(filename[1:]):
-                tif_data = np.load(dem)
-                tif_data = np.array(tif_data, dtype=np.float32)
-                tif_data = cv2.resize(
-                    tif_data, (3612, 3612), interpolation=cv2.INTER_NEAREST
-                )
-                tif_data = np.expand_dims(tif_data, axis=-1)
-
-                # Flip the tif data over a horizontal axis
-                tif_data = np.flip(tif_data, axis=0)
-
-                if key == "north":
-                    # stack tiles along axis = 0 -> leftmost: bottom, rightmost: top
-                    data = np.concatenate((data, tif_data), axis=0)
-                elif key == "east":
-                    # stack tiles along axis = 2 -> leftmost, rightmost
-                    data = np.concatenate((data, tif_data), axis=1)
-                elif key == "square":
-                    if idx + 1 == 1:
-                        data = np.concatenate((data, tif_data), axis=1)
-                    elif idx + 1 == 2:
-                        tmp_array = tif_data
-                    elif idx + 1 == 3:
-                        tmp_array = np.concatenate((tif_data, tmp_array), axis=1)
-                        data = np.concatenate((data, tmp_array), axis=0)
-
-        tr = (self.lat_long_box.bl[0][0], self.lat_long_box.tr[1][0])
-        bl = (self.lat_long_box.tr[0][0], self.lat_long_box.bl[1][0])
-        data_array = data[tr[0] : bl[0], tr[1] : bl[1]]
-        return data_array
-
-    def _get_fuel_dems(self) -> None:
+    def _get_data(self):
         """
-        This method will use the outputed tiles and return the correct dem files
-        for both the RGB fuel model data and the fuel model data.
+        Functionality to get the raw Fuel Model data for the Simharness
         """
-        self.rgb_filenames = []
-        self.fuel_model_filenames = []
-        fuel_model = f"LF2020_FBFM{self.type}_200_CONUS"
-        fuel_data_fm = f"LC20_F{self.type}_200_no_whitespace.npy"
-        fuel_data_rgb = f"LC20_F{self.type}_200_rgb.npy"
-        for _, ranges in self.lat_long_box.tiles.items():
-            for range in ranges:
-                (five_deg_n, five_deg_w) = range
-
-                int_data_region = Path(
-                    f"n{five_deg_n}w{five_deg_w}/{fuel_model}/{fuel_data_fm}"
-                )
-
-                rgb_data_region = Path(
-                    f"n{five_deg_n}w{five_deg_w}/{fuel_model}/{fuel_data_rgb}"
-                )
-
-                int_npy_file = self.datapath / int_data_region
-                rgb_npy_file = self.datapath / rgb_data_region
-                self.rgb_filenames.append(rgb_npy_file)
-                self.fuel_model_filenames.append(int_npy_file)
-
-    def _make_fuel_data(self, data: np.ndarray) -> np.ndarray:
-        """
-        Map Fire Behavior Fuel Model data to the Fuel type that the fire simulator expects
-
-        Arguments:
-            np.ndarray: the array containing integer representations of Fuel Model
-
-        Returns:
-            np.ndarray: Fuel (as strings)
-        """
-        func = np.vectorize(lambda x: FuelModelToFuel[x])
-        data_array = func(data)
-        return data_array
+        return self.LandFireLatLongBox.fuel
 
 
 class FunctionalFuelLayer(FuelLayer):

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "simfire"
-version = "1.4.37"
+version = "1.4.38"
 description = "Fire simulator built in Python"
 authors = ["Tim Welsh <twelsh@mitre.org>", "Marissa Dotter <mdotter@mitre.org>",
            "Michael Doyle <mdoyle@mitre.org>", "Dhanuj Gandikota <dgandikota@mitre.org>",

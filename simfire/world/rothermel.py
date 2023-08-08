@@ -47,9 +47,29 @@ def compute_rate_of_spread(
     Returns:
         R: The computed rate of spread in ft/min
     """
-    # Check for non-burnable fuel and return 0 (no spread)
-    if w_0.all() == 0:
-        return np.zeros_like(loc_x)
+    # Retain the original number of values from the inputs
+    orig_shape = w_0.shape
+    # Keep only the non-zero w0 values for calculation
+    # This will avoid division by zero, NaN, and overflow errors
+    w_0_idxs_non_zero = np.argwhere(w_0 > 0)
+    loc_x = loc_x[w_0_idxs_non_zero]
+    loc_y = loc_y[w_0_idxs_non_zero]
+    new_loc_x = new_loc_x[w_0_idxs_non_zero]
+    new_loc_y = new_loc_y[w_0_idxs_non_zero]
+    w_0 = w_0[w_0_idxs_non_zero]
+    delta = delta[w_0_idxs_non_zero]
+    M_x = M_x[w_0_idxs_non_zero]
+    sigma = sigma[w_0_idxs_non_zero]
+    h = h[w_0_idxs_non_zero]
+    S_T = S_T[w_0_idxs_non_zero]
+    S_e = S_e[w_0_idxs_non_zero]
+    p_p = p_p[w_0_idxs_non_zero]
+    M_f = M_f[w_0_idxs_non_zero]
+    U = U[w_0_idxs_non_zero]
+    U_dir = U_dir[w_0_idxs_non_zero]
+    slope_mag = slope_mag[w_0_idxs_non_zero]
+    slope_dir = slope_dir[w_0_idxs_non_zero]
+
     # Mineral Damping Coefficient
     eta_S = np.minimum(0.174 * S_e**-0.19, np.ones_like(S_e))
     # Moisture Damping Coefficient
@@ -72,7 +92,6 @@ def compute_rate_of_spread(
     I_R = gamma_prime * w_n * h * eta_M * eta_S
     # Propagating Flux Ratio
     xi = np.exp((0.792 + 0.681 * sigma**0.5) * (B + 0.1)) / (192 + 0.25 * sigma)
-
     # Wind Factor
     c = 7.47 * np.exp(-0.133 * sigma**0.55)
     b = 0.02526 * sigma**0.54
@@ -90,7 +109,6 @@ def compute_rate_of_spread(
     # physically make sense
     U = np.maximum(U, np.zeros_like(U))
     phi_w = c * U**b * (B / B_op) ** -e
-
     # Slope Factor
     # Phi is the slope between the two locations (i.e. the change in elevation).
     # The model calls for the tangent of the slope angle between the two points,
@@ -99,16 +117,22 @@ def compute_rate_of_spread(
     slope_along_angle_of_travel = -slope_mag * np.cos(slope_dir + angle_of_travel)
     sign = -1 + 2 * (slope_along_angle_of_travel > 0)
     phi_s = 5.275 * B**-0.3 * sign * slope_along_angle_of_travel**2
-
     # Effective Heating Number
     epsilon = np.exp(-138 / sigma)
     # Heat of Preignition (BTU/lb)
     Q_ig = 250 + 1116 * M_f
 
     # Rate of Spread (ft/min)
-    R = ((I_R * xi) * (1 + phi_w + phi_s)) / (p_b * epsilon * Q_ig)
+    # Default everything to 0. This will set all w0=0 values to 0
+    R = np.zeros(orig_shape)
+    R_w_0_non_zero = ((I_R * xi) * (1 + phi_w + phi_s)) / (p_b * epsilon * Q_ig)
+    # Set the non-zero w0 values to the calculated rate of spread
+    R[w_0_idxs_non_zero] = R_w_0_non_zero
 
-    # Take the minimum with 0 because a fire cannot put itself out
+    # Take the maximum with 0 because a fire cannot put itself out
+    # Don't want negative values for R
     R = np.maximum(R, np.zeros_like(R))
+
+    # Any points where w_0 is zero muxt bet set to 0 since they are non-burnable
 
     return R

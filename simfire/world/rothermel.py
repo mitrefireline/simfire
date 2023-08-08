@@ -133,6 +133,4 @@ def compute_rate_of_spread(
     # Don't want negative values for R
     R = np.maximum(R, np.zeros_like(R))
 
-    # Any points where w_0 is zero muxt bet set to 0 since they are non-burnable
-
     return R

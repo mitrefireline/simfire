@@ -81,7 +81,7 @@ def main():
 
     fire_map = game.fire_map
     fire_map[cfg.fire.fire_initial_position] = BurnStatus.BURNING
-    # fire_map = fireline_manager.update(fire_map, points)
+    fire_map = fireline_manager.update(fire_map, points)
     game.fire_map = fire_map
 
     fire_manager = RothermelFireManager(

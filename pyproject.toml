@@ -70,7 +70,7 @@ exclude = [
 ]
 
 [tool.bandit]
-skips = ["B311"]
+skips = ["B101", "B311"]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

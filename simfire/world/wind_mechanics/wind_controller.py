@@ -35,7 +35,7 @@ class WindController:
         lacunarity: float,
         range_min: float,
         range_max: float,
-        screen_size: tuple,
+        screen_size: tuple[int, int],
     ) -> None:
         """
         Set simplex noise values for wind speeds
@@ -53,7 +53,7 @@ class WindController:
                         Higher lacunarity, higher frequency per pass.
             range_min: The minimum speed of the wind in ft/min.
             range_max: The maximum speed of the wind in ft/min.
-            screen_size: Size of screen (both heigh and width) MUST BE SQUARE
+            screen_size: Size of screen (both heigh and width)
         """
         self.speed_layer.set_noise_parameters(
             seed, scale, octaves, persistence, lacunarity, range_min, range_max
@@ -70,7 +70,7 @@ class WindController:
         lacunarity: float,
         range_min: float,
         range_max: float,
-        screen_size: tuple,
+        screen_size: tuple[int, int],
     ) -> None:
         """
         Set simplex noise values for wind directions

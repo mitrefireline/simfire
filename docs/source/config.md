@@ -11,7 +11,7 @@ This file can have any name, as a path is required to load the configuration fil
 ### Area Parameters
 
 #### screen_size
-(`int`)<br>
+(`Tuple[int, int]`)<br>
 Determines how large the simulation is in pixels. The `screen_size` sets both the height and the width of the screen.
 
 #### pixel_scale
@@ -34,6 +34,10 @@ The size of the control lines in pixels. Only used for display purposes, and doe
 (`int`)<br>
 The size of the agent(s) in pixels. Only used for display purposes, and does not change how much space the agent takes up in the simulation.
 
+#### rescale_factor
+(`int`)<br>
+The factor to increase the height and width of the screen for display purposes only.
+
 ---
 
 ### Simulation Parameters
@@ -54,6 +58,20 @@ Whether or not to run the simulation in a headless state.
 (`str`)<br>
 Where to save GIF recordings and burn graphs of simulation [runs](https://fireline.pages.mitre.org/simfire/autoapi/simfire/sim/simulation/index.html#simfire.sim.simulation.FireSimulation.run). It will create subfolders in `save_path` that are of the format `<month>-<day>-<year>_<hour>-<minute>-<second>` based on when the outputs were saved to file.
 
+#### draw_spread_graph
+(`bool`)<br>
+
+
+#### record
+(`bool`)<br>
+
+#### save_data
+(`bool`)<br>
+
+#### data_type
+(`str`)<br>
+The format to save the data of the simulation. Can by type: "npy", "h5".
+
 ---
 
 ### Mitigation Parameters
@@ -72,11 +90,11 @@ The seed that would pick a random latitude and longitude. Leave empty if using t
 
 #### latitude
 (`float`)<br>
-The latitude given in decimal degrees.
+The latitude given in decimal degrees. The latitude sets the North-bounding (top-left) coordinate.
 
 #### longitude
 (`float`)<br>
-The longitude given in decimal degrees.
+The longitude given in decimal degrees. The longitude sets the West-bounding (top-left) coordinate.
 
 #### height
 (`int`)<br>
@@ -88,7 +106,7 @@ The width of the screen in meters. This is not randomized if choosing a seed.
 
 #### resolution
 (`int`)<br>
-The resolution of each pixel in meters. Data is measured in pixels corresponding to the resolution i.e: resolution = 10m = 1 pixel. This is not randomized if choosing a seed.
+The resolution of each pixel in meters. Data is measured in pixels corresponding to the resolution i.e: resolution = 30m x 30m = 1 pixel. This is not randomized if choosing a seed. The `area.pixel_scale` auto-scales to this resolution, i.e 30m ~= 98ft.
 
 #### year
 (`int`)<br>
@@ -329,14 +347,14 @@ Go [here](https://gitlab.mitre.org/fireline/simfire/-/blob/main/configs) for mor
 
 ```yaml
 area:
-  screen_size: 225
+  screen_size: [225, 225]
   pixel_scale: 50
 
 display:
   fire_size: 2
   control_line_size: 2
   agent_size: 4
-  rescale_size: 225
+  rescale_factor: 2
 
 simulation:
   update_rate: 1
@@ -358,7 +376,7 @@ operational:
 
 terrain:
   topography:
-    type: functional
+    type: operational
     functional:
       function: perlin
       perlin:
@@ -375,7 +393,7 @@ terrain:
         sigma_x: 50
         sigma_y: 50
   fuel:
-    type: functional
+    type: operational
     functional:
       function: chaparral
       chaparral:

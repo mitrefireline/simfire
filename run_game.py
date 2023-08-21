@@ -23,22 +23,22 @@ def main():
     Create the Managers
     """
 
-    cfg_path = Path("configs/functional_config.yml")
+    cfg_path = Path("configs/operational_config.yml")
     log.info(f"Starting simulation with {cfg_path}")
     cfg = Config(cfg_path)
 
     fuel_particle = FuelParticle()
 
-    if cfg.display.rescale_size is not None:
-        rescale_size = (cfg.display.rescale_size, cfg.display.rescale_size)
+    if cfg.display.rescale_factor is not None:
+        rescale_factor = int(cfg.display.rescale_factor)
     else:
-        rescale_size = None
+        rescale_factor = None
     log.info(f"Creating game with screen size: {cfg.area.screen_size}")
     log.info(f"Headless: {bool(cfg.simulation.headless)}")
     log.info(f"Recording: {bool(cfg.simulation.record)}")
     game = Game(
-        (cfg.area.screen_size, cfg.area.screen_size),
-        rescale_size=rescale_size,
+        cfg.area.screen_size,
+        rescale_factor=rescale_factor,
         headless=cfg.simulation.headless,
         record=cfg.simulation.record,
     )
@@ -81,7 +81,7 @@ def main():
 
     fire_map = game.fire_map
     fire_map[cfg.fire.fire_initial_position] = BurnStatus.BURNING
-    fire_map = fireline_manager.update(fire_map, points)
+    # fire_map = fireline_manager.update(fire_map, points)
     game.fire_map = fire_map
 
     fire_manager = RothermelFireManager(
@@ -94,6 +94,7 @@ def main():
         terrain,
         environment,
         max_time=cfg.simulation.runtime,
+        attenuate_line_ros=cfg.mitigation.ros_attenuation,
     )
     fire_manager_str = str(fire_manager).split(".")[-1].split(" ")[0]
     log.info(
@@ -113,15 +114,15 @@ def main():
         fire_sprites = fire_manager.sprites
         fireline_sprites = fireline_manager.sprites
         game_status = game.update(
-            terrain,
-            fire_sprites,
-            fireline_sprites,
-            [],
-            cfg.wind.speed,
-            cfg.wind.direction,
+            terrain=terrain,
+            fire_sprites=fire_sprites,
+            fireline_sprites=fireline_sprites,
+            agent_sprites=[],
+            wind_magnitude_map=cfg.wind.speed,
+            wind_direction_map=cfg.wind.direction,
         )
         fire_map = game.fire_map
-        fire_map = fireline_manager.update(fire_map)
+        # fire_map = fireline_manager.update(fire_map)
         fire_map, fire_status = fire_manager.update(fire_map)
         game.fire_map = fire_map
 

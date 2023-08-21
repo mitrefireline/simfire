@@ -14,7 +14,12 @@ from matplotlib.contour import QuadContourSet
 from PIL import Image
 from scipy import ndimage
 
-from ..enums import DRY_TERRAIN_BROWN_IMG, TERRAIN_TEXTURE_PATH, FuelModelRGB13
+from ..enums import (
+    DRY_TERRAIN_BROWN_IMG,
+    TERRAIN_TEXTURE_PATH,
+    FuelModelRGB13,
+    FuelModelToFuel,
+)
 from ..utils.log import create_logger
 from ..world.elevation_functions import ElevationFn
 from ..world.fuel_array_functions import FuelArrayFn
@@ -73,11 +78,11 @@ class LandFireLatLongBox:
         # check if we've already pulled this data before
         exists = self._check_paths()
         if exists:
-            self.fuel, self.topography = self._make_data()
+            self._make_data()
         else:
             self.layer_products = self._get_layer_names()
             self.query_lat_lon_layer_data()
-            self.fuel, self.topography = self._make_data()
+            self._make_data()
 
     def _check_paths(self):
         """
@@ -124,7 +129,7 @@ class LandFireLatLongBox:
                 if layer == "fuel":
                     code = "FBFM13"
                     product_theme = ProductTheme.fuel
-                    if self.year == "2019" or self.year == "2020":
+                    if str(self.year) == "2019" or str(self.year) == "2020":
                         product_version = ProductVersion.lf_2016_remap
                     else:
                         product_version = ProductVersion.lf_2020
@@ -144,7 +149,7 @@ class LandFireLatLongBox:
                 layer_search = search.get_layers()
                 # 2019 and 2020 for fuel have the same codes/name/version in LandFire
                 if layer == "fuel":
-                    if self.year == "2019":
+                    if str(self.year) == "2019":
                         layer_products[layer] = layer_search[0]
                     else:
                         layer_products[layer] = layer_search[1]
@@ -195,18 +200,23 @@ class LandFireLatLongBox:
         """
         Functionality to read in tif data for layers, and create iamge data.
 
+        NOTE: for now we assume fuel and topography are always pulled in the respective
+                order, but this could be used in the future:
+
+        ```
+            for i in range(len(self.layers)):
+                globals()[self.layers[i]] = np.array(self.geotiff_data[:, :, i])
+        ```
+
         """
         tifs = glob.glob(self.output_path + "*.tif")[0]
 
-        fuel = np.array([])
-        topography = np.array([])
         # the order the data was requested is the order of the Band in the Tif file
-        # hacky
         geo_tiff = GeoTiff(tifs, crs_code=4326)
         self.geotiff_data = geo_tiff.read()
-        for i in range(len(self.layers)):
-            globals()[self.layers[i]] = np.array(self.geotiff_data[:, :, i])
-        return fuel, topography
+
+        self.fuel = np.array(self.geotiff_data[:, :, 0])
+        self.topography = np.array(self.geotiff_data[:, :, 1])
 
 
 class LatLongBox:
@@ -217,7 +227,9 @@ class LatLongBox:
         BurnProbabilty data.
     """
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+    ) -> None:
         """
         Initializes variables/methods that the BurnProbabilty layer types.
         """
@@ -450,14 +462,7 @@ class OperationalTopographyLayer(TopographyLayer):
         """
         self.LandFireLatLongBox = LandFireLatLongBox
         self.data = self._get_data()
-        self.image = self._make_image()
-
-    def _make_image(self):
-        """
-        Functionality to convert elvation data into topography
-            lines.
-        """
-        return np.array([])
+        self.image = self._make_contours()
 
     def _get_data(self):
         """
@@ -546,7 +551,6 @@ class FuelLayer(DataLayer):
 
         """
         return np.array([])
-        pass
 
 
 class OperationalFuelLayer(FuelLayer):
@@ -572,13 +576,20 @@ class OperationalFuelLayer(FuelLayer):
             func = np.vectorize(lambda x: tuple(FuelModelRGB13[x]))
             fuel_data_rgb = func(self.LandFireLatLongBox.fuel)
 
-            fuel_data_rgb = np.stack(fuel_data_rgb, axis=-1)
+            fuel_data_rgb = np.stack(fuel_data_rgb, axis=-1) * 255.0
+
+        else:
+            fuel_data_rgb = np.array([])
+
+        return fuel_data_rgb
 
     def _get_data(self):
         """
         Functionality to get the raw Fuel Model data for the Simharness
         """
-        return self.LandFireLatLongBox.fuel
+        func = np.vectorize(lambda x: FuelModelToFuel[x])
+        fuel_data = func(self.LandFireLatLongBox.fuel)
+        return fuel_data
 
 
 class FunctionalFuelLayer(FuelLayer):

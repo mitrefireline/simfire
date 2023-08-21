@@ -20,12 +20,11 @@ from ..world.wind_mechanics.wind_controller import (
 )
 from .layers import (
     BurnProbabilityLayer,
-    DataLayer,
     FuelLayer,
     FunctionalBurnProbabilityLayer,
     FunctionalFuelLayer,
     FunctionalTopographyLayer,
-    HistoricalLayer,
+    LandFireLatLongBox,
     LatLongBox,
     OperationalBurnProbabilityLayer,
     OperationalFuelLayer,
@@ -48,11 +47,11 @@ class ConfigError(Exception):
 
 @dataclasses.dataclass
 class AreaConfig:
-    screen_size: int
+    screen_size: Tuple[int, int]
     pixel_scale: float
 
     def __post_init__(self) -> None:
-        self.screen_size = int(self.screen_size)
+        self.screen_size = (int(self.screen_size[0]), int(self.screen_size[1]))
         self.pixel_scale = float(self.pixel_scale)
 
 
@@ -61,30 +60,30 @@ class DisplayConfig:
     fire_size: int
     control_line_size: int
     agent_size: int
-    rescale_size: Optional[int] = None
+    rescale_factor: Optional[int] = None
 
     def __post_init__(self) -> None:
         self.fire_size = int(self.fire_size)
         self.control_line_size = int(self.control_line_size)
         self.agent_size = int(self.agent_size)
-        if self.rescale_size is not None:
+        if self.rescale_factor is not None:
             try:
-                self.rescale_size = int(self.rescale_size)
+                self.rescale_factor = int(self.rescale_factor)
             except ValueError:
-                if isinstance(self.rescale_size, str):
-                    if self.rescale_size.upper() == "NONE":
-                        self.rescale_size = None
+                if isinstance(self.rescale_factor, str):
+                    if self.rescale_factor.upper() == "NONE":
+                        self.rescale_factor = None
                     else:
                         raise ValueError(
-                            f"Specified value  of {self.rescale_size} for "
-                            "config:display:rescale_size is not valid. "
+                            f"Specified value  of {self.rescale_factor} for "
+                            "config:display:rescale_factor is not valid. "
                             "Specify either an integer value or None"
                         )
                 else:
                     raise TypeError(
-                        "Speicified type of config:display:rescale_size "
-                        f"({type(self.rescale_size)}) with value "
-                        f"{self.rescale_size} is invalid. rescale_size "
+                        "Speicified type of config:display:rescale_factor "
+                        f"({type(self.rescale_factor)}) with value "
+                        f"{self.rescale_factor} is invalid. rescale_factor "
                         "should be int or None."
                     )
 
@@ -133,7 +132,6 @@ class OperationalConfig:
     longitude: float
     height: float
     width: float
-    path: Union[Path, str]
     resolution: float  # TODO: Make enum for resolution?
     year: int  # TODO: Make enum for year?
 
@@ -142,23 +140,8 @@ class OperationalConfig:
         self.longitude = float(self.longitude)
         self.height = float(self.height)
         self.width = float(self.width)
-        self.path = Path(self.path)
         self.resolution = float(self.resolution)
         self.year = int(self.year)
-
-
-@dataclasses.dataclass
-class HistoricalConfig:
-    """
-    Class that tracks historical layer.
-    """
-
-    use: bool
-    fire_init_pos_lat: float
-    fire_init_pos_long: float
-    name: str
-    year: str
-    historical_layer = DataLayer
 
 
 @dataclasses.dataclass
@@ -233,7 +216,8 @@ class Config:
         # operational to functional
         self.original_screen_size = self.yaml_data["area"]["screen_size"]
 
-        self.lat_long_box, self.historical_layer = self._make_lat_long_box()
+        # This can take up to 30 seconds to pull LandFire data directly from source
+        self.landfire_lat_long_box = self._make_lat_long_box()
 
         self.area = self._load_area()
         self.display = self._load_display()
@@ -270,9 +254,7 @@ class Config:
             raise ConfigError(message)
         return yaml_data
 
-    def _make_lat_long_box(
-        self,
-    ) -> Tuple[Optional[LatLongBox], Optional[HistoricalLayer]]:
+    def _make_lat_long_box(self) -> Optional[LandFireLatLongBox]:
         """
         Optionally create the LatLongBox used by the data layers if any
         of the data layers are of type `operational`.
@@ -283,79 +265,115 @@ class Config:
             the data layers are `operational`
         """
 
+        # temporarily instantiate LatLongBox for the BurnProbabiltyLayer
+        # TODO: remove this layer until LandFire supports the data
+        self.lat_long_box = LatLongBox()
+
         if (
             self.yaml_data["terrain"]["topography"]["type"] == "operational"
             or self.yaml_data["terrain"]["fuel"]["type"] == "operational"
         ):
+            year = self.yaml_data["operational"]["year"]
             self._set_all_combos()
             if self.yaml_data["operational"]["seed"] is not None:
-                lat_long_box: Optional[LatLongBox] = self._randomly_select_box(
-                    self.yaml_data["operational"]["seed"]
-                )
-                valid = self._check_lat_long(lat_long_box)
+                points: Tuple[
+                    Tuple[float, float], Tuple[float, float]
+                ] = self._randomly_select_box(self.yaml_data["operational"]["seed"])
+                valid = self._check_lat_long(points)
                 if not valid:
-                    if lat_long_box is None:
+                    if self.landfire_lat_long_box is None:
                         message = (
                             "Lat/Long box is not valid and was not created successfully."
                         )
                         log.error(message)
                         raise ConfigError(message)
                     message = (
-                        "Lat/Long box is not valid. Data does not "
-                        f"exist for latitude {lat_long_box.center[0]} and "
-                        f"longitude {lat_long_box.center[1]} with "
-                        f"a height of {lat_long_box.height} and width of "
-                        f"{lat_long_box.width}. Checking another location "
+                        "Latitude and Longitude box is not valid. Data does not "
+                        f"exist within the bounding box: ({points[0]}), "
+                        f" ({points[1]}) and the year {year}."
+                        "Checking another location "
                         f"with seed {self.yaml_data['operational']['seed'] + 1}."
                     )
                     log.warning(message)
                     self.yaml_data["operational"]["seed"] += 1
-                    lat_long_box, _ = self._make_lat_long_box()
+                    landfire_lat_long_box = self._make_lat_long_box()
             else:
-                lat = self.yaml_data["operational"]["latitude"]
-                lon = self.yaml_data["operational"]["longitude"]
+                tl_lat = self.yaml_data["operational"]["latitude"]
+                tl_lon = self.yaml_data["operational"]["longitude"]
                 height = self.yaml_data["operational"]["height"]
                 width = self.yaml_data["operational"]["width"]
-                resolution = self.yaml_data["operational"]["resolution"]
-                lat_long_box = LatLongBox((lat, lon), height, width, resolution)
-                valid = self._check_lat_long(lat_long_box)
+                # calculate the bottom right corner
+                br_lat = tl_lat - ((height / 30) * 0.00027777777803598015)
+                br_long = tl_lon + ((width / 30) * 0.00027777777803598015)
+                valid = self._check_lat_long(((tl_lat, tl_lon), (br_lat, br_long)))
                 if not valid:
                     message = (
                         "Lat/Long box is not valid. Data does not "
-                        f"exist for latitude {lat} and longitude {lon} with "
-                        f"a height of {height} and width of {width}."
+                        "exist between the bounding box: "
+                        f"({(tl_lat, tl_lon), (br_lat, br_long) }), "
+                        f"and the year {year}."
                     )
                     log.error(message)
                     raise ConfigError(message)
-            return lat_long_box, None
+                else:
+                    landfire_lat_long_box = LandFireLatLongBox(
+                        points=((tl_lat, tl_lon), (br_lat, br_long)), year=year
+                    )
+            return landfire_lat_long_box
         else:
-            return None, None
+            return None
 
-    def _check_lat_long(self, lat_long_box: Optional[LatLongBox]) -> bool:
+    def _check_lat_long(
+        self, points: Tuple[Tuple[float, float], Tuple[float, float]]
+    ) -> bool:
         """
-        Check that the lat/long box is within the bounds of the data.
+        Check that the points going to be queried are within the bounds of
+            the CONUS data.
+
+        CONUS extent:
+                West_Bounding_Coordinate: -127.9878
+                East_Bounding_Coordinate: -65.2544
+                North_Bounding_Coordinate: 51.6497
+                South_Bounding_Coordinate: 22.7654
 
         Args:
-            lat_long_box: The LatLongBox to check
+            points: The bounding box that will be passed into LandFireLatLongBox
 
         Returns:
-            True if the LatLongBox is within the bounds of the data
+            True if the LandFireLatLongBox is within the bounds of the data
         """
-        if lat_long_box is None:
+        TLW = -127.9878  # west bounding coord
+        BRW = -65.2544  # east bounding coord
+        TLN = 51.6497  # north bounding coord
+        BRN = 22.7654  # south bounding coord
+
+        tlw = points[0][1]
+        brw = points[1][1]
+        tln = points[0][0]
+        brn = points[1][0]
+        # If top-left inner box corner is inside the bounding box
+        if TLN > tln and TLW < tlw:
+            # If bottom-right inner box corner is inside the bounding box
+            if BRN < brn and BRW > brw:
+                return True
+            else:
+                return False
+        else:
             return False
-        for tile in lat_long_box.tiles.values():
-            for range in tile:
-                if range not in self._all_combos:
-                    return False
-        return True
 
     def _set_all_combos(self) -> None:
         """
         Get all possible combinations of latitude and longitude for the
         data layers.
+
+        TODO: This needs to get re-vsisted since we no longer use the tiles
+        CONUS extent:
+                West_Bounding_Coordinate: -127.9878
+                East_Bounding_Coordinate: -65.2544
+                North_Bounding_Coordinate: 51.6497
+                South_Bounding_Coordinate: 22.7654
         """
-        path = self.yaml_data["operational"]["path"]
-        data_path = Path(f"{path}/fuel/")
+
         res = str(self.yaml_data["operational"]["resolution"]) + "m"
         year = str(self.yaml_data["operational"]["year"])
         if res not in ["30m"]:
@@ -366,54 +384,59 @@ class Config:
             message = "Year must be 2019, 2020, or 2022"
             log.error(message)
             raise ConfigError(message)
-        data_path = data_path / res / year
-        all_files = [
-            f.stem
-            for f in data_path.iterdir()
-            if f.is_dir() and "n" in f.stem and "w" in f.stem
-        ]
-        self._all_combos = [
-            (
-                int(str(f).split(".")[0][1:].split("w")[0]),
-                int(str(f).split(".")[0][1:].split("w")[1]),
-            )
-            for f in all_files
-        ]
 
-    def _randomly_select_box(self, seed: int) -> LatLongBox:
+        # create a random point within CONUS bounds
+        y = random.choice(np.linspace(-127.9878, -65.2544, 100000))  # nosec
+        x = random.choice(np.linspace(22.7654, 51.6497, 100000))  # nosec
+        self._all_combos = (x, y)
+
+    def _randomly_select_box(
+        self, seed: int
+    ) -> Tuple[Tuple[float, float], Tuple[float, float]]:
         """
-        Randomly select a latitude and longitude for the LatLongBox.
+        Randomly select a latitude and longitude for the LandFireLatLongBox.
 
         Args:
             seed: The seed to use for the random number generator
 
         Returns:
-            A LatLongBox with a random latitude and longitude
+            A LandFireLatLongBox with a random latitude and longitude
         """
         random.seed(seed)  # nosec
-        lat, lon = random.choice(self._all_combos)  # nosec
-        lat = round(random.random(), 4) + lat  # nosec
-        lon = round(random.random(), 4) + lon  # nosec
+        lat, lon = self._all_combos  # nosec
+        tl_lat = round(random.random(), 4) + lat  # nosec
+        tl_lon = round(random.random(), 4) + lon  # nosec
         height = self.yaml_data["operational"]["height"]
         width = self.yaml_data["operational"]["width"]
-        resolution = self.yaml_data["operational"]["resolution"]
-        lat_long_box = LatLongBox((lat, lon), height, width, resolution)
-        return lat_long_box
+
+        # calculate the bottom right corner
+        br_lat = tl_lat - ((height / 30) * 0.00027777777803598015)
+        br_long = tl_lon + ((width / 30) * 0.00027777777803598015)
+
+        return ((tl_lat, tl_lon), (br_lat, br_long))
 
     def _load_area(self) -> AreaConfig:
         """
         Load the AreaConfig from the YAML data.
 
+        This is in pixel space, to convert to actual physical space multiple the
+            height/width by the resolution: 0.000277..., which represents 30m
+            per decimal degree of the lat/lon input.
+
         returns:
             The YAML data converted to an AreaConfig dataclass
         """
+
         # No processing needed for the AreaConfig
-        if self.lat_long_box is not None:
+        if self.landfire_lat_long_box is not None:
             # Overwite the screen_size since operational data will determine
-            # its own screen_size based on lat/long input
-            # Height and width are the same since we assume square input
-            height = int(self.lat_long_box.tr[0][0] - self.lat_long_box.bl[0][0])
-            self.yaml_data["area"]["screen_size"] = height
+            self.yaml_data["area"]["screen_size"] = (
+                self.landfire_lat_long_box.geotiff_data[:, :, -1].shape[0],
+                self.landfire_lat_long_box.geotiff_data[:, :, -1].shape[1],
+            )
+            self.yaml_data["area"]["pixel_scale"] = int(
+                self.yaml_data["operational"]["resolution"] / 0.3048
+            )
         return AreaConfig(**self.yaml_data["area"])
 
     def _load_display(self) -> DisplayConfig:
@@ -455,15 +478,6 @@ class Config:
         """
         # No processing needed for the OperationalConfig
         return OperationalConfig(**self.yaml_data["operational"])
-
-    def _load_historical(self) -> HistoricalConfig:
-        """
-        Load the HistoricalConfig from the YAML data.
-
-        returns:
-            The YAML data converted to an HistoricalConfig dataclass
-        """
-        return HistoricalConfig(**self.yaml_data["historical"])
 
     def _load_terrain(self) -> TerrainConfig:
         """
@@ -516,9 +530,8 @@ class Config:
         topo_layer: TopographyLayer
         topo_type = self.yaml_data["terrain"]["topography"]["type"]
         if topo_type == "operational":
-            if self.lat_long_box is not None:
-                path = Path(self.yaml_data["operational"]["path"])
-                topo_layer = OperationalTopographyLayer(self.lat_long_box, path)
+            if self.landfire_lat_long_box is not None:
+                topo_layer = OperationalTopographyLayer(self.landfire_lat_long_box)
             else:
                 raise ConfigError(
                     "The topography layer type is `operational`, "
@@ -547,8 +560,8 @@ class Config:
                     f"The specified topography function ({fn_name}) " "is not valid."
                 )
             topo_layer = FunctionalTopographyLayer(
-                self.yaml_data["area"]["screen_size"],
-                self.yaml_data["area"]["screen_size"],
+                self.yaml_data["area"]["screen_size"][0],
+                self.yaml_data["area"]["screen_size"][1],
                 fn,
                 fn_name,
             )
@@ -617,8 +630,8 @@ class Config:
                     f"The specified topography function ({fn_name}) " "is not valid."
                 )
             burn_prob_layer = FunctionalBurnProbabilityLayer(
-                self.yaml_data["area"]["screen_size"],
-                self.yaml_data["area"]["screen_size"],
+                self.yaml_data["area"]["screen_size"][0],
+                self.yaml_data["area"]["screen_size"][1],
                 fn,
                 fn_name,
             )
@@ -643,13 +656,12 @@ class Config:
         fuel_layer: FuelLayer
         fuel_type = self.yaml_data["terrain"]["fuel"]["type"]
         if fuel_type == "operational":
-            if self.lat_long_box is not None:
-                path = Path(self.yaml_data["operational"]["path"])
-                fuel_layer = OperationalFuelLayer(self.lat_long_box, path)
+            if self.landfire_lat_long_box is not None:
+                fuel_layer = OperationalFuelLayer(self.landfire_lat_long_box)
             else:
                 raise ConfigError(
-                    "The topography layer type is `operational`, "
-                    "but self.lat_long_box is None"
+                    "The fuel layer type is `operational`, "
+                    "but self.landfire_lat_long_box is None"
                 )
             fn_name = None
             kwargs = None
@@ -670,8 +682,8 @@ class Config:
                     f"The specified fuel function ({fn_name}) " "is not valid."
                 )
             fuel_layer = FunctionalFuelLayer(
-                self.yaml_data["area"]["screen_size"],
-                self.yaml_data["area"]["screen_size"],
+                self.yaml_data["area"]["screen_size"][0],
+                self.yaml_data["area"]["screen_size"][1],
                 fn,
                 fn_name,
             )
@@ -717,8 +729,8 @@ class Config:
             screen_size = self.yaml_data["area"]["screen_size"]
             seed = self.yaml_data["fire"]["fire_initial_position"]["random"]["seed"]
             rng = np.random.default_rng(seed)
-            pos_x = rng.integers(screen_size, dtype=int)
-            pos_y = rng.integers(screen_size, dtype=int)
+            pos_x = rng.integers(screen_size[0], dtype=int)
+            pos_y = rng.integers(screen_size[1], dtype=int)
             return FireConfig((pos_x, pos_y), max_fire_duration, seed)
         else:
             raise ConfigError(
@@ -748,8 +760,8 @@ class Config:
         fn_name = self.yaml_data["wind"]["function"]
         if fn_name == "simple":
             arr_shape = (
-                self.yaml_data["area"]["screen_size"],
-                self.yaml_data["area"]["screen_size"],
+                self.yaml_data["area"]["screen_size"][0],
+                self.yaml_data["area"]["screen_size"][1],
             )
             speed = self.yaml_data["wind"]["simple"]["speed"]
             direction = self.yaml_data["wind"]["simple"]["direction"]
@@ -826,7 +838,7 @@ class Config:
         return WindConfig(speed_arr, direction_arr, speed_fn, direction_fn)
 
     def _cfd_wind_setup(self) -> WindControllerCFD:
-        screen_size: int = self.yaml_data["area"]["screen_size"]
+        screen_size: tuple[int, int] = self.yaml_data["area"]["screen_size"]
         result_accuracy: int = self.yaml_data["wind"]["cfd"]["result_accuracy"]
         # scale: int = self.yaml_data['wind']['cfd']['scale']
         scale: int = self.yaml_data["area"]["pixel_scale"]
@@ -839,16 +851,16 @@ class Config:
         time_to_train = self.yaml_data["wind"]["cfd"]["time_to_train"]
 
         wind_map = WindControllerCFD(
-            screen_size,
-            result_accuracy,
-            scale,
-            timestep,
-            diffusion,
-            viscosity,
-            terrain_features,
-            wind_speed,
-            wind_direction,
-            time_to_train,
+            screen_size=screen_size,
+            result_accuracy=result_accuracy,
+            scale=scale,
+            timestep=timestep,
+            diffusion=diffusion,
+            viscosity=viscosity,
+            terrain_features=terrain_features,
+            wind_speed=wind_speed,
+            wind_direction=wind_direction,
+            time_to_train=time_to_train,
         )
         return wind_map
 
@@ -872,14 +884,14 @@ class Config:
         # We want to update the YAML terrain data so that the call to _load_terrain()
         # re-create the layers with the updated parameters
 
-        # Do the location first, as the creation of the LatLongBox depends on it
+        # Do the location first, as the creation of the LandFireLatLongBox depends on it
         if location is not None:
-            # Since all operational layers use the LatLongBox, we can update
-            # the yaml data and the LatLongBox at the class level
+            # Since all operational layers use the LandFireLatLongBox, we can update
+            # the yaml data and the LandFireLatLongBox at the class level
             lat, long = location
             self.yaml_data["operational"]["latitude"] = lat
             self.yaml_data["operational"]["longitude"] = long
-            self.lat_long_box, self.historical_layer = self._make_lat_long_box()
+            self.landfire_lat_long_box = self._make_lat_long_box()
 
         # Can only reset functional topography seeds, since operational is updated
         # via the `location` argument
@@ -918,8 +930,8 @@ class Config:
             # Update the yaml data
             self.yaml_data["terrain"]["fuel"]["type"] = fuel_type
 
-        # Remake the LatLongBox
-        self.lat_long_box, self.historical_layer = self._make_lat_long_box()
+        # Remake the LandFireLatLongBox
+        self.landfire_lat_long_box = self._make_lat_long_box()
         # Remake the AreaConfig since operational/functional could have changed
         self.area = self._load_area()
         # Remake the terrain

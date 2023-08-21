@@ -19,7 +19,7 @@ class WindController:
     given size of the screen
     """
 
-    def __init__(self, screen_size: int = 225) -> None:
+    def __init__(self, screen_size: tuple[int, int] = (225, 225)) -> None:
         self.speed_layer = WindNoise()
         self.direction_layer = WindNoise()
         self.map_wind_speed: Optional[np.ndarray] = None
@@ -35,7 +35,7 @@ class WindController:
         lacunarity: float,
         range_min: float,
         range_max: float,
-        screen_size: int,
+        screen_size: tuple,
     ) -> None:
         """
         Set simplex noise values for wind speeds
@@ -70,7 +70,7 @@ class WindController:
         lacunarity: float,
         range_min: float,
         range_max: float,
-        screen_size: int,
+        screen_size: tuple,
     ) -> None:
         """
         Set simplex noise values for wind directions
@@ -105,7 +105,7 @@ class WindControllerCFD:
 
     def __init__(
         self,
-        screen_size: int = 225,
+        screen_size: tuple[int, int] = (225, 450),
         result_accuracy: int = 1,
         scale: int = 1,
         timestep: float = 1.0,
@@ -128,7 +128,7 @@ class WindControllerCFD:
         self.time_to_train = time_to_train
 
         if terrain_features is None:
-            self.terrain_features = np.zeros((self.N, self.N))
+            self.terrain_features = np.zeros((self.N))
         else:
 
             def terrain_downsample(height):
@@ -154,11 +154,11 @@ class WindControllerCFD:
         )
 
     def iterate_wind_step(self) -> None:
-        for v in range(0, self.N):
+        for v in range(0, self.N[0]):
             if self.wind_direction.lower() == "north":
                 self.fvect.addVelocity(v, 1, 0, self.wind_speed)
             elif self.wind_direction.lower() == "east":
-                self.fvect.addVelocity(self.N - 1, v, -1 * self.wind_speed, 0)
+                self.fvect.addVelocity(self.N[0] - 1, v, -1 * self.wind_speed, 0)
             elif self.wind_direction.lower() == "south":
                 self.fvect.addVelocity(1, v, -1 * self.wind_speed, 0)
             elif self.wind_direction.lower() == "west":
@@ -181,5 +181,5 @@ class WindControllerCFD:
     def get_wind_scale(self) -> int:
         return self.scale
 
-    def get_screen_size(self) -> int:
+    def get_screen_size(self) -> tuple:
         return self.N

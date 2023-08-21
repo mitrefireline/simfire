@@ -208,7 +208,7 @@ class FireSimulation(Simulation):
         self.terrain = Terrain(
             self.config.terrain.fuel_layer,
             self.config.terrain.topography_layer,
-            (self.config.area.screen_size, self.config.area.screen_size),
+            self.config.area.screen_size,
             headless=self.config.simulation.headless,
         )
 
@@ -343,8 +343,8 @@ class FireSimulation(Simulation):
         sigma = np.zeros_like(self.terrain.fuels)
         delta = np.zeros_like(self.terrain.fuels)
         M_x = np.zeros_like(self.terrain.fuels)
-        for y in range(self.config.area.screen_size):
-            for x in range(self.config.area.screen_size):
+        for y in range(self.config.area.screen_size[1]):
+            for x in range(self.config.area.screen_size[0]):
                 fuel = self.terrain.fuels[y][x]
                 w_0[y][x] = fuel.w_0
                 sigma[y][x] = fuel.sigma
@@ -364,7 +364,7 @@ class FireSimulation(Simulation):
     def _correct_pos(self, position: np.ndarray) -> np.ndarray:
         """
         Correct the position to be the same shape as
-        `(self.config.area.screen_size, self.config.area.screen_size)`
+        `self.config.area.screen_size`
 
         Arguments:
             position: The position to be corrected.
@@ -377,9 +377,7 @@ class FireSimulation(Simulation):
         prev_pos = current_pos - 1
         pos[prev_pos] = 1
         pos[current_pos] = 0
-        position = np.reshape(
-            pos, (self.config.area.screen_size, self.config.area.screen_size)
-        )
+        position = np.reshape(pos, self.config.area.screen_size)
 
         return position
 
@@ -523,7 +521,7 @@ class FireSimulation(Simulation):
         `BurnStatus.BURNING`.
         """
         self.fire_map = np.full(
-            (self.config.area.screen_size, self.config.area.screen_size),
+            self.config.area.screen_size,
             BurnStatus.UNBURNED,
         )
         x, y = self.config.fire.fire_initial_position
@@ -940,7 +938,7 @@ class FireSimulation(Simulation):
             # Create the Game and switch the internal variable to track if we're
             # currently rendering
             self._game = Game(
-                (self.config.area.screen_size, self.config.area.screen_size),
+                self.config.area.screen_size,
                 record=True,
             )
         else:

@@ -681,7 +681,7 @@ class RothermelFireManager(FireManager):
         # Update the burn_amounts dependent on if there are control lines there
         # And only update if specified in the class
         self.rate_of_spread = self._update_rate_of_spread(rate_of_spread, fire_map)
-        self.burn_amounts += rate_of_spread
+        self.burn_amounts += self.rate_of_spread
 
         # Update the fire_map with new burning locations and update self.sprites and
         # self.durations

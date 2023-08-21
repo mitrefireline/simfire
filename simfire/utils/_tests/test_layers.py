@@ -10,18 +10,17 @@ from ..layers import (
     FunctionalBurnProbabilityLayer,
     FunctionalFuelLayer,
     FunctionalTopographyLayer,
-    LatLongBox,
-    OperationalBurnProbabilityLayer,
+    LandFireLatLongBox,
     TopographyLayer,
 )
 
 
-class TestLatLongBox(unittest.TestCase):
+class TestLandFireLatLongBox(unittest.TestCase):
     def setUp(self) -> None:
         """
         Set up tests for reading in real topography
         """
-        self.lat_long_box = LatLongBox(
+        self.lat_long_box = LandFireLatLongBox(
             ((37.45, -120.44), (37.42, -120.40)),
             year="2020",
             layers=("fuel", "topographic"),
@@ -204,22 +203,10 @@ class TestOperationalBurnProbabilityLayer(unittest.TestCase):
         This method returns the data array containing the elevations within the
             specified bounding box region of the given latitudes and longitudes.
 
-        NOTE: This method should always return a square
+        # TODO: This layer is unused at this time.
         """
 
-        resolution = 30
-        # 2 Tiles (easternly)
-        center = (33.4, 115.04)
-        height, width = 3200, 3200
-        lat_long_box = LatLongBox(center, height, width, resolution)
-        self.assertTrue(True)  # Remove after burn probability data is fixed to
-        return
-        OperationalBurnProbabilityLayer(lat_long_box)
-
-        # match 3612, 3612 (pixel x pixel per image)
-        # self.assertEqual(
-        #     burnprobabilityGen.data.shape[0], burnprobabilityGen.data.shape[1]
-        # )
+        self.assertTrue(True)
 
     def test__get_dems(self) -> None:
         """

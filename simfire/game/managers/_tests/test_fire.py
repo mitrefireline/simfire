@@ -15,8 +15,8 @@ class TestFireManager(unittest.TestCase):
     def setUp(self) -> None:
         self.config = Config("./simfire/utils/_tests/test_configs/test_config.yml")
         self.init_pos = (
-            self.config.area.screen_size // 2,
-            self.config.area.screen_size // 2,
+            self.config.area.screen_size[0] // 2,
+            self.config.area.screen_size[1] // 2,
         )
         self.fire_size = self.config.display.fire_size
         self.max_fire_duration = self.config.fire.max_fire_duration
@@ -37,7 +37,7 @@ class TestFireManager(unittest.TestCase):
         Test that the sprites are pruned correctly.
         """
         fire_map = np.full(
-            (self.config.area.screen_size, self.config.area.screen_size),
+            self.config.area.screen_size,
             BurnStatus.UNBURNED,
         )
         # Create a sprite that is past the duration
@@ -63,11 +63,11 @@ class TestFireManager(unittest.TestCase):
         Test that new locations can be retrieved correctly.
         """
         fire_map = np.full(
-            (self.config.area.screen_size, self.config.area.screen_size),
+            self.config.area.screen_size,
             BurnStatus.UNBURNED,
         )
         # Use a location that is too large and out-of-bounds
-        x, y = (self.config.area.screen_size, self.config.area.screen_size)
+        x, y = self.config.area.screen_size
         new_locs = self.fire_manager._get_new_locs(x, y, fire_map)
         valid_locs = ((x - 1, y - 1),)
         self.assertTupleEqual(
@@ -95,7 +95,10 @@ class TestFireManager(unittest.TestCase):
         )
 
         # Use a location that is BURNED
-        x, y = (self.config.area.screen_size // 2, self.config.area.screen_size // 2)
+        x, y = (
+            self.config.area.screen_size[0] // 2,
+            self.config.area.screen_size[1] // 2,
+        )
         fire_map[y, x + 1] = BurnStatus.BURNED
         new_locs = self.fire_manager._get_new_locs(x, y, fire_map)
         # All 8-connected points except (x+1, y)
@@ -123,7 +126,7 @@ class TestFireManager(unittest.TestCase):
         Test updating the rate of spread based on locations of control lines
         """
         fire_map = np.full(
-            (self.config.area.screen_size, self.config.area.screen_size),
+            self.config.area.screen_size,
             BurnStatus.UNBURNED,
         )
         rate_of_spread = np.zeros_like(fire_map)
@@ -164,7 +167,7 @@ class TestRothermelFireManager(unittest.TestCase):
         self.config = Config(
             "./simfire/utils/_tests/test_configs/test_config_rothermel_manager.yml"
         )
-        self.screen_size = (self.config.area.screen_size, self.config.area.screen_size)
+        self.screen_size = self.config.area.screen_size
         self.headless = False
 
         self.fuel_particle = FuelParticle()
@@ -397,8 +400,8 @@ class TestConstantSpreadFireManager(unittest.TestCase):
     def setUp(self) -> None:
         self.config = Config("./simfire/utils/_tests/test_configs/test_config.yml")
         self.init_pos = (
-            self.config.area.screen_size // 5,
-            self.config.area.screen_size // 7,
+            self.config.area.screen_size[0] // 5,
+            self.config.area.screen_size[1] // 7,
         )
         self.fire_size = self.config.display.fire_size
         self.max_fire_duration = self.config.fire.max_fire_duration
@@ -414,7 +417,7 @@ class TestConstantSpreadFireManager(unittest.TestCase):
         make sure that no fires are spread before max_fire_duration updates, and that the
         correct number of new fires are created at the correct locations.
         """
-        fire_map = np.zeros((self.config.area.screen_size, self.config.area.screen_size))
+        fire_map = np.zeros(self.config.area.screen_size)
         # Get the locations where Fires should be created
         new_locs = self.fire_manager._get_new_locs(
             self.init_pos[0], self.init_pos[1], fire_map

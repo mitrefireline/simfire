@@ -23,7 +23,7 @@ class FireSimulationTest(unittest.TestCase):
             Path(self.config.path).parent / "test_config_flat_simple.yml"
         )
 
-        self.screen_size = (self.config.area.screen_size, self.config.area.screen_size)
+        self.screen_size = self.config.area.screen_size
 
         self.simulation = FireSimulation(self.config)
         self.simulation_flat = FireSimulation(self.config_flat_simple)
@@ -94,7 +94,7 @@ class FireSimulationTest(unittest.TestCase):
         """
         # Check against a completely burned fire_map
         fire_map = np.full(
-            (self.config.area.screen_size, self.config.area.screen_size),
+            self.config.area.screen_size,
             BurnStatus.BURNED,
         )
 

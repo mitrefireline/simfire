@@ -758,11 +758,16 @@ class FireSimulation(Simulation):
         """
         keys = list(types.keys())
         success = False
-        if "elevation" in keys:
-            self.config.reset_terrain(topography_type=types["elevation"])
+        if "elevation" in keys and "fuel" in keys:
+            self.config.reset_terrain(
+                topography_type=types["elevation"], fuel_type=types["fuel"]
+            )
             success = True
-        if "fuel" in keys:
+        elif "fuel" in keys and "elevation" not in keys:
             self.config.reset_terrain(fuel_type=types["fuel"])
+            success = True
+        elif "elevation" in keys and "fuel" not in keys:
+            self.config.reset_terrain(topography_type=types["elevation"])
             success = True
 
         valid_keys = list(self.get_layer_types().keys())

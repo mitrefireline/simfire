@@ -31,6 +31,13 @@ export PATH=$PATH:$HOME/.local/bin
 poetry install --no-dev
 ```
 
+Currently there are additional version dependencies that poetry cannot handle. To resolve:
+```shell
+
+pip install -r requirements.txt
+
+```
+
 And run the `run_game.py` script:
 
 ```shell

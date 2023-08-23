@@ -1,4 +1,3 @@
-import glob
 import os
 import shutil
 from pathlib import Path
@@ -61,14 +60,25 @@ class LandFireLatLongBox:
         self.year = year
         self.layers = layers
 
-        # sepcify the output paths of the Ladfire python-client query
-        self.product_layers_path = (
+        # sepcify the output paths of the Landfire python-client query
+        self.product_layers_path = Path(
             f"lf_{abs(self.points[0][1])}_{self.points[0][0]}_"
             f"{abs(self.points[1][1])}_{self.points[1][0]}.zip"
         )
+
+        if os.environ.get("SF_HOME") is None:
+            sf_path = Path().home() / ".simfire"
+        else:
+            sf_path = Path(os.environ.get("SF_HOME"))
+            if not sf_path.exists():
+                log.info(f"Creating SF_HOME directory: {sf_path}")
+                sf_path.mkdir(parents=True, exist_ok=True)
+
         self.output_path = (
-            f"./landfire_cache/{self.year}/{self.product_layers_path[:-4]}/"
+            sf_path / f"landfire/{self.year}/{self.product_layers_path.stem}/"
         )
+
+        log.info(f"Saving LandFire data to: {self.output_path}")
 
         # make each a layer a global varibale that we "fill"
         self.fuel = np.array([])
@@ -94,8 +104,11 @@ class LandFireLatLongBox:
                 existing LatLongBox that has already been downloaded.
                 This could greatly improve functionality and speed up training interations
         """
-        if os.path.exists(self.output_path):
-            print("Data for this area already exists. Loading from file.")
+        if self.output_path.exists():
+            log.debug(
+                "Data for this area already exists. Loading from file: "
+                f"{self.output_path}"
+            )
             return True
         else:
             return False
@@ -156,9 +169,9 @@ class LandFireLatLongBox:
                     layer_products[layer] = layer_search[0]
 
             else:
-                print(
-                    f"Currently only support the following LandFire Products "
-                    " within SimFire: "
+                log.warning(
+                    f"Currently only supports the following LandFire Products "
+                    "within SimFire: "
                     f"{ProductTheme.fuel}, {ProductTheme.topographic}."
                 )
 
@@ -175,8 +188,8 @@ class LandFireLatLongBox:
             band: the gdal raster band that contains the data
 
         """
-        if not os.path.exists(self.output_path):
-            os.makedirs(self.output_path)
+        if not self.output_path.exists():
+            self.output_path.mkdir(parents=True, exist_ok=True)
 
             lf = landfire.Landfire(
                 bbox=f"{self.points[0][1]} {self.points[0][0]} \
@@ -186,14 +199,14 @@ class LandFireLatLongBox:
             # assume the order of data retrieval stays the same
             lf.request_data(
                 layers=self.layer_products.values(),
-                output_path=f"{self.output_path}/{self.product_layers_path}",
+                output_path=str(self.output_path / self.product_layers_path),
             )
 
             shutil.unpack_archive(
-                f"{self.output_path}/{self.product_layers_path}", f"{self.output_path}/"
+                self.output_path / self.product_layers_path, self.output_path
             )
         else:
-            print("data already exists for this bounding box and these layers")
+            log.debug(f"Data already exists for {self.output_path}")
 
     def _make_data(self):
         """
@@ -208,7 +221,7 @@ class LandFireLatLongBox:
         ```
 
         """
-        tifs = glob.glob(self.output_path + "*.tif")[0]
+        tifs = [str(t) for t in self.output_path.glob("*.tif")][0]
 
         # the order the data was requested is the order of the Band in the Tif file
         geo_tiff = GeoTiff(tifs, crs_code=4326)
@@ -319,7 +332,6 @@ class OperationalBurnProbabilityLayer(BurnProbabilityLayer):
         data = np.expand_dims(data, axis=-1)
 
         for key, _ in self.lat_long_box.tiles.items():
-
             if key == "single":
                 # simple case
                 tr = (self.lat_long_box.bl[0][0], self.lat_long_box.tr[1][0])

@@ -4,6 +4,7 @@ import unittest
 import matplotlib as mpl
 import numpy as np
 
+from ...utils.log import create_logger
 from ...world.fuel_array_functions import chaparral_fn
 from ..layers import (
     DataLayer,
@@ -13,6 +14,8 @@ from ..layers import (
     LandFireLatLongBox,
     TopographyLayer,
 )
+
+log = create_logger(__name__)
 
 
 class TestLandFireLatLongBox(unittest.TestCase):
@@ -61,10 +64,10 @@ class TestDataLayer(unittest.TestCase):
         """
         Test that the data is set to None.
         """
-        print(self.layer.data)
+        log.info(self.layer.data)
         self.assertIsNone(
             self.layer.data,
-            msg="The initialized data should be None, " f"but is {self.layer.data}",
+            msg=f"The initialized data should be None, but is {self.layer.data}",
         )
 
 

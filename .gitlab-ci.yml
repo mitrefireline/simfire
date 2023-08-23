@@ -76,7 +76,7 @@ isort:
     - lslab2
   script:
     - poetry install --only dev
-    - poetry run isort --check --trailing-comma -m=3 .
+    - poetry run isort --check --profile black --trailing-comma -m=3 .
   needs: []
   only:
     refs:

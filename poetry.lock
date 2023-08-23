@@ -590,20 +590,20 @@ sphinx-basic-ng = "*"
 
 [[package]]
 name = "geotiff"
-version = "0.2.9"
+version = "0.2.10"
 description = "A noGDAL tool for reading and writing geotiff files"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "geotiff-0.2.9-py3-none-any.whl", hash = "sha256:d309e3b65c34cb697b87461265f5a07ddcc9b083111283b4e76c90cd01b24b35"},
-    {file = "geotiff-0.2.9.tar.gz", hash = "sha256:4a14de2e170840c5a137c5047e47d6f5fca3e36df72843bd40ce91b234c1e505"},
+    {file = "geotiff-0.2.10-py3-none-any.whl", hash = "sha256:1c238b1115884a82b0e8b462384828b1bfe2819194f9f16384f517d07ab12e68"},
+    {file = "geotiff-0.2.10.tar.gz", hash = "sha256:36da356d3e2f6e3719bad32212283fe99049373391c7f576c2d6022642ad88d6"},
 ]
 
 [package.dependencies]
 numpy = "*"
 pyproj = "*"
-tifffile = ">=2021.7.2,<2022.4.28"
-zarr = ">=2.10.0"
+tifffile = ">=2021.7.4,<2022.4.28 || >2022.4.28"
+zarr = ">=2.12.0,<2.13"
 
 [package.extras]
 dev = ["pytest"]
@@ -2589,20 +2589,20 @@ tinycss2 = ">=0.6.0"
 
 [[package]]
 name = "tifffile"
-version = "2022.4.26"
+version = "2023.8.12"
 description = "Read and write TIFF files"
 optional = false
-python-versions = ">=3.8"
+python-versions = ">=3.9"
 files = [
-    {file = "tifffile-2022.4.26-py3-none-any.whl", hash = "sha256:e36b4e4a04e62f374893ddc91927bb1a8524a6aea0534fc23fe4d318b24a6573"},
-    {file = "tifffile-2022.4.26.tar.gz", hash = "sha256:018054f54b3c2fc06842b224077d059340309addfcd94263988c05d7f19724e9"},
+    {file = "tifffile-2023.8.12-py3-none-any.whl", hash = "sha256:d1ef06461a947a6800ba6121b330b54a57fb9cbf7e5bc0adab8307081297d66b"},
+    {file = "tifffile-2023.8.12.tar.gz", hash = "sha256:824956b6d974b9d346aae59932bea862a2ad18fcc2b1a820b6941b7f6ddb2bca"},
 ]
 
 [package.dependencies]
-numpy = ">=1.19.2"
+numpy = "*"
 
 [package.extras]
-all = ["imagecodecs (>=2021.11.20)", "lxml", "matplotlib (>=3.3)"]
+all = ["defusedxml", "fsspec", "imagecodecs (>=2023.8.12)", "lxml", "matplotlib", "zarr"]
 
 [[package]]
 name = "tinycss2"
@@ -2859,24 +2859,23 @@ files = [
 
 [[package]]
 name = "zarr"
-version = "2.16.1"
-description = "An implementation of chunked, compressed, N-dimensional arrays for Python"
+version = "2.12.0"
+description = "An implementation of chunked, compressed, N-dimensional arrays for Python."
 optional = false
-python-versions = ">=3.8"
+python-versions = ">=3.7, <4"
 files = [
-    {file = "zarr-2.16.1-py3-none-any.whl", hash = "sha256:de4882433ccb5b42cc1ec9872b95e64ca3a13581424666b28ed265ad76c7056f"},
-    {file = "zarr-2.16.1.tar.gz", hash = "sha256:4276cf4b4a653431042cd53ff2282bc4d292a6842411e88529964504fb073286"},
+    {file = "zarr-2.12.0-py3-none-any.whl", hash = "sha256:3713f28f3fafa838f62bb442504da8e89bb969ecd1da09c9a96927536ec9be34"},
+    {file = "zarr-2.12.0.tar.gz", hash = "sha256:515a31ee4bad6bb48ae05178c588ae49a02a35defa01dd9a3293306903368165"},
 ]
 
 [package.dependencies]
 asciitree = "*"
 fasteners = "*"
-numcodecs = ">=0.10.0"
-numpy = ">=1.20,<1.21.0 || >1.21.0"
+numcodecs = ">=0.6.4"
+numpy = ">=1.7"
 
 [package.extras]
-docs = ["numcodecs[msgpack]", "numpydoc", "pydata-sphinx-theme", "sphinx", "sphinx-copybutton", "sphinx-design", "sphinx-issues", "sphinx-rtd-theme"]
-jupyter = ["ipytree (>=0.2.2)", "ipywidgets (>=8.0.0)", "notebook"]
+jupyter = ["ipytree", "notebook"]
 
 [[package]]
 name = "zipp"
@@ -2896,4 +2895,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.9"
-content-hash = "59582ee71ad41aa33bc73d306451b9ddb945d790dfc6764aa0c89df28be59760"
+content-hash = "b3e86f5f8846a24bef4777831d267a6c5770599de221eea20b9a60dd998c633d"

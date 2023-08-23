@@ -7,8 +7,8 @@ from ..wind_mechanics.cfd_wind import Fluid
 
 class TestFluid(unittest.TestCase):
     def setUp(self) -> None:
-        self.n = 10
-        self.shape = (self.n, self.n)
+        self.n = (10, 10)
+        self.shape = self.n
         self.iterations = 1
         self.scale = 400
         self.dt = 1

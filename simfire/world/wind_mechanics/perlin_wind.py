@@ -66,11 +66,11 @@ class WindNoise:
         self.range_min = range_min
         self.range_max = range_max
 
-    def generate_map_array(self, screen_size) -> np.ndarray:
+    def generate_map_array(self, screen_size: tuple[int, int]) -> np.ndarray:
         map = []
         map = [
-            [self._generate_noise_value(x, y) for x in range(screen_size)]
-            for y in range(screen_size)
+            [self._generate_noise_value(x, y) for x in range(screen_size[1])]
+            for y in range(screen_size[0])
         ]
         return np.array(map, dtype=np.float32)
 

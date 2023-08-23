@@ -1,44 +1,36 @@
 # For a description of config parameters, go to
 # https://fireline.pages.mitre.org/simfire/config.html
 area:
-  screen_size: 225
+  screen_size: [225, 450] # h, w
   pixel_scale: 50
 
 display:
   fire_size: 2
   control_line_size: 2
   agent_size: 4
-  rescale_size: 512
+  rescale_factor: 2
 
 simulation:
   update_rate: 1
-  runtime: 15m
-  headless: true
+  runtime: 15h
+  headless: false
   draw_spread_graph: false
-  record: false
-  save_data: false
+  record: true
+  save_data: true
   data_type: "npy"
-  save_path: "~/.simfire/simulation_outputs"
+  sf_home: "~/.simfire"
 
 mitigation:
-  ros_attenuation: true
+  ros_attenuation: false
 
 operational:
   seed:
-  latitude: 39.095
-  longitude: 120.52
-  height: 2000
-  width: 2000
-  path: "/nfs/lslab2/fireline/data/"
-  resolution: 30
+  latitude: 38.422 # top left corner
+  longitude: -118.266 # top left corner
+  height: 2000 # in meters
+  width: 2000 # in meters
+  resolution: 30 # in meters
   year: 2020
-
-historical:
-  use: true
-  fire_init_pos_lat: 41.11037
-  fire_init_pos_long: -120.923293
-  name: carmel
-  year: '2020'
 
 terrain:
   topography:
@@ -87,24 +79,25 @@ fire:
   fire_initial_position:
     type: static
     static:
-      position: (65, 65)
+      position: (25, 25)
     random:
       seed: 1234
-  max_fire_duration: 4
+  max_fire_duration: 5
 
 environment:
-  moisture: 0.03
+  moisture: 0.001
 
 wind:
   function: perlin
   cfd:
     time_to_train: 1000
+    result_accuracy: 1
     iterations: 1
     scale: 1
     timestep_dt: 1.0
     diffusion: 0.0
     viscosity: 0.0000001
-    speed: 19
+    speed: 19.0
     direction: north
   simple:
     speed: 7

@@ -25,7 +25,7 @@ class Game:
     def __init__(
         self,
         screen_size: Tuple[int, int],
-        rescale_size: Optional[Tuple[int, int]] = None,
+        rescale_factor: Optional[int] = None,
         headless: bool = False,
         record: bool = False,
         show_wind_magnitude: bool = False,
@@ -40,7 +40,7 @@ class Game:
 
         Arguments:
             screen_size: The (n,n) size of the game screen/display in pixels.
-            rescale_size: The (s, s) size of the display to resize to
+            rescale_size: The (s, s) factor to rescale display to
             headless: Flag to run in a headless state.
             record: Flag to save a recording of the simulation game screen
         """
@@ -50,7 +50,7 @@ class Game:
                 "Got record=True and headless=True"
             )
         self.screen_size = screen_size
-        self.rescale_size = rescale_size
+        self.rescale_factor = rescale_factor
         self.headless = headless
         self.record = record
         self.show_wind_magnitude = show_wind_magnitude
@@ -68,16 +68,20 @@ class Game:
             # self.screen is for drawing all backgrounds/sprites at the simulation's scale
             # self.display_screen is for actually displaying the simulation to the user
             # These can have different sizes to do potential rescaling
-            if self.rescale_size is None:
-                self.display_screen = pygame.display.set_mode(self.screen_size)
+            if self.rescale_factor is None:
+                self.display_screen = pygame.display.set_mode(screen_size)
             else:
-                self.display_screen = pygame.display.set_mode(self.rescale_size)
-            self.screen = pygame.Surface(self.screen_size)
+                rescale_size = (
+                    self.screen_size[1] * self.rescale_factor,
+                    self.screen_size[0] * self.rescale_factor,
+                )
+                self.display_screen = pygame.display.set_mode(rescale_size)
+            self.screen = pygame.Surface((screen_size[1], screen_size[0]))
             pygame.display.set_caption("SimFire")
             with resources.path("simfire.utils.assets", "fireline_logo.png") as path:
                 fireline_logo_path = path
             pygame.display.set_icon(load_image(str(fireline_logo_path)))
-
+            # pygame returns as w, h
             self.background = pygame.Surface(self.screen.get_size())
             self.background = self.background.convert()
             self.background.fill((0, 0, 0))
@@ -371,17 +375,19 @@ class Game:
                 terrain.update(self.fire_map)
                 all_sprites.draw(self.screen)
 
-                if self.rescale_size is None:
+                if self.rescale_factor is None:
                     self.display_screen.blit(self.screen, (0, 0))
                 else:
                     self.display_screen.blit(
-                        pygame.transform.smoothscale(self.screen, self.rescale_size),
+                        pygame.transform.smoothscale_by(self.screen, self.rescale_factor),
                         (0, 0),
                     )
 
                 if self.record and self.frames is not None:
                     screen_bytes = pygame.image.tostring(self.screen, "RGB")
-                    screen_im = Image.frombuffer("RGB", self.screen_size, screen_bytes)
+                    screen_im = Image.frombuffer(
+                        "RGB", (self.screen_size[1], self.screen_size[0]), screen_bytes
+                    )
                     self.frames.append(screen_im)
 
                 if self.show_wind_magnitude is True:

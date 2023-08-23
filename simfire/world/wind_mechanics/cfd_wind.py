@@ -9,7 +9,7 @@ terrain_features: np.ndarray
 class Fluid:
     def __init__(
         self,
-        n: int,
+        n: tuple[int, int],
         iterations: int,
         scale: int,
         dt: float,
@@ -17,21 +17,21 @@ class Fluid:
         viscosity: float,
         terrain: np.ndarray,
     ) -> None:
-        self.N: int = n  # Width x Height of the Screen
+        self.N: tuple[int, int] = n  # Width x Height of the Screen
         self.itr = iterations
 
         self.dt = dt  # Timestep (can be 1 but better if <1 for better behavior)
         self.diff = diffusion  # Controls how vectors and densitys diffuse out
         self.visc = viscosity  # Thickness of the fluid
 
-        self.s = np.zeros((n, n))
-        self.density = np.zeros((n, n))
+        self.s = np.zeros(self.N)
+        self.density = np.zeros(self.N)
 
-        self.Vx = np.zeros((n, n))
-        self.Vy = np.zeros((n, n))
+        self.Vx = np.zeros(self.N)
+        self.Vy = np.zeros(self.N)
 
-        self.Vx0 = np.zeros((n, n))
-        self.Vy0 = np.zeros((n, n))
+        self.Vx0 = np.zeros(self.N)
+        self.Vy0 = np.zeros(self.N)
 
         self.scale = scale
 
@@ -60,8 +60,8 @@ class Fluid:
         advect(0, self.density, self.s, self.Vx, self.Vy, self.dt, self.N)
 
     def renderD(self, surface):
-        for i in range(0, self.N):
-            for j in range(0, self.N):
+        for i in range(0, self.N[1]):
+            for j in range(0, self.N[0]):
                 x = i * self.scale
                 y = j * self.scale
                 d = self.density[i][j]
@@ -73,8 +73,8 @@ class Fluid:
         pygame.display.flip()
 
     def renderV(self, surface):
-        for i in range(0, self.N):
-            for j in range(0, self.N):
+        for i in range(0, self.N[1]):
+            for j in range(0, self.N[0]):
                 x = i * self.scale
                 y = j * self.scale
                 vx = self.Vx[i][j]
@@ -101,30 +101,30 @@ class Fluid:
 # cells and maintain their vector magnitude
 
 
-def set_bnd(b: int, x: np.ndarray, N: int):
+def set_bnd(b: int, x: np.ndarray, N: tuple[int, int]):
     # Y Boundaries
-    for i in range(1, N - 1):
+    for i in range(1, N[0] - 1):
         x[i][0] = -x[i][1] if b == 2 else x[i][1]
-        x[i][N - 1] = -x[i][N - 2] if b == 2 else x[i][N - 2]
+        x[i][N[0] - 1] = -x[i][N[0] - 2] if b == 2 else x[i][N[0] - 2]
 
     # X Boundaries
-    for j in range(1, N - 1):
+    for j in range(1, N[1] - 1):
         x[0][j] = -x[1][j] if b == 1 else x[1][j]
-        x[N - 1][j] = -x[N - 2][j] if b == 1 else x[N - 2][j]
+        x[N[1] - 1][j] = -x[N[1] - 2][j] if b == 1 else x[N[1] - 2][j]
 
     # Handle corners
     x[0][0] = 0.5 * (x[1][0] + x[0][1])
-    x[0][N - 1] = 0.5 * (x[1][N - 1] + x[0][N - 2])
-    x[N - 1][0] = 0.5 * (x[N - 2][0] + x[N - 1][1])
-    x[N - 1][N - 1] = 0.5 * (x[N - 2][N - 1] + x[N - 1][N - 2])
+    x[0][N[0] - 1] = 0.5 * (x[1][N[0] - 1] + x[0][N[0] - 2])
+    x[N[1] - 1][0] = 0.5 * (x[N[1] - 2][0] + x[N[1] - 1][1])
+    x[N[1] - 1][N[1] - 1] = 0.5 * (x[N[1] - 2][N[1] - 1] + x[N[1] - 1][N[1] - 2])
 
     # Handle Terrain Collisions
     global terrain_features
 
     # Handle Horizontal Interaction
     if b == 2:
-        for row in range(2, N - 2):
-            for col in range(2, N - 2):
+        for row in range(2, N[0] - 2):
+            for col in range(2, N[1] - 2):
                 # Left to right interaction
                 if terrain_features[row][col] == 1.0:
                     x[row][col] = 0.0
@@ -133,8 +133,8 @@ def set_bnd(b: int, x: np.ndarray, N: int):
                     if terrain_features[row][col + 1] == 0:
                         x[row][col + 1] = -1 * x[row][col + 1]
     if b == 1:
-        for row in range(2, N - 2):
-            for col in range(2, N - 2):
+        for row in range(2, N[0] - 2):
+            for col in range(2, N[1] - 2):
                 # Left to right interaction
                 if terrain_features[row][col] == 1.0:
                     x[row][col] = 0.0
@@ -166,12 +166,18 @@ def set_bnd(b: int, x: np.ndarray, N: int):
 
 
 def lin_solve(
-    b: int, x: np.ndarray, x0: np.ndarray, a: float, c: float, itr: int, N: int
+    b: int,
+    x: np.ndarray,
+    x0: np.ndarray,
+    a: float,
+    c: float,
+    itr: int,
+    N: tuple[int, int],
 ):
     cRecip = 1.0 / c
     for t in range(0, itr):
-        for j in range(1, N - 1):
-            for i in range(1, N - 1):
+        for j in range(1, N[0] - 1):
+            for i in range(1, N[1] - 1):
                 calc = (
                     x0[i][j] + a * (x[i + 1][j] + x[i - 1][j] + x[i][j + 1] + x[i][j - 1])
                 ) * cRecip
@@ -187,9 +193,15 @@ def lin_solve(
 
 
 def diffuse(
-    b: int, x: np.ndarray, x0: np.ndarray, diff: float, dt: float, itr: int, N: int
+    b: int,
+    x: np.ndarray,
+    x0: np.ndarray,
+    diff: float,
+    dt: float,
+    itr: int,
+    N: tuple[int, int],
 ):
-    a = dt * diff * (N - 2) * (N - 2)
+    a = dt * diff * (N[0] - 2) * (N[1] - 2)
     lin_solve(b, x, x0, a, 1 + 6 * a, itr, N)
 
 
@@ -202,10 +214,10 @@ def project(
     p: np.ndarray,
     div: np.ndarray,
     itr: int,
-    N: int,
+    N: tuple[int, int],
 ):
-    for j in range(1, N - 1):
-        for i in range(1, N - 1):
+    for j in range(1, N[0] - 1):
+        for i in range(1, N[1] - 1):
             div[i][j] = (
                 -0.5
                 * (
@@ -214,17 +226,17 @@ def project(
                     + velocY[i][j + 1]
                     - velocY[i][j - 1]
                 )
-            ) / N
+            ) / N[0]
             p[i][j] = 0
 
     set_bnd(0, div, N)
     set_bnd(0, p, N)
     lin_solve(0, p, div, 1, 6, itr, N)
 
-    for j in range(1, N - 1):
-        for i in range(1, N - 1):
-            velocX[i][j] -= 0.5 * (p[i + 1][j] - p[i - 1][j]) * N
-            velocY[i][j] -= 0.5 * (p[i][j + 1] - p[i][j - 1]) * N
+    for j in range(1, N[0] - 1):
+        for i in range(1, N[1] - 1):
+            velocX[i][j] -= 0.5 * (p[i + 1][j] - p[i - 1][j]) * N[1]
+            velocY[i][j] -= 0.5 * (p[i][j + 1] - p[i][j - 1]) * N[0]
 
     set_bnd(1, velocX, N)
     set_bnd(2, velocY, N)
@@ -242,14 +254,15 @@ def advect(
     velocX: np.ndarray,
     velocY: np.ndarray,
     dt: float,
-    N: int,
+    N: tuple[int, int],
 ):
-    dtx = dt * (N - 2)
-    dty = dt * (N - 2)
+    dtx = dt * (N[1] - 2)
+    dty = dt * (N[0] - 2)
 
-    Nfloat = N - 2
-    for j, jfloat in zip(range(1, N - 1), range(1, N - 1)):
-        for i, ifloat in zip(range(1, N - 1), range(1, N - 1)):
+    Nfloat_i = N[1] - 2
+    Nfloat_j = N[0] - 2
+    for j, jfloat in zip(range(1, N[0] - 1), range(1, N[0] - 1)):
+        for i, ifloat in zip(range(1, N[1] - 1), range(1, N[1] - 1)):
             tmp1 = dtx * velocX[i][j]
             tmp2 = dty * velocY[i][j]
             x = ifloat - tmp1
@@ -257,15 +270,15 @@ def advect(
 
             if x < 0.5:
                 x = 0.5
-            if x > Nfloat + 0.5:
-                x = Nfloat + 0.5
+            if x > Nfloat_i + 0.5:
+                x = Nfloat_i + 0.5
             i0 = math.floor(x)
             i1 = i0 + 1.0
 
             if y < 0.5:
                 y = 0.5
-            if y > Nfloat + 0.5:
-                y = Nfloat + 0.5
+            if y > Nfloat_j + 0.5:
+                y = Nfloat_j + 0.5
             j0 = math.floor(y)
             j1 = j0 + 1.0
 

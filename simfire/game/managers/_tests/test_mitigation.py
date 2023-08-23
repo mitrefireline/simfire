@@ -24,7 +24,7 @@ class TestControlLineManager(unittest.TestCase):
 
     def setUp(self) -> None:
         self.config = Config("./simfire/utils/_tests/test_configs/test_config.yml")
-        self.screen_size = (self.config.area.screen_size, self.config.area.screen_size)
+        self.screen_size = self.config.area.screen_size
         points = line(self.screen_size[0] // 4, 0, 0, self.screen_size[1] // 4)
         y = points[0].tolist()
         x = points[1].tolist()
@@ -68,7 +68,7 @@ class TestControlLineManager(unittest.TestCase):
         resulting `fire_map`
         """
         fire_map = np.full(
-            (self.config.area.screen_size, self.config.area.screen_size),
+            self.config.area.screen_size,
             BurnStatus.UNBURNED,
         )
 
@@ -107,7 +107,7 @@ class TestFireLineManager(unittest.TestCase):
 
     def setUp(self) -> None:
         self.config = Config("./simfire/utils/_tests/test_configs/test_config.yml")
-        self.screen_size = (self.config.area.screen_size, self.config.area.screen_size)
+        self.screen_size = self.config.area.screen_size
         points = line(self.screen_size[0] // 4, 0, 0, self.screen_size[1] // 4)
         y = points[0].tolist()
         x = points[1].tolist()
@@ -151,7 +151,7 @@ class TestScratchLineManager(unittest.TestCase):
 
     def setUp(self) -> None:
         self.config = Config("./simfire/utils/_tests/test_configs/test_config.yml")
-        self.screen_size = (self.config.area.screen_size, self.config.area.screen_size)
+        self.screen_size = self.config.area.screen_size
         points = line(self.screen_size[0] // 4, 0, 0, self.screen_size[1] // 4)
         y = points[0].tolist()
         x = points[1].tolist()
@@ -195,7 +195,7 @@ class TestWetLineManager(unittest.TestCase):
 
     def setUp(self) -> None:
         self.config = Config("./simfire/utils/_tests/test_configs/test_config.yml")
-        self.screen_size = (self.config.area.screen_size, self.config.area.screen_size)
+        self.screen_size = self.config.area.screen_size
         points = line(self.screen_size[0] // 4, 0, 0, self.screen_size[1] // 4)
         y = points[0].tolist()
         x = points[1].tolist()

@@ -43,12 +43,14 @@ repos:
         name: isort
         language: python
         entry: isort
-        args: [--trailing-comma, -m=3]
+        args: [--profile, black, --trailing-comma, -m=3]
         types: [python]
-  - repo: https://github.com/PyCQA/flake8
-    rev: 3.9.2
-    hooks:
-    -   id: flake8
+      - id: flake8
+        name: flake8
+        language: python
+        entry: flake8
+        args: [--config=.flake8]
+        types: [python]
   - repo: https://github.com/PyCQA/bandit
     rev: 1.7.4
     hooks:

@@ -11,7 +11,7 @@ from svglib.svglib import svg2rlg
 from wurlitzer import pipes
 
 from ..enums import BURNED_RGB_COLOR, BurnStatus, SpriteLayer
-from ..utils.layers import FuelLayer, HistoricalLayer, TopographyLayer
+from ..utils.layers import FuelLayer, TopographyLayer
 from ..utils.log import create_logger
 
 log = create_logger(__name__)
@@ -31,7 +31,6 @@ class Terrain(pygame.sprite.Sprite):
         topo_layer: TopographyLayer,
         screen_size: Tuple[int, int],
         headless: bool = False,
-        hist_layer: Optional[HistoricalLayer] = None,
     ) -> None:
 
         super().__init__()
@@ -41,8 +40,6 @@ class Terrain(pygame.sprite.Sprite):
 
         self.screen_size = screen_size
         self.headless = headless
-
-        self.hist_layer = hist_layer
 
         self.elevations = self.topo_layer.data.squeeze()
         self.fuels = self.fuel_layer.data.squeeze()

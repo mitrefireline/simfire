@@ -1,7 +1,7 @@
 # For a description of config parameters, go to
 # https://fireline.pages.mitre.org/simfire/config.html
 area:
-  screen_size: 225
+  screen_size: [225, 225]
   pixel_scale: 50
 
 display:
@@ -17,7 +17,7 @@ simulation:
   record: true
   save_data: false
   data_type: "npy"
-  save_path: "/tmp/test"
+  sf_home: "/tmp/test"
 
 mitigation:
   ros_attenuation: true
@@ -25,19 +25,11 @@ mitigation:
 operational:
   seed:
   latitude: 39.67
-  longitude: 119.8
+  longitude: -119.8
   height: 4000
   width: 4000
-  path: "/nfs/lslab2/fireline/data/"
   resolution: 30
   year: 2020
-
-historical:
-  use: false
-  fire_init_pos_lat: 36.095
-  fire_init_pos_long: -120.522
-  name: Mineral
-  year: '2020'
 
 terrain:
   topography:

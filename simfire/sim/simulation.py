@@ -1,4 +1,5 @@
 import json
+import os
 import warnings
 from abc import ABC, abstractmethod
 from datetime import datetime
@@ -52,7 +53,7 @@ class Simulation(ABC):
         self.config = config
         # Create a _now time to use for the simulation object. This is used to
         # create folders based on individual simulation runs.
-        self.start_time = datetime.now().strftime("%m-%d-%Y_%H-%M-%S")
+        self.start_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
     @abstractmethod
     def run(self, time: Union[str, int]) -> Tuple[np.ndarray, bool]:
@@ -185,6 +186,7 @@ class FireSimulation(Simulation):
         self.fire_map: np.ndarray
         self.agent_positions: np.ndarray
         self.agents: Dict[int, Agent] = {}
+        self._create_out_path()
         self.reset()
 
     def reset(self) -> None:
@@ -208,7 +210,7 @@ class FireSimulation(Simulation):
         self.terrain = Terrain(
             self.config.terrain.fuel_layer,
             self.config.terrain.topography_layer,
-            (self.config.area.screen_size, self.config.area.screen_size),
+            self.config.area.screen_size,
             headless=self.config.simulation.headless,
         )
 
@@ -343,8 +345,8 @@ class FireSimulation(Simulation):
         sigma = np.zeros_like(self.terrain.fuels)
         delta = np.zeros_like(self.terrain.fuels)
         M_x = np.zeros_like(self.terrain.fuels)
-        for y in range(self.config.area.screen_size):
-            for x in range(self.config.area.screen_size):
+        for y in range(self.config.area.screen_size[0]):
+            for x in range(self.config.area.screen_size[1]):
                 fuel = self.terrain.fuels[y][x]
                 w_0[y][x] = fuel.w_0
                 sigma[y][x] = fuel.sigma
@@ -364,7 +366,7 @@ class FireSimulation(Simulation):
     def _correct_pos(self, position: np.ndarray) -> np.ndarray:
         """
         Correct the position to be the same shape as
-        `(self.config.area.screen_size, self.config.area.screen_size)`
+        `self.config.area.screen_size`
 
         Arguments:
             position: The position to be corrected.
@@ -377,9 +379,7 @@ class FireSimulation(Simulation):
         prev_pos = current_pos - 1
         pos[prev_pos] = 1
         pos[current_pos] = 0
-        position = np.reshape(
-            pos, (self.config.area.screen_size, self.config.area.screen_size)
-        )
+        position = np.reshape(pos, self.config.area.screen_size)
 
         return position
 
@@ -523,7 +523,7 @@ class FireSimulation(Simulation):
         `BurnStatus.BURNING`.
         """
         self.fire_map = np.full(
-            (self.config.area.screen_size, self.config.area.screen_size),
+            self.config.area.screen_size,
             BurnStatus.UNBURNED,
         )
         x, y = self.config.fire.fire_initial_position
@@ -760,11 +760,16 @@ class FireSimulation(Simulation):
         """
         keys = list(types.keys())
         success = False
-        if "elevation" in keys:
-            self.config.reset_terrain(topography_type=types["elevation"])
+        if "elevation" in keys and "fuel" in keys:
+            self.config.reset_terrain(
+                topography_type=types["elevation"], fuel_type=types["fuel"]
+            )
             success = True
-        if "fuel" in keys:
+        elif "fuel" in keys and "elevation" not in keys:
             self.config.reset_terrain(fuel_type=types["fuel"])
+            success = True
+        elif "elevation" in keys and "fuel" not in keys:
+            self.config.reset_terrain(topography_type=types["elevation"])
             success = True
 
         valid_keys = list(self.get_layer_types().keys())
@@ -795,15 +800,14 @@ class FireSimulation(Simulation):
         to `True`.
         """
         if path is None:
-            path = self._create_out_path()
-
-        # Convert to a Path object for easy manipulation
-        if not isinstance(path, Path) and path is not None:
+            path = self.sf_home / "gifs"
+        else:
             path = Path(path).expanduser()
 
         # If the path does not end in a filename, create a default filename
         if path.suffix == "":
-            now = datetime.now().strftime("%H-%M-%S")
+            # Create a now time with the format "YYYY-MM-DD_HH-MM-SS"
+            now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
             filename = f"simulation_{now}.gif"
             path = path / filename
 
@@ -819,7 +823,7 @@ class FireSimulation(Simulation):
         self._game.save(path, duration=100)  # 0.1s
         log.info("Finished saving GIF")
 
-    def save_spread_graph(self, filename: Optional[Union[str, Path]] = None) -> None:
+    def save_spread_graph(self, path: Optional[Union[str, Path]] = None) -> None:
         """
         Saves the most recent simulation as a PNG.
 
@@ -827,18 +831,19 @@ class FireSimulation(Simulation):
         to `True`.
         """
         # Convert to a Path object for easy manipulation
-        if not isinstance(filename, Path) and filename is not None:
-            filename = Path(filename)
-        out_path = self._create_out_path()
-        log.info("Saving fire spread graph...")
-        # Create the fire_spread_graph and save it to PNG
-        if filename is None:
-            now = datetime.now().strftime("%H-%M-%S")
+        if path is None:
+            out_path = self.sf_home / "graphs"
+        else:
+            out_path = Path(path)
+        if Path(out_path).is_dir() or out_path.suffix != ".png":
+            out_path.mkdir(parents=True, exist_ok=True)
+            now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
             filename = f"fire_spread_graph_{now}.png"
         else:
-            if filename.suffix != ".png":
-                filename = filename.with_suffix(".png")
+            filename = out_path.name
+            out_path = out_path.parent
         fig_out_path = out_path / filename
+        log.info(f"Saving fire spread graph to {fig_out_path}")
         fig = self.fire_manager.draw_spread_graph(self._game.screen)
         fig.savefig(fig_out_path)
         log.info("Done saving fire spread graph")
@@ -848,9 +853,9 @@ class FireSimulation(Simulation):
         Save the data into a JSON file.
         """
         # Create the output path if it doesn't exist
-        out_path = self._create_out_path()
+        out_path = self.sf_home
         # Create the data directory if it doesn't exist
-        datapath = out_path / "data"
+        datapath = out_path / "data" / self.start_time
         datapath.mkdir(parents=True, exist_ok=True)
 
         # Get the filepath, depending on the data type
@@ -940,7 +945,7 @@ class FireSimulation(Simulation):
             # Create the Game and switch the internal variable to track if we're
             # currently rendering
             self._game = Game(
-                (self.config.area.screen_size, self.config.area.screen_size),
+                self.config.area.screen_size,
                 record=True,
             )
         else:
@@ -962,12 +967,17 @@ class FireSimulation(Simulation):
         self._game.fire_map = self.fire_map
         self._last_screen = self._game.screen
 
-    def _create_out_path(self) -> Path:
+    def _create_out_path(self) -> None:
         """
-        Creates the output path if it does not exist.
+        Creates the output path if it does not exist and sets `self.sf_home`.
+
+        Also assigns the environment variable `SF_HOME` to the output path.
         """
-        out_path = Path(self.config.simulation.save_path).expanduser()
-        if not out_path.parent.is_dir():
+        self.sf_home = Path(self.config.simulation.sf_home).expanduser()
+        # Set the environment variable so the LandFireLatLongBox knows where to save the
+        # LandFire data
+        os.environ["SF_HOME"] = str(self.sf_home)
+        if not self.sf_home.parent.is_dir():
             log.warning(
                 "Designated save path from the config does not exist, "
                 "creating parent directories"
@@ -976,10 +986,9 @@ class FireSimulation(Simulation):
         else:
             parents = False
 
-        if not out_path.is_dir():
-            log.info(f"Creating directory '{out_path}'")
-            out_path.mkdir(parents=parents) if not out_path.is_dir() else None
-        return out_path
+        if not self.sf_home.is_dir():
+            log.info(f"Creating SF_HOME directory '{self.sf_home}'")
+            self.sf_home.mkdir(parents=parents) if not self.sf_home.is_dir() else None
 
     def _load_fire_map(self, filepath: Path) -> Optional[np.ndarray]:
         """

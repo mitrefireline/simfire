@@ -12,7 +12,7 @@ class TestWindNoise(unittest.TestCase):
         self.lacunarity: float = 2.0
         self.range_min: float = 7
         self.range_max: float = 47
-        self.screen_size = 150
+        self.screen_size = (150, 150)
         self.test_wind = WindNoise()
         self.test_wind.set_noise_parameters(
             self.seed,
@@ -28,8 +28,8 @@ class TestWindNoise(unittest.TestCase):
         wind_map = self.test_wind.generate_map_array(self.screen_size)
         wind_map_row = wind_map[0]
 
-        self.assertEqual(len(wind_map), self.screen_size)
-        self.assertEqual(len(wind_map_row), self.screen_size)
+        self.assertEqual(wind_map.shape, self.screen_size)
+        self.assertEqual(len(wind_map_row), self.screen_size[0])
 
         for column_list in wind_map:
             for row_value in column_list:

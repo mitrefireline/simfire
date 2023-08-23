@@ -1,5 +1,6 @@
 import os
 import unittest
+from datetime import datetime
 from pathlib import Path
 from typing import Dict
 
@@ -23,7 +24,7 @@ class FireSimulationTest(unittest.TestCase):
             Path(self.config.path).parent / "test_config_flat_simple.yml"
         )
 
-        self.screen_size = (self.config.area.screen_size, self.config.area.screen_size)
+        self.screen_size = self.config.area.screen_size
 
         self.simulation = FireSimulation(self.config)
         self.simulation_flat = FireSimulation(self.config_flat_simple)
@@ -94,7 +95,7 @@ class FireSimulationTest(unittest.TestCase):
         """
         # Check against a completely burned fire_map
         fire_map = np.full(
-            (self.config.area.screen_size, self.config.area.screen_size),
+            self.config.area.screen_size,
             BurnStatus.BURNED,
         )
 
@@ -299,9 +300,8 @@ class FireSimulationTest(unittest.TestCase):
         """
         Test the creation of the output path
         """
-        out_path = self.simulation._create_out_path()
-        self.assertIsInstance(out_path, Path)
-        out_path.rmdir()
+        self.simulation._create_out_path()
+        self.assertTrue(self.simulation.sf_home.exists())
 
     def test_update_agent_positions(self) -> None:
         """
@@ -386,11 +386,27 @@ class FireSimulationTest(unittest.TestCase):
         self.simulation_flat.rendering = True
         self.simulation_flat.run(1)
         self.simulation_flat.save_spread_graph("tmp.png")
-        tmp_file = self.simulation_flat._create_out_path() / "tmp.png"
+        tmp_file = Path("tmp.png")
         self.assertTrue(tmp_file.exists(), msg="The spread graph was not saved correctly")
         tmp_file.unlink()
         self.simulation_flat.save_spread_graph("tmp")
-        self.assertTrue(tmp_file.exists(), msg="The spread graph was not saved correctly")
+        now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        filename = f"fire_spread_graph_{now}.png"
+        tmp_file = Path("tmp") / filename
+        tmp_file_minus_one_second = (
+            Path("tmp")
+            / f"fire_spread_graph_{now.split('-')[:-1]}-{int(now.split('-')[-1]) - 1}.png"
+        )
+        tmp_file_plus_one_second = (
+            Path("tmp")
+            / f"fire_spread_graph_{now.split('-')[:-1]}-{int(now.split('-')[-1]) + 1}.png"
+        )
+        self.assertTrue(
+            tmp_file.exists()
+            or tmp_file_minus_one_second.exists()
+            or tmp_file_plus_one_second.exists(),
+            msg="The spread graph was not saved correctly",
+        )
         tmp_file.unlink()
         tmp_file.parent.rmdir()
         self.simulation_flat.rendering = False

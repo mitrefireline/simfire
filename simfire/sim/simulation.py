@@ -53,7 +53,7 @@ class Simulation(ABC):
         self.config = config
         # Create a _now time to use for the simulation object. This is used to
         # create folders based on individual simulation runs.
-        self.start_time = datetime.now().strftime("%m-%d-%Y_%H-%M-%S")
+        self.start_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
     @abstractmethod
     def run(self, time: Union[str, int]) -> Tuple[np.ndarray, bool]:
@@ -855,7 +855,7 @@ class FireSimulation(Simulation):
         # Create the output path if it doesn't exist
         out_path = self.sf_home
         # Create the data directory if it doesn't exist
-        datapath = out_path / "data"
+        datapath = out_path / "data" / self.start_time
         datapath.mkdir(parents=True, exist_ok=True)
 
         # Get the filepath, depending on the data type

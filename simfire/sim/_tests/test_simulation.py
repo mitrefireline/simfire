@@ -300,9 +300,8 @@ class FireSimulationTest(unittest.TestCase):
         """
         Test the creation of the output path
         """
-        out_path = self.simulation._create_out_path()
-        self.assertIsInstance(out_path, Path)
-        out_path.rmdir()
+        self.simulation._create_out_path()
+        self.assertTrue(self.simulation.sf_home.exists())
 
     def test_update_agent_positions(self) -> None:
         """

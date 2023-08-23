@@ -49,7 +49,7 @@ sim.run("2h")
 # Now save a GIF and fire spread graph from the last 2 hours of simulation
 sim.save_gif()
 sim.save_spread_graph()
-# Saved to the location specified in the config: simulation.save_path
+# Saved to the location specified in the config: simulation.sf_home
 
 # Update agents for display
 # (x, y, agent_id)

@@ -1,5 +1,6 @@
 import os
 import unittest
+from datetime import datetime
 from pathlib import Path
 from typing import Dict
 
@@ -386,11 +387,27 @@ class FireSimulationTest(unittest.TestCase):
         self.simulation_flat.rendering = True
         self.simulation_flat.run(1)
         self.simulation_flat.save_spread_graph("tmp.png")
-        tmp_file = self.simulation_flat._create_out_path() / "tmp.png"
+        tmp_file = Path("tmp.png")
         self.assertTrue(tmp_file.exists(), msg="The spread graph was not saved correctly")
         tmp_file.unlink()
         self.simulation_flat.save_spread_graph("tmp")
-        self.assertTrue(tmp_file.exists(), msg="The spread graph was not saved correctly")
+        now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        filename = f"fire_spread_graph_{now}.png"
+        tmp_file = Path("tmp") / filename
+        tmp_file_minus_one_second = (
+            Path("tmp")
+            / f"fire_spread_graph_{now.split('-')[:-1]}-{int(now.split('-')[-1]) - 1}.png"
+        )
+        tmp_file_plus_one_second = (
+            Path("tmp")
+            / f"fire_spread_graph_{now.split('-')[:-1]}-{int(now.split('-')[-1]) + 1}.png"
+        )
+        self.assertTrue(
+            tmp_file.exists()
+            or tmp_file_minus_one_second.exists()
+            or tmp_file_plus_one_second.exists(),
+            msg="The spread graph was not saved correctly",
+        )
         tmp_file.unlink()
         tmp_file.parent.rmdir()
         self.simulation_flat.rendering = False

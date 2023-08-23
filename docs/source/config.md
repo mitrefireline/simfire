@@ -54,9 +54,9 @@ The amount of time that the simulation is supposed to run. This can be expressed
 (`bool`)<br>
 Whether or not to run the simulation in a headless state.
 
-#### save_path
+#### sf_home
 (`str`)<br>
-Where to save GIF recordings and burn graphs of simulation [runs](https://fireline.pages.mitre.org/simfire/autoapi/simfire/sim/simulation/index.html#simfire.sim.simulation.FireSimulation.run). It will create subfolders in `save_path` that are of the format `<month>-<day>-<year>_<hour>-<minute>-<second>` based on when the outputs were saved to file.
+Where to save the LandFire operational data, GIF recordings, and burn graphs of simulation [runs](https://fireline.pages.mitre.org/simfire/autoapi/simfire/sim/simulation/index.html#simfire.sim.simulation.FireSimulation.run). It will create subfolders in `sf_home` that are called `landfire`, `gifs`, and `graphs`. This can be overriden for GIFs and burn graphs in individual function calls for `save_gif` and `save_spread_graph`. This will also set the environment variable `SF_HOME` to the same value.
 
 #### draw_spread_graph
 (`bool`)<br>

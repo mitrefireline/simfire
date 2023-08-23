@@ -18,7 +18,7 @@ simulation:
   record: true
   save_data: true
   data_type: "npy"
-  save_path: "~/.simfire/simulation_outputs"
+  sf_home: "~/.simfire"
 
 mitigation:
   ros_attenuation: false

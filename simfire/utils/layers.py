@@ -69,7 +69,7 @@ class LandFireLatLongBox:
         if os.environ.get("SF_HOME") is None:
             sf_path = Path().home() / ".simfire"
         else:
-            sf_path = Path(os.environ.get("SF_HOME"))
+            sf_path = Path(str(os.environ.get("SF_HOME")))
             if not sf_path.exists():
                 log.info(f"Creating SF_HOME directory: {sf_path}")
                 sf_path.mkdir(parents=True, exist_ok=True)

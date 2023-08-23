@@ -14,10 +14,7 @@ from yaml.parser import ParserError  # type: ignore
 
 from ..world.elevation_functions import flat, gaussian, perlin
 from ..world.fuel_array_functions import chaparral_fn
-from ..world.wind_mechanics.wind_controller import (
-    WindController,
-    WindControllerCFD,
-)
+from ..world.wind_mechanics.wind_controller import WindController, WindControllerCFD
 from .layers import (
     BurnProbabilityLayer,
     FuelLayer,
@@ -99,7 +96,7 @@ class SimulationConfig:
         record: bool,
         save_data: bool,
         data_type: str,
-        save_path: str,
+        sf_home: str,
     ) -> None:
         self.update_rate = float(update_rate)
         self.runtime = str_to_minutes(runtime)
@@ -114,7 +111,7 @@ class SimulationConfig:
                 "Specify either 'npy' or 'h5'."
             )
         self.data_type = data_type
-        self.save_path = Path(save_path)
+        self.sf_home = Path(sf_home)
 
 
 @dataclasses.dataclass

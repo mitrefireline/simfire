@@ -92,7 +92,7 @@ def generate_cfd_wind_layer(display: bool = False):
     wm_size = wind_map.get_screen_size()
 
     if display is True:
-        screen = pygame.display.set_mode([wm_size, wm_size])
+        screen = pygame.display.set_mode(wm_size)
         screen.fill("white")
         pygame.display.flip()
 

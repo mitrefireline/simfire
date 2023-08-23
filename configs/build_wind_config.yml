@@ -1,7 +1,7 @@
 # For a description of config parameters, go to
 # https://fireline.pages.mitre.org/simfire/config.html
 area:
-  screen_size: 225
+  screen_size: [225, 225]
   pixel_scale: 50
 
 display:
@@ -29,7 +29,6 @@ operational:
   longitude: 119.8
   height: 4000
   width: 4000
-  path: "/nfs/lslab2/fireline/data/"
   resolution: 30
   year: 2020
 

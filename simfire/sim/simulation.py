@@ -345,8 +345,8 @@ class FireSimulation(Simulation):
         sigma = np.zeros_like(self.terrain.fuels)
         delta = np.zeros_like(self.terrain.fuels)
         M_x = np.zeros_like(self.terrain.fuels)
-        for y in range(self.config.area.screen_size[1]):
-            for x in range(self.config.area.screen_size[0]):
+        for y in range(self.config.area.screen_size[0]):
+            for x in range(self.config.area.screen_size[1]):
                 fuel = self.terrain.fuels[y][x]
                 w_0[y][x] = fuel.w_0
                 sigma[y][x] = fuel.sigma

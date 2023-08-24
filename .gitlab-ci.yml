@@ -234,6 +234,7 @@ test_release:
     changes:
       - "**/*.py"
       - poetry.lock
+      - pyproject.toml
 
 tag:
   stage: Release

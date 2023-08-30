@@ -120,6 +120,55 @@ class FireSimulationTest(unittest.TestCase):
             "passed.",
         )
 
+    def test_agent_settings_reset(self) -> None:
+        """
+        Test that the call to `_reset_agents` which will check if self.agents
+        and self.agent_positions are reset properly.
+        """
+        import secrets
+
+        def create_random_agent() -> Agent:
+            pos = (secrets.randbelow(101), secrets.randbelow(101))
+            size = secrets.randbelow(101)
+            headless = secrets.choice([True, False])
+            return Agent(pos, size, headless)
+
+            # Check against a completely burned fire_map
+
+        fire_map = np.full(
+            self.config.area.screen_size,
+            BurnStatus.BURNED,
+        )
+
+        self.fire_map, _ = self.simulation_flat.run(time="1h")
+        # assert the fire map is all BURNED
+        self.assertEqual(
+            self.fire_map.max(),
+            fire_map.max(),
+            msg=f"The fire map has a maximum BurnStatus of {self.fire_map.max()} "
+            f", but it should be {fire_map.max()}",
+        )
+
+        num_agents: int = secrets.randbelow(101)
+        self.simulation_flat.agents = {
+            i: create_random_agent() for i in range(num_agents)
+        }
+        self.simulation_flat._reset_agents()
+
+        self.assertEqual(
+            len(self.simulation_flat.agents),
+            0,
+            msg=f"Agents should be reset to 0 but \
+                self.agents is {len(self.simulation_flat.agents)}",
+        )
+
+        self.assertEqual(
+            np.all(self.simulation_flat.agent_positions == 0),
+            True,
+            msg="agent positions should be reset to 0 but self.agents \
+                is currently populated",
+        )
+
     def test_get_seeds(self) -> None:
         """
         Test the get_seeds method and ensure it returns all available seeds

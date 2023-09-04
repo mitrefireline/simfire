@@ -194,12 +194,21 @@ class FireSimulation(Simulation):
         Reset the `self.fire_map`, `self.terrain`, `self.fire_manager`,
         and all mitigations to initial conditions
         """
+        self.agents.clear()
         self._create_fire_map()
-        self._create_agent_positions()
+        self._reset_agents()
         self._create_terrain()
         self._create_fire()
         self._create_mitigations()
         self.elapsed_steps = 0
+
+    def _reset_agents(self) -> None:
+        """
+        Reset agents settings back to initial
+        """
+        self.agents.clear()
+        self._create_agent_positions()
+        return
 
     def _create_terrain(self) -> None:
         """

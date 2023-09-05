@@ -22,7 +22,6 @@ Classes
    simfire.utils.config.SimulationConfig
    simfire.utils.config.MitigationConfig
    simfire.utils.config.OperationalConfig
-   simfire.utils.config.HistoricalConfig
    simfire.utils.config.FunctionalConfig
    simfire.utils.config.TerrainConfig
    simfire.utils.config.FireConfig
@@ -58,7 +57,7 @@ Attributes
 .. py:class:: AreaConfig
 
    .. py:attribute:: screen_size
-      :annotation: :int
+      :annotation: :Tuple[int, int]
 
       
 
@@ -85,13 +84,13 @@ Attributes
 
       
 
-   .. py:attribute:: rescale_size
+   .. py:attribute:: rescale_factor
       :annotation: :Optional[int]
 
       
 
 
-.. py:class:: SimulationConfig(update_rate, runtime, headless, draw_spread_graph, record, save_data, data_type, save_path)
+.. py:class:: SimulationConfig(update_rate, runtime, headless, draw_spread_graph, record, save_data, data_type, sf_home)
 
 
 .. py:class:: MitigationConfig
@@ -129,11 +128,6 @@ Attributes
 
       
 
-   .. py:attribute:: path
-      :annotation: :Union[pathlib.Path, str]
-
-      
-
    .. py:attribute:: resolution
       :annotation: :float
 
@@ -141,41 +135,6 @@ Attributes
 
    .. py:attribute:: year
       :annotation: :int
-
-      
-
-
-.. py:class:: HistoricalConfig
-
-   Class that tracks historical layer.
-
-   .. py:attribute:: use
-      :annotation: :bool
-
-      
-
-   .. py:attribute:: fire_init_pos_lat
-      :annotation: :float
-
-      
-
-   .. py:attribute:: fire_init_pos_long
-      :annotation: :float
-
-      
-
-   .. py:attribute:: name
-      :annotation: :str
-
-      
-
-   .. py:attribute:: year
-      :annotation: :str
-
-      
-
-   .. py:attribute:: historical_layer
-      
 
       
 

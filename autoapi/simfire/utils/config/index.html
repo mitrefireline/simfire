@@ -277,25 +277,22 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#simfire.utils.config.OperationalConfig" title="simfire.utils.config.OperationalConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OperationalConfig</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#simfire.utils.config.HistoricalConfig" title="simfire.utils.config.HistoricalConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HistoricalConfig</span></code></a></p></td>
-<td><p>Class that tracks historical layer.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#simfire.utils.config.FunctionalConfig" title="simfire.utils.config.FunctionalConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FunctionalConfig</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#simfire.utils.config.FunctionalConfig" title="simfire.utils.config.FunctionalConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FunctionalConfig</span></code></a></p></td>
 <td><p>Class that tracks functional layer names and keyword arguments.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#simfire.utils.config.TerrainConfig" title="simfire.utils.config.TerrainConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TerrainConfig</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#simfire.utils.config.TerrainConfig" title="simfire.utils.config.TerrainConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TerrainConfig</span></code></a></p></td>
 <td><p>Class that tracks the terrain topography and fuel layers.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#simfire.utils.config.FireConfig" title="simfire.utils.config.FireConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FireConfig</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#simfire.utils.config.FireConfig" title="simfire.utils.config.FireConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FireConfig</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#simfire.utils.config.EnvironmentConfig" title="simfire.utils.config.EnvironmentConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EnvironmentConfig</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#simfire.utils.config.EnvironmentConfig" title="simfire.utils.config.EnvironmentConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EnvironmentConfig</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#simfire.utils.config.WindConfig" title="simfire.utils.config.WindConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WindConfig</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#simfire.utils.config.WindConfig" title="simfire.utils.config.WindConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WindConfig</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#simfire.utils.config.Config" title="simfire.utils.config.Config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Config</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#simfire.utils.config.Config" title="simfire.utils.config.Config"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Config</span></code></a></p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -331,7 +328,7 @@
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simfire.utils.config.</span></span><span class="sig-name descname"><span class="pre">AreaConfig</span></span><a class="headerlink" href="#simfire.utils.config.AreaConfig" title="Permalink to this definition">#</a></dt>
 <dd><dl class="py attribute">
 <dt class="sig sig-object py" id="simfire.utils.config.AreaConfig.screen_size">
-<span class="sig-name descname"><span class="pre">screen_size</span></span><em class="property"><span class="w"> </span><span class="pre">:int</span></em><a class="headerlink" href="#simfire.utils.config.AreaConfig.screen_size" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">screen_size</span></span><em class="property"><span class="w"> </span><span class="pre">:Tuple[int,</span> <span class="pre">int]</span></em><a class="headerlink" href="#simfire.utils.config.AreaConfig.screen_size" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -360,15 +357,15 @@
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="simfire.utils.config.DisplayConfig.rescale_size">
-<span class="sig-name descname"><span class="pre">rescale_size</span></span><em class="property"><span class="w"> </span><span class="pre">:Optional[int]</span></em><a class="headerlink" href="#simfire.utils.config.DisplayConfig.rescale_size" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="simfire.utils.config.DisplayConfig.rescale_factor">
+<span class="sig-name descname"><span class="pre">rescale_factor</span></span><em class="property"><span class="w"> </span><span class="pre">:Optional[int]</span></em><a class="headerlink" href="#simfire.utils.config.DisplayConfig.rescale_factor" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="simfire.utils.config.SimulationConfig">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simfire.utils.config.</span></span><span class="sig-name descname"><span class="pre">SimulationConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">update_rate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runtime</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headless</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">draw_spread_graph</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.utils.config.SimulationConfig" title="Permalink to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simfire.utils.config.</span></span><span class="sig-name descname"><span class="pre">SimulationConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">update_rate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runtime</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headless</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">draw_spread_graph</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">record</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sf_home</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.utils.config.SimulationConfig" title="Permalink to this definition">#</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -379,7 +376,7 @@
 <li><p><strong>record</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a>) – </p></li>
 <li><p><strong>save_data</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a>) – </p></li>
 <li><p><strong>data_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – </p></li>
-<li><p><strong>save_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – </p></li>
+<li><p><strong>sf_home</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – </p></li>
 </ul>
 </dd>
 </dl>
@@ -424,11 +421,6 @@
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="simfire.utils.config.OperationalConfig.path">
-<span class="sig-name descname"><span class="pre">path</span></span><em class="property"><span class="w"> </span><span class="pre">:Union[pathlib.Path,</span> <span class="pre">str]</span></em><a class="headerlink" href="#simfire.utils.config.OperationalConfig.path" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
 <dt class="sig sig-object py" id="simfire.utils.config.OperationalConfig.resolution">
 <span class="sig-name descname"><span class="pre">resolution</span></span><em class="property"><span class="w"> </span><span class="pre">:float</span></em><a class="headerlink" href="#simfire.utils.config.OperationalConfig.resolution" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
@@ -436,42 +428,6 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="simfire.utils.config.OperationalConfig.year">
 <span class="sig-name descname"><span class="pre">year</span></span><em class="property"><span class="w"> </span><span class="pre">:int</span></em><a class="headerlink" href="#simfire.utils.config.OperationalConfig.year" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="simfire.utils.config.HistoricalConfig">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simfire.utils.config.</span></span><span class="sig-name descname"><span class="pre">HistoricalConfig</span></span><a class="headerlink" href="#simfire.utils.config.HistoricalConfig" title="Permalink to this definition">#</a></dt>
-<dd><p>Class that tracks historical layer.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="simfire.utils.config.HistoricalConfig.use">
-<span class="sig-name descname"><span class="pre">use</span></span><em class="property"><span class="w"> </span><span class="pre">:bool</span></em><a class="headerlink" href="#simfire.utils.config.HistoricalConfig.use" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="simfire.utils.config.HistoricalConfig.fire_init_pos_lat">
-<span class="sig-name descname"><span class="pre">fire_init_pos_lat</span></span><em class="property"><span class="w"> </span><span class="pre">:float</span></em><a class="headerlink" href="#simfire.utils.config.HistoricalConfig.fire_init_pos_lat" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="simfire.utils.config.HistoricalConfig.fire_init_pos_long">
-<span class="sig-name descname"><span class="pre">fire_init_pos_long</span></span><em class="property"><span class="w"> </span><span class="pre">:float</span></em><a class="headerlink" href="#simfire.utils.config.HistoricalConfig.fire_init_pos_long" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="simfire.utils.config.HistoricalConfig.name">
-<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="w"> </span><span class="pre">:str</span></em><a class="headerlink" href="#simfire.utils.config.HistoricalConfig.name" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="simfire.utils.config.HistoricalConfig.year">
-<span class="sig-name descname"><span class="pre">year</span></span><em class="property"><span class="w"> </span><span class="pre">:str</span></em><a class="headerlink" href="#simfire.utils.config.HistoricalConfig.year" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="simfire.utils.config.HistoricalConfig.historical_layer">
-<span class="sig-name descname"><span class="pre">historical_layer</span></span><a class="headerlink" href="#simfire.utils.config.HistoricalConfig.historical_layer" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -744,7 +700,7 @@ is used for static cases.</p>
 <li><a class="reference internal" href="#simfire.utils.config.DisplayConfig.fire_size"><code class="docutils literal notranslate"><span class="pre">DisplayConfig.fire_size</span></code></a></li>
 <li><a class="reference internal" href="#simfire.utils.config.DisplayConfig.control_line_size"><code class="docutils literal notranslate"><span class="pre">DisplayConfig.control_line_size</span></code></a></li>
 <li><a class="reference internal" href="#simfire.utils.config.DisplayConfig.agent_size"><code class="docutils literal notranslate"><span class="pre">DisplayConfig.agent_size</span></code></a></li>
-<li><a class="reference internal" href="#simfire.utils.config.DisplayConfig.rescale_size"><code class="docutils literal notranslate"><span class="pre">DisplayConfig.rescale_size</span></code></a></li>
+<li><a class="reference internal" href="#simfire.utils.config.DisplayConfig.rescale_factor"><code class="docutils literal notranslate"><span class="pre">DisplayConfig.rescale_factor</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#simfire.utils.config.SimulationConfig"><code class="docutils literal notranslate"><span class="pre">SimulationConfig</span></code></a></li>
@@ -758,18 +714,8 @@ is used for static cases.</p>
 <li><a class="reference internal" href="#simfire.utils.config.OperationalConfig.longitude"><code class="docutils literal notranslate"><span class="pre">OperationalConfig.longitude</span></code></a></li>
 <li><a class="reference internal" href="#simfire.utils.config.OperationalConfig.height"><code class="docutils literal notranslate"><span class="pre">OperationalConfig.height</span></code></a></li>
 <li><a class="reference internal" href="#simfire.utils.config.OperationalConfig.width"><code class="docutils literal notranslate"><span class="pre">OperationalConfig.width</span></code></a></li>
-<li><a class="reference internal" href="#simfire.utils.config.OperationalConfig.path"><code class="docutils literal notranslate"><span class="pre">OperationalConfig.path</span></code></a></li>
 <li><a class="reference internal" href="#simfire.utils.config.OperationalConfig.resolution"><code class="docutils literal notranslate"><span class="pre">OperationalConfig.resolution</span></code></a></li>
 <li><a class="reference internal" href="#simfire.utils.config.OperationalConfig.year"><code class="docutils literal notranslate"><span class="pre">OperationalConfig.year</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#simfire.utils.config.HistoricalConfig"><code class="docutils literal notranslate"><span class="pre">HistoricalConfig</span></code></a><ul>
-<li><a class="reference internal" href="#simfire.utils.config.HistoricalConfig.use"><code class="docutils literal notranslate"><span class="pre">HistoricalConfig.use</span></code></a></li>
-<li><a class="reference internal" href="#simfire.utils.config.HistoricalConfig.fire_init_pos_lat"><code class="docutils literal notranslate"><span class="pre">HistoricalConfig.fire_init_pos_lat</span></code></a></li>
-<li><a class="reference internal" href="#simfire.utils.config.HistoricalConfig.fire_init_pos_long"><code class="docutils literal notranslate"><span class="pre">HistoricalConfig.fire_init_pos_long</span></code></a></li>
-<li><a class="reference internal" href="#simfire.utils.config.HistoricalConfig.name"><code class="docutils literal notranslate"><span class="pre">HistoricalConfig.name</span></code></a></li>
-<li><a class="reference internal" href="#simfire.utils.config.HistoricalConfig.year"><code class="docutils literal notranslate"><span class="pre">HistoricalConfig.year</span></code></a></li>
-<li><a class="reference internal" href="#simfire.utils.config.HistoricalConfig.historical_layer"><code class="docutils literal notranslate"><span class="pre">HistoricalConfig.historical_layer</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#simfire.utils.config.FunctionalConfig"><code class="docutils literal notranslate"><span class="pre">FunctionalConfig</span></code></a><ul>
@@ -821,7 +767,7 @@ is used for static cases.</p>
 <li><a class="reference internal" href="#simfire.utils.config.DisplayConfig.fire_size">fire_size</a></li>
 <li><a class="reference internal" href="#simfire.utils.config.DisplayConfig.control_line_size">control_line_size</a></li>
 <li><a class="reference internal" href="#simfire.utils.config.DisplayConfig.agent_size">agent_size</a></li>
-<li><a class="reference internal" href="#simfire.utils.config.DisplayConfig.rescale_size">rescale_size</a></li>
+<li><a class="reference internal" href="#simfire.utils.config.DisplayConfig.rescale_factor">rescale_factor</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#simfire.utils.config.SimulationConfig">SimulationConfig</a></li>
@@ -835,18 +781,8 @@ is used for static cases.</p>
 <li><a class="reference internal" href="#simfire.utils.config.OperationalConfig.longitude">longitude</a></li>
 <li><a class="reference internal" href="#simfire.utils.config.OperationalConfig.height">height</a></li>
 <li><a class="reference internal" href="#simfire.utils.config.OperationalConfig.width">width</a></li>
-<li><a class="reference internal" href="#simfire.utils.config.OperationalConfig.path">path</a></li>
 <li><a class="reference internal" href="#simfire.utils.config.OperationalConfig.resolution">resolution</a></li>
 <li><a class="reference internal" href="#simfire.utils.config.OperationalConfig.year">year</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#simfire.utils.config.HistoricalConfig">HistoricalConfig</a><ul>
-<li><a class="reference internal" href="#simfire.utils.config.HistoricalConfig.use">use</a></li>
-<li><a class="reference internal" href="#simfire.utils.config.HistoricalConfig.fire_init_pos_lat">fire_init_pos_lat</a></li>
-<li><a class="reference internal" href="#simfire.utils.config.HistoricalConfig.fire_init_pos_long">fire_init_pos_long</a></li>
-<li><a class="reference internal" href="#simfire.utils.config.HistoricalConfig.name">name</a></li>
-<li><a class="reference internal" href="#simfire.utils.config.HistoricalConfig.year">year</a></li>
-<li><a class="reference internal" href="#simfire.utils.config.HistoricalConfig.historical_layer">historical_layer</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#simfire.utils.config.FunctionalConfig">FunctionalConfig</a><ul>

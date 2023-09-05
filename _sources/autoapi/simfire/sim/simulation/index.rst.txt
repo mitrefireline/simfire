@@ -289,7 +289,7 @@ Attributes
       to `True`.
 
 
-   .. py:method:: save_spread_graph(filename = None)
+   .. py:method:: save_spread_graph(path = None)
 
       Saves the most recent simulation as a PNG.
 

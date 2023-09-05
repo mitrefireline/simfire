@@ -30,7 +30,7 @@ Attributes
 
    
 
-.. py:class:: Game(screen_size, rescale_size = None, headless = False, record = False, show_wind_magnitude = False, show_wind_direction = False, mw_speed_min = 0.0, mw_speed_max = mph_to_ftpm(150.0), dw_deg_min = 0.0, dw_deg_max = 360.0)
+.. py:class:: Game(screen_size, rescale_factor = None, headless = False, record = False, show_wind_magnitude = False, show_wind_direction = False, mw_speed_min = 0.0, mw_speed_max = mph_to_ftpm(150.0), dw_deg_min = 0.0, dw_deg_max = 360.0)
 
    Class that controls the game. This class will initalize the game and allow for
    terrain, fire, and other sprites to be rendered and interact.
@@ -38,7 +38,7 @@ Attributes
    Initalize the class by creating the game display and background.
 
    :param screen_size: The (n,n) size of the game screen/display in pixels.
-   :param rescale_size: The (s, s) size of the display to resize to
+   :param rescale_size: The (s, s) factor to rescale display to
    :param headless: Flag to run in a headless state.
    :param record: Flag to save a recording of the simulation game screen
 

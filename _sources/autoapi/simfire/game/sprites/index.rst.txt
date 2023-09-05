@@ -35,7 +35,7 @@ Attributes
 
    
 
-.. py:class:: Terrain(fuel_layer, topo_layer, screen_size, headless = False, hist_layer = None)
+.. py:class:: Terrain(fuel_layer, topo_layer, screen_size, headless = False)
 
    Bases: :py:obj:`pygame.sprite.Sprite`
 

@@ -31,7 +31,7 @@ Attributes
 
    
 
-.. py:class:: WindController(screen_size = 225)
+.. py:class:: WindController(screen_size = (225, 225))
 
    Generates and tracks objects that dictate wind magnitude and wind direction for map
    given size of the screen
@@ -52,7 +52,7 @@ Attributes
                          Higher lacunarity, higher frequency per pass.
       :param range_min: The minimum speed of the wind in ft/min.
       :param range_max: The maximum speed of the wind in ft/min.
-      :param screen_size: Size of screen (both heigh and width) MUST BE SQUARE
+      :param screen_size: Size of screen (both heigh and width)
 
 
    .. py:method:: init_wind_direction_generator(seed, scale, octaves, persistence, lacunarity, range_min, range_max, screen_size)
@@ -74,7 +74,7 @@ Attributes
 
 
 
-.. py:class:: WindControllerCFD(screen_size = 225, result_accuracy = 1, scale = 1, timestep = 1.0, diffusion = 0.0, viscosity = 1e-07, terrain_features = None, wind_speed = 27.0, wind_direction = 'north', time_to_train = 1000)
+.. py:class:: WindControllerCFD(screen_size = (225, 450), result_accuracy = 1, scale = 1, timestep = 1.0, diffusion = 0.0, viscosity = 1e-07, terrain_features = None, wind_speed = 27.0, wind_direction = 'north', time_to_train = 1000)
 
    This is a PRECOMPUTE wind controller.  It generates and tracks objects that dictate
    wind magnitude and wind direction for map given size of the screen.

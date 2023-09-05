@@ -263,7 +263,7 @@
 <h3>Area Parameters<a class="headerlink" href="#area-parameters" title="Permalink to this heading">#</a></h3>
 <section id="screen-size">
 <h4>screen_size<a class="headerlink" href="#screen-size" title="Permalink to this heading">#</a></h4>
-<p>(<code class="docutils literal notranslate"><span class="pre">int</span></code>)<br>
+<p>(<code class="docutils literal notranslate"><span class="pre">Tuple[int,</span> <span class="pre">int]</span></code>)<br>
 Determines how large the simulation is in pixels. The <code class="docutils literal notranslate"><span class="pre">screen_size</span></code> sets both the height and the width of the screen.</p>
 </section>
 <section id="pixel-scale">
@@ -290,6 +290,11 @@ The size of the control lines in pixels. Only used for display purposes, and doe
 <p>(<code class="docutils literal notranslate"><span class="pre">int</span></code>)<br>
 The size of the agent(s) in pixels. Only used for display purposes, and does not change how much space the agent takes up in the simulation.</p>
 </section>
+<section id="rescale-factor">
+<h4>rescale_factor<a class="headerlink" href="#rescale-factor" title="Permalink to this heading">#</a></h4>
+<p>(<code class="docutils literal notranslate"><span class="pre">int</span></code>)<br>
+The factor to increase the height and width of the screen for display purposes only.</p>
+</section>
 </section>
 <hr class="docutils" />
 <section id="simulation-parameters">
@@ -309,10 +314,27 @@ The amount of time that the simulation is supposed to run. This can be expressed
 <p>(<code class="docutils literal notranslate"><span class="pre">bool</span></code>)<br>
 Whether or not to run the simulation in a headless state.</p>
 </section>
-<section id="save-path">
-<h4>save_path<a class="headerlink" href="#save-path" title="Permalink to this heading">#</a></h4>
+<section id="sf-home">
+<h4>sf_home<a class="headerlink" href="#sf-home" title="Permalink to this heading">#</a></h4>
 <p>(<code class="docutils literal notranslate"><span class="pre">str</span></code>)<br>
-Where to save GIF recordings and burn graphs of simulation <a class="reference external" href="https://fireline.pages.mitre.org/simfire/autoapi/simfire/sim/simulation/index.html#simfire.sim.simulation.FireSimulation.run">runs</a>. It will create subfolders in <code class="docutils literal notranslate"><span class="pre">save_path</span></code> that are of the format <code class="docutils literal notranslate"><span class="pre">&lt;month&gt;-&lt;day&gt;-&lt;year&gt;_&lt;hour&gt;-&lt;minute&gt;-&lt;second&gt;</span></code> based on when the outputs were saved to file.</p>
+Where to save the LandFire operational data, GIF recordings, and burn graphs of simulation <a class="reference external" href="https://fireline.pages.mitre.org/simfire/autoapi/simfire/sim/simulation/index.html#simfire.sim.simulation.FireSimulation.run">runs</a>. It will create subfolders in <code class="docutils literal notranslate"><span class="pre">sf_home</span></code> that are called <code class="docutils literal notranslate"><span class="pre">landfire</span></code>, <code class="docutils literal notranslate"><span class="pre">gifs</span></code>, and <code class="docutils literal notranslate"><span class="pre">graphs</span></code>. This can be overriden for GIFs and burn graphs in individual function calls for <code class="docutils literal notranslate"><span class="pre">save_gif</span></code> and <code class="docutils literal notranslate"><span class="pre">save_spread_graph</span></code>. This will also set the environment variable <code class="docutils literal notranslate"><span class="pre">SF_HOME</span></code> to the same value.</p>
+</section>
+<section id="draw-spread-graph">
+<h4>draw_spread_graph<a class="headerlink" href="#draw-spread-graph" title="Permalink to this heading">#</a></h4>
+<p>(<code class="docutils literal notranslate"><span class="pre">bool</span></code>)<br></p>
+</section>
+<section id="record">
+<h4>record<a class="headerlink" href="#record" title="Permalink to this heading">#</a></h4>
+<p>(<code class="docutils literal notranslate"><span class="pre">bool</span></code>)<br></p>
+</section>
+<section id="save-data">
+<h4>save_data<a class="headerlink" href="#save-data" title="Permalink to this heading">#</a></h4>
+<p>(<code class="docutils literal notranslate"><span class="pre">bool</span></code>)<br></p>
+</section>
+<section id="data-type">
+<h4>data_type<a class="headerlink" href="#data-type" title="Permalink to this heading">#</a></h4>
+<p>(<code class="docutils literal notranslate"><span class="pre">str</span></code>)<br>
+The format to save the data of the simulation. Can by type: “npy”, “h5”.</p>
 </section>
 </section>
 <hr class="docutils" />
@@ -336,12 +358,12 @@ The seed that would pick a random latitude and longitude. Leave empty if using t
 <section id="latitude">
 <h4>latitude<a class="headerlink" href="#latitude" title="Permalink to this heading">#</a></h4>
 <p>(<code class="docutils literal notranslate"><span class="pre">float</span></code>)<br>
-The latitude given in decimal degrees.</p>
+The latitude given in decimal degrees. The latitude sets the North-bounding (top-left) coordinate.</p>
 </section>
 <section id="longitude">
 <h4>longitude<a class="headerlink" href="#longitude" title="Permalink to this heading">#</a></h4>
 <p>(<code class="docutils literal notranslate"><span class="pre">float</span></code>)<br>
-The longitude given in decimal degrees.</p>
+The longitude given in decimal degrees. The longitude sets the West-bounding (top-left) coordinate.</p>
 </section>
 <section id="height">
 <h4>height<a class="headerlink" href="#height" title="Permalink to this heading">#</a></h4>
@@ -356,7 +378,7 @@ The width of the screen in meters. This is not randomized if choosing a seed.</p
 <section id="resolution">
 <h4>resolution<a class="headerlink" href="#resolution" title="Permalink to this heading">#</a></h4>
 <p>(<code class="docutils literal notranslate"><span class="pre">int</span></code>)<br>
-The resolution of each pixel in meters. Data is measured in pixels corresponding to the resolution i.e: resolution = 10m = 1 pixel. This is not randomized if choosing a seed.</p>
+The resolution of each pixel in meters. Data is measured in pixels corresponding to the resolution i.e: resolution = 30m x 30m = 1 pixel. This is not randomized if choosing a seed. The <code class="docutils literal notranslate"><span class="pre">area.pixel_scale</span></code> auto-scales to this resolution, i.e 30m ~= 98ft.</p>
 </section>
 <section id="year">
 <h4>year<a class="headerlink" href="#year" title="Permalink to this heading">#</a></h4>
@@ -599,14 +621,14 @@ Whether or not to render with post agent and fire in place.</p>
 <h2>Example Config File<a class="headerlink" href="#example-config-file" title="Permalink to this heading">#</a></h2>
 <p>Go <a class="reference external" href="https://gitlab.mitre.org/fireline/simfire/-/blob/main/configs">here</a> for more examples.</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">area</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">screen_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">225</span>
+<span class="w">  </span><span class="nt">screen_size</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">225</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">225</span><span class="p p-Indicator">]</span>
 <span class="w">  </span><span class="nt">pixel_scale</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span>
 
 <span class="nt">display</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">fire_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
 <span class="w">  </span><span class="nt">control_line_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
 <span class="w">  </span><span class="nt">agent_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span>
-<span class="w">  </span><span class="nt">rescale_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">225</span>
+<span class="w">  </span><span class="nt">rescale_factor</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
 
 <span class="nt">simulation</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">update_rate</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
@@ -628,7 +650,7 @@ Whether or not to render with post agent and fire in place.</p>
 
 <span class="nt">terrain</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">topography</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">functional</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">operational</span>
 <span class="w">    </span><span class="nt">functional</span><span class="p">:</span>
 <span class="w">      </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">perlin</span>
 <span class="w">      </span><span class="nt">perlin</span><span class="p">:</span>
@@ -645,7 +667,7 @@ Whether or not to render with post agent and fire in place.</p>
 <span class="w">        </span><span class="nt">sigma_x</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span>
 <span class="w">        </span><span class="nt">sigma_y</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span>
 <span class="w">  </span><span class="nt">fuel</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">functional</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">operational</span>
 <span class="w">    </span><span class="nt">functional</span><span class="p">:</span>
 <span class="w">      </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">chaparral</span>
 <span class="w">      </span><span class="nt">chaparral</span><span class="p">:</span>
@@ -760,13 +782,18 @@ Whether or not to render with post agent and fire in place.</p>
 <li><a class="reference internal" href="#fire-size">fire_size</a></li>
 <li><a class="reference internal" href="#control-line-size">control_line_size</a></li>
 <li><a class="reference internal" href="#agent-size">agent_size</a></li>
+<li><a class="reference internal" href="#rescale-factor">rescale_factor</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#simulation-parameters">Simulation Parameters</a><ul>
 <li><a class="reference internal" href="#update-rate">update_rate</a></li>
 <li><a class="reference internal" href="#runtime">runtime</a></li>
 <li><a class="reference internal" href="#headless">headless</a></li>
-<li><a class="reference internal" href="#save-path">save_path</a></li>
+<li><a class="reference internal" href="#sf-home">sf_home</a></li>
+<li><a class="reference internal" href="#draw-spread-graph">draw_spread_graph</a></li>
+<li><a class="reference internal" href="#record">record</a></li>
+<li><a class="reference internal" href="#save-data">save_data</a></li>
+<li><a class="reference internal" href="#data-type">data_type</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#mitigation-parameters">Mitigation Parameters</a><ul>

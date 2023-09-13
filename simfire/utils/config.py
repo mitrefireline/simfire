@@ -726,8 +726,8 @@ class Config:
             screen_size = self.yaml_data["area"]["screen_size"]
             seed = self.yaml_data["fire"]["fire_initial_position"]["random"]["seed"]
             rng = np.random.default_rng(seed)
-            pos_x = rng.integers(screen_size[0], dtype=int)
-            pos_y = rng.integers(screen_size[1], dtype=int)
+            pos_x = rng.integers(screen_size[1], dtype=int)
+            pos_y = rng.integers(screen_size[0], dtype=int)
             return FireConfig((pos_x, pos_y), max_fire_duration, seed)
         else:
             raise ConfigError(

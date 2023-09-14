@@ -434,6 +434,8 @@ class Config:
             self.yaml_data["area"]["pixel_scale"] = int(
                 self.yaml_data["operational"]["resolution"] / 0.3048
             )
+            # "Clear" the geotiff_data to enable making deepcopy of Config object
+            self.landfire_lat_long_box.geotiff_data = None
         return AreaConfig(**self.yaml_data["area"])
 
     def _load_display(self) -> DisplayConfig:

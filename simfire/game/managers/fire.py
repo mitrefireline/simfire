@@ -204,6 +204,9 @@ class FireManager:
             )
             return in_boundaries
 
+        # mypy requires this type definition for the `new_locs` variable
+        new_locs: NewLocsType
+
         if self.diagonal_spread:
             new_locs = (
                 (x + 1, y),
@@ -299,7 +302,7 @@ class RothermelFireManager(FireManager):
         max_time: Optional[int] = None,
         attenuate_line_ros: bool = True,
         headless: bool = False,
-        diagonal_spread: bool = True
+        diagonal_spread: bool = True,
     ) -> None:
         """
         Initialize the class by recording the initial fire location and size.

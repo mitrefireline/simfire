@@ -276,6 +276,7 @@ class FireSimulation(Simulation):
             max_time=self.config.simulation.runtime,
             attenuate_line_ros=self.config.mitigation.ros_attenuation,
             headless=self.config.simulation.headless,
+            diagonal_spread=self.config.fire.diagonal_spread,
         )
         self.fire_sprites = self.fire_manager.sprites
 

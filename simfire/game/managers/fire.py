@@ -204,7 +204,7 @@ class FireManager:
             )
             return in_boundaries
 
-        if self.diagonal_spread
+        if self.diagonal_spread:
             new_locs = (
                 (x + 1, y),
                 (x + 1, y + 1),

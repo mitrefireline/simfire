@@ -170,6 +170,7 @@ class TerrainConfig:
 @dataclasses.dataclass
 class FireConfig:
     fire_initial_position: Tuple[int, int]
+    diagonal_spread: bool
     max_fire_duration: int
     seed: Optional[int] = None
 
@@ -701,6 +702,7 @@ class Config:
             The YAML data converted to a FireConfig dataclass
         """
         max_fire_duration = int(self.yaml_data["fire"]["max_fire_duration"])
+        diagonal_spread = bool(self.yaml_data["fire"]["diagonal_spread"])
         fire_init_pos_type = self.yaml_data["fire"]["fire_initial_position"]["type"]
         if fire_init_pos_type == "static":
             # If pos is unspecified, read from the YAML data
@@ -718,7 +720,7 @@ class Config:
             # Pos is specified, so use that
             else:
                 fire_initial_position = pos
-            return FireConfig(fire_initial_position, max_fire_duration)
+            return FireConfig(fire_initial_position, diagonal_spread, max_fire_duration)
         elif fire_init_pos_type == "random":
             if pos is not None:
                 log.warn(
@@ -730,7 +732,7 @@ class Config:
             rng = np.random.default_rng(seed)
             pos_x = rng.integers(screen_size[1], dtype=int)
             pos_y = rng.integers(screen_size[0], dtype=int)
-            return FireConfig((pos_x, pos_y), max_fire_duration, seed)
+            return FireConfig((pos_x, pos_y), diagonal_spread, max_fire_duration, seed)
         else:
             raise ConfigError(
                 "The specified fire initial position type "

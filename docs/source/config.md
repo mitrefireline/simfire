@@ -212,6 +212,10 @@ simulation.
 (`int`)<br>
 The maximum number of frames that a single pixel can be on fire.
 
+#### diagonal_spread
+(`bool`)<br>
+Whether or not to have the fire spread calculation apply to diagonal pixels. If this is `true`, the fire may spread through firelines that don't take this into account.
+
 ---
 
 ### Environment Parameters

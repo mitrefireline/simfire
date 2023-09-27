@@ -83,6 +83,7 @@ fire:
     random:
       seed: 1234
   max_fire_duration: 5
+  diagonal_spread: true
 
 environment:
   moisture: 0.001

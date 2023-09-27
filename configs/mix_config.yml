@@ -67,6 +67,7 @@ terrain:
 fire:
   fire_initial_position: (65, 65)
   max_fire_duration: 4
+  diagonal_spread: true
 
 environment:
   moisture: 0.03

@@ -59,6 +59,7 @@ class FireManager:
         max_fire_duration: int,
         attenuate_line_ros: bool = True,
         headless: bool = False,
+        diagonal_spread: bool = True,
     ) -> None:
         """
         Initialize the class by recording the initial fire location and size.
@@ -83,6 +84,9 @@ class FireManager:
                                 different control lines will completely stop the fire.
             headless: Flag to run in a headless state. This will allow PyGame objects to
                       not be initialized.
+            diagonal_spread: Whether or not to have the fire spread calculation apply to
+                             diagonal pixels. If this is `True`, the fire may spread past
+                             firelines that don't take this into account.
         Returns:
             None
         """
@@ -91,6 +95,7 @@ class FireManager:
         self.max_fire_duration = max_fire_duration
         self.attenuate_line_ros = attenuate_line_ros
         self.headless = headless
+        self.diagonal_spread = diagonal_spread
 
         init_fire = Fire(self.init_pos, self.fire_size, headless=self.headless)
         self.sprites: List[Fire] = [init_fire]
@@ -199,16 +204,27 @@ class FireManager:
             )
             return in_boundaries
 
-        new_locs = (
-            (x + 1, y),
-            (x + 1, y + 1),
-            (x, y + 1),
-            (x - 1, y + 1),
-            (x - 1, y),
-            (x - 1, y - 1),
-            (x, y - 1),
-            (x + 1, y - 1),
-        )
+        # mypy requires this type definition for the `new_locs` variable
+        new_locs: NewLocsType
+
+        if self.diagonal_spread:
+            new_locs = (
+                (x + 1, y),
+                (x + 1, y + 1),
+                (x, y + 1),
+                (x - 1, y + 1),
+                (x - 1, y),
+                (x - 1, y - 1),
+                (x, y - 1),
+                (x + 1, y - 1),
+            )
+        else:
+            new_locs = (
+                (x + 1, y),
+                (x, y + 1),
+                (x - 1, y),
+                (x, y - 1),
+            )
         # Make sure each new location/pixel is:
         #   Within the game screen boundaries
         #   UNBURNED
@@ -286,6 +302,7 @@ class RothermelFireManager(FireManager):
         max_time: Optional[int] = None,
         attenuate_line_ros: bool = True,
         headless: bool = False,
+        diagonal_spread: bool = True,
     ) -> None:
         """
         Initialize the class by recording the initial fire location and size.
@@ -321,9 +338,17 @@ class RothermelFireManager(FireManager):
                                 different control lines will completely stop the fire.
             headless: Flag to run in a headless state. This will allow PyGame objects to
                       not be initialized.
+            diagonal_spread: Whether or not to have the fire spread calculation apply to
+                             diagonal pixels. If this is `True`, the fire may spread past
+                             firelines that don't take this into account.
         """
         super().__init__(
-            init_pos, fire_size, max_fire_duration, attenuate_line_ros, headless
+            init_pos,
+            fire_size,
+            max_fire_duration,
+            attenuate_line_ros,
+            headless,
+            diagonal_spread,
         )
         self.pixel_scale = pixel_scale
         self.update_rate = update_rate

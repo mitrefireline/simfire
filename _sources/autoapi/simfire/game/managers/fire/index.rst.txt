@@ -53,7 +53,7 @@ Attributes
 
    
 
-.. py:class:: FireManager(init_pos, fire_size, max_fire_duration, attenuate_line_ros = True, headless = False)
+.. py:class:: FireManager(init_pos, fire_size, max_fire_duration, attenuate_line_ros = True, headless = False, diagonal_spread = True)
 
    Base class to manage the spread of the fire as well as the map of which
    pixels have already burned. Child classes should create their own update()
@@ -80,6 +80,9 @@ Attributes
                               different control lines will completely stop the fire.
    :param headless: Flag to run in a headless state. This will allow PyGame objects to
                     not be initialized.
+   :param diagonal_spread: Whether or not to have the fire spread calculation apply to
+                           diagonal pixels. If this is `True`, the fire may spread past
+                           firelines that don't take this into account.
 
    :returns: None
 
@@ -93,7 +96,7 @@ Attributes
 
 
 
-.. py:class:: RothermelFireManager(init_pos, fire_size, max_fire_duration, pixel_scale, update_rate, fuel_particle, terrain, environment, max_time = None, attenuate_line_ros = True, headless = False)
+.. py:class:: RothermelFireManager(init_pos, fire_size, max_fire_duration, pixel_scale, update_rate, fuel_particle, terrain, environment, max_time = None, attenuate_line_ros = True, headless = False, diagonal_spread = True)
 
    Bases: :py:obj:`FireManager`
 
@@ -132,6 +135,9 @@ Attributes
                               different control lines will completely stop the fire.
    :param headless: Flag to run in a headless state. This will allow PyGame objects to
                     not be initialized.
+   :param diagonal_spread: Whether or not to have the fire spread calculation apply to
+                           diagonal pixels. If this is `True`, the fire may spread past
+                           firelines that don't take this into account.
 
    .. py:method:: draw_spread_graph(game_screen = None)
 

@@ -198,6 +198,11 @@ Attributes
 
       
 
+   .. py:attribute:: diagonal_spread
+      :annotation: :bool
+
+      
+
    .. py:attribute:: max_fire_duration
       :annotation: :int
 

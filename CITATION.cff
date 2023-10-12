@@ -1,0 +1,51 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: SimFire
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Michael
+    family-names: Doyle
+    email: mdoyle@mitre.org
+    affiliation: MITRE
+    orcid: 'https://orcid.org/0009-0002-0229-5693'
+  - given-names: Michael
+    family-names: Threet
+    email: mthreet@mitre.org
+    affiliation: MITRE
+  - given-names: Marissa
+    family-names: Dotter
+    email: mdotter@mitre.org
+    affiliation: MITRE
+  - given-names: Chris
+    family-names: Kempis
+    email: ckempis@mitre.org
+    affiliation: MITRE
+  - given-names: Alex
+    family-names: Tapley
+    email: atapley@mitre.org
+    affiliation: MITRE
+  - given-names: Tim
+    family-names: Welsh
+    email: twelsh@mitre.org
+    affiliation: MITRE
+repository-code: 'https://github.com/mitrefireline/simfire'
+url: 'https://fireline.mitre.org'
+repository-artifact: 'https://pypi.org/project/simfire/'
+abstract: >-
+  SimFire uses PyGame to display and simulate different fire
+  spread models, including the Rothermel Surface fire spread
+  model.
+keywords:
+  - simulator
+  - reinforcement learning
+  - wildfire
+  - fire
+  - python
+license: Apache-2.0
+version: 1.5.5
+date-released: '2023-09-27'

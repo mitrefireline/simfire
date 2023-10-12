@@ -296,3 +296,19 @@ release_artifactory:
     - poetry publish --repository mitre-artifactory -u fireline-ci-bot -p ${CI_ARTIFACTORY_TOKEN}
   only:
     - tags
+
+################
+# Dummy CI Job #
+################
+# This is so if there is no functional pipeline for a particular MR,
+# it will still run a pipeline
+dummy:
+  stage: Static Analysis
+  tags:
+    - lslab2
+  script:
+    - echo "Dummy CI Job"
+  needs: []
+  only:
+    refs:
+      - merge_requests

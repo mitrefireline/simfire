@@ -84,3 +84,7 @@ pip install simfire
 ## Contributing
 
 For contributing, see the [Contribution Page](https://mitrefireline.github.io/simfire/contributing.html) in our [docs](https://mitrefireline.github.io/simfire).
+
+## Citation
+
+To cite this software, use the “Cite this repository” link built into GitHub on the right.

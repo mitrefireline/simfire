@@ -87,4 +87,4 @@ For contributing, see the [Contribution Page](https://mitrefireline.github.io/si
 
 ## Citation
 
-To cite this software, use the `Cite this repository` link, built into GitHub to the right.
+To cite this software, use the “Cite this repository” link built into GitHub on the right.

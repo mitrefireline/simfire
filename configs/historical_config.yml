@@ -1,0 +1,128 @@
+# For a description of config parameters, go to
+# https://fireline.pages.mitre.org/simfire/config.html
+area:
+  screen_size: [225, 450] # h, w
+  pixel_scale: 50
+
+display:
+  fire_size: 2
+  control_line_size: 2
+  agent_size: 4
+  rescale_factor: 2
+
+simulation:
+  update_rate: 1
+  runtime: 15h
+  headless: false
+  draw_spread_graph: false
+  record: true
+  save_data: true
+  data_type: "npy"
+  sf_home: "~/.simfire"
+
+mitigation:
+  ros_attenuation: false
+
+operational:
+  seed:
+  latitude: 38.422 # top left corner
+  longitude: -118.266 # top left corner
+  height: 2000 # in meters
+  width: 2000 # in meters
+  resolution: 30 # in meters
+  year: 2020
+
+historical:
+  default: true
+  path: '/nfs/lslab2/fireline/data/historical'
+  year: 2020
+  state: "California"
+  fire: "mineral"
+
+terrain:
+  topography:
+    type: operational
+    functional:
+      function: perlin
+      perlin:
+        octaves: 3
+        persistence: 0.7
+        lacunarity: 2.0
+        seed: 827
+        range_min: 100.0
+        range_max: 300.0
+      gaussian:
+        amplitude: 500
+        mu_x: 50
+        mu_y: 50
+        sigma_x: 50
+        sigma_y: 50
+  fuel:
+    type: operational
+    functional:
+      function: chaparral
+      chaparral:
+        seed: 1113
+    burn_probability:
+      type: operational
+      functional:
+        function: perlin
+        perlin:
+          octaves: 3
+          persistence: 0.7
+          lacunarity: 2.0
+          seed: 827
+          range_min: 100.0
+          range_max: 300.0
+        gaussian:
+          amplitude: 500
+          mu_x: 50
+          mu_y: 50
+          sigma_x: 50
+          sigma_y: 50
+
+
+fire:
+  fire_initial_position:
+    type: static
+    static:
+      position: (25, 25)
+    random:
+      seed: 1234
+  max_fire_duration: 5
+
+environment:
+  moisture: 0.001
+
+wind:
+  function: perlin
+  cfd:
+    time_to_train: 1000
+    result_accuracy: 1
+    iterations: 1
+    scale: 1
+    timestep_dt: 1.0
+    diffusion: 0.0
+    viscosity: 0.0000001
+    speed: 19.0
+    direction: north
+  simple:
+    speed: 7
+    direction: 90.0
+  perlin:
+    speed:
+      seed: 2345
+      scale: 400
+      octaves: 3
+      persistence: 0.7
+      lacunarity: 2.0
+      range_min: 7
+      range_max: 47
+    direction:
+      seed: 650
+      scale: 1500
+      octaves: 2
+      persistence: 0.9
+      lacunarity: 1.0
+      range_min: 0.0
+      range_max: 360.0

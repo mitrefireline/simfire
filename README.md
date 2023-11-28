@@ -88,3 +88,6 @@ For contributing, see the [Contribution Page](https://mitrefireline.github.io/si
 ## Citation
 
 To cite this software, use the “Cite this repository” link built into GitHub on the right.
+
+### Copyright
+Copyright ©2023 The MITRE Corporation. ALL RIGHTS RESERVED. Approved for Public Release; Distribution Unlimited. Public Release Case Number 22-3261.

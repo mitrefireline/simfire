@@ -11,7 +11,7 @@ This file can have any name, as a path is required to load the configuration fil
 ### Area Parameters
 
 ```{attention}
-The parameters will be overwritten if you are using the "[Operational](#operational-parameters)" data.
+These parameters will be overwritten if you are using the "[Operational](#operational-parameters)" data.
 ```
 
 #### screen_size

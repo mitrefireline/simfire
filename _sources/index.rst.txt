@@ -1,4 +1,4 @@
-fiReLine SimFire Fire Simulator
+Fireline SimFire Fire Simulator
 ===============================
 
 Running The Simulation

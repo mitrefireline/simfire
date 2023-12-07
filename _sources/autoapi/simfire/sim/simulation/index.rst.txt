@@ -38,7 +38,7 @@ Attributes
    Base class with several built in methods for interacting with different simulators.
 
    Current simulators using this API:
-     - `SimFire <https://gitlab.mitre.org/fireline/simfire>`_
+     - `SimFire <https://github.com/mitrefireline/simfire>`_
 
    Initialize the Simulation object for interacting with the RL harness.
 
@@ -148,7 +148,7 @@ Attributes
    Base class with several built in methods for interacting with different simulators.
 
    Current simulators using this API:
-     - `SimFire <https://gitlab.mitre.org/fireline/simfire>`_
+     - `SimFire <https://github.com/mitrefireline/simfire>`_
 
    Initialize the `FireSimulation` object for interacting with the RL harness.
 

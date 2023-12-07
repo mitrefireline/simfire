@@ -3,6 +3,12 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+<meta property="og:title" content="Configuring the Simulation" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="config.html" />
+<meta property="og:site_name" content="SimFire" />
+<meta property="og:description" content="The configuration for SimFire is all done through a YAML file. All of the configurable settings will be explained in the sections below. This file can have any name, as a path is required to load t..." />
+<meta name="description" content="The configuration for SimFire is all done through a YAML file. All of the configurable settings will be explained in the sections below. This file can have any name, as a path is required to load t..." />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Contributing" href="contributing.html" /><link rel="prev" title="Introduction" href="intro.html" />
 
     <link rel="shortcut icon" href="_static/favicon.ico"/><!-- Generated with Sphinx 5.3.0 and Furo 2022.12.07 -->
@@ -10,6 +16,7 @@
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=91d0f0d1c444bdcb17a68e833c7a53903343c195" />
     <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
     
     
@@ -255,7 +262,11 @@
           <section id="configuring-the-simulation">
 <h1>Configuring the Simulation<a class="headerlink" href="#configuring-the-simulation" title="Permalink to this heading">#</a></h1>
 <p>The configuration for SimFire is all done through a <a class="reference external" href="https://yaml.org/">YAML</a> file. All of the configurable settings will be explained in the sections below.</p>
-<p>This file can have any name, as a path is required to load the configuration file, but the hierarchy of the file must match the hierarchy found in the example <a class="reference external" href="https://gitlab.mitre.org/fireline/simfire/-/blob/main/config.yml"><code class="docutils literal notranslate"><span class="pre">config.yml</span></code></a>. This example configuration can be seen in its entirety at the <span class="xref myst">bottom of this page</span>.</p>
+<p>This file can have any name, as a path is required to load the configuration file, but the hierarchy of the file must match the hierarchy found in the example <a class="reference external" href="https://github.com/mitrefireline/simfire/blob/main/configs/operational_config.yml"><code class="docutils literal notranslate"><span class="pre">operational_config.yml</span></code></a>. This example configuration can be seen in its entirety at the <span class="xref myst">bottom of this page</span>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This example in the docs may be out of date, so it is better to rely on the configs found in the <a class="reference external" href="https://github.com/mitrefireline/simfire/tree/main/configs">configs</a> directory of the repository.</p>
+</div>
 <section id="settings">
 <h2>Settings<a class="headerlink" href="#settings" title="Permalink to this heading">#</a></h2>
 <hr class="docutils" />
@@ -347,7 +358,7 @@ The format to save the data of the simulation. Can by type: “npy”, “h5”.
 <section id="ros-attenuation">
 <h4>ros_attenuation<a class="headerlink" href="#ros-attenuation" title="Permalink to this heading">#</a></h4>
 <p>(<code class="docutils literal notranslate"><span class="pre">bool</span></code>)<br>
-Whether or not to attenuate rate of spread based on the type of line being used. These attenuation values can be seen in <a class="reference external" href="https://gitlab.mitre.org/fireline/simfire/-/blob/main/simfire/enums.py#L48"><code class="docutils literal notranslate"><span class="pre">enums.py</span></code></a>. These values will be subtracted from the rate of spread for a given pixel based on the control line type. If this value is set to <code class="docutils literal notranslate"><span class="pre">false</span></code>, all lines will completely stop a fire and the rate of spread for any pixel with a control line will be set to zero.</p>
+Whether or not to attenuate rate of spread based on the type of line being used. These attenuation values can be seen in <a class="reference external" href="https://github.com/mitrefireline/simfire/blob/main/simfire/enums.py"><code class="docutils literal notranslate"><span class="pre">enums.py</span></code></a>. These values will be subtracted from the rate of spread for a given pixel based on the control line type. If this value is set to <code class="docutils literal notranslate"><span class="pre">false</span></code>, all lines will completely stop a fire and the rate of spread for any pixel with a control line will be set to zero.</p>
 </section>
 </section>
 <hr class="docutils" />
@@ -632,9 +643,15 @@ Whether or not to render with post agent and fire in place.</p>
 <hr class="docutils" />
 <section id="example-config-file">
 <h2>Example Config File<a class="headerlink" href="#example-config-file" title="Permalink to this heading">#</a></h2>
-<p>Go <a class="reference external" href="https://gitlab.mitre.org/fireline/simfire/-/blob/main/configs">here</a> for more examples.</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">area</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">screen_size</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">225</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">225</span><span class="p p-Indicator">]</span>
+<p>Go <a class="reference external" href="https://github.com/mitrefireline/simfire/tree/main/configs">here</a> for more examples.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If this config doesn’t work, look to the most up-to-date version in the link above.</p>
+</div>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># For a description of config parameters, go to</span>
+<span class="c1"># https://fireline.pages.mitre.org/simfire/config.html</span>
+<span class="nt">area</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">screen_size</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">225</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">450</span><span class="p p-Indicator">]</span><span class="w"> </span><span class="c1"># h, w</span>
 <span class="w">  </span><span class="nt">pixel_scale</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span>
 
 <span class="nt">display</span><span class="p">:</span>
@@ -645,20 +662,24 @@ Whether or not to render with post agent and fire in place.</p>
 
 <span class="nt">simulation</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">update_rate</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
-<span class="w">  </span><span class="nt">runtime</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">24h</span>
+<span class="w">  </span><span class="nt">runtime</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">15h</span>
 <span class="w">  </span><span class="nt">headless</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="w">  </span><span class="nt">draw_spread_graph</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
 <span class="w">  </span><span class="nt">record</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">  </span><span class="nt">save_data</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">  </span><span class="nt">data_type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;npy&quot;</span>
+<span class="w">  </span><span class="nt">sf_home</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;~/.simfire&quot;</span>
 
 <span class="nt">mitigation</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">ros_attenuation</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">  </span><span class="nt">ros_attenuation</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
 
 <span class="nt">operational</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">seed</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">latitude</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">39.67</span>
-<span class="w">  </span><span class="nt">longitude</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">119.8</span>
-<span class="w">  </span><span class="nt">height</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4000</span>
-<span class="w">  </span><span class="nt">width</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4000</span>
-<span class="w">  </span><span class="nt">resolution</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">30</span>
+<span class="w">  </span><span class="nt">latitude</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">38.422</span><span class="w"> </span><span class="c1"># top left corner</span>
+<span class="w">  </span><span class="nt">longitude</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">-118.266</span><span class="w"> </span><span class="c1"># top left corner</span>
+<span class="w">  </span><span class="nt">height</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2000</span><span class="w"> </span><span class="c1"># in meters</span>
+<span class="w">  </span><span class="nt">width</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2000</span><span class="w"> </span><span class="c1"># in meters</span>
+<span class="w">  </span><span class="nt">resolution</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">30</span><span class="w"> </span><span class="c1"># in meters</span>
 <span class="w">  </span><span class="nt">year</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2020</span>
 
 <span class="nt">terrain</span><span class="p">:</span>
@@ -685,24 +706,49 @@ Whether or not to render with post agent and fire in place.</p>
 <span class="w">      </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">chaparral</span>
 <span class="w">      </span><span class="nt">chaparral</span><span class="p">:</span>
 <span class="w">        </span><span class="nt">seed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1113</span>
+<span class="w">    </span><span class="nt">burn_probability</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">operational</span>
+<span class="w">      </span><span class="nt">functional</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">perlin</span>
+<span class="w">        </span><span class="nt">perlin</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">octaves</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
+<span class="w">          </span><span class="nt">persistence</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.7</span>
+<span class="w">          </span><span class="nt">lacunarity</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2.0</span>
+<span class="w">          </span><span class="nt">seed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">827</span>
+<span class="w">          </span><span class="nt">range_min</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">100.0</span>
+<span class="w">          </span><span class="nt">range_max</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">300.0</span>
+<span class="w">        </span><span class="nt">gaussian</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">amplitude</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">500</span>
+<span class="w">          </span><span class="nt">mu_x</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span>
+<span class="w">          </span><span class="nt">mu_y</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span>
+<span class="w">          </span><span class="nt">sigma_x</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span>
+<span class="w">          </span><span class="nt">sigma_y</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span>
+
 
 <span class="nt">fire</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">fire_initial_position</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">(16, 16)</span>
-<span class="w">  </span><span class="nt">max_fire_duration</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span>
+<span class="w">  </span><span class="nt">fire_initial_position</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">static</span>
+<span class="w">    </span><span class="nt">static</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">position</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">(25, 25)</span>
+<span class="w">    </span><span class="nt">random</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">seed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1234</span>
+<span class="w">  </span><span class="nt">max_fire_duration</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5</span>
+<span class="w">  </span><span class="nt">diagonal_spread</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 
 <span class="nt">environment</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">moisture</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.03</span>
+<span class="w">  </span><span class="nt">moisture</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.001</span>
 
 <span class="nt">wind</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">function</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">perlin</span>
 <span class="w">  </span><span class="nt">cfd</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">time_to_train</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1000</span>
+<span class="w">    </span><span class="nt">result_accuracy</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
 <span class="w">    </span><span class="nt">iterations</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
 <span class="w">    </span><span class="nt">scale</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
 <span class="w">    </span><span class="nt">timestep_dt</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0</span>
 <span class="w">    </span><span class="nt">diffusion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.0</span>
 <span class="w">    </span><span class="nt">viscosity</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.0000001</span>
-<span class="w">    </span><span class="nt">speed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">19</span>
+<span class="w">    </span><span class="nt">speed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">19.0</span>
 <span class="w">    </span><span class="nt">direction</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">north</span>
 <span class="w">  </span><span class="nt">simple</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">speed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">7</span>
@@ -758,7 +804,7 @@ Whether or not to render with post agent and fire in place.</p>
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 2023, fiReLine
+                Copyright &#169; 2023, The MITRE Corporation
             </div>
             Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
             
@@ -893,5 +939,7 @@ Whether or not to render with post agent and fire in place.</p>
     <script src="_static/doctools.js"></script>
     <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/scripts/furo.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
     </body>
 </html>

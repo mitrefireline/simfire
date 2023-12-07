@@ -39,7 +39,7 @@ class Simulation(ABC):
     Base class with several built in methods for interacting with different simulators.
 
     Current simulators using this API:
-      - `SimFire <https://gitlab.mitre.org/fireline/simfire>`_
+      - `SimFire <https://github.com/mitrefireline/simfire>`_
     """
 
     def __init__(self, config: Config) -> None:

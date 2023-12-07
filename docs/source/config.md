@@ -2,7 +2,11 @@
 
 The configuration for SimFire is all done through a [YAML](https://yaml.org/) file. All of the configurable settings will be explained in the sections below.
 
-This file can have any name, as a path is required to load the configuration file, but the hierarchy of the file must match the hierarchy found in the example [`config.yml`](https://gitlab.mitre.org/fireline/simfire/-/blob/main/config.yml). This example configuration can be seen in its entirety at the [bottom of this page](#example-config-file).
+This file can have any name, as a path is required to load the configuration file, but the hierarchy of the file must match the hierarchy found in the example [`operational_config.yml`](https://github.com/mitrefireline/simfire/blob/main/configs/operational_config.yml). This example configuration can be seen in its entirety at the [bottom of this page](#example-config-file).
+
+```{note}
+This example in the docs may be out of date, so it is better to rely on the configs found in the [configs](https://github.com/mitrefireline/simfire/tree/main/configs) directory of the repository.
+```
 
 ## Settings
 
@@ -82,7 +86,7 @@ The format to save the data of the simulation. Can by type: "npy", "h5".
 
 #### ros_attenuation
 (`bool`)<br>
-Whether or not to attenuate rate of spread based on the type of line being used. These attenuation values can be seen in [`enums.py`](https://gitlab.mitre.org/fireline/simfire/-/blob/main/simfire/enums.py#L48). These values will be subtracted from the rate of spread for a given pixel based on the control line type. If this value is set to `false`, all lines will completely stop a fire and the rate of spread for any pixel with a control line will be set to zero.
+Whether or not to attenuate rate of spread based on the type of line being used. These attenuation values can be seen in [`enums.py`](https://github.com/mitrefireline/simfire/blob/main/simfire/enums.py). These values will be subtracted from the rate of spread for a given pixel based on the control line type. If this value is set to `false`, all lines will completely stop a fire and the rate of spread for any pixel with a control line will be set to zero.
 
 ---
 
@@ -356,11 +360,17 @@ Whether or not to render with post agent and fire in place.
 
 ## Example Config File
 
-Go [here](https://gitlab.mitre.org/fireline/simfire/-/blob/main/configs) for more examples.
+Go [here](https://github.com/mitrefireline/simfire/tree/main/configs) for more examples.
+
+```{note}
+If this config doesn't work, look to the most up-to-date version in the link above.
+```
 
 ```yaml
+# For a description of config parameters, go to
+# https://fireline.pages.mitre.org/simfire/config.html
 area:
-  screen_size: [225, 225]
+  screen_size: [225, 450] # h, w
   pixel_scale: 50
 
 display:
@@ -371,20 +381,24 @@ display:
 
 simulation:
   update_rate: 1
-  runtime: 24h
+  runtime: 15h
   headless: false
+  draw_spread_graph: false
   record: true
+  save_data: true
+  data_type: "npy"
+  sf_home: "~/.simfire"
 
 mitigation:
-  ros_attenuation: true
+  ros_attenuation: false
 
 operational:
   seed:
-  latitude: 39.67
-  longitude: 119.8
-  height: 4000
-  width: 4000
-  resolution: 30
+  latitude: 38.422 # top left corner
+  longitude: -118.266 # top left corner
+  height: 2000 # in meters
+  width: 2000 # in meters
+  resolution: 30 # in meters
   year: 2020
 
 terrain:
@@ -411,24 +425,49 @@ terrain:
       function: chaparral
       chaparral:
         seed: 1113
+    burn_probability:
+      type: operational
+      functional:
+        function: perlin
+        perlin:
+          octaves: 3
+          persistence: 0.7
+          lacunarity: 2.0
+          seed: 827
+          range_min: 100.0
+          range_max: 300.0
+        gaussian:
+          amplitude: 500
+          mu_x: 50
+          mu_y: 50
+          sigma_x: 50
+          sigma_y: 50
+
 
 fire:
-  fire_initial_position: (16, 16)
-  max_fire_duration: 4
+  fire_initial_position:
+    type: static
+    static:
+      position: (25, 25)
+    random:
+      seed: 1234
+  max_fire_duration: 5
+  diagonal_spread: true
 
 environment:
-  moisture: 0.03
+  moisture: 0.001
 
 wind:
   function: perlin
   cfd:
     time_to_train: 1000
+    result_accuracy: 1
     iterations: 1
     scale: 1
     timestep_dt: 1.0
     diffusion: 0.0
     viscosity: 0.0000001
-    speed: 19
+    speed: 19.0
     direction: north
   simple:
     speed: 7

@@ -322,23 +322,23 @@ initial fire.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>init_pos</strong> (<em>Tuple</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>]</em>) – The (x,y) location of the initial fire</p></li>
-<li><p><strong>fire_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – The (n,n) pixel size of the fire sprite. Note that
+<li><p><strong>init_pos</strong> (<em>Tuple</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a><em>]</em>) – The (x,y) location of the initial fire</p></li>
+<li><p><strong>fire_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a>) – The (n,n) pixel size of the fire sprite. Note that
 the sprite pixel size does not affect which tiles/pixels
 are actually burning. This is for display purposes only.
 Each fire is only burning on one pixel at a time.</p></li>
-<li><p><strong>max_fire_duration</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – The number of frames/updates a fire will burn
+<li><p><strong>max_fire_duration</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a>) – The number of frames/updates a fire will burn
 for before going out. This is moslty useful so
 that fires that have spread and are now on the
 interior do not have to keep being rendered.</p></li>
-<li><p><strong>attenuate_line_ros</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a>) – Whether or not to attenuate the rate of spread.
+<li><p><strong>attenuate_line_ros</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a>) – Whether or not to attenuate the rate of spread.
 Defaults to <cite>True</cite>. If set to <cite>True</cite>, will subtract
 values found in <cite>enums.RoSAttenuation</cite> from the initial
 rate of spread calculation. If set to <cite>False</cite>, all
 different control lines will completely stop the fire.</p></li>
-<li><p><strong>headless</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a>) – Flag to run in a headless state. This will allow PyGame objects to
+<li><p><strong>headless</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a>) – Flag to run in a headless state. This will allow PyGame objects to
 not be initialized.</p></li>
-<li><p><strong>diagonal_spread</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a>) – Whether or not to have the fire spread calculation apply to
+<li><p><strong>diagonal_spread</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a>) – Whether or not to have the fire spread calculation apply to
 diagonal pixels. If this is <cite>True</cite>, the fire may spread past
 firelines that don’t take this into account.</p></li>
 </ul>
@@ -376,35 +376,35 @@ initial fire.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>init_pos</strong> (<em>Tuple</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>]</em>) – The (x,y) location of the initial fire</p></li>
-<li><p><strong>fire_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – The (n,n) pixel size of the fire sprite. Note that
+<li><p><strong>init_pos</strong> (<em>Tuple</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a><em>]</em>) – The (x,y) location of the initial fire</p></li>
+<li><p><strong>fire_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a>) – The (n,n) pixel size of the fire sprite. Note that
 the sprite pixel size does not affect which tiles/pixels
 are actually burning. This is for display purposes only.
 Each fire is only burning on one pixel at a time.</p></li>
-<li><p><strong>max_fire_duration</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – The number of frames/updates a fire will burn
+<li><p><strong>max_fire_duration</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a>) – The number of frames/updates a fire will burn
 for before going out. This is moslty useful so
 that fires that have spread and are now on the
 interior do not have to keep being rendered.</p></li>
-<li><p><strong>pixel_scale</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – The amount of ft each pixel represents. This is needed
+<li><p><strong>pixel_scale</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><em>float</em></a>) – The amount of ft each pixel represents. This is needed
 to track how much a fire has burned at a certain
 location since it may take more than one update for
 a pixel/location to catch on fire depending on the
 rate of spread.</p></li>
-<li><p><strong>update_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – The amount of time in minutes that passes for each simulation
+<li><p><strong>update_rate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><em>float</em></a>) – The amount of time in minutes that passes for each simulation
 update step</p></li>
 <li><p><strong>fuel_particle</strong> (<a class="reference internal" href="../../../world/parameters/index.html#simfire.world.parameters.FuelParticle" title="simfire.world.parameters.FuelParticle"><em>simfire.world.parameters.FuelParticle</em></a>) – The parameters that describe the fuel particle</p></li>
 <li><p><strong>terrain</strong> (<a class="reference internal" href="../../sprites/index.html#simfire.game.sprites.Terrain" title="simfire.game.sprites.Terrain"><em>simfire.game.sprites.Terrain</em></a>) – The Terrain that describes the simulation/game</p></li>
 <li><p><strong>environment</strong> (<a class="reference internal" href="../../../world/parameters/index.html#simfire.world.parameters.Environment" title="simfire.world.parameters.Environment"><em>simfire.world.parameters.Environment</em></a>) – The Environment that describes the simulation/game</p></li>
-<li><p><strong>max_time</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>]</em>) – The maximum amount of time that the fire can spread for, in
+<li><p><strong>max_time</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a><em>]</em>) – The maximum amount of time that the fire can spread for, in
 minutes.</p></li>
-<li><p><strong>attenuate_line_ros</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a>) – Whether or not to attenuate the rate of spread.
+<li><p><strong>attenuate_line_ros</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a>) – Whether or not to attenuate the rate of spread.
 Defaults to <cite>True</cite>. If set to <cite>True</cite>, will subtract
 values found in <cite>enums.RoSAttenuation</cite> from the initial
 rate of spread calculation. If set to <cite>False</cite>, all
 different control lines will completely stop the fire.</p></li>
-<li><p><strong>headless</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a>) – Flag to run in a headless state. This will allow PyGame objects to
+<li><p><strong>headless</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a>) – Flag to run in a headless state. This will allow PyGame objects to
 not be initialized.</p></li>
-<li><p><strong>diagonal_spread</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a>) – Whether or not to have the fire spread calculation apply to
+<li><p><strong>diagonal_spread</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a>) – Whether or not to have the fire spread calculation apply to
 diagonal pixels. If this is <cite>True</cite>, the fire may spread past
 firelines that don’t take this into account.</p></li>
 </ul>
@@ -467,16 +467,16 @@ initial fire.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>init_pos</strong> (<em>Tuple</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>]</em>) – The (x,y) location of the initial fire</p></li>
-<li><p><strong>fire_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – The (n,n) pixel size of the fire sprite. Note that
+<li><p><strong>init_pos</strong> (<em>Tuple</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a><em>]</em>) – The (x,y) location of the initial fire</p></li>
+<li><p><strong>fire_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a>) – The (n,n) pixel size of the fire sprite. Note that
 the sprite pixel size does not affect which tiles/pixels
 are actually burning. This is for display purposes only.
 Each fire is only burning on one pixel at a time.</p></li>
-<li><p><strong>max_fire_duration</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – The number of frames/updates a fire will burn
+<li><p><strong>max_fire_duration</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a>) – The number of frames/updates a fire will burn
 for before going out. This is moslty useful so
 that fires that have spread and are now on the
 interior do not have to keep being rendered.</p></li>
-<li><p><strong>rate_of_spread</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – The number of frames that must pass before a fire
+<li><p><strong>rate_of_spread</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a>) – The number of frames that must pass before a fire
 can spread to adjacent pixels.</p></li>
 </ul>
 </dd>

@@ -261,6 +261,10 @@
 <hr class="docutils" />
 <section id="area-parameters">
 <h3>Area Parameters<a class="headerlink" href="#area-parameters" title="Permalink to this heading">#</a></h3>
+<div class="admonition attention">
+<p class="admonition-title">Attention</p>
+<p>These parameters will be overwritten if you are using the “<span class="xref myst">Operational</span>” data.</p>
+</div>
 <section id="screen-size">
 <h4>screen_size<a class="headerlink" href="#screen-size" title="Permalink to this heading">#</a></h4>
 <p>(<code class="docutils literal notranslate"><span class="pre">Tuple[int,</span> <span class="pre">int]</span></code>)<br>
@@ -350,6 +354,10 @@ Whether or not to attenuate rate of spread based on the type of line being used.
 <section id="operational-parameters">
 <h3>Operational Parameters<a class="headerlink" href="#operational-parameters" title="Permalink to this heading">#</a></h3>
 <p>These are the operational parameters that will be used for the operational data layers that rely on a location, if those layers’ types are set to <code class="docutils literal notranslate"><span class="pre">operational</span></code>.</p>
+<div class="admonition attention">
+<p class="admonition-title">Attention</p>
+<p>If using operational data, this will overwrite the values set in the <span class="xref myst">Area Parameters</span> section, as the height, width, and resolution set here will take precedence.</p>
+</div>
 <section id="seed">
 <h4>seed<a class="headerlink" href="#seed" title="Permalink to this heading">#</a></h4>
 <p>(<code class="docutils literal notranslate"><span class="pre">int</span></code>)<br>

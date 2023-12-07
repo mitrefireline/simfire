@@ -312,11 +312,11 @@ variances given by sigma_x and sigma_y. The input A will modify the final amplit
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>amplitude</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – The Gaussian amplitude</p></li>
-<li><p><strong>mu_x</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – The mean/center in the x direction</p></li>
-<li><p><strong>mu_y</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – The mean/center in the y direction</p></li>
-<li><p><strong>sigma_x</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – The variance in the x direction</p></li>
-<li><p><strong>sigma_y</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – The variance in the y direction</p></li>
+<li><p><strong>amplitude</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><em>float</em></a>) – The Gaussian amplitude</p></li>
+<li><p><strong>mu_x</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><em>float</em></a>) – The mean/center in the x direction</p></li>
+<li><p><strong>mu_y</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><em>float</em></a>) – The mean/center in the y direction</p></li>
+<li><p><strong>sigma_x</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><em>float</em></a>) – The variance in the x direction</p></li>
+<li><p><strong>sigma_y</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><em>float</em></a>) – The variance in the y direction</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -335,17 +335,17 @@ variances given by sigma_x and sigma_y. The input A will modify the final amplit
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>octaves</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – specifies the number of passes, defaults to 1 (simple noise).</p></li>
-<li><p><strong>persistence</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – specifies the amplitude of each successive octave relative
+<li><p><strong>octaves</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a>) – specifies the number of passes, defaults to 1 (simple noise).</p></li>
+<li><p><strong>persistence</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><em>float</em></a>) – specifies the amplitude of each successive octave relative
 to the one below it. Defaults to 0.5 (each higher octave’s amplitude
 is halved). Note the amplitude of the first pass is always 1.0.</p></li>
-<li><p><strong>lacunarity</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – specifies the frequency of each successive octave relative
+<li><p><strong>lacunarity</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><em>float</em></a>) – specifies the frequency of each successive octave relative
 to the one below it, similar to persistence. Defaults to 2.0.</p></li>
-<li><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – The seed to used to generate random terrain. <cite>seed</cite> takes the place of the
+<li><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a>) – The seed to used to generate random terrain. <cite>seed</cite> takes the place of the
 <cite>base</cite> argument in the <cite>snoise2()</cite> function, which adds offsets to the
 input (x, y) coordinates to get new terrain</p></li>
-<li><p><strong>range_min</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – The minimum amplitude to scale to</p></li>
-<li><p><strong>range_max</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)"><em>float</em></a>) – The maximum amplitude to scale to</p></li>
+<li><p><strong>range_min</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><em>float</em></a>) – The minimum amplitude to scale to</p></li>
+<li><p><strong>range_max</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><em>float</em></a>) – The maximum amplitude to scale to</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>

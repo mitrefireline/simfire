@@ -42,6 +42,8 @@ extensions = [
     "autoapi.extension",
     "myst_parser",
     "sphinx.ext.intersphinx",
+    "sphinx_copybutton",
+    "sphinxext.opengraph",
 ]
 
 intersphinx_mapping = {

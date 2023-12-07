@@ -2,8 +2,8 @@ name: GitHub Pages
 
 on:
   push:
-    tags:
-      - '*'
+    branches:
+      - main
 
 jobs:
   deploy-pages:

@@ -10,8 +10,8 @@ readme = "README.md"
 include = ["simfire/utils/textures/terrain.jpg", "simfire/utils/assets/fireline_logo.png"]
 
 keywords = ["python", "reinforcement learning", "simulation", "fire"]
-documentation = "https://fireline.pages.mitre.org/simfire/"
-repository = "https://gitlab.mitre.org/fireline/simfire"
+documentation = "https://mitrefireline.github.io/simfire/"
+repository = "https://github.com/mitrefireline/simfire"
 
 [tool.poetry.dependencies]
 python = "~3.9"
@@ -42,6 +42,8 @@ sphinx-autoapi = "^1.8.4"
 sphinx-rtd-theme = "^1.0.0"
 myst-parser = "^0.18.0"
 furo = "^2022.6.4.1"
+sphinxext-opengraph = "^0.9.0"
+sphinx-copybutton = "^0.5.2"
 
 [tool.poetry.group.dev.dependencies]
 black = "^22.3.0"

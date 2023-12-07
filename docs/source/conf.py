@@ -19,10 +19,10 @@ from datetime import date
 # -- Project information -----------------------------------------------------
 
 project = "SimFire"
-copyright = f"{date.today().year}, fiReLine"
+copyright = f"{date.today().year}, The MITRE Corporation"
 author = (
-    "Marissa Dotter, Michael Doyle, Dhanuj Gandikota, Chris Kempis, Lauren Schambach, "
-    "Alex Tapley, Michael Threet, Tim Welsh"
+    "Marissa Dotter, Michael Doyle, Aidan Fennelly, Dhanuj Gandikota, Chris Kempis, "
+    "Lauren Schambach, Alex Tapley, Michael Threet, Tim Welsh"
 )
 
 # The full version, including alpha/beta/rc tags
@@ -42,6 +42,8 @@ extensions = [
     "autoapi.extension",
     "myst_parser",
     "sphinx.ext.intersphinx",
+    "sphinx_copybutton",
+    "sphinxext.opengraph",
 ]
 
 intersphinx_mapping = {

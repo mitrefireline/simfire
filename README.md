@@ -30,8 +30,8 @@ python run_game.py
 ### Running as a Python Module
 
 ```python
-from simfire.utils.config import Config
 from simfire.sim.simulation import FireSimulation
+from simfire.utils.config import Config
 
 config = Config("configs/operational_config.yml")
 sim = FireSimulation(config)
@@ -53,8 +53,8 @@ sim.save_spread_graph()
 
 # Update agents for display
 # (x, y, agent_id)
-agent_0 = (5, 78, 0)
-agent_1 = (80, 105, 1)
+agent_0 = (5, 5, 0)
+agent_1 = (5, 5, 1)
 
 agents = [agent_0, agent_1]
 
@@ -62,16 +62,16 @@ agents = [agent_0, agent_1]
 sim.update_agent_positions(agents)
 
 # Loop through to move agents
-for i in range(60):
-    # Do something here to choose the new agent locations
-    agent_0 = (new_col, new_row, 0)
-    agent_1 = (new_col, new_row, 1)
+for i in range(5):
+    agent_0 = (5 + i, 5 + i, 0)
+    agent_1 = (5 + i, 5 + i, 1)
     # Update the agent positions on the simulation
     sim.update_agent_positions([agent_0, agent_1])
     # Run for 1 update step
     sim.run(1)
 
-# Turn off rendering so the display disappears and the simulation continues to run in the background
+# Turn off rendering so the display disappears and the simulation continues to run in the
+# background
 sim.rendering = False
 ```
 

@@ -269,7 +269,7 @@ tag:
     refs:
       - main
     changes:
-      - "**/*.py"
+      - "simfire/**/*"
       - poetry.lock
       - pyproject.toml
 

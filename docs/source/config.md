@@ -10,6 +10,10 @@ This file can have any name, as a path is required to load the configuration fil
 
 ### Area Parameters
 
+```{attention}
+These parameters will be overwritten if you are using the "[Operational](#operational-parameters)" data.
+```
+
 #### screen_size
 (`Tuple[int, int]`)<br>
 Determines how large the simulation is in pixels. The `screen_size` sets both the height and the width of the screen.
@@ -84,6 +88,11 @@ Whether or not to attenuate rate of spread based on the type of line being used.
 
 ### Operational Parameters
 These are the operational parameters that will be used for the operational data layers that rely on a location, if those layers' types are set to `operational`.
+
+```{attention}
+If using operational data, this will overwrite the values set in the [Area Parameters](#area-parameters) section, as the height, width, and resolution set here will take precedence.
+```
+
 #### seed
 (`int`)<br>
 The seed that would pick a random latitude and longitude. Leave empty if using the [latitude](#latitude) and [longitude](#longitude) below.

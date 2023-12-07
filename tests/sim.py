@@ -31,7 +31,6 @@ sim.update_agent_positions(agents)
 
 # Loop through to move agents
 for i in range(5):
-    # Do something here to choose the new agent locations
     agent_0 = (5 + i, 5 + i, 0)
     agent_1 = (5 + i, 5 + i, 1)
     # Update the agent positions on the simulation

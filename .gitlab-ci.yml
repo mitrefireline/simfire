@@ -247,8 +247,8 @@ tag:
     - poetry --version
     - DEBIAN_FRONTEND=noninteractive apt update
     - DEBIAN_FRONTEND=noninteractive apt -y install php php-json git curl wget
-    - wget --no-check-certificate https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O yq
-    - chmod +x yq
+    - wget --no-check-certificate https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq
+    - chmod +x /usr/bin/yq
     - git --version
   script:
     - poetry version patch

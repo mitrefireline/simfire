@@ -258,7 +258,7 @@ tag:
     - MR=$(git log -1 | grep -Po '(?<=fireline/simulators/simfire)(.*?).*')
     - echo -e "# Version ${VERSION}\n\nThis version includes:\n\n* ${LOG} (closed ${ISSUE} with merge request ${MR})" > RELEASE.md
     - MESSAGE="$(php -r "echo json_encode(['name' => '$VERSION', 'tag_name' => '$VERSION', 'description' => file_get_contents('RELEASE.md')]);")"
-    - yq e -i '.version=${VERSION} | .date-released="'$(date +'%Y-%m-%d')'"' CITATION.cff
+    - yq e -i '.version="'${VERSION}'" | .date-released="'$(date +'%Y-%m-%d')'"' CITATION.cff
     - !reference [.commit_version, script]
     - git tag -a $VERSION -m "$VERSION"
     - git push origin $VERSION

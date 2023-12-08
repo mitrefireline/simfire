@@ -246,7 +246,9 @@ tag:
     - export PATH=$PATH:$HOME/.local/bin
     - poetry --version
     - DEBIAN_FRONTEND=noninteractive apt update
-    - DEBIAN_FRONTEND=noninteractive apt -y install php php-json git curl yq
+    - DEBIAN_FRONTEND=noninteractive apt -y install php php-json git curl wget
+    - wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O yq
+    - chmod +x yq
     - git --version
   script:
     - poetry version patch

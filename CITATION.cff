@@ -4,8 +4,7 @@
 cff-version: 1.2.0
 title: SimFire
 message: >-
-  If you use this software, please cite it using the
-  metadata from this file.
+  If you use this software, please cite it using the metadata from this file.
 type: software
 authors:
   - given-names: Michael
@@ -37,9 +36,7 @@ repository-code: 'https://github.com/mitrefireline/simfire'
 url: 'https://fireline.mitre.org'
 repository-artifact: 'https://pypi.org/project/simfire/'
 abstract: >-
-  SimFire uses PyGame to display and simulate different fire
-  spread models, including the Rothermel Surface fire spread
-  model.
+  SimFire uses PyGame to display and simulate different fire spread models, including the Rothermel Surface fire spread model.
 keywords:
   - simulator
   - reinforcement learning
@@ -47,5 +44,5 @@ keywords:
   - fire
   - python
 license: Apache-2.0
-version: 1.5.5
-date-released: '2023-09-27'
+version: 1.5.6
+date-released: '2023-12-08'

@@ -2,6 +2,10 @@ name: GitHub Pages
 
 on:
   pull_request:
+    paths:
+      - 'simfire/**/*.py'
+      - 'docs/**/*'
+      - poetry.lock
   workflow_dispatch:
 
 jobs:

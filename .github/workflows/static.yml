@@ -1,6 +1,10 @@
 name: Static Analysis
 on:
   pull_request:
+    paths:
+      - '**/*.py'
+      - poetry.lock
+      - .flake8
   workflow_dispatch:
 
 jobs:

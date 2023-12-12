@@ -25,8 +25,8 @@ jobs:
 
       - name: Install libgl1-mesa-dev
         run: |
-          sudo apt update
-          sudo apt -y install libgl1-mesa-dev
+          apt update
+          apt -y install libgl1-mesa-dev
 
       - name: Install Dependencies
         run: |
@@ -57,8 +57,8 @@ jobs:
 
       - name: Install libgl1-mesa-dev
         run: |
-          sudo apt update
-          sudo apt -y install libgl1-mesa-dev
+          apt update
+          apt -y install libgl1-mesa-dev
 
       - name: Install Dependencies
         run: |

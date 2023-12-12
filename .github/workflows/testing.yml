@@ -40,6 +40,8 @@ jobs:
 
   coverage:
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
     container:
       image: python:3.9
     timeout-minutes: 20

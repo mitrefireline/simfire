@@ -9,8 +9,6 @@ on:
 jobs:
   run_game-py:
     runs-on: ubuntu-latest
-    env:
-      POETRY_VERSION: ${{ vars.POETRY_VERSION }}
     container:
       image: python:3.9
     steps:
@@ -24,6 +22,8 @@ jobs:
           curl -sSkL https://install.python-poetry.org | python -
           export PATH=$PATH:$HOME/.local/bin
           poetry --version
+        env:
+          POETRY_VERSION: ${{ vars.POETRY_VERSION }}
 
       - name: Install libgl1-mesa-dev
         run: |
@@ -42,8 +42,6 @@ jobs:
 
   coverage:
     runs-on: ubuntu-latest
-    env:
-      POETRY_VERSION: ${{ vars.POETRY_VERSION }}
     permissions:
       pull-requests: write
       contents: read
@@ -62,6 +60,8 @@ jobs:
           curl -sSkL https://install.python-poetry.org | python -
           export PATH=$PATH:$HOME/.local/bin
           poetry --version
+        env:
+          POETRY_VERSION: ${{ vars.POETRY_VERSION }}
 
       - name: Install libgl1-mesa-dev
         run: |

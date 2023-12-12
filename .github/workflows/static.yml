@@ -3,6 +3,9 @@ on:
   pull_request:
   workflow_dispatch:
 
+env:
+  PATH: $PATH:$HOME/.local/bin
+
 jobs:
   flake8:
     runs-on: ubuntu-latest
@@ -17,7 +20,6 @@ jobs:
         run: |
           export POETRY_VERSION=${{ vars.POETRY_VERSION }}
           curl -sSkL https://install.python-poetry.org | python -
-          export PATH=$PATH:$HOME/.local/bin
           poetry --version
 
       - name: Install libgl1-mesa-dev
@@ -36,27 +38,26 @@ jobs:
     container:
       image: python:3.9
     steps:
-    - uses: actions/checkout@v4.1.0
-    - name: Check Python version
-      run: python --version
+      - uses: actions/checkout@v4.1.0
+      - name: Check Python version
+        run: python --version
 
-    - name: Install Poetry
-      run: |
-        export POETRY_VERSION=${{ vars.POETRY_VERSION }}
-        curl -sSkL https://install.python-poetry.org | python -
-        export PATH=$PATH:$HOME/.local/bin
-        poetry --version
+      - name: Install Poetry
+        run: |
+          export POETRY_VERSION=${{ vars.POETRY_VERSION }}
+          curl -sSkL https://install.python-poetry.org | python -
+          poetry --version
 
-    - name: Install libgl1-mesa-dev
-      run: |
-          apt update
-          apt -y install libgl1-mesa-dev
+      - name: Install libgl1-mesa-dev
+        run: |
+            apt update
+            apt -y install libgl1-mesa-dev
 
-    - name: Install Dependencies
-      run: poetry install --only dev
+      - name: Install Dependencies
+        run: poetry install --only dev
 
-    - name: Run Black
-      run: poetry run black --check ./
+      - name: Run Black
+        run: poetry run black --check ./
 
   mypy:
     runs-on: ubuntu-latest
@@ -71,7 +72,6 @@ jobs:
         run: |
           export POETRY_VERSION=${{ vars.POETRY_VERSION }}
           curl -sSkL https://install.python-poetry.org | python -
-          export PATH=$PATH:$HOME/.local/bin
           poetry --version
 
       - name: Install libgl1-mesa-dev
@@ -98,7 +98,6 @@ jobs:
         run: |
           export POETRY_VERSION=${{ vars.POETRY_VERSION }}
           curl -sSkL https://install.python-poetry.org | python -
-          export PATH=$PATH:$HOME/.local/bin
           poetry --version
 
       - name: Install libgl1-mesa-dev

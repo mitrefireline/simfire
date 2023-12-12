@@ -18,7 +18,7 @@ jobs:
 
       - name: Install Poetry
         run: |
-          export POETRY_VERSION=1.4.0
+          export POETRY_VERSION=${{ secrets.POETRY_VERSION }}
           curl -sSkL https://install.python-poetry.org | python -
           export PATH=$PATH:$HOME/.local/bin
           poetry --version
@@ -42,6 +42,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
+      contents: read
+      id-token: write
     container:
       image: python:3.9
     timeout-minutes: 20
@@ -52,7 +54,7 @@ jobs:
 
       - name: Install Poetry
         run: |
-          export POETRY_VERSION=1.4.0
+          export POETRY_VERSION=${{ secrets.POETRY_VERSION }}
           curl -sSkL https://install.python-poetry.org | python -
           export PATH=$PATH:$HOME/.local/bin
           poetry --version

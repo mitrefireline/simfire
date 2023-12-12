@@ -18,7 +18,7 @@ jobs:
 
       - name: Install Poetry
         run: |
-          export POETRY_VERSION=${{ secrets.POETRY_VERSION }}
+          export POETRY_VERSION=${{ vars.POETRY_VERSION }}
           curl -sSkL https://install.python-poetry.org | python -
           export PATH=$PATH:$HOME/.local/bin
           poetry --version
@@ -54,7 +54,7 @@ jobs:
 
       - name: Install Poetry
         run: |
-          export POETRY_VERSION=${{ secrets.POETRY_VERSION }}
+          export POETRY_VERSION=${{ vars.POETRY_VERSION }}
           curl -sSkL https://install.python-poetry.org | python -
           export PATH=$PATH:$HOME/.local/bin
           poetry --version
@@ -74,7 +74,8 @@ jobs:
           export PATH=$PATH:$HOME/.local/bin  
           poetry run pytest --junitxml=pytest.xml --cov-report=term-missing:skip-covered --cov=simfire | tee pytest-coverage.txt
 
-      - name: Pytest coverage comment
+      - name: Comment on PR with Coverage
+        continue-on-error: true  # To let people create forked PRs
         uses: MishaKav/pytest-coverage-comment@main
         with:
           pytest-coverage-path: ./pytest-coverage.txt

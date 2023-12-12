@@ -15,7 +15,7 @@ jobs:
 
       - name: Install Poetry
         run: |
-          export POETRY_VERSION={{ vars.POETRY_VERSION }}
+          export POETRY_VERSION=${{ vars.POETRY_VERSION }}
           curl -sSkL https://install.python-poetry.org | python -
           export PATH=$PATH:$HOME/.local/bin
           poetry --version
@@ -42,7 +42,7 @@ jobs:
 
     - name: Install Poetry
       run: |
-        export POETRY_VERSION={{ vars.POETRY_VERSION }}
+        export POETRY_VERSION=${{ vars.POETRY_VERSION }}
         curl -sSkL https://install.python-poetry.org | python -
         export PATH=$PATH:$HOME/.local/bin
         poetry --version
@@ -69,7 +69,7 @@ jobs:
 
       - name: Install Poetry
         run: |
-          export POETRY_VERSION={{ vars.POETRY_VERSION }}
+          export POETRY_VERSION=${{ vars.POETRY_VERSION }}
           curl -sSkL https://install.python-poetry.org | python -
           export PATH=$PATH:$HOME/.local/bin
           poetry --version
@@ -96,7 +96,7 @@ jobs:
 
       - name: Install Poetry
         run: |
-          export POETRY_VERSION={{ vars.POETRY_VERSION }}
+          export POETRY_VERSION=${{ vars.POETRY_VERSION }}
           curl -sSkL https://install.python-poetry.org | python -
           export PATH=$PATH:$HOME/.local/bin
           poetry --version

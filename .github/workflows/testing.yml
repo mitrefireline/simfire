@@ -1,0 +1,76 @@
+name: Testing & Coverage
+on:
+  pull_request:
+    # paths:
+    #   - '**/*.py'
+    #   - poetry.lock
+  workflow_dispatch:
+
+jobs:
+  run_game-py:
+    runs-on: ubuntu-latest
+    container:
+      image: python:3.9
+    steps:
+      - uses: actions/checkout@v4.1.0
+      - name: Check Python version
+        run: python --version
+
+      - name: Install Poetry
+        run: |
+          export POETRY_VERSION=1.4.0
+          curl -sSkL https://install.python-poetry.org | python -
+          export PATH=$PATH:$HOME/.local/bin
+          poetry --version
+
+      - name: Install libgl1-mesa-dev
+        run: |
+          sudo apt update
+          sudo apt -y install libgl1-mesa-dev
+
+      - name: Install Dependencies
+        run: |
+          export PATH=$PATH:$HOME/.local/bin
+          poetry install --with coverage
+
+      - name: Run run_game.py
+        run: |
+          export PATH=$PATH:$HOME/.local/bin
+          SDL_VIDEODRIVER="dummy" poetry run python run_game.py
+
+  coverage:
+    runs-on: ubuntu-latest
+    container:
+      image: python:3.9
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4.1.0
+      - name: Check Python version
+        run: python --version
+
+      - name: Install Poetry
+        run: |
+          export POETRY_VERSION=1.4.0
+          curl -sSkL https://install.python-poetry.org | python -
+          export PATH=$PATH:$HOME/.local/bin
+          poetry --version
+
+      - name: Install libgl1-mesa-dev
+        run: |
+          sudo apt update
+          sudo apt -y install libgl1-mesa-dev
+
+      - name: Install Dependencies
+        run: |
+          export PATH=$PATH:$HOME/.local/bin
+          poetry install --with coverage
+
+      - name: Build Coverage File
+        run: |
+          export PATH=$PATH:$HOME/.local/bin  
+          poetry run pytest --junitxml=pytest.xml --cov-report=term-missing:skip-covered --cov=app simfire/ | tee pytest-coverage.txt
+      - name: Pytest coverage comment
+        uses: MishaKav/pytest-coverage-comment@main
+        with:
+          pytest-coverage-path: ./pytest-coverage.txt
+          junitxml-path: ./pytest.xml

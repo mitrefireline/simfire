@@ -23,18 +23,15 @@ jobs:
         env:
           POETRY_VERSION: ${{ vars.POETRY_VERSION }}
 
-      - name: Install libgl1-mesa-dev
-        run: |
-          apt update
-          apt -y install libgl1-mesa-dev
-
       - name: Install Dependencies
         run: |
           export PATH=$PATH:$HOME/.local/bin
           poetry install --only docs
 
       - name: Build Docs
-        run: poetry run sphinx-build -d docs/build/doctrees docs/source docs/build/html
+        run: |
+          export PATH=$PATH:$HOME/.local/bin
+          poetry run sphinx-build -d docs/build/doctrees docs/source docs/build/html
 
       - name: Move Docs
         run: mv docs/build/html public/

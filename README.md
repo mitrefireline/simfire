@@ -8,7 +8,7 @@
 
 SimFire uses [PyGame](https://www.pygame.org/wiki/about) to display and simulate different fire spread models, including the Rothermel Surface fire spread model described in [this](https://www.fs.usda.gov/rm/pubs_series/rmrs/gtr/rmrs_gtr371.pdf) paper.
 
-For more comprehensive documentation, go to our [docs page](https://mitrefireline.github.io/simfire).
+For more comprehensive documentation, go to our [docs page](https://mitrefireline.github.io/simfire) or read our [whitepaper](https://arxiv.org/abs/2311.15925).
 
 
 ## Running the Simulation

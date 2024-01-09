@@ -183,6 +183,7 @@ class FireSimulation(Simulation):
         self._rendering: bool = False
         self.game_status: GameStatus = GameStatus.RUNNING
         self.fire_status: GameStatus = GameStatus.RUNNING
+        self.active = True
         self.fire_map: np.ndarray
         self.agent_positions: np.ndarray
         self.agents: Dict[int, Agent] = {}

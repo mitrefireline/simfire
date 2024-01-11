@@ -337,10 +337,11 @@ class FireSimulation(Simulation):
         wind_dir_max = 360.0
 
         wind_bounds = {
-            "wind": {
-                "speed": {"min": WindConstants.MIN_SPEED, "max": WindConstants.MAX_SPEED},
-                "direction": {"min": wind_dir_min, "max": wind_dir_max},
-            }
+            "wind_speed": {
+                "min": WindConstants.MIN_SPEED,
+                "max": WindConstants.MAX_SPEED,
+            },
+            "wind_direction": {"min": wind_dir_min, "max": wind_dir_max},
         }
         bounds.update(wind_bounds)
         return bounds

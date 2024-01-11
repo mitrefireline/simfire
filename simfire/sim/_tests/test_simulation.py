@@ -442,16 +442,17 @@ class FireSimulationTest(unittest.TestCase):
         now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         filename = f"fire_spread_graph_{now}.png"
         tmp_file = Path("tmp") / filename
-        exists = []
-        exists.append(tmp_file.exists())
+        exists = {tmp_file: tmp_file.exists()}
         for i in range(-30, 30):
-            num = f"{now.split('-')[:-1]}-{int(now.split('-')[-1]) + i}"
-            tmp_file = Path("tmp") / f"fire_spread_graph_{num}.png"
-            exists.append(tmp_file.exists())
+            num = f"{'-'.join(now.split('-')[:-1])}-{int(now.split('-')[-1]) + i}"
+            tmp = Path("tmp") / f"fire_spread_graph_{num}.png"
+            exists[tmp] = tmp.exists()
         self.assertTrue(
-            any(exists),
+            any(list(exists.values())),
             msg="The spread graph was not saved correctly",
         )
-        tmp_file.unlink()
-        tmp_file.parent.rmdir()
+        for file, exist in exists.items():
+            if exist:
+                file.unlink()
+                file.parent.rmdir()
         self.simulation_flat.rendering = False

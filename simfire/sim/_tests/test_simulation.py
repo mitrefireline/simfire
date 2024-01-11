@@ -447,7 +447,7 @@ class FireSimulationTest(unittest.TestCase):
         for i in range(-30, 30):
             num = f"{now.split('-')[:-1]}-{int(now.split('-')[-1]) + i}"
             tmp_file = Path("tmp") / f"fire_spread_graph_{num}.png"
-            exists.append()
+            exists.append(tmp_file.exists())
         self.assertTrue(
             any(exists),
             msg="The spread graph was not saved correctly",

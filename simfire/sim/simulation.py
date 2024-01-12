@@ -182,7 +182,6 @@ class FireSimulation(Simulation):
         super().__init__(config)
         self._rendering: bool = False
         self.game_status: GameStatus = GameStatus.RUNNING
-        self.fire_status: GameStatus = GameStatus.RUNNING
         self.fire_map: np.ndarray
         self.agent_positions: np.ndarray
         self.agents: Dict[int, Agent] = {}
@@ -200,7 +199,8 @@ class FireSimulation(Simulation):
         self._create_fire()
         self._create_mitigations()
         self.elapsed_steps = 0
-        self.active = True if self.fire_status == GameStatus.RUNNING else False
+        self.fire_status: GameStatus = GameStatus.RUNNING
+        self.active = True
 
     def _reset_agents(self) -> None:
         """
@@ -490,9 +490,6 @@ class FireSimulation(Simulation):
                   range from [0, 6] (see simfire/enums.py:BurnStatus).
                 - A boolean indicating whether the simulation has reached the end.
         """
-        # reset the fire status to running
-        self.fire_status = GameStatus.RUNNING
-
         if isinstance(time, str):
             # Convert the string to a number of minutes
             time = str_to_minutes(time)

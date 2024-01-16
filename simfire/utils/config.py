@@ -990,14 +990,13 @@ class Config:
             seed: The seed used to randomize fire initial position generation.
             pos: The static position to start the fire at
         """
+        fire_init_pos_type = self.yaml_data["fire"]["fire_initial_position"]["type"]
+
         if seed is None and pos is None:
             raise ValueError("Both `seed` and `pos` cannot be None")
         elif seed is not None and pos is None:
             try:
                 # Change the seed for the current fire initital position type
-                fire_init_pos_type = self.yaml_data["fire"]["fire_initial_position"][
-                    "type"
-                ]
                 self.yaml_data["fire"]["fire_initial_position"][fire_init_pos_type][
                     "seed"
                 ] = seed
@@ -1010,7 +1009,19 @@ class Config:
                     "seed. The seed value will be ignored."
                 )
         elif seed is None and pos is not None:
-            self.fire = self._load_fire(pos=pos)
+            try:
+                # For consistency, ensure YAML data contains the same position value.
+                self.yaml_data["fire"]["fire_initial_position"][fire_init_pos_type][
+                    "position"
+                ] = pos
+                # Reload the FireConfig with the updated position in the yaml data
+                self.fire = self._load_fire(pos=pos)
+            except KeyError:
+                log.warning(
+                    "Trying to set a position for fire initial position type "
+                    f"({fire_init_pos_type}), which does not support the use of a "
+                    "position. The position value will be ignored."
+                )
         else:
             raise ValueError("Both `seed` and `pos` cannot be specified together")
 

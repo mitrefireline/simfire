@@ -182,8 +182,6 @@ class FireSimulation(Simulation):
         super().__init__(config)
         self._rendering: bool = False
         self.game_status: GameStatus = GameStatus.RUNNING
-        self.fire_status: GameStatus = GameStatus.RUNNING
-        self.active = True
         self.fire_map: np.ndarray
         self.agent_positions: np.ndarray
         self.agents: Dict[int, Agent] = {}
@@ -195,13 +193,14 @@ class FireSimulation(Simulation):
         Reset the `self.fire_map`, `self.terrain`, `self.fire_manager`,
         and all mitigations to initial conditions
         """
-        self.agents.clear()
         self._create_fire_map()
         self._reset_agents()
         self._create_terrain()
         self._create_fire()
         self._create_mitigations()
         self.elapsed_steps = 0
+        self.fire_status: GameStatus = GameStatus.RUNNING
+        self.active = True
 
     def _reset_agents(self) -> None:
         """
@@ -209,7 +208,6 @@ class FireSimulation(Simulation):
         """
         self.agents.clear()
         self._create_agent_positions()
-        return
 
     def _create_terrain(self) -> None:
         """
@@ -337,10 +335,11 @@ class FireSimulation(Simulation):
         wind_dir_max = 360.0
 
         wind_bounds = {
-            "wind": {
-                "speed": {"min": WindConstants.MIN_SPEED, "max": WindConstants.MAX_SPEED},
-                "direction": {"min": wind_dir_min, "max": wind_dir_max},
-            }
+            "wind_speed": {
+                "min": WindConstants.MIN_SPEED,
+                "max": WindConstants.MAX_SPEED,
+            },
+            "wind_direction": {"min": wind_dir_min, "max": wind_dir_max},
         }
         bounds.update(wind_bounds)
         return bounds
@@ -491,9 +490,6 @@ class FireSimulation(Simulation):
                   range from [0, 6] (see simfire/enums.py:BurnStatus).
                 - A boolean indicating whether the simulation has reached the end.
         """
-        # reset the fire status to running
-        self.fire_status = GameStatus.RUNNING
-
         if isinstance(time, str):
             # Convert the string to a number of minutes
             time = str_to_minutes(time)

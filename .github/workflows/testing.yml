@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
-      contents: read
+      contents: write
       id-token: write
     container:
       image: python:3.9

@@ -1,0 +1,52 @@
+name: Testing & Coverage
+on:
+  pull_request:
+    paths:
+      - 'simfire/**/*.py'
+      - poetry.lock
+  workflow_dispatch:
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: write
+      id-token: write
+    container:
+      image: python:3.9
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4.1.0
+      - name: Check Python version
+        run: python --version
+
+      - name: Install Poetry
+        run: |
+          curl -sSkL https://install.python-poetry.org | python -
+          export PATH=$PATH:$HOME/.local/bin
+          poetry --version
+        env:
+          POETRY_VERSION: ${{ vars.POETRY_VERSION }}
+
+      - name: Install libgl1-mesa-dev
+        run: |
+          apt update
+          apt -y install libgl1-mesa-dev
+
+      - name: Install Dependencies
+        run: |
+          export PATH=$PATH:$HOME/.local/bin
+          poetry install --with coverage
+
+      - name: Build Coverage File
+        run: |
+          export PATH=$PATH:$HOME/.local/bin
+          poetry run pytest --junitxml=pytest.xml --cov-report=term-missing:skip-covered --cov=simfire | tee pytest-coverage.txt
+
+      - name: Comment on PR with Coverage
+        continue-on-error: true  # To let people create forked PRs
+        uses: MishaKav/pytest-coverage-comment@main
+        with:
+          pytest-coverage-path: ./pytest-coverage.txt
+          junitxml-path: ./pytest.xml

@@ -1,0 +1,134 @@
+name: Static Analysis
+on:
+  pull_request:
+    paths:
+      - '**/*.py'
+      - poetry.lock
+      - .flake8
+      - pyproject.toml
+  workflow_dispatch:
+
+jobs:
+  flake8:
+    runs-on: ubuntu-latest
+    container:
+      image: python:3.9
+    steps:
+      - uses: actions/checkout@v4.1.0
+      - name: Check Python version
+        run: python --version
+
+      - name: Install Poetry
+        run: |
+          export POETRY_VERSION=${{ vars.POETRY_VERSION }}
+          curl -sSkL https://install.python-poetry.org | python -
+          export PATH=$PATH:$HOME/.local/bin
+          poetry --version
+
+      - name: Install libgl1-mesa-dev
+        run: |
+          apt update
+          apt -y install libgl1-mesa-dev
+
+      - name: Install Dependencies
+        run: |
+          export PATH=$PATH:$HOME/.local/bin
+          poetry install --only dev
+
+      - name: Run Flake8
+        run: |
+          export PATH=$PATH:$HOME/.local/bin
+          poetry run flake8 .
+
+  black:
+    runs-on: ubuntu-latest
+    container:
+      image: python:3.9
+    steps:
+    - uses: actions/checkout@v4.1.0
+    - name: Check Python version
+      run: python --version
+
+    - name: Install Poetry
+      run: |
+        export POETRY_VERSION=${{ vars.POETRY_VERSION }}
+        curl -sSkL https://install.python-poetry.org | python -
+        export PATH=$PATH:$HOME/.local/bin
+        poetry --version
+
+    - name: Install libgl1-mesa-dev
+      run: |
+          apt update
+          apt -y install libgl1-mesa-dev
+
+    - name: Install Dependencies
+      run: |
+        export PATH=$PATH:$HOME/.local/bin
+        poetry install --only dev
+
+    - name: Run Black
+      run: |
+        export PATH=$PATH:$HOME/.local/bin
+        poetry run black --check ./
+
+  mypy:
+    runs-on: ubuntu-latest
+    container:
+      image: python:3.9
+    steps:
+      - uses: actions/checkout@v4.1.0
+      - name: Check Python version
+        run: python --version
+
+      - name: Install Poetry
+        run: |
+          export POETRY_VERSION=${{ vars.POETRY_VERSION }}
+          curl -sSkL https://install.python-poetry.org | python -
+          export PATH=$PATH:$HOME/.local/bin
+          poetry --version
+
+      - name: Install libgl1-mesa-dev
+        run: |
+          apt update
+          apt -y install libgl1-mesa-dev
+
+      - name: Install Dependencies
+        run: |
+          export PATH=$PATH:$HOME/.local/bin
+          poetry install --only dev
+
+      - name: Run MyPy
+        run: |
+          export PATH=$PATH:$HOME/.local/bin
+          poetry run mypy --config-file pyproject.toml .
+
+  isort:
+    runs-on: ubuntu-latest
+    container:
+      image: python:3.9
+    steps:
+      - uses: actions/checkout@v4.1.0
+      - name: Check Python version
+        run: python --version
+
+      - name: Install Poetry
+        run: |
+          export POETRY_VERSION=${{ vars.POETRY_VERSION }}
+          curl -sSkL https://install.python-poetry.org | python -
+          export PATH=$PATH:$HOME/.local/bin
+          poetry --version
+
+      - name: Install libgl1-mesa-dev
+        run: |
+          apt update
+          apt -y install libgl1-mesa-dev
+
+      - name: Install Dependencies
+        run: |
+          export PATH=$PATH:$HOME/.local/bin
+          poetry install --only dev
+
+      - name: Run isort
+        run: |
+          export PATH=$PATH:$HOME/.local/bin
+          poetry run isort --check --profile black --trailing-comma -m=3 .

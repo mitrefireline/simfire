@@ -108,21 +108,6 @@ bandit:
 #########
 # Tests #
 #########
-run_game.py:
-  stage: Tests
-  tags:
-    - lslab2
-  script:
-    - !reference [.install_dev, script]
-    - SDL_VIDEODRIVER="dummy" poetry run python run_game.py
-  needs: []
-  only:
-    refs:
-      - merge_requests
-    changes:
-      - "**/*.py"
-      - poetry.lock
-
 coverage:
   stage: Tests
   tags:

@@ -468,6 +468,20 @@ Available seeds can be retreived by calling the <cite>self.get_seeds</cite> meth
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="simfire.sim.simulation.Simulation.supported_attributes">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">supported_attributes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#simfire.sim.simulation.Simulation.supported_attributes" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the supported attributes for the simulation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A list of supported attributes.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>List[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)">str</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
@@ -524,6 +538,20 @@ and all mitigations to initial conditions</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>Iterable[<a class="reference internal" href="../../enums/index.html#simfire.enums.BurnStatus" title="simfire.enums.BurnStatus">simfire.enums.BurnStatus</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simfire.sim.simulation.FireSimulation.supported_attributes">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">supported_attributes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#simfire.sim.simulation.FireSimulation.supported_attributes" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the supported attributes for the simulation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A list of supported attributes.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>List[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)">str</a>]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -838,12 +866,14 @@ to <cite>True</cite>.</p>
 <li><a class="reference internal" href="#simfire.sim.simulation.Simulation.load_mitigation"><code class="docutils literal notranslate"><span class="pre">Simulation.load_mitigation()</span></code></a></li>
 <li><a class="reference internal" href="#simfire.sim.simulation.Simulation.get_disaster_categories"><code class="docutils literal notranslate"><span class="pre">Simulation.get_disaster_categories()</span></code></a></li>
 <li><a class="reference internal" href="#simfire.sim.simulation.Simulation.disaster_categories"><code class="docutils literal notranslate"><span class="pre">Simulation.disaster_categories()</span></code></a></li>
+<li><a class="reference internal" href="#simfire.sim.simulation.Simulation.supported_attributes"><code class="docutils literal notranslate"><span class="pre">Simulation.supported_attributes()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#simfire.sim.simulation.FireSimulation"><code class="docutils literal notranslate"><span class="pre">FireSimulation</span></code></a><ul>
 <li><a class="reference internal" href="#simfire.sim.simulation.FireSimulation.reset"><code class="docutils literal notranslate"><span class="pre">FireSimulation.reset()</span></code></a></li>
 <li><a class="reference internal" href="#simfire.sim.simulation.FireSimulation.get_actions"><code class="docutils literal notranslate"><span class="pre">FireSimulation.get_actions()</span></code></a></li>
 <li><a class="reference internal" href="#simfire.sim.simulation.FireSimulation.disaster_categories"><code class="docutils literal notranslate"><span class="pre">FireSimulation.disaster_categories()</span></code></a></li>
+<li><a class="reference internal" href="#simfire.sim.simulation.FireSimulation.supported_attributes"><code class="docutils literal notranslate"><span class="pre">FireSimulation.supported_attributes()</span></code></a></li>
 <li><a class="reference internal" href="#simfire.sim.simulation.FireSimulation.get_attribute_bounds"><code class="docutils literal notranslate"><span class="pre">FireSimulation.get_attribute_bounds()</span></code></a></li>
 <li><a class="reference internal" href="#simfire.sim.simulation.FireSimulation.get_attribute_data"><code class="docutils literal notranslate"><span class="pre">FireSimulation.get_attribute_data()</span></code></a></li>
 <li><a class="reference internal" href="#simfire.sim.simulation.FireSimulation.load_mitigation"><code class="docutils literal notranslate"><span class="pre">FireSimulation.load_mitigation()</span></code></a></li>
@@ -872,12 +902,14 @@ to <cite>True</cite>.</p>
 <li><a class="reference internal" href="#simfire.sim.simulation.Simulation.load_mitigation">load_mitigation</a></li>
 <li><a class="reference internal" href="#simfire.sim.simulation.Simulation.get_disaster_categories">get_disaster_categories</a></li>
 <li><a class="reference internal" href="#simfire.sim.simulation.Simulation.disaster_categories">disaster_categories</a></li>
+<li><a class="reference internal" href="#simfire.sim.simulation.Simulation.supported_attributes">supported_attributes</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#simfire.sim.simulation.FireSimulation">FireSimulation</a><ul>
 <li><a class="reference internal" href="#simfire.sim.simulation.FireSimulation.reset">reset</a></li>
 <li><a class="reference internal" href="#simfire.sim.simulation.FireSimulation.get_actions">get_actions</a></li>
 <li><a class="reference internal" href="#simfire.sim.simulation.FireSimulation.disaster_categories">disaster_categories</a></li>
+<li><a class="reference internal" href="#simfire.sim.simulation.FireSimulation.supported_attributes">supported_attributes</a></li>
 <li><a class="reference internal" href="#simfire.sim.simulation.FireSimulation.get_attribute_bounds">get_attribute_bounds</a></li>
 <li><a class="reference internal" href="#simfire.sim.simulation.FireSimulation.get_attribute_data">get_attribute_data</a></li>
 <li><a class="reference internal" href="#simfire.sim.simulation.FireSimulation.load_mitigation">load_mitigation</a></li>

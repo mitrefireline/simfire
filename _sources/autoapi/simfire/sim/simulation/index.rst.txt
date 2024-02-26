@@ -140,6 +140,15 @@ Attributes
       :returns: An enum of possible categories.
 
 
+   .. py:method:: supported_attributes()
+      :staticmethod:
+      :abstractmethod:
+
+      Returns the supported attributes for the simulation.
+
+      :returns: A list of supported attributes.
+
+
 
 .. py:class:: FireSimulation(config)
 
@@ -175,6 +184,14 @@ Attributes
       Returns all possible categories that a location in the map can be in.
 
       :returns: A dictionary of enum name to enum value.
+
+
+   .. py:method:: supported_attributes()
+      :staticmethod:
+
+      Returns the supported attributes for the simulation.
+
+      :returns: A list of supported attributes.
 
 
    .. py:method:: get_attribute_bounds()

@@ -169,6 +169,17 @@ class Simulation(ABC):
         """
         pass
 
+    @staticmethod
+    @abstractmethod
+    def supported_attributes() -> List[str]:
+        """
+        Returns the supported attributes for the simulation.
+
+        Returns:
+            A list of supported attributes.
+        """
+        pass
+
 
 class FireSimulation(Simulation):
     def __init__(self, config: Config) -> None:
@@ -301,6 +312,24 @@ class FireSimulation(Simulation):
             A dictionary of enum name to enum value.
         """
         return BurnStatus
+
+    @staticmethod
+    def supported_attributes() -> List[str]:
+        """
+        Returns the supported attributes for the simulation.
+
+        Returns:
+            A list of supported attributes.
+        """
+        return [
+            "w_0",
+            "sigma",
+            "delta",
+            "M_x",
+            "elevation",
+            "wind_speed",
+            "wind_direction",
+        ]
 
     def get_attribute_bounds(self) -> Dict[str, object]:
         """

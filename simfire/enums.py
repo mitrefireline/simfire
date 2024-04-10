@@ -6,6 +6,7 @@ Contains many enumeration classes for use throughout `rothermel_model` that depi
 burn status, the ordering of sprite layers, how much to attenuate the rate of spread on
 different types of control lines, and the current game status.
 """
+
 from dataclasses import dataclass
 from enum import Enum, IntEnum, auto
 from pathlib import Path

@@ -1,6 +1,7 @@
 """
 Module containing all config parsing and dataclass logic.
 """
+
 import dataclasses
 import os
 import random
@@ -274,9 +275,9 @@ class Config:
             year = self.yaml_data["operational"]["year"]
             self._set_all_combos()
             if self.yaml_data["operational"]["seed"] is not None:
-                points: Tuple[
-                    Tuple[float, float], Tuple[float, float]
-                ] = self._randomly_select_box(self.yaml_data["operational"]["seed"])
+                points: Tuple[Tuple[float, float], Tuple[float, float]] = (
+                    self._randomly_select_box(self.yaml_data["operational"]["seed"])
+                )
                 valid = self._check_lat_long(points)
                 if not valid:
                     if self.landfire_lat_long_box is None:

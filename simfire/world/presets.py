@@ -11,6 +11,7 @@ As specified in: https://www.fs.fed.us/rm/pubs_series/rmrs/gtr/rmrs_gtr371.pdf
 Urban, Snow/Ice, Agricutlture, Water, Barren are Non-Burnable fuel types as described in:
 https://gacc.nifc.gov/oncc/docs/40-Standard%20Fire%20Behavior%20Fuel%20Models.pdf
 """
+
 from .parameters import Fuel
 
 ShortGrass = Fuel(w_0=0.0340, delta=1.000, M_x=0.1200, sigma=3500)

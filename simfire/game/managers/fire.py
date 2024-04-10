@@ -5,6 +5,7 @@ Fire
 Defines the different `FireManager`s (`ConstantSpreadFireManager` and
 `RothermelFireManager`) that determine how a fire moves about a `fire_map`.
 """
+
 import collections
 from dataclasses import astuple
 from typing import Any, List, Optional, Sequence, Tuple, Union
@@ -270,9 +271,9 @@ class FireManager:
         factor = np.zeros_like(rate_of_spread)
         if self.attenuate_line_ros:
             factor[np.where(fire_map == BurnStatus.FIRELINE)] = RoSAttenuation.FIRELINE
-            factor[
-                np.where(fire_map == BurnStatus.SCRATCHLINE)
-            ] = RoSAttenuation.SCRATCHLINE
+            factor[np.where(fire_map == BurnStatus.SCRATCHLINE)] = (
+                RoSAttenuation.SCRATCHLINE
+            )
             factor[np.where(fire_map == BurnStatus.WETLINE)] = RoSAttenuation.WETLINE
             rate_of_spread = rate_of_spread - factor
         else:

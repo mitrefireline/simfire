@@ -743,35 +743,35 @@ files = [
 
 [[package]]
 name = "imagecodecs"
-version = "2023.8.12"
+version = "2023.9.18"
 description = "Image transformation, compression, and decompression codecs"
 optional = false
 python-versions = ">=3.9"
 files = [
-    {file = "imagecodecs-2023.8.12-1-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:16215457c8c3ebd6e49fd7d1982122b988dca2624d41d0f9c1fdeeb70e5d764f"},
-    {file = "imagecodecs-2023.8.12-1-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:654c1416d337eb7ebb9b5057adca99ab2657d10c67756773442a6d2067587737"},
-    {file = "imagecodecs-2023.8.12-1-cp39-cp39-macosx_10_9_x86_64.whl", hash = "sha256:a1a1406ec533f8aeac75cf7e04c272b900d2e08007b5f1e88f912e68ac4895ef"},
-    {file = "imagecodecs-2023.8.12-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:0d7263ac48a0022000bdc6654eaa538f42fd8c2b82c011881d8ba0b3c47efb3f"},
-    {file = "imagecodecs-2023.8.12-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:6dca810c994983fd7be60f8425e7d860f7853744900f36af3f985b40c50c9c2c"},
-    {file = "imagecodecs-2023.8.12-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:ef1bad87ef606a73f20b67bbe6a5afda50f5e6253cdf76c1ef54d29ebaa379ee"},
-    {file = "imagecodecs-2023.8.12-cp310-cp310-win32.whl", hash = "sha256:21b44d5c810fa46b69ccd250b9dffc5a07ff90bfdef3b2f3c046be0accd6f1e5"},
-    {file = "imagecodecs-2023.8.12-cp310-cp310-win_amd64.whl", hash = "sha256:103edc9d0a76b1a03f811f9824946eef3dfed14bfb65bc1eb26a5f976212046a"},
-    {file = "imagecodecs-2023.8.12-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:876a5ab742fa439dd73834370ee41fe9c719681d2d6af6d4441f5e517b5a362e"},
-    {file = "imagecodecs-2023.8.12-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:a756109cb862ab1670745db096c3305c4eb1bf979cedf59097dbe473e03fb27c"},
-    {file = "imagecodecs-2023.8.12-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:323685d4bb9375b2bde9540757f42b6a50dc9cd94630a5c3ca9c07ff68ceb05a"},
-    {file = "imagecodecs-2023.8.12-cp311-cp311-win32.whl", hash = "sha256:669daef6a4c81cb350b2e4d0d4aa905a75c216f89e81ba51bc4abe44f181d1e8"},
-    {file = "imagecodecs-2023.8.12-cp311-cp311-win_amd64.whl", hash = "sha256:56d3f3a25b72be2ad18d3a9e4de1189f44f63c3110721ffe0915e37bad35bd19"},
-    {file = "imagecodecs-2023.8.12-cp311-cp311-win_arm64.whl", hash = "sha256:c7dba8d610c1a9fdbd0b69e69536ce788b5548c033c6b7f2c3cce3b35f0cf1cd"},
-    {file = "imagecodecs-2023.8.12-cp312-cp312-win32.whl", hash = "sha256:5a2da217433c6699bb4f053a1dd9ce180d4d291c73fef3c9db7d0a07fc65ac86"},
-    {file = "imagecodecs-2023.8.12-cp312-cp312-win_amd64.whl", hash = "sha256:bcd24859906100724f075b0225331357cfc78be317272626d414f8b9a303f27e"},
-    {file = "imagecodecs-2023.8.12-cp312-cp312-win_arm64.whl", hash = "sha256:959fe9a8855dda011a5ce8b68b866c66663664e600788cf0bd815262edb6a449"},
-    {file = "imagecodecs-2023.8.12-cp39-cp39-macosx_10_9_x86_64.whl", hash = "sha256:2acf95e09fdebacc48fac1ef282155a044535c329bce5e4d7c7dd6406b3b3e2b"},
-    {file = "imagecodecs-2023.8.12-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:ff356336fcbef9b98c925a96962ba110b963e2c4c58ba00f1200bae04135dc94"},
-    {file = "imagecodecs-2023.8.12-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:79a271fbaf317de2a346950672d2362e6b1caa5029c248ca2e2d0f0546274898"},
-    {file = "imagecodecs-2023.8.12-cp39-cp39-win32.whl", hash = "sha256:656e871098ff0ea2221918814ca1a93afd5b92c8da4c9200b05266adccea1bbd"},
-    {file = "imagecodecs-2023.8.12-cp39-cp39-win_amd64.whl", hash = "sha256:6651d92e874ebe6ea608bfb4fce683a4bf995728bc6c9d2e2221916ad2f3f70d"},
-    {file = "imagecodecs-2023.8.12-pp310-pypy310_pp73-win_amd64.whl", hash = "sha256:b610ffa7a8b0467c3dd5895b133b6d29d37d32d38cf10da40d55ce62a0fdf4bc"},
-    {file = "imagecodecs-2023.8.12.tar.gz", hash = "sha256:5410ccd1e6f46289c10c076579d38f621b4aaa207d54d93aeb338c5fbcdea709"},
+    {file = "imagecodecs-2023.9.18-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:304aefd3c752b3ab221737ba5109666f7282a48fbb0ca5f59630bc5084e2ba9d"},
+    {file = "imagecodecs-2023.9.18-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:7c01d2915d518323b55df8faf8a04577f0e5417e2d93440862c4df33157743c3"},
+    {file = "imagecodecs-2023.9.18-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:30ff5932687775dc6182789fde728af9cf4f48d299372d207d14ad0796f2abd3"},
+    {file = "imagecodecs-2023.9.18-cp310-cp310-win32.whl", hash = "sha256:558f471255cb4310e67a5ccf367cd892ac711de1171eb7a19d9a313914bbe37e"},
+    {file = "imagecodecs-2023.9.18-cp310-cp310-win_amd64.whl", hash = "sha256:ed0b407506326ccc00027cc4c7aa8157b3e7ca5a830c136b7ff3bc7f6feffc38"},
+    {file = "imagecodecs-2023.9.18-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:d39c99a63491ee4a282446f424d6f84975e7e171bd9d55d350ac213a533b49bc"},
+    {file = "imagecodecs-2023.9.18-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:17781990ce4e8558507619bf08bac9beda523a514d6f993ed947289e0cdddcb4"},
+    {file = "imagecodecs-2023.9.18-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:095363b928cf39a58a37d478a86ccabced484f9e7f8ce33d03617e384d6089b9"},
+    {file = "imagecodecs-2023.9.18-cp311-cp311-win32.whl", hash = "sha256:f17ad19f10c6adbfa0132735cf19d50a4a51a36fd02b5291211a06b44235b998"},
+    {file = "imagecodecs-2023.9.18-cp311-cp311-win_amd64.whl", hash = "sha256:ac2e3f761502f70838a37e7687482083b1b46840fdc3371387d6f366dba74e67"},
+    {file = "imagecodecs-2023.9.18-cp311-cp311-win_arm64.whl", hash = "sha256:0cb1e1640ef55bbcc00119fe12277ec086bd83ab3a816def435d5a05f6d6bf3a"},
+    {file = "imagecodecs-2023.9.18-cp312-cp312-macosx_10_9_x86_64.whl", hash = "sha256:1d016cf897d9616566a86fa42477bde25f8f6a9072744322a710c5eacc1d18e0"},
+    {file = "imagecodecs-2023.9.18-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:63c401bc8b779ba6881f846292e58952cf60610baf241ced55a225f313050504"},
+    {file = "imagecodecs-2023.9.18-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:01f4bf8090d4908ee1aaef908e9e38515b73e653937fc4e525811c69829a89dd"},
+    {file = "imagecodecs-2023.9.18-cp312-cp312-win32.whl", hash = "sha256:39ea788a4a7e7f1410ce26656831ad7fad0050844aa66606982284257449ad04"},
+    {file = "imagecodecs-2023.9.18-cp312-cp312-win_amd64.whl", hash = "sha256:e53ef9fbc2b42c13794b0ddc571ad736913337eaa182f41e05793ca69ff2c8d0"},
+    {file = "imagecodecs-2023.9.18-cp312-cp312-win_arm64.whl", hash = "sha256:495126d49a31dd3f04a037ba2a4866e9f421ffc3284ab66f26e497e0d5d0f174"},
+    {file = "imagecodecs-2023.9.18-cp39-cp39-macosx_10_9_x86_64.whl", hash = "sha256:a24d98cb5d433d1e022cc990273b0363f189b3cffc8f39976d3c3cd773ce2fda"},
+    {file = "imagecodecs-2023.9.18-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:22d649d67d9c6262285d6c34e877b720b7fb2a6390d0e74ee49b908f3c6b2467"},
+    {file = "imagecodecs-2023.9.18-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:d435f9eea4ac5e99fd0366a94f9980a9888c8151457ec6f3671f4966948568f7"},
+    {file = "imagecodecs-2023.9.18-cp39-cp39-win32.whl", hash = "sha256:d810960d4cf68ca5e1d2475f9b6b781619cc3f13a75fb2ba2f96965a59ccd606"},
+    {file = "imagecodecs-2023.9.18-cp39-cp39-win_amd64.whl", hash = "sha256:72714ab37ea0bc7f922555df73779524cb11df7cd27b0beca453784d1c6ac327"},
+    {file = "imagecodecs-2023.9.18-pp310-pypy310_pp73-win_amd64.whl", hash = "sha256:235b7fad48572fa22bff6b294438b9063225ab66f211fb87ac310d78fcef12be"},
+    {file = "imagecodecs-2023.9.18.tar.gz", hash = "sha256:bf4b4be4759fc3b27b5022228aada83e735744e4b7c204bcdccaa961c3f79d4d"},
 ]
 
 [package.dependencies]

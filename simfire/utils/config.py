@@ -316,7 +316,10 @@ class Config:
                     raise ConfigError(message)
                 else:
                     landfire_lat_long_box = LandFireLatLongBox(
-                        points=((tl_lat, tl_lon), (br_lat, br_long)), year=year
+                        points=((tl_lat, tl_lon), (br_lat, br_long)),
+                        year=year,
+                        height=height,
+                        width=width,
                     )
             return landfire_lat_long_box
         else:
@@ -430,8 +433,8 @@ class Config:
         if self.landfire_lat_long_box is not None:
             # Overwite the screen_size since operational data will determine
             self.yaml_data["area"]["screen_size"] = (
-                self.landfire_lat_long_box.geotiff_data[:, :, -1].shape[0],
-                self.landfire_lat_long_box.geotiff_data[:, :, -1].shape[1],
+                self.landfire_lat_long_box.fuel.shape[0],
+                self.landfire_lat_long_box.fuel.shape[1],
             )
             self.yaml_data["area"]["pixel_scale"] = int(
                 self.yaml_data["operational"]["resolution"] / 0.3048

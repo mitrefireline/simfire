@@ -41,7 +41,7 @@ Attributes
 
    
 
-.. py:class:: LandFireLatLongBox(points = ((37.45, -120.44), (37.35, -120.22)), year = '2020', layers = ('fuel', 'topographic'))
+.. py:class:: LandFireLatLongBox(points = ((37.45, -120.44), (37.35, -120.22)), year = '2020', layers = ('fuel', 'topographic'), height = 4500, width = 4500)
 
    Class that gets all relevant operational data.
 

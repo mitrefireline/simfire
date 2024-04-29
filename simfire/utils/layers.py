@@ -41,6 +41,8 @@ class LandFireLatLongBox:
         ),
         year: str = "2020",
         layers: Tuple[str, str] = ("fuel", "topographic"),
+        height: int = 4500,
+        width: int = 4500,
     ) -> None:
         """
         This class of methods will get initialized with the config using the lat/long
@@ -60,10 +62,20 @@ class LandFireLatLongBox:
         self.year = year
         self.layers = layers
 
+        # FIX FOR CRS CHANGES
+        # pad the original BR points by a marginal amount of area --> 90 meters each side
+        # to ensure that the output shape matches the specified/desired output shape
+
+        # Padding only one corner allows us to use the TL as a starting point to
+        # crop from
+
+        self.pad_distance = 0.00027777777803598015 * 100
+
         # sepcify the output paths of the Landfire python-client query
         self.product_layers_path = Path(
             f"lf_{abs(self.points[0][1])}_{self.points[0][0]}_"
-            f"{abs(self.points[1][1])}_{self.points[1][0]}.zip"
+            f"{abs(self.points[1][1]+self.pad_distance)}_"
+            f"{self.points[1][0]-self.pad_distance}.zip"
         )
 
         if os.environ.get("SF_HOME") is None:
@@ -80,7 +92,7 @@ class LandFireLatLongBox:
 
         log.info(f"Saving LandFire data to: {self.output_path}")
 
-        # make each a layer a global varibale that we "fill"
+        # make each a layer a global variable that we "fill"
         self.fuel = np.array([])
         self.topography = np.array([])
 
@@ -92,6 +104,18 @@ class LandFireLatLongBox:
             self.layer_products = self._get_layer_names()
             self.query_lat_lon_layer_data()
             self._make_data()
+
+        # FIX FOR CRS CHANGES
+        # crop data to new pixel_height and pixel_width
+        pixel_height = int(np.floor(height / 30))  # round down to nearest int
+        pixel_width = int(np.floor(width / 30))  # round down to nearest int
+        self.fuel = self.fuel[:pixel_height, :pixel_width]
+        self.topography = self.topography[:pixel_height, :pixel_width]
+
+        print(
+            f"Output shape of Fire Map: {height}m x {width}m "
+            f"--> {self.fuel.shape} in pixel space"
+        )
 
     def _check_paths(self):
         """
@@ -193,7 +217,8 @@ class LandFireLatLongBox:
 
             lf = landfire.Landfire(
                 bbox=f"{self.points[0][1]} {self.points[0][0]} \
-                    {self.points[1][1]} {self.points[1][0]}",
+                    {self.points[1][1]+self.pad_distance} \
+                    {self.points[1][0]-self.pad_distance}",
                 output_crs="4326",
             )
             # assume the order of data retrieval stays the same

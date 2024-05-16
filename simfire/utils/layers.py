@@ -778,7 +778,7 @@ class FunctionalFuelLayer(FuelLayer):
 class HistoricalLayer:
     def __init__(
         self,
-        year: int,
+        year: str,
         state: str,
         fire: str,
         path: Union[Path, str],

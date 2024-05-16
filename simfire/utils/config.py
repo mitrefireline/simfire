@@ -22,6 +22,7 @@ from .layers import (
     FunctionalBurnProbabilityLayer,
     FunctionalFuelLayer,
     FunctionalTopographyLayer,
+    HistoricalLayer,
     LandFireLatLongBox,
     LatLongBox,
     OperationalBurnProbabilityLayer,

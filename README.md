@@ -10,6 +10,7 @@ SimFire uses [PyGame](https://www.pygame.org/wiki/about) to display and simulate
 
 For more comprehensive documentation, go to our [docs page](https://mitrefireline.github.io/simfire).
 
+This repository is part of the MITRE Fireline project and is associated with both [BurnMD](https://github.com/mitrefireline/burnmd) and [SimHarness](https://github.com/mitrefireline/simharness). BurnMD is used in the `HistoricalDataLayer` to provide historical fire data for the simulation. SimHarness is a reinforcement learning training harness that uses this simulator to train agents to fight fires.
 
 ## Running the Simulation
 <figure>

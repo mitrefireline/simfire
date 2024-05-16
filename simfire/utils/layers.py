@@ -2,7 +2,7 @@ import datetime
 import os
 import shutil
 from pathlib import Path
-from typing import Dict, Optional, Tuple
+from typing import Dict, Optional, Tuple, Union
 
 import geopandas
 import landfire
@@ -776,7 +776,14 @@ class FunctionalFuelLayer(FuelLayer):
 
 
 class HistoricalLayer:
-    def __init__(self, year: int, state: str, fire: str, path: str) -> None:
+    def __init__(
+        self,
+        year: int,
+        state: str,
+        fire: str,
+        path: Union[Path, str],
+        screen_size: Tuple[int, int],
+    ) -> None:
         """Functionality to load the apporpriate/available historical data
         given a fire name, the state, and year of the fire.
 
@@ -791,17 +798,20 @@ class HistoricalLayer:
                 TODO: Include intermediary perimeters and simulation runtime
 
         Arguments:
-            year: the year of the historical fire
-            state: the state of teh historical fire
-            fire: the individual fire given the year and state
-            path: the path to the BurnMD dataset
+            year: The year of the historical fire.
+            state: The state of teh historical fire. This is the full name of the state
+                and is case-sensitive.
+            fire: The individual fire given the year and state. This is case-sensitive.
+            path: The path to the BurnMD dataset.
+            screen_size: The size of the screen in pixels. This is a tuple of
+                (height, width).
         """
         self.year = year
         self.state = state
         self.fire = fire
         self.path = path
 
-        self.screen_size: Tuple[int, int]
+        self.screen_size: Tuple[int, int] = screen_size
         self.lat_lon_array: np.ndarray
 
         # set the path

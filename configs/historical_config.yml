@@ -34,7 +34,7 @@ operational:
 
 historical:
   default: true
-  path: '/nfs/lslab2/fireline/data/historical'
+  path: '../burnmd/BurnMD'
   year: 2020
   state: "California"
   fire: "mineral"
@@ -90,6 +90,7 @@ fire:
     random:
       seed: 1234
   max_fire_duration: 5
+  diagonal_spread: false
 
 environment:
   moisture: 0.001

@@ -144,6 +144,15 @@ class OperationalConfig:
 
 
 @dataclasses.dataclass
+class HistoricalConfig:
+    default: bool
+    path: Union[Path, str]
+    year: int
+    state: str
+    fire: str
+
+
+@dataclasses.dataclass
 class FunctionalConfig:
     """
     Class that tracks functional layer names and keyword arguments.
@@ -224,6 +233,7 @@ class Config:
         self.simulation = self._load_simulation()
         self.mitigation = self._load_mitigation()
         self.operational = self._load_operational()
+        self.historical = self._load_historical()
         self.terrain = self._load_terrain()
         self.fire = self._load_fire()
         self.environment = self._load_environment()
@@ -699,6 +709,23 @@ class Config:
 
         return fuel_type, fuel_layer, fn_name, kwargs
 
+    def _create_historical_layer(self):
+        """Create a HistoricalLayer given the config parameters.
+        This is an optional dataclass.
+
+        Returns:
+            A HIstoricalLayer that sets the screen size, area, and fire start location.
+        """
+        historical_config = self._load_historical()
+        historical_layer = HistoricalLayer(
+            historical_config.year,
+            historical_config.state,
+            historical_config.fire,
+            historical_config.path,
+            self.yaml_data["area"]["screen_size"],
+        )
+        return historical_layer
+
     def _load_fire(self, pos: Optional[Tuple[int, int]] = None) -> FireConfig:
         """
         Load the FireConfig from the YAML data.
@@ -743,6 +770,14 @@ class Config:
                 "The specified fire initial position type "
                 f"({fire_init_pos_type}) is not supported"
             )
+
+    def _load_historical(self) -> HistoricalConfig:
+        """Load the HistoricalConfig from the YAML data.
+
+        Returns:
+            The YAML data converted to a HistoricalConfig dataclass
+        """
+        return HistoricalConfig(**self.yaml_data["historical"])
 
     def _load_environment(self) -> EnvironmentConfig:
         """

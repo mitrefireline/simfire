@@ -1,3 +1,4 @@
+import datetime
 import os
 import shutil
 from pathlib import Path
@@ -541,9 +542,7 @@ class OperationalTopographyLayer(TopographyLayer):
         self.image = self._make_contours()
 
     def _get_data(self):
-        """
-        Functionality to get the raw elevation data for the SimHarness
-        """
+        """Functionality to get the raw elevation data for the SimHarness"""
 
         # Convert from meters to feet for use with simulator
         data_array = 3.28084 * self.LandFireLatLongBox.topography
@@ -778,9 +777,8 @@ class FunctionalFuelLayer(FuelLayer):
 
 class HistoricalLayer:
     def __init__(self, year: int, state: str, fire: str, path: str) -> None:
-        """
-        Functionality to load the apporpriate/available historical data
-            given a fire name, the state, and year of the fire.
+        """Functionality to load the apporpriate/available historical data
+        given a fire name, the state, and year of the fire.
 
         NOTE: Currently, this layer supports adding ALL mitigations to the
             firemap at initialization
@@ -797,10 +795,6 @@ class HistoricalLayer:
             state: the state of teh historical fire
             fire: the individual fire given the year and state
             path: the path to the BurnMD dataset
-
-        Returns:
-
-
         """
         self.year = year
         self.state = state
@@ -824,9 +818,7 @@ class HistoricalLayer:
         )
 
     def _get_historical_data(self) -> None:
-        """
-        Collect geopandas dataframes availbale for the specified fire
-        """
+        """Collect geopandas dataframes availbale for the specified fire"""
         # get the path
         data_path = os.path.join(self.path, self.fire_path)
         try:
@@ -849,14 +841,10 @@ class HistoricalLayer:
         self.lines_df = lines_df
 
     def _get_bounds_of_screen(self):
-        """
-        Collect the extent of the historical data to set screen
+        """Collect the extent of the historical data to set screen
 
-        Arguments
-            None
-
-        Return
-            ((), ())
+        Returns:
+            ((maxy, maxx), (miny, minx))
         """
         if len(self.lines_df) > 0:
             # Calculate the bounds of the operational data using mitigations
@@ -890,8 +878,10 @@ class HistoricalLayer:
         return ((maxy, maxx), (miny, minx))
 
     def _get_fire_init_pos(self):
-        """
-        Ge the embedded fire initial position (approximation)
+        """Get the embedded fire initial position (approximation)
+
+        Returns:
+            (latitude, longitude)
         """
         fire_init_pos = self.polygons_df.iloc[0]["FireInitPo"]
         latitutde = float(fire_init_pos.split(", ")[0])
@@ -900,11 +890,11 @@ class HistoricalLayer:
         return latitutde, longitude
 
     def _make_mitigations(self) -> np.ndarray:
-        """
-        Method to add mitigation locations to the firemap at the start of the simulation.
+        """Method to add mitigation locations to the firemap at the start of the
+        simulation.
 
-        Return an array of the mitigation type as an enum that gets passed into
-            the sprites
+        Return an array of the mitigation type as an enum that gets passed into the
+        sprites.
 
         Arguments:
             screen_size (h, w): Numpy instantiates array as (column, row)
@@ -912,11 +902,12 @@ class HistoricalLayer:
 
         NOTE: This will not use the time-series aspect of the mitigations
 
-        TODO: Re-write to check if 'Completed Hand' or 'Completed Dozer'
-            lines even exist
-        TODO: This will overwrite dozer/hand lines - dozer lines are "stronger"
-                so we may want to add logic to keep dozer lines
+        TODO: Re-write to check if 'Completed Hand' or 'Completed Dozer' lines even exist
+        TODO: This will overwrite dozer/hand lines - dozer lines are "stronger" so we
+        may want to add logic to keep dozer lines
 
+        Returns:
+            An array of mitigations
         """
         mitigation_array = np.zeros((self.screen_size)).astype(int)
 
@@ -970,19 +961,16 @@ class HistoricalLayer:
         return mitigation_array
 
     def _calc_time_elapsed(self, start_time: str, end_time: str) -> str:
-        """
-        Calculate the time between each timestamp with format:
-            YYYY/MM/DD HRS:MIN:SEC.0000
+        """Calculate the time between each timestamp with format:
+        YYYY/MM/DD HRS:MIN:SEC.0000
 
         Arguments:
             start_time: beginning of fire as described in BurnMD ddataset
             end_time: end of fire as described by BurnMD dataset
 
         Returns
-            a string of `<>h <>m <>s'
+            A string of `<>h <>m <>s`
         """
-        import datetime
-
         datetimeFormat = "%Y/%m/%d %H:%M:%S.%f"
 
         time_dif = datetime.datetime.strptime(
@@ -1002,6 +990,8 @@ class HistoricalLayer:
         """
         Create an array of the historical perimeter data
 
+        Returns:
+            an array of the historical perimeters
         """
         perimeter_array = np.zeros((self.screen_size)).astype(int)
         geo_perimeters = self.polygons_df.loc[
@@ -1039,16 +1029,12 @@ class HistoricalLayer:
         return out_image
 
     def _get_perimeter_time_deltas(self):
-        """
-        Use `_calc_time_elapsed` functionality to get a list of time elapsed
-            between perimeters. This can be used in `simulation.run()`to
-            incremently add time to the simulation.
-
-        Arguments:
+        """Use `_calc_time_elapsed` functionality to get a list of time elapsed between
+        perimeters. This can be used in `simulation.run()`to incremently add time to the
+        simulation.
 
         Returns:
             List of time deltas between perimeters
-
         """
 
         geo_perimeters = self.polygons_df.loc[
@@ -1077,15 +1063,14 @@ class HistoricalLayer:
 def get_closest_indice(
     lat_lon_data: np.ndarray, point: Tuple[float, float]
 ) -> Tuple[int, int]:
-    """
-    Utility function to help find the closest index for the geospatial point.
+    """Utility function to help find the closest index for the geospatial point.
 
     Arguments:
         lat_lon_data: array of the (h, w, (lat, lon)) data of the screen_size
-                        of the simulation
+            of the simulation
         point: a tuple pair of lat/lon point. [longitude, latitude]
 
-    Return:
+    Returns:
         x, y: tuple pair of index in lat/lon array that corresponds to
                 the simulation array index
     """

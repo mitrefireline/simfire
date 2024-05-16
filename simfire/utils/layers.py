@@ -783,6 +783,8 @@ class HistoricalLayer:
         fire: str,
         path: Union[Path, str],
         screen_size: Tuple[int, int],
+        height: int,
+        width: int,
     ) -> None:
         """Functionality to load the apporpriate/available historical data
         given a fire name, the state, and year of the fire.
@@ -810,9 +812,10 @@ class HistoricalLayer:
         self.state = state
         self.fire = fire
         self.path = path
+        self.height = height
+        self.width = width
 
         self.screen_size: Tuple[int, int] = screen_size
-        self.lat_lon_array: np.ndarray
 
         # set the path
         self.fire_path = f"{self.state.title()}/{self.year}/fires/{self.fire.title()}"
@@ -822,6 +825,9 @@ class HistoricalLayer:
         self.latitude, self.longitude = self._get_fire_init_pos()
         # get the bounds of screen
         self.points = self._get_bounds_of_screen()
+        self.lat_lon_box = LandFireLatLongBox(self.points, year=self.year, height=self.height, width=self.width)
+        self.lat_lon_array = self.lat_lon_box.create_lat_lon_array()
+        self.mitigation_array = self._make_mitigations()
         # get the duraton of fire specified
         self.duration = self._calc_time_elapsed(
             self.polygons_df.iloc[0]["DateStart"], self.polygons_df.iloc[0]["DateContai"]

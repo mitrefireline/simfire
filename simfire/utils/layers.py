@@ -815,8 +815,10 @@ class HistoricalLayer:
         self.height = height
         self.width = width
 
-        self.screen_size: Tuple[int, int] = screen_size
+        self.screen_size = screen_size
 
+        # Format to convert BurnMD timestamp to datetime object
+        self.strptime_fmt = "%Y/%m/%d %H:%M:%S.%f"
         # set the path
         self.fire_path = f"{self.state.title()}/{self.year}/fires/{self.fire.title()}"
         # get available geopandas dataframes
@@ -825,13 +827,14 @@ class HistoricalLayer:
         self.latitude, self.longitude = self._get_fire_init_pos()
         # get the bounds of screen
         self.points = self._get_bounds_of_screen()
-        self.lat_lon_box = LandFireLatLongBox(self.points, year=self.year, height=self.height, width=self.width)
-        self.lat_lon_array = self.lat_lon_box.create_lat_lon_array()
-        self.mitigation_array = self._make_mitigations()
-        # get the duraton of fire specified
-        self.duration = self._calc_time_elapsed(
-            self.polygons_df.iloc[0]["DateStart"], self.polygons_df.iloc[0]["DateContai"]
+        self.lat_lon_box = LandFireLatLongBox(
+            self.points, year=self.year, height=self.height, width=self.width
         )
+        self.lat_lon_array = self.lat_lon_box.create_lat_lon_array()
+        self.start_time = self.polygons_df.iloc[0]["DateStart"]
+        self.end_time = self.polygons_df.iloc[0]["DateContai"]
+        # get the duraton of fire specified
+        self.duration = self._calc_time_elapsed(self.start_time, self.end_time)
 
     def _get_historical_data(self) -> None:
         """Collect geopandas dataframes availbale for the specified fire"""
@@ -853,6 +856,19 @@ class HistoricalLayer:
             lines_df = geopandas.GeoDataFrame()
             print("There is no mitigation data for this wildfire.")
 
+        # Add a column with a datetime object for ease of future computation
+        polygons_df.insert(
+            2,
+            "DateTime",
+            list(map(self.convert_to_datetime, polygons_df.CreateDate.to_list())),
+            True,
+        )
+        lines_df.insert(
+            2,
+            "DateTime",
+            list(map(self.convert_to_datetime, lines_df.CreateDate.to_list())),
+            True,
+        )
         self.polygons_df = polygons_df
         self.lines_df = lines_df
 
@@ -905,7 +921,9 @@ class HistoricalLayer:
 
         return latitutde, longitude
 
-    def _make_mitigations(self) -> np.ndarray:
+    def make_mitigations(
+        self, start_time: datetime.datetime, end_time: datetime.datetime
+    ) -> np.ndarray:
         """Method to add mitigation locations to the firemap at the start of the
         simulation.
 
@@ -913,8 +931,8 @@ class HistoricalLayer:
         sprites.
 
         Arguments:
-            screen_size (h, w): Numpy instantiates array as (column, row)
-            lat_lon_array (w, h, 2):  Array of tuples (lat, lon)
+            start_time: The start time to grab mitigations for
+            end_time: The end time to grab mitigations for
 
         NOTE: This will not use the time-series aspect of the mitigations
 
@@ -929,12 +947,22 @@ class HistoricalLayer:
 
         # only going to use `Completed` mitigations
         # we do not care about 'MitigationTimestamps'
-        geo_completed_dozer_mitigations = self.lines_df.loc[
-            self.lines_df["FeatureCat"] == "Completed Dozer Line", :
-        ]
-        geo_completed_hand_mitigations = self.lines_df.loc[
-            self.lines_df["FeatureCat"] == "Completed Hand Line", :
-        ]
+        dozer_idxs = np.logical_and.reduce(
+            (
+                (self.lines_df["FeatureCat"] == "Completed Dozer Line").to_numpy(),
+                (self.lines_df["DateTime"] > start_time).to_numpy(),
+                (self.lines_df["DateTime"] < end_time).to_numpy(),
+            )
+        )
+        hand_idxs = np.logical_and.reduce(
+            (
+                (self.lines_df["FeatureCat"] == "Completed Hand Line").to_numpy(),
+                (self.lines_df["DateTime"] > start_time).to_numpy(),
+                (self.lines_df["DateTime"] < end_time).to_numpy(),
+            )
+        )
+        geo_completed_dozer_mitigations = self.lines_df.loc[dozer_idxs, :]
+        geo_completed_hand_mitigations = self.lines_df.loc[hand_idxs, :]
 
         def _get_geometry(df):
             xy = df.geometry.xy
@@ -987,11 +1015,9 @@ class HistoricalLayer:
         Returns
             A string of `<>h <>m <>s`
         """
-        datetimeFormat = "%Y/%m/%d %H:%M:%S.%f"
-
-        time_dif = datetime.datetime.strptime(
-            end_time, datetimeFormat
-        ) - datetime.datetime.strptime(start_time, datetimeFormat)
+        time_dif = self.convert_to_datetime(end_time) - self.convert_to_datetime(
+            start_time
+        )
 
         # convert to days, hours, minutes, seconds
         days = f"{time_dif.days}d"
@@ -1001,6 +1027,9 @@ class HistoricalLayer:
         seconds = f"{datetime_seconds[2]}s"
 
         return days + " " + hours + " " + minutes + " " + seconds
+
+    def convert_to_datetime(self, bmd_time: str) -> datetime.datetime:
+        return datetime.datetime.strptime(bmd_time, self.strptime_fmt)
 
     def _make_perimeters_image(self) -> np.ndarray:
         """

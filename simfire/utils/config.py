@@ -13,6 +13,7 @@ import numpy as np
 import yaml  # type: ignore
 from yaml.parser import ParserError  # type: ignore
 
+from ..utils.generate_cfd_wind_layer import generate_cfd_wind_layer
 from ..world.elevation_functions import flat, gaussian, perlin
 from ..world.fuel_array_functions import chaparral_fn
 from ..world.wind_mechanics.wind_controller import WindController, WindControllerCFD
@@ -789,6 +790,13 @@ class Config:
             pos_x = rng.integers(screen_size[1], dtype=int)
             pos_y = rng.integers(screen_size[0], dtype=int)
             return FireConfig((pos_x, pos_y), diagonal_spread, max_fire_duration, seed)
+        elif fire_init_pos_type == "historical":
+            return FireConfig(
+                (self.historical_layer.fire_start_y, self.historical_layer.fire_start_x),
+                diagonal_spread,
+                max_fire_duration,
+                None,
+            )
         else:
             raise ConfigError(
                 "The specified fire initial position type "
@@ -837,15 +845,29 @@ class Config:
         elif fn_name == "cfd":
             # Check if wind files have been generated
             cfd_generated = os.path.isfile(
-                "generated_wind_directions.npy"
-            ) and os.path.isfile("generated_wind_magnitudes.npy")
+                "pregenerated_wind_files/generated_wind_directions.npy"
+            ) and os.path.isfile("pregenerated_wind_files/generated_wind_magnitudes.npy")
             if cfd_generated is False:
-                log.error("Missing pregenerated cfd npy files, switching to perlin")
-                self.wind_function = "perlin"
-            else:
-                speed_arr = np.load("generated_wind_magnitudes.npy")
-                direction_arr = np.load("generated_wind_directions.npy")
-                speed_arr = scale_ms_to_ftpm(speed_arr)
+                log.info("Generating CFD wind data")
+                time_to_train = self.yaml_data["wind"]["cfd"]["time_to_train"]
+                cfd_setup = WindControllerCFD(
+                    self.yaml_data["area"]["screen_size"],
+                    self.yaml_data["wind"]["cfd"]["result_accuracy"],
+                    self.yaml_data["wind"]["cfd"]["scale"],
+                    self.yaml_data["wind"]["cfd"]["timestep_dt"],
+                    self.yaml_data["wind"]["cfd"]["diffusion"],
+                    self.yaml_data["wind"]["cfd"]["viscosity"],
+                    self.terrain.topography_layer.data,
+                    self.yaml_data["wind"]["cfd"]["speed"],
+                    self.yaml_data["wind"]["cfd"]["direction"],
+                    time_to_train,
+                )
+                generate_cfd_wind_layer(time_to_train, cfd_setup)
+            speed_arr = np.load("pregenerated_wind_files/generated_wind_magnitudes.npy")
+            direction_arr = np.load(
+                "pregenerated_wind_files/generated_wind_directions.npy"
+            )
+            speed_arr = scale_ms_to_ftpm(speed_arr)
             speed_kwargs = self.yaml_data["wind"]["cfd"]
             dir_kwargs = self.yaml_data["wind"]["cfd"]
         elif fn_name == "perlin":

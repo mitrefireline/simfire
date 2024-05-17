@@ -11,10 +11,8 @@ from pathlib import Path
 import numpy as np
 import pygame
 
-from simfire.utils.config import Config
-from simfire.world.wind_mechanics.wind_controller import WindControllerCFD
-
-from ..utils.log import create_logger
+from ..world.wind_mechanics.wind_controller import WindControllerCFD
+from .log import create_logger
 
 log = create_logger(__name__)
 
@@ -82,12 +80,12 @@ def generate_direction_array(velocity_x, velocity_y):
     return direction
 
 
-def generate_cfd_wind_layer(display: bool = False):
-    cfg_path = Path("../../configs/build_wind_config.yml")
-    cfg = Config(cfg_path, cfd_precompute=True)
-    time_bound = cfg.cfd_setup.time_to_train  # in seconds
+def generate_cfd_wind_layer(
+    time_to_train: int, cfd_setup: WindControllerCFD, display: bool = False
+):
+    time_bound = time_to_train  # in seconds
     time_end = time.time() + time_bound
-    wind_map: WindControllerCFD = cfg.cfd_setup
+    wind_map: WindControllerCFD = cfd_setup
 
     wm_scale = wind_map.get_wind_scale()
     wm_size = wind_map.get_screen_size()

@@ -118,7 +118,3 @@ def generate_cfd_wind_layer(
     wind_path.mkdir(parents=True)
     np.save(wind_path / "generated_wind_magnitudes.npy", wm_mag)
     np.save(wind_path / "generated_wind_directions.npy", wm_dir)
-
-
-if __name__ == "__main__":
-    generate_cfd_wind_layer(False)

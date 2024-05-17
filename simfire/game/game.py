@@ -11,7 +11,7 @@ from ..enums import BurnStatus, GameStatus
 from ..utils.log import create_logger
 from ..utils.units import mph_to_ftpm
 from .image import load_image
-from .sprites import Agent, Fire, FireLine, Terrain
+from .sprites import Agent, Fire, FireLine, ScratchLine, Terrain, WetLine
 
 log = create_logger(__name__)
 
@@ -318,7 +318,7 @@ class Game:
         self,
         terrain: Terrain,
         fire_sprites: Sequence[Fire],
-        fireline_sprites: Sequence[FireLine],
+        fireline_sprites: Sequence[Union[FireLine, ScratchLine, WetLine]],
         agent_sprites: Sequence[Agent],
         wind_magnitude_map: Union[Sequence[Sequence[float]], np.ndarray],
         wind_direction_map: Union[Sequence[Sequence[float]], np.ndarray],

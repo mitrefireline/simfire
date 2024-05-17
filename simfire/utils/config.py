@@ -606,7 +606,9 @@ class Config:
 
     def _create_burn_probability_layer(
         self, init: bool = False, seed: Optional[int] = None
-    ) -> Tuple[str, BurnProbabilityLayer, Optional[str], Optional[Dict[str, Any]]]:
+    ) -> Tuple[
+        str, Optional[BurnProbabilityLayer], Optional[str], Optional[Dict[str, Any]]
+    ]:
         """
         Create a BurnProbabilityLayer given the config parameters.
         This is used for initalization and after resetting the layer seeds.
@@ -624,7 +626,7 @@ class Config:
                 The keyword arguments for the function if a functinoal layer is used.
                     Otherwise None
         """
-        burn_prob_layer: BurnProbabilityLayer
+        burn_prob_layer: Optional[BurnProbabilityLayer]
         bp_type = self.yaml_data["terrain"]["burn_probability"]["type"]
         if bp_type == "operational":
             if self.lat_long_box is not None:

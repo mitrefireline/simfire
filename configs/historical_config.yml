@@ -98,7 +98,7 @@ environment:
   moisture: 0.001
 
 wind:
-  function: simple
+  function: perlin
   cfd:
     time_to_train: 1000
     result_accuracy: 1

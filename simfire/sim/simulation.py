@@ -991,11 +991,14 @@ class FireSimulation(Simulation):
         """
         Render `self._game` frame with `self._game.update`
         """
+        all_contol_line_sprites = (
+            self.fireline_sprites + self.scratchline_sprites + self.wetline_sprites
+        )
         agent_sprites = list(self.agents.values())
         self._game.update(
             self.terrain,
             self.fire_sprites,
-            self.fireline_sprites,
+            all_contol_line_sprites,
             agent_sprites,
             self.config.wind.speed,
             self.config.wind.direction,

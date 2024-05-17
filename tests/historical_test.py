@@ -1,9 +1,6 @@
 import datetime
 import re
 
-import numpy as np
-
-from simfire.enums import BurnStatus
 from simfire.sim.simulation import FireSimulation
 from simfire.utils.config import Config
 
@@ -15,6 +12,7 @@ sim.rendering = True
 hist_layer = config.historical_layer
 
 current_time = hist_layer.convert_to_datetime(hist_layer.start_time)
+current_time += datetime.timedelta(days=2, hours=13)
 end_time = hist_layer.convert_to_datetime(hist_layer.end_time)
 hist_layer.perimeter_deltas
 i = 0
@@ -31,20 +29,17 @@ def parse_duration(duration_str):
     return datetime.timedelta(days=days, hours=hours, minutes=minutes, seconds=seconds)
 
 
-for time in hist_layer.perimeter_deltas:
-    mitigation_iterable = []
-    duration = parse_duration(time)
-    mitigations = hist_layer.make_mitigations(
+# for time in hist_layer.perimeter_deltas:
+#     duration = parse_duration(time)
+duration = "1h"
+datetime_duration = parse_duration(duration)
+while current_time < end_time:
+    mitigation_points = hist_layer.get_mitigations_by_time(
         current_time,
-        current_time + duration,
+        current_time + datetime_duration,
     )
-    locations = np.argwhere(mitigations != 0)
-    try:
-        mitigation_iterable = np.insert(locations, 2, BurnStatus.FIRELINE.value, axis=1)
-    except IndexError:
-        mitigation_iterable = []
-    sim.update_mitigation(mitigation_iterable)
-    sim.run(time)
-    current_time += duration
+    sim.update_mitigation(mitigation_points)
+    sim.run(duration)
+    current_time += datetime_duration
 
 sim.save_gif()

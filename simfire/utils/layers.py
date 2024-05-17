@@ -2,12 +2,13 @@ import datetime
 import os
 import shutil
 from pathlib import Path
-from typing import Dict, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 import geopandas
 import landfire
 import matplotlib.pyplot as plt
 import numpy as np
+from geopy.distance import great_circle
 from geotiff import GeoTiff
 from landfire.product.enums import ProductRegion, ProductTheme, ProductVersion
 from landfire.product.search import ProductSearch
@@ -841,6 +842,7 @@ class HistoricalLayer:
         self.perimeter_deltas = self._get_perimeter_time_deltas()
         # get the duraton of fire specified
         self.duration = self._calc_time_elapsed(self.start_time, self.end_time)
+        self.mitigation_arr, self.mitigation_pts = self._make_mitigations()
 
     def _get_historical_data(self) -> None:
         """Collect geopandas dataframes availbale for the specified fire"""
@@ -920,89 +922,130 @@ class HistoricalLayer:
 
         return latitude, longitude
 
-    def make_mitigations(
-        self, start_time: datetime.datetime, end_time: datetime.datetime
-    ) -> np.ndarray:
-        """
-        Method to add mitigation locations to the firemap at the start of the
-        simulation.
-
-        Return an array of the mitigation type as an enum that gets passed into the
-        sprites.
-
-        Arguments:
-            start_time: The start time to grab mitigations for
-            end_time: The end time to grab mitigations for
-
-        NOTE: This will not use the time-series aspect of the mitigations
-
-        TODO: Re-write to check if 'Completed Hand' or 'Completed Dozer' lines even exist
-        TODO: This will overwrite dozer/hand lines - dozer lines are "stronger" so we
-        may want to add logic to keep dozer lines
+    def _make_mitigations(
+        self,
+    ) -> Tuple[np.ndarray, List[Tuple[int, int, BurnStatus, datetime.datetime]]]:
+        """Method to pre-compute mitigation locations and times before the simulation
+        starts. This will allow for easier addition of mitigations as the fire progresses.
 
         Returns:
-            An array of mitigations
+            A numpy array with the same shape as the simulation fire map. Each location on
+            the array is a BurnStatus enum value.
+            A list containing a tuple of information for each mitigation point:
+                - x coordinate
+                - y coordinate
+                - BurnStatus
+                - datetime object of when that mitigation point was created
         """
         mitigation_array = np.zeros((self.screen_size)).astype(int)
 
         # only going to use `Completed` mitigations
         # we do not care about 'MitigationTimestamps'
-        dozer_idxs = np.logical_and.reduce(
-            (
-                (self.lines_df["FeatureCat"] == "Completed Dozer Line").to_numpy(),
-                (self.lines_df["DateTime"] > start_time).to_numpy(),
-                (self.lines_df["DateTime"] < end_time).to_numpy(),
-            )
-        )
-        hand_idxs = np.logical_and.reduce(
-            (
-                (self.lines_df["FeatureCat"] == "Completed Hand Line").to_numpy(),
-                (self.lines_df["DateTime"] > start_time).to_numpy(),
-                (self.lines_df["DateTime"] < end_time).to_numpy(),
-            )
-        )
-        geo_completed_dozer_mitigations = self.lines_df.loc[dozer_idxs, :]
-        geo_completed_hand_mitigations = self.lines_df.loc[hand_idxs, :]
+        geo_completed_dozer_mitigations = self.lines_df.loc[
+            self.lines_df["FeatureCat"] == "Completed Dozer Line", :
+        ]
+        geo_completed_hand_mitigations = self.lines_df.loc[
+            self.lines_df["FeatureCat"] == "Completed Hand Line", :
+        ]
 
         def _get_geometry(df):
             xy = df.geometry.xy
             longs = xy[0].tolist()
             lats = xy[1].tolist()
-            return [list(z) for z in zip(lats, longs)]
+            out_list = [None] * len(lats)
+            create_date = self.convert_to_datetime(df["CreateDate"])
+            lat_lon_pairs = [list(z) for z in zip(lats, longs)]
+            for i, (lat, lon) in enumerate(lat_lon_pairs):
+                if i == 0:
+                    create_date = create_date
+                else:
+                    if df["FeatureCat"] == "Completed Dozer Line":
+                        rate = 20  # ft/min
+                    if df["FeatureCat"] == "Completed Hand Line":
+                        rate = 2  # ft/min
+                    distance_to_prev_pt = great_circle(
+                        (lat, lon), lat_lon_pairs[i - 1]
+                    ).feet
+                    time_to_prev_pt = distance_to_prev_pt / rate
+                    time_delta = datetime.timedelta(minutes=time_to_prev_pt)
+                    create_date += time_delta
+                out_list[i] = [lat, lon, create_date]
+            return out_list
 
         # for mitigation in range(len(geo_completed_dozer_mitigations)):
         dozer_lines = geo_completed_dozer_mitigations.apply(_get_geometry, axis=1)
         hand_lines = geo_completed_hand_mitigations.apply(_get_geometry, axis=1)
 
+        interp_mitigation_points = []
+
         for i in range(len(hand_lines)):
             array_points = []
             points = hand_lines.iloc[i]
+            mitigation_points = []
             for p in points:
-                y, x = get_closest_indice(self.lat_lon_array, (p[1], p[0]))
+                lat, lon, create_date = p
+                y, x = get_closest_indice(self.lat_lon_array, (lat, lon))
                 array_points.append((y, x))
                 mitigation_array[y, x] = BurnStatus.SCRATCHLINE
+                mitigation_points.append((x, y, BurnStatus.SCRATCHLINE, create_date))
             # need to interpolate points in this line
-            for idx in range(len(array_points) - 1):
+            for idx in range(len(mitigation_points) - 1):
                 coords = np.linspace(array_points[idx], array_points[idx + 1])
                 coords = np.unique(coords.astype(int), axis=0)
-                for y, x in coords:
+                # Compute average time to move to each new coordinate (in seconds)
+                avg_create_time = (
+                    mitigation_points[idx + 1][3] - mitigation_points[idx][3]
+                ).seconds / len(coords)
+                for coord_idx, (y, x) in enumerate(coords):
                     mitigation_array[y, x] = BurnStatus.SCRATCHLINE
+                    create_date = mitigation_points[idx][3] + datetime.timedelta(
+                        seconds=avg_create_time * coord_idx
+                    )
+                    interp_mitigation_points.append(
+                        (x, y, BurnStatus.SCRATCHLINE, create_date)
+                    )
 
         for i in range(len(dozer_lines)):
             array_points = []
             points = dozer_lines.iloc[i]
+            mitigation_points = []
             for p in points:
-                y, x = get_closest_indice(self.lat_lon_array, (p[1], p[0]))
+                lat, lon, create_date = p
+                y, x = get_closest_indice(self.lat_lon_array, (lat, lon))
                 array_points.append((y, x))
                 mitigation_array[y, x] = BurnStatus.FIRELINE
+                mitigation_points.append((x, y, BurnStatus.FIRELINE, create_date))
             # need to interpolate points in this line
-            for idx in range(len(array_points) - 1):
+            for idx in range(len(mitigation_points) - 1):
                 coords = np.linspace(array_points[idx], array_points[idx + 1])
                 coords = np.unique(coords.astype(int), axis=0)
+                # Compute average time to move to each new coordinate (in seconds)
+                avg_create_time = (
+                    mitigation_points[idx + 1][3] - mitigation_points[idx][3]
+                ).seconds / len(coords)
                 for y, x in coords:
                     mitigation_array[y, x] = BurnStatus.FIRELINE
+                    create_date = mitigation_points[idx][3] + datetime.timedelta(
+                        seconds=avg_create_time * coord_idx
+                    )
+                    interp_mitigation_points.append(
+                        (x, y, BurnStatus.FIRELINE, create_date)
+                    )
 
-        return mitigation_array
+        return mitigation_array, interp_mitigation_points
+
+    def get_mitigations_by_time(
+        self, start_time: datetime.datetime, end_time: datetime.datetime
+    ) -> List[Tuple[int, int, BurnStatus]]:
+        """Retrieve all mitigations between the start and end times"""
+
+        def filter_fn(mitigation: Tuple[int, int, BurnStatus, datetime.datetime]) -> bool:
+            return mitigation[3] >= start_time and mitigation[3] <= end_time
+
+        filtered_points = list(filter(filter_fn, self.mitigation_pts))
+        mitigation_points = [(x, y, status) for x, y, status, _ in filtered_points]
+        mitigation_points = np.unique(mitigation_points, axis=0).tolist()
+        return mitigation_points
 
     def _calc_time_elapsed(self, start_time: str, end_time: str) -> str:
         """
@@ -1030,6 +1073,14 @@ class HistoricalLayer:
         return days + " " + hours + " " + minutes + " " + seconds
 
     def convert_to_datetime(self, bmd_time: str) -> datetime.datetime:
+        """Convert a BurnMD dataset time to a Python datetime.datetime object
+
+        Arguments:
+            bmd_time: The BurmMD time string
+
+        Returns:
+            A Python datetime.datetime object of the input BurnMD time
+        """
         return datetime.datetime.strptime(bmd_time, self.strptime_fmt)
 
     def _make_perimeters_image(self) -> np.ndarray:

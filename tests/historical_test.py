@@ -1,4 +1,5 @@
-from datetime import timedelta
+import datetime
+import re
 
 import numpy as np
 
@@ -13,15 +14,29 @@ sim.rendering = True
 
 hist_layer = config.historical_layer
 
-update_minutes = 1 * 60
-update_interval = f"{update_minutes}m"
-update_interval_datetime = timedelta(minutes=update_minutes)
 current_time = hist_layer.convert_to_datetime(hist_layer.start_time)
 end_time = hist_layer.convert_to_datetime(hist_layer.end_time)
-while current_time < end_time:
+hist_layer.perimeter_deltas
+i = 0
+
+
+def parse_duration(duration_str):
+    """Converts a string like '2d 1h 06m 21s' to a timedelta object."""
+    pattern = r"(?:(\d+)d)?\s*(?:(\d+)h)?\s*(?:(\d+)m)?\s*(?:(\d+)s)?"
+    match = re.match(pattern, duration_str)
+    if not match:
+        raise ValueError("Invalid duration format")
+
+    days, hours, minutes, seconds = (int(x) if x else 0 for x in match.groups())
+    return datetime.timedelta(days=days, hours=hours, minutes=minutes, seconds=seconds)
+
+
+for time in hist_layer.perimeter_deltas:
     mitigation_iterable = []
+    duration = parse_duration(time)
     mitigations = hist_layer.make_mitigations(
-        current_time, current_time + update_interval_datetime
+        current_time,
+        current_time + duration,
     )
     locations = np.argwhere(mitigations != 0)
     try:
@@ -29,7 +44,7 @@ while current_time < end_time:
     except IndexError:
         mitigation_iterable = []
     sim.update_mitigation(mitigation_iterable)
-    sim.run(update_interval)
-    current_time += update_interval_datetime
+    sim.run(time)
+    current_time += duration
 
 sim.save_gif()

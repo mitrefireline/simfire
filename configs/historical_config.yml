@@ -38,8 +38,8 @@ historical:
   year: 2020
   state: "California"
   fire: "mineral"
-  height: 12_000 # in meters
-  width: 12_000 # in meters
+  height: 20_000 # in meters
+  width: 20_000 # in meters
 
 terrain:
   topography:
@@ -86,7 +86,7 @@ terrain:
 
 fire:
   fire_initial_position:
-    type: static
+    type: historical
     static:
       position: (25, 25)
     random:
@@ -110,8 +110,8 @@ wind:
     speed: 19.0
     direction: north
   simple:
-    speed: 15
-    direction: 135
+    speed: 5
+    direction: 320
   perlin:
     speed:
       seed: 2345

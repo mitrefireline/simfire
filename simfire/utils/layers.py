@@ -832,9 +832,13 @@ class HistoricalLayer:
         self.topography = OperationalTopographyLayer(self.lat_lon_box)
         self.fuel = OperationalFuelLayer(self.lat_lon_box)
         self.lat_lon_array = self.lat_lon_box.create_lat_lon_array()
+        self.fire_start_y, self.fire_start_x = get_closest_indice(
+            self.lat_lon_array, (self.latitude, self.longitude)
+        )
         self.screen_size = self.lat_lon_array.shape[:2]
         self.start_time = self.polygons_df.iloc[0]["DateStart"]
         self.end_time = self.polygons_df.iloc[0]["DateContai"]
+        self.perimeter_deltas = self._get_perimeter_time_deltas()
         # get the duraton of fire specified
         self.duration = self._calc_time_elapsed(self.start_time, self.end_time)
 
@@ -911,10 +915,10 @@ class HistoricalLayer:
             (latitude, longitude)
         """
         fire_init_pos = self.polygons_df.iloc[0]["FireInitPo"]
-        latitutde = float(fire_init_pos.split(", ")[0])
-        longitude = float(fire_init_pos.split(", ")[1])
+        longitude = float(fire_init_pos.split(", ")[0])
+        latitude = float(fire_init_pos.split(", ")[1])
 
-        return latitutde, longitude
+        return latitude, longitude
 
     def make_mitigations(
         self, start_time: datetime.datetime, end_time: datetime.datetime
@@ -1101,6 +1105,7 @@ class HistoricalLayer:
                 )
 
             perimeter_time_deltas.append(delta)
+        return perimeter_time_deltas
 
 
 def get_closest_indice(
@@ -1112,7 +1117,7 @@ def get_closest_indice(
     Arguments:
         lat_lon_data: array of the (h, w, (lat, lon)) data of the screen_size of the
             simulation
-        point: a tuple pair of lat/lon point. [longitude, latitude]
+        point: a tuple pair of lat/lon point. [latitude, longitude]
 
     Returns:
         y, x: tuple pair of index in lat/lon array that corresponds to
@@ -1121,8 +1126,8 @@ def get_closest_indice(
 
     idx = np.argmin(
         np.sqrt(
-            np.square(lat_lon_data[..., 0] - point[1])
-            + np.square(lat_lon_data[..., 1] - point[0])
+            np.square(lat_lon_data[..., 0] - point[0])
+            + np.square(lat_lon_data[..., 1] - point[1])
         )
     )
     x, y = np.unravel_index(idx, lat_lon_data.shape[:2])

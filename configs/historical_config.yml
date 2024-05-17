@@ -16,7 +16,7 @@ simulation:
   headless: false
   draw_spread_graph: false
   record: true
-  save_data: true
+  save_data: false
   data_type: "npy"
   sf_home: "~/.simfire"
 
@@ -27,8 +27,8 @@ operational:
   seed:
   latitude: 38.422 # top left corner
   longitude: -118.266 # top left corner
-  height: 2000 # in meters
-  width: 2000 # in meters
+  height: 12_000 # in meters
+  width: 12_000 # in meters
   resolution: 30 # in meters
   year: 2020
 
@@ -38,10 +38,12 @@ historical:
   year: 2020
   state: "California"
   fire: "mineral"
+  height: 12_000 # in meters
+  width: 12_000 # in meters
 
 terrain:
   topography:
-    type: operational
+    type: historical
     functional:
       function: perlin
       perlin:
@@ -58,13 +60,13 @@ terrain:
         sigma_x: 50
         sigma_y: 50
   fuel:
-    type: operational
+    type: historical
     functional:
       function: chaparral
       chaparral:
         seed: 1113
     burn_probability:
-      type: operational
+      type: historical
       functional:
         function: perlin
         perlin:
@@ -96,7 +98,7 @@ environment:
   moisture: 0.001
 
 wind:
-  function: perlin
+  function: simple
   cfd:
     time_to_train: 1000
     result_accuracy: 1
@@ -108,8 +110,8 @@ wind:
     speed: 19.0
     direction: north
   simple:
-    speed: 7
-    direction: 90.0
+    speed: 15
+    direction: 135
   perlin:
     speed:
       seed: 2345

@@ -150,6 +150,8 @@ class HistoricalConfig:
     year: int
     state: str
     fire: str
+    height: int
+    width: int
 
 
 @dataclasses.dataclass
@@ -225,6 +227,12 @@ class Config:
         # operational to functional
         self.original_screen_size = self.yaml_data["area"]["screen_size"]
 
+        if (
+            self.yaml_data["terrain"]["topography"]["type"] == "historical"
+            or self.yaml_data["terrain"]["fuel"]["type"] == "historical"
+        ):
+            self.historical = self._load_historical()
+            self.historical_layer = self._create_historical_layer()
         # This can take up to 30 seconds to pull LandFire data directly from source
         self.landfire_lat_long_box = self._make_lat_long_box()
 
@@ -233,7 +241,6 @@ class Config:
         self.simulation = self._load_simulation()
         self.mitigation = self._load_mitigation()
         self.operational = self._load_operational()
-        self.historical = self._load_historical()
         self.terrain = self._load_terrain()
         self.fire = self._load_fire()
         self.environment = self._load_environment()
@@ -333,6 +340,11 @@ class Config:
                         width=width,
                     )
             return landfire_lat_long_box
+        elif (
+            self.yaml_data["terrain"]["topography"]["type"] == "historical"
+            or self.yaml_data["terrain"]["fuel"]["type"] == "historical"
+        ):
+            return self.historical_layer.lat_lon_box
         else:
             return None
 
@@ -580,6 +592,10 @@ class Config:
                 fn,
                 fn_name,
             )
+        elif topo_type == "historical":
+            topo_layer = self.historical_layer.topography
+            fn_name = None
+            kwargs = None
         else:
             raise ConfigError(
                 f"The specified topography type ({topo_type}) " "is not supported"
@@ -650,6 +666,10 @@ class Config:
                 fn,
                 fn_name,
             )
+        elif bp_type == "historical":
+            burn_prob_layer = None
+            fn_name = None
+            kwargs = None
         else:
             raise ConfigError(
                 f"The specified topography type ({bp_type}) " "is not supported"
@@ -702,6 +722,10 @@ class Config:
                 fn,
                 fn_name,
             )
+        elif fuel_type == "historical":
+            fuel_layer = self.historical_layer.fuel
+            fn_name = None
+            kwargs = None
         else:
             raise ConfigError(
                 f"The specified fuel type ({fuel_type}) " "is not supported"
@@ -714,15 +738,15 @@ class Config:
         This is an optional dataclass.
 
         Returns:
-            A HIstoricalLayer that sets the screen size, area, and fire start location.
+            A HistoricalLayer that utilizes the data specified in the config.
         """
-        historical_config = self._load_historical()
         historical_layer = HistoricalLayer(
-            historical_config.year,
-            historical_config.state,
-            historical_config.fire,
-            historical_config.path,
-            self.yaml_data["area"]["screen_size"],
+            self.historical.year,
+            self.historical.state,
+            self.historical.fire,
+            self.historical.path,
+            self.historical.height,
+            self.historical.width,
         )
         return historical_layer
 
@@ -804,7 +828,7 @@ class Config:
                 self.yaml_data["area"]["screen_size"][0],
                 self.yaml_data["area"]["screen_size"][1],
             )
-            speed = self.yaml_data["wind"]["simple"]["speed"]
+            speed = mph_to_ftpm(self.yaml_data["wind"]["simple"]["speed"])
             direction = self.yaml_data["wind"]["simple"]["direction"]
             speed_arr = np.full(arr_shape, speed)
             direction_arr = np.full(arr_shape, direction)

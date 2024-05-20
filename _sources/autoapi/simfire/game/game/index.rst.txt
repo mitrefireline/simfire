@@ -42,6 +42,11 @@ Attributes
    :param headless: Flag to run in a headless state.
    :param record: Flag to save a recording of the simulation game screen
 
+   .. py:attribute:: num_active_games
+      :annotation: :int = 0
+
+      
+
    .. py:method:: quit()
 
       Close the PyGame window and stop the `Game`

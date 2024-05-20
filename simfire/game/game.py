@@ -22,6 +22,8 @@ class Game:
     terrain, fire, and other sprites to be rendered and interact.
     """
 
+    num_active_games: int = 0
+
     def __init__(
         self,
         screen_size: Tuple[int, int],
@@ -89,6 +91,9 @@ class Game:
         self.frames: Optional[List[Image.Image]] = None
         if self.record:
             self.frames = []
+
+        # Increment number of active games to track across instances.
+        Game.num_active_games += 1
 
     def _toggle_wind_magnitude_display(self):
         """
@@ -281,8 +286,11 @@ class Game:
         """
         Close the PyGame window and stop the `Game`
         """
-        pygame.display.quit()
-        pygame.quit()
+        Game.num_active_games -= 1
+
+        if Game.num_active_games == 0:
+            pygame.display.quit()
+            pygame.quit()
 
     def save(self, path: pathlib.Path, duration: int = 100) -> None:
         """Save a GIF of the simulation to a specified path

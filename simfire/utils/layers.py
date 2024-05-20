@@ -112,7 +112,7 @@ class LandFireLatLongBox:
         self.fuel = self.fuel[:pixel_height, :pixel_width]
         self.topography = self.topography[:pixel_height, :pixel_width]
 
-        print(
+        log.info(
             f"Output shape of Fire Map: {height}m x {width}m "
             f"--> {self.fuel.shape} in pixel space"
         )
@@ -129,11 +129,20 @@ class LandFireLatLongBox:
                 This could greatly improve functionality and speed up training interations
         """
         if self.output_path.exists():
-            log.debug(
-                "Data for this area already exists. Loading from file: "
-                f"{self.output_path}"
-            )
-            return True
+            tifs = [str(t) for t in self.output_path.glob("*.tif")]
+            if len(tifs) == 0:
+                log.info(
+                    f"The output path, {self.output_path}, exists, but does not "
+                    "contain any tif files. Returning false to ensure that data "
+                    "for this area is pulled."
+                )
+                return False
+            else:
+                log.debug(
+                    "Data for this area already exists. Loading from file: "
+                    f"{self.output_path}"
+                )
+                return True
         else:
             return False
 
@@ -212,26 +221,23 @@ class LandFireLatLongBox:
             band: the gdal raster band that contains the data
 
         """
-        if not self.output_path.exists():
-            self.output_path.mkdir(parents=True, exist_ok=True)
+        self.output_path.mkdir(parents=True, exist_ok=True)
 
-            lf = landfire.Landfire(
-                bbox=f"{self.points[0][1]} {self.points[0][0]} \
-                    {self.points[1][1]+self.pad_distance} \
-                    {self.points[1][0]-self.pad_distance}",
-                output_crs="4326",
-            )
-            # assume the order of data retrieval stays the same
-            lf.request_data(
-                layers=self.layer_products.values(),
-                output_path=str(self.output_path / self.product_layers_path),
-            )
+        lf = landfire.Landfire(
+            bbox=f"{self.points[0][1]} {self.points[0][0]} \
+                {self.points[1][1]+self.pad_distance} \
+                {self.points[1][0]-self.pad_distance}",
+            output_crs="4326",
+        )
+        # assume the order of data retrieval stays the same
+        lf.request_data(
+            layers=self.layer_products.values(),
+            output_path=str(self.output_path / self.product_layers_path),
+        )
 
-            shutil.unpack_archive(
-                self.output_path / self.product_layers_path, self.output_path
-            )
-        else:
-            log.debug(f"Data already exists for {self.output_path}")
+        shutil.unpack_archive(
+            self.output_path / self.product_layers_path, self.output_path
+        )
 
     def _make_data(self):
         """

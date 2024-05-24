@@ -85,6 +85,21 @@ def str_to_minutes(string: str) -> int:
     )
 
 
+def meters_to_feet(
+    meters: Union[int, float, np.ndarray]
+) -> Union[int, float, np.ndarray]:
+    """
+    Convert meters to feet
+
+    Arguments:
+        meters: The distance in meters.
+
+    Returns:
+        The distance in feet.
+    """
+    return meters * 3.28084
+
+
 def chains_to_feet_handline(chains: float) -> Tuple[int, int]:
     """
     Convert "chains" to (width x hieght) / hour per individual firefighters.

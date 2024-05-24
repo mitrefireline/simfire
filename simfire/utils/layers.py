@@ -1,24 +1,31 @@
+import datetime
 import os
 import shutil
 from pathlib import Path
-from typing import Dict, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Union
 
+import geopandas
 import landfire
 import matplotlib.pyplot as plt
 import numpy as np
+from geopy.distance import great_circle
 from geotiff import GeoTiff
 from landfire.product.enums import ProductRegion, ProductTheme, ProductVersion
 from landfire.product.search import ProductSearch
 from matplotlib.contour import QuadContourSet
 from PIL import Image
+from scipy.ndimage.morphology import binary_dilation
 
 from ..enums import (
+    COLORS,
     DRY_TERRAIN_BROWN_IMG,
     TERRAIN_TEXTURE_PATH,
+    BurnStatus,
     FuelModelRGB13,
     FuelModelToFuel,
 )
 from ..utils.log import create_logger
+from ..utils.units import meters_to_feet
 from ..world.elevation_functions import ElevationFn
 from ..world.fuel_array_functions import FuelArrayFn
 from ..world.parameters import Fuel
@@ -112,7 +119,7 @@ class LandFireLatLongBox:
         self.fuel = self.fuel[:pixel_height, :pixel_width]
         self.topography = self.topography[:pixel_height, :pixel_width]
 
-        log.info(
+        log.debug(
             f"Output shape of Fire Map: {height}m x {width}m "
             f"--> {self.fuel.shape} in pixel space"
         )
@@ -259,7 +266,37 @@ class LandFireLatLongBox:
         self.geotiff_data = geo_tiff.read()
 
         self.fuel = np.array(self.geotiff_data[:, :, 0])
+        # expand "Roads/Urban" fuel type so that fires cannot burn through it
+        mask = binary_dilation(self.fuel == 91, [[5, 5, 5]])
+        self.fuel[mask] = 91
+
         self.topography = np.array(self.geotiff_data[:, :, 1])
+
+    def create_lat_lon_array(self) -> np.ndarray:
+        """
+        We will need to be able to map between the geospatial data and
+        the numpy arrays that SimFire uses. To do this, we will create a
+        secondary np.ndarray of tuples of lat/lon data.
+
+        This will especially get used with the HistoricalLayer
+
+        Arguments:
+            None
+
+        Returns:
+            np.ndarray of tuples (h, w): (lat, lon)
+        """
+        column = np.linspace(
+            float(self.points[0][0]), float(self.points[1][0]), self.fuel.shape[0]
+        )
+        row = np.linspace(
+            float(self.points[0][1]), float(self.points[1][1]), self.fuel.shape[1]
+        )
+        XX, YY = np.meshgrid(row, column)
+        # needs to be inverted, but maybe doesn't matter for this....
+        lat_lon_data = np.stack((YY, XX))
+        lat_lon_data = np.rollaxis(lat_lon_data, axis=0, start=3)
+        return lat_lon_data
 
 
 class LatLongBox:
@@ -507,12 +544,10 @@ class OperationalTopographyLayer(TopographyLayer):
         self.image = self._make_contours()
 
     def _get_data(self):
-        """
-        Functionality to get the raw elevation data for the SimHarness
-        """
+        """Functionality to get the raw elevation data for the SimHarness"""
 
         # Convert from meters to feet for use with simulator
-        data_array = 3.28084 * self.LandFireLatLongBox.topography
+        data_array = meters_to_feet(self.LandFireLatLongBox.topography)
         return data_array
 
 
@@ -740,3 +775,412 @@ class FunctionalFuelLayer(FuelLayer):
         texture = np.array(texture)
 
         return texture
+
+
+class HistoricalLayer:
+    def __init__(
+        self,
+        year: str,
+        state: str,
+        fire: str,
+        path: Union[Path, str],
+        height: int,
+        width: int,
+    ) -> None:
+        """
+        Functionality to load the apporpriate/available historical data
+        given a fire name, the state, and year of the fire.
+
+        NOTE: Currently, this layer supports adding ALL mitigations to the
+            firemap at initialization
+        TODO: Add mitigations based upon runtime and implementation time
+
+        NOTE: This layer includes functionality to calculate IoU of final perimeter
+        given the BurnMD timestamp and simulation duration for validation
+        purposes.
+        TODO: Move this functionality to a utilities file
+        TODO: Include intermediary perimeters and simulation runtime
+
+        Arguments:
+            year: The year of the historical fire.
+            state: The state of teh historical fire. This is the full name of the state
+                and is case-sensitive.
+            fire: The individual fire given the year and state. This is case-sensitive.
+            path: The path to the BurnMD dataset.
+            height: The height of the screen size (meters).
+            width: The width of the screen size (meters).
+        """
+        self.year = year
+        self.state = state
+        self.fire = fire
+        self.path = path
+        self.height = height
+        self.width = width
+
+        # Format to convert BurnMD timestamp to datetime object
+        self.strptime_fmt = "%Y/%m/%d %H:%M:%S.%f"
+        # set the path
+        self.fire_path = f"{self.state.title()}/{self.year}/fires/{self.fire.title()}"
+        # get available geopandas dataframes
+        self._get_historical_data()
+        # get fire start location
+        self.latitude, self.longitude = self._get_fire_init_pos()
+        # get the bounds of screen
+        self.points = self._get_bounds_of_screen()
+        self.lat_lon_box = LandFireLatLongBox(
+            self.points, year=self.year, height=self.height, width=self.width
+        )
+        self.topography = OperationalTopographyLayer(self.lat_lon_box)
+        self.fuel = OperationalFuelLayer(self.lat_lon_box)
+        self.lat_lon_array = self.lat_lon_box.create_lat_lon_array()
+        self.fire_start_y, self.fire_start_x = get_closest_indice(
+            self.lat_lon_array, (self.latitude, self.longitude)
+        )
+        self.screen_size = self.lat_lon_array.shape[:2]
+        self.start_time = self.polygons_df.iloc[0]["DateStart"]
+        self.end_time = self.polygons_df.iloc[0]["DateContai"]
+        self.perimeter_deltas = self._get_perimeter_time_deltas()
+        # get the duraton of fire specified
+        self.duration = self._calc_time_elapsed(self.start_time, self.end_time)
+        self.mitigation_arr, self.mitigation_pts = self._make_mitigations()
+
+    def _get_historical_data(self) -> None:
+        """Collect geopandas dataframes availbale for the specified fire"""
+        # get the path
+        data_path = os.path.join(self.path, self.fire_path)
+        try:
+            polygons_df = geopandas.read_file(
+                os.path.join(data_path, f"{self.fire.title()}_POLYGONS.shp")
+            )
+        except ValueError:
+            polygons_df = geopandas.GeoDataFrame()
+            log.warning("There is no perimeter data for this wildfire.")
+
+        try:
+            lines_df = geopandas.read_file(
+                os.path.join(data_path, f"{self.fire.title()}_LINES.shp")
+            )
+        except ValueError:
+            lines_df = geopandas.GeoDataFrame()
+            log.warning("There is no mitigation data for this wildfire.")
+
+        # Add a column with a datetime object for ease of future computation
+        polygons_df.insert(
+            2,
+            "DateTime",
+            list(map(self.convert_to_datetime, polygons_df.CreateDate.to_list())),
+            True,
+        )
+        lines_df.insert(
+            2,
+            "DateTime",
+            list(map(self.convert_to_datetime, lines_df.CreateDate.to_list())),
+            True,
+        )
+        self.polygons_df = polygons_df
+        self.lines_df = lines_df
+
+    def _get_bounds_of_screen(self):
+        """
+        Collect the extent of the historical data to set screen
+
+        Returns:
+            ((maxy, maxx), (miny, minx))
+        """
+        if len(self.lines_df) > 0:
+            df = self.lines_df
+        else:
+            df = self.polygons_df
+
+        # most left (west) bound
+        maxx = min(
+            min(df.geometry.bounds.minx),
+            min(df.geometry.bounds.maxx),
+        )
+        # most right (east) bound
+        minx = max(
+            max(df.geometry.bounds.maxx),
+            max(df.geometry.bounds.minx),
+        )
+        # most bottom (south) bound
+        miny = min(df.geometry.bounds.miny)
+        # most top (north) bound
+        maxy = max(df.geometry.bounds.maxy)
+
+        return ((maxy, maxx), (miny, minx))
+
+    def _get_fire_init_pos(self):
+        """
+        Get the embedded fire initial position (approximation)
+
+        Returns:
+            (latitude, longitude)
+        """
+        fire_init_pos = self.polygons_df.iloc[0]["FireInitPo"]
+        longitude = float(fire_init_pos.split(", ")[0])
+        latitude = float(fire_init_pos.split(", ")[1])
+
+        return latitude, longitude
+
+    def _make_mitigations(
+        self,
+    ) -> Tuple[np.ndarray, List[Tuple[int, int, BurnStatus, datetime.datetime]]]:
+        """Method to pre-compute mitigation locations and times before the simulation
+        starts. This will allow for easier addition of mitigations as the fire progresses.
+
+        Returns:
+            A numpy array with the same shape as the simulation fire map. Each location on
+            the array is a BurnStatus enum value.
+            A list containing a tuple of information for each mitigation point:
+                - x coordinate
+                - y coordinate
+                - BurnStatus
+                - datetime object of when that mitigation point was created
+        """
+        mitigation_array = np.zeros((self.screen_size)).astype(int)
+
+        # only going to use `Completed` mitigations
+        # we do not care about 'MitigationTimestamps'
+        geo_completed_dozer_mitigations = self.lines_df.loc[
+            self.lines_df["FeatureCat"] == "Completed Dozer Line", :
+        ]
+        geo_completed_hand_mitigations = self.lines_df.loc[
+            self.lines_df["FeatureCat"] == "Completed Hand Line", :
+        ]
+
+        def _get_geometry(df):
+            xy = df.geometry.xy
+            longs = xy[0].tolist()
+            lats = xy[1].tolist()
+            out_list = [None] * len(lats)
+            create_date = self.convert_to_datetime(df["CreateDate"])
+            lat_lon_pairs = [list(z) for z in zip(lats, longs)]
+            for i, (lat, lon) in enumerate(lat_lon_pairs):
+                if i == 0:
+                    create_date = create_date
+                else:
+                    if df["FeatureCat"] == "Completed Dozer Line":
+                        rate = 20  # ft/min
+                    if df["FeatureCat"] == "Completed Hand Line":
+                        rate = 2  # ft/min
+                    distance_to_prev_pt = great_circle(
+                        (lat, lon), lat_lon_pairs[i - 1]
+                    ).feet
+                    time_to_prev_pt = distance_to_prev_pt / rate
+                    time_delta = datetime.timedelta(minutes=time_to_prev_pt)
+                    create_date += time_delta
+                out_list[i] = [lat, lon, create_date]
+            return out_list
+
+        # for mitigation in range(len(geo_completed_dozer_mitigations)):
+        dozer_lines = geo_completed_dozer_mitigations.apply(_get_geometry, axis=1)
+        hand_lines = geo_completed_hand_mitigations.apply(_get_geometry, axis=1)
+
+        interp_mitigation_points = []
+
+        for i in range(len(hand_lines)):
+            array_points = []
+            points = hand_lines.iloc[i]
+            mitigation_points = []
+            for p in points:
+                lat, lon, create_date = p
+                y, x = get_closest_indice(self.lat_lon_array, (lat, lon))
+                array_points.append((y, x))
+                mitigation_array[y, x] = BurnStatus.SCRATCHLINE
+                mitigation_points.append((x, y, BurnStatus.SCRATCHLINE, create_date))
+            # need to interpolate points in this line
+            for idx in range(len(mitigation_points) - 1):
+                coords = np.linspace(array_points[idx], array_points[idx + 1])
+                coords = np.unique(coords.astype(int), axis=0)
+                # Compute average time to move to each new coordinate (in seconds)
+                avg_create_time = (
+                    mitigation_points[idx + 1][3] - mitigation_points[idx][3]
+                ).seconds / len(coords)
+                for coord_idx, (y, x) in enumerate(coords):
+                    mitigation_array[y, x] = BurnStatus.SCRATCHLINE
+                    create_date = mitigation_points[idx][3] + datetime.timedelta(
+                        seconds=avg_create_time * coord_idx
+                    )
+                    interp_mitigation_points.append(
+                        (x, y, BurnStatus.SCRATCHLINE, create_date)
+                    )
+
+        for i in range(len(dozer_lines)):
+            array_points = []
+            points = dozer_lines.iloc[i]
+            mitigation_points = []
+            for p in points:
+                lat, lon, create_date = p
+                y, x = get_closest_indice(self.lat_lon_array, (lat, lon))
+                array_points.append((y, x))
+                mitigation_array[y, x] = BurnStatus.FIRELINE
+                mitigation_points.append((x, y, BurnStatus.FIRELINE, create_date))
+            # need to interpolate points in this line
+            for idx in range(len(mitigation_points) - 1):
+                coords = np.linspace(array_points[idx], array_points[idx + 1])
+                coords = np.unique(coords.astype(int), axis=0)
+                # Compute average time to move to each new coordinate (in seconds)
+                avg_create_time = (
+                    mitigation_points[idx + 1][3] - mitigation_points[idx][3]
+                ).seconds / len(coords)
+                for y, x in coords:
+                    mitigation_array[y, x] = BurnStatus.FIRELINE
+                    create_date = mitigation_points[idx][3] + datetime.timedelta(
+                        seconds=avg_create_time * coord_idx
+                    )
+                    interp_mitigation_points.append(
+                        (x, y, BurnStatus.FIRELINE, create_date)
+                    )
+
+        return mitigation_array, interp_mitigation_points
+
+    def get_mitigations_by_time(
+        self, start_time: datetime.datetime, end_time: datetime.datetime
+    ) -> List[Tuple[int, int, BurnStatus]]:
+        """Retrieve all mitigations between the start and end times"""
+
+        def filter_fn(mitigation: Tuple[int, int, BurnStatus, datetime.datetime]) -> bool:
+            return mitigation[3] >= start_time and mitigation[3] <= end_time
+
+        filtered_points = list(filter(filter_fn, self.mitigation_pts))
+        mitigation_points = [(x, y, status) for x, y, status, _ in filtered_points]
+        mitigation_points = np.unique(mitigation_points, axis=0).tolist()
+        return mitigation_points
+
+    def _calc_time_elapsed(self, start_time: str, end_time: str) -> str:
+        """
+        Calculate the time between each timestamp with format:
+        YYYY/MM/DD HRS:MIN:SEC.0000
+
+        Arguments:
+            start_time: beginning of fire as described in BurnMD ddataset
+            end_time: end of fire as described by BurnMD dataset
+
+        Returns
+            A string of `<>h <>m <>s`
+        """
+        time_dif = self.convert_to_datetime(end_time) - self.convert_to_datetime(
+            start_time
+        )
+
+        # convert to days, hours, minutes, seconds
+        days = f"{time_dif.days}d"
+        datetime_seconds = str(datetime.timedelta(seconds=time_dif.seconds)).split(":")
+        hours = f"{datetime_seconds[0]}h"
+        minutes = f"{datetime_seconds[1]}m"
+        seconds = f"{datetime_seconds[2]}s"
+
+        return days + " " + hours + " " + minutes + " " + seconds
+
+    def convert_to_datetime(self, bmd_time: str) -> datetime.datetime:
+        """Convert a BurnMD dataset time to a Python datetime.datetime object
+
+        Arguments:
+            bmd_time: The BurmMD time string
+
+        Returns:
+            A Python datetime.datetime object of the input BurnMD time
+        """
+        return datetime.datetime.strptime(bmd_time, self.strptime_fmt)
+
+    def _make_perimeters_image(self) -> np.ndarray:
+        """
+        Create an array of the historical perimeter data
+
+        Returns:
+            an array of the historical perimeters
+        """
+        perimeter_array = np.zeros((self.screen_size)).astype(int)
+        geo_perimeters = self.polygons_df.loc[
+            self.polygons_df["FeatureCat"] == "Wildfire Daily Fire Perimeter", :
+        ]
+
+        def _get_geometry(df):
+            xy = df.geometry.exterior.xy
+            longs = xy[0].tolist()
+            lats = xy[1].tolist()
+            return [list(z) for z in zip(lats, longs)]
+
+        perimeters = geo_perimeters.apply(_get_geometry, axis=1)
+
+        for i in range(len(perimeters)):
+            array_points = []
+            points = perimeters.iloc[i]
+            for p in points:
+                y, x = get_closest_indice(self.lat_lon_array, (p[1], p[0]))
+                array_points.append((x, y))
+                # set the value to the perimeter index
+                perimeter_array[x, y] = i + 1
+            # need to interpolate points in this polygon for connectedness
+            for perim_idx in range(len(array_points) - 1):
+                coords = np.linspace(
+                    array_points[perim_idx], array_points[perim_idx + 1], dtype=int
+                )
+                coords = np.unique(coords.astype(int), axis=0)
+                for coord_x, coord_y in coords:
+                    perimeter_array[coord_x, coord_y] = i + 1
+        out_image = np.zeros((*perimeter_array.shape, 4), dtype=np.uint8)
+        # Map the colors to each index in the fireline points
+        np.take(COLORS, perimeter_array, axis=0, out=out_image)
+
+        return out_image
+
+    def _get_perimeter_time_deltas(self):
+        """
+        Use `_calc_time_elapsed` functionality to get a list of time elapsed between
+        perimeters. This can be used in `simulation.run()`to incremently add time to the
+        simulation.
+
+        Returns:
+            List of time deltas between perimeters
+        """
+
+        geo_perimeters = self.polygons_df.loc[
+            self.polygons_df["FeatureCat"] == "Wildfire Daily Fire Perimeter", :
+        ]
+
+        perimeter_time_deltas = []
+        for i in range(len(geo_perimeters)):
+            # if first pass, use fire start time to get time delta
+
+            if i == 0:
+                delta = self._calc_time_elapsed(
+                    geo_perimeters.iloc[i]["DateStart"],
+                    geo_perimeters.iloc[i]["PolygonDat"],
+                )
+            else:
+                # TODO do a check to skip an entries that do not have 'PolygonDat' entries
+                delta = self._calc_time_elapsed(
+                    geo_perimeters.iloc[i - 1]["PolygonDat"],
+                    geo_perimeters.iloc[i]["PolygonDat"],
+                )
+
+            perimeter_time_deltas.append(delta)
+        return perimeter_time_deltas
+
+
+def get_closest_indice(
+    lat_lon_data: np.ndarray, point: Tuple[float, float]
+) -> Tuple[int, int]:
+    """
+    Utility function to help find the closest index for the geospatial point.
+
+    Arguments:
+        lat_lon_data: array of the (h, w, (lat, lon)) data of the screen_size of the
+            simulation
+        point: a tuple pair of lat/lon point. [latitude, longitude]
+
+    Returns:
+        y, x: tuple pair of index in lat/lon array that corresponds to
+            the simulation array index
+    """
+
+    idx = np.argmin(
+        np.sqrt(
+            np.square(lat_lon_data[..., 0] - point[0])
+            + np.square(lat_lon_data[..., 1] - point[1])
+        )
+    )
+    x, y = np.unravel_index(idx, lat_lon_data.shape[:2])
+
+    return int(y), int(x)

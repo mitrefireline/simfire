@@ -443,9 +443,9 @@ class RothermelFireManager(FireManager):
             The gradient/slope magnitude for every pixel ([0]) and the gradient
             direction/angle for every pixel ([1])
         """
-        grad_y, grad_x = np.gradient(self.terrain.elevations)
+        grad_y, grad_x = np.gradient(self.terrain.elevations, self.pixel_scale)
         grad_mag = np.sqrt(grad_x**2 + grad_y**2)
-        grad_dir = np.tan(grad_y / (grad_x + 0.000001))
+        grad_dir = np.arctan2(grad_y, grad_x + 0.000001)
         return grad_mag, grad_dir
 
     def _accrue_sprites(

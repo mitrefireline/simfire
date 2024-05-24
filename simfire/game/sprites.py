@@ -11,7 +11,7 @@ from svglib.svglib import svg2rlg
 from wurlitzer import pipes
 
 from ..enums import BURNED_RGB_COLOR, BurnStatus, SpriteLayer
-from ..utils.layers import FuelLayer, TopographyLayer
+from ..utils.layers import FuelLayer, HistoricalLayer, TopographyLayer
 from ..utils.log import create_logger
 
 log = create_logger(__name__)
@@ -31,12 +31,14 @@ class Terrain(pygame.sprite.Sprite):
         topo_layer: TopographyLayer,
         screen_size: Tuple[int, int],
         headless: bool = False,
+        historical_layer: Optional[HistoricalLayer] = None,
     ) -> None:
 
         super().__init__()
 
         self.fuel_layer = fuel_layer
         self.topo_layer = topo_layer
+        self.historical_layer = historical_layer
 
         self.screen_size = screen_size
         self.headless = headless
@@ -132,8 +134,10 @@ class Terrain(pygame.sprite.Sprite):
             out_image: The input image with the contour lines drawn on it
         """
         image = self.fuel_layer.image.squeeze()
+
         # Create a figure with axes
         fig, ax = plt.subplots()
+
         # the decimal points look messy)
         contours = ax.contour(
             self.topo_layer.data.squeeze(), origin="upper", colors="black"
@@ -148,7 +152,16 @@ class Terrain(pygame.sprite.Sprite):
             fmt=lambda x: f"{x:.0f}",
             fontsize="small",
         )
-        ax.imshow(image.astype(np.uint8))
+        ax.imshow(image.astype(np.uint8), alpha=np.zeros(image.shape[:2]))
+
+        # plot the historical perimeters
+        # TODO: Not plotting in the correct order
+        # if self.historical_layer:
+        #     # now we can make the perimater image
+        #     perimeter_image = self.historical_layer._make_perimeters_image()
+        #     ax.imshow(perimeter_image[...,:3].astype(np.uint8),
+        #               alpha=np.uint8(perimeter_image[...,3]/255))
+
         plt.axis("off")
 
         # Save the figure as a vector graphic to get just the image (no axes,
@@ -264,9 +277,9 @@ class FireLine(pygame.sprite.Sprite):
             self.rect = pygame.Rect(*(pos + (size, size)))
         else:
             fireline_color = np.zeros((self.size, self.size, 3))
-            fireline_color[:, :, 0] = 155  # R
-            fireline_color[:, :, 1] = 118  # G
-            fireline_color[:, :, 2] = 83  # B
+            fireline_color[:, :, 0] = 255  # R
+            fireline_color[:, :, 1] = 0  # G
+            fireline_color[:, :, 2] = 0  # B
             self.image = pygame.surfarray.make_surface(fireline_color)
 
             self.rect = self.image.get_rect()
@@ -308,9 +321,9 @@ class ScratchLine(pygame.sprite.Sprite):
             self.rect = pygame.Rect(*(pos + (size, size)))
         else:
             scratchline_color = np.zeros((self.size, self.size, 3))
-            scratchline_color[:, :, 0] = 139  # R
-            scratchline_color[:, :, 1] = 125  # G
-            scratchline_color[:, :, 2] = 58  # B
+            scratchline_color[:, :, 0] = 255  # R
+            scratchline_color[:, :, 1] = 0  # G
+            scratchline_color[:, :, 2] = 0  # B
             self.image = pygame.surfarray.make_surface(scratchline_color)
 
             self.rect = self.image.get_rect()

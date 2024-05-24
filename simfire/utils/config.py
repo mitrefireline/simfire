@@ -13,6 +13,7 @@ import numpy as np
 import yaml  # type: ignore
 from yaml.parser import ParserError  # type: ignore
 
+from ..utils.generate_cfd_wind_layer import generate_cfd_wind_layer
 from ..world.elevation_functions import flat, gaussian, perlin
 from ..world.fuel_array_functions import chaparral_fn
 from ..world.wind_mechanics.wind_controller import WindController, WindControllerCFD
@@ -22,6 +23,7 @@ from .layers import (
     FunctionalBurnProbabilityLayer,
     FunctionalFuelLayer,
     FunctionalTopographyLayer,
+    HistoricalLayer,
     LandFireLatLongBox,
     LatLongBox,
     OperationalBurnProbabilityLayer,
@@ -143,6 +145,17 @@ class OperationalConfig:
 
 
 @dataclasses.dataclass
+class HistoricalConfig:
+    default: bool
+    path: Union[Path, str]
+    year: int
+    state: str
+    fire: str
+    height: int
+    width: int
+
+
+@dataclasses.dataclass
 class FunctionalConfig:
     """
     Class that tracks functional layer names and keyword arguments.
@@ -215,6 +228,12 @@ class Config:
         # operational to functional
         self.original_screen_size = self.yaml_data["area"]["screen_size"]
 
+        if (
+            self.yaml_data["terrain"]["topography"]["type"] == "historical"
+            or self.yaml_data["terrain"]["fuel"]["type"] == "historical"
+        ):
+            self.historical = self._load_historical()
+            self.historical_layer = self._create_historical_layer()
         # This can take up to 30 seconds to pull LandFire data directly from source
         self.landfire_lat_long_box = self._make_lat_long_box()
 
@@ -322,6 +341,11 @@ class Config:
                         width=width,
                     )
             return landfire_lat_long_box
+        elif (
+            self.yaml_data["terrain"]["topography"]["type"] == "historical"
+            or self.yaml_data["terrain"]["fuel"]["type"] == "historical"
+        ):
+            return self.historical_layer.lat_lon_box
         else:
             return None
 
@@ -569,6 +593,10 @@ class Config:
                 fn,
                 fn_name,
             )
+        elif topo_type == "historical":
+            topo_layer = self.historical_layer.topography
+            fn_name = None
+            kwargs = None
         else:
             raise ConfigError(
                 f"The specified topography type ({topo_type}) " "is not supported"
@@ -578,7 +606,9 @@ class Config:
 
     def _create_burn_probability_layer(
         self, init: bool = False, seed: Optional[int] = None
-    ) -> Tuple[str, BurnProbabilityLayer, Optional[str], Optional[Dict[str, Any]]]:
+    ) -> Tuple[
+        str, Optional[BurnProbabilityLayer], Optional[str], Optional[Dict[str, Any]]
+    ]:
         """
         Create a BurnProbabilityLayer given the config parameters.
         This is used for initalization and after resetting the layer seeds.
@@ -596,7 +626,7 @@ class Config:
                 The keyword arguments for the function if a functinoal layer is used.
                     Otherwise None
         """
-        burn_prob_layer: BurnProbabilityLayer
+        burn_prob_layer: Optional[BurnProbabilityLayer]
         bp_type = self.yaml_data["terrain"]["burn_probability"]["type"]
         if bp_type == "operational":
             if self.lat_long_box is not None:
@@ -639,6 +669,10 @@ class Config:
                 fn,
                 fn_name,
             )
+        elif bp_type == "historical":
+            burn_prob_layer = None
+            fn_name = None
+            kwargs = None
         else:
             raise ConfigError(
                 f"The specified topography type ({bp_type}) " "is not supported"
@@ -691,12 +725,33 @@ class Config:
                 fn,
                 fn_name,
             )
+        elif fuel_type == "historical":
+            fuel_layer = self.historical_layer.fuel
+            fn_name = None
+            kwargs = None
         else:
             raise ConfigError(
                 f"The specified fuel type ({fuel_type}) " "is not supported"
             )
 
         return fuel_type, fuel_layer, fn_name, kwargs
+
+    def _create_historical_layer(self):
+        """Create a HistoricalLayer given the config parameters.
+        This is an optional dataclass.
+
+        Returns:
+            A HistoricalLayer that utilizes the data specified in the config.
+        """
+        historical_layer = HistoricalLayer(
+            self.historical.year,
+            self.historical.state,
+            self.historical.fire,
+            self.historical.path,
+            self.historical.height,
+            self.historical.width,
+        )
+        return historical_layer
 
     def _load_fire(self, pos: Optional[Tuple[int, int]] = None) -> FireConfig:
         """
@@ -737,11 +792,26 @@ class Config:
             pos_x = rng.integers(screen_size[1], dtype=int)
             pos_y = rng.integers(screen_size[0], dtype=int)
             return FireConfig((pos_x, pos_y), diagonal_spread, max_fire_duration, seed)
+        elif fire_init_pos_type == "historical":
+            return FireConfig(
+                (self.historical_layer.fire_start_y, self.historical_layer.fire_start_x),
+                diagonal_spread,
+                max_fire_duration,
+                None,
+            )
         else:
             raise ConfigError(
                 "The specified fire initial position type "
                 f"({fire_init_pos_type}) is not supported"
             )
+
+    def _load_historical(self) -> HistoricalConfig:
+        """Load the HistoricalConfig from the YAML data.
+
+        Returns:
+            The YAML data converted to a HistoricalConfig dataclass
+        """
+        return HistoricalConfig(**self.yaml_data["historical"])
 
     def _load_environment(self) -> EnvironmentConfig:
         """
@@ -768,7 +838,7 @@ class Config:
                 self.yaml_data["area"]["screen_size"][0],
                 self.yaml_data["area"]["screen_size"][1],
             )
-            speed = self.yaml_data["wind"]["simple"]["speed"]
+            speed = mph_to_ftpm(self.yaml_data["wind"]["simple"]["speed"])
             direction = self.yaml_data["wind"]["simple"]["direction"]
             speed_arr = np.full(arr_shape, speed)
             direction_arr = np.full(arr_shape, direction)
@@ -777,15 +847,29 @@ class Config:
         elif fn_name == "cfd":
             # Check if wind files have been generated
             cfd_generated = os.path.isfile(
-                "generated_wind_directions.npy"
-            ) and os.path.isfile("generated_wind_magnitudes.npy")
+                "pregenerated_wind_files/generated_wind_directions.npy"
+            ) and os.path.isfile("pregenerated_wind_files/generated_wind_magnitudes.npy")
             if cfd_generated is False:
-                log.error("Missing pregenerated cfd npy files, switching to perlin")
-                self.wind_function = "perlin"
-            else:
-                speed_arr = np.load("generated_wind_magnitudes.npy")
-                direction_arr = np.load("generated_wind_directions.npy")
-                speed_arr = scale_ms_to_ftpm(speed_arr)
+                log.info("Generating CFD wind data")
+                time_to_train = self.yaml_data["wind"]["cfd"]["time_to_train"]
+                cfd_setup = WindControllerCFD(
+                    self.yaml_data["area"]["screen_size"],
+                    self.yaml_data["wind"]["cfd"]["result_accuracy"],
+                    self.yaml_data["wind"]["cfd"]["scale"],
+                    self.yaml_data["wind"]["cfd"]["timestep_dt"],
+                    self.yaml_data["wind"]["cfd"]["diffusion"],
+                    self.yaml_data["wind"]["cfd"]["viscosity"],
+                    self.terrain.topography_layer.data,
+                    self.yaml_data["wind"]["cfd"]["speed"],
+                    self.yaml_data["wind"]["cfd"]["direction"],
+                    time_to_train,
+                )
+                generate_cfd_wind_layer(time_to_train, cfd_setup)
+            speed_arr = np.load("pregenerated_wind_files/generated_wind_magnitudes.npy")
+            direction_arr = np.load(
+                "pregenerated_wind_files/generated_wind_directions.npy"
+            )
+            speed_arr = scale_ms_to_ftpm(speed_arr)
             speed_kwargs = self.yaml_data["wind"]["cfd"]
             dir_kwargs = self.yaml_data["wind"]["cfd"]
         elif fn_name == "perlin":

@@ -24,7 +24,16 @@ Classes
    simfire.utils.layers.FuelLayer
    simfire.utils.layers.OperationalFuelLayer
    simfire.utils.layers.FunctionalFuelLayer
+   simfire.utils.layers.HistoricalLayer
 
+
+
+Functions
+~~~~~~~~~
+
+.. autoapisummary::
+
+   simfire.utils.layers.get_closest_indice
 
 
 
@@ -67,6 +76,20 @@ Attributes
 
       :param layer: the gdal layer to query
       :param band: the gdal raster band that contains the data
+
+
+   .. py:method:: create_lat_lon_array()
+
+      We will need to be able to map between the geospatial data and
+      the numpy arrays that SimFire uses. To do this, we will create a
+      secondary np.ndarray of tuples of lat/lon data.
+
+      This will especially get used with the HistoricalLayer
+
+      :param None:
+
+      :returns: (lat, lon)
+      :rtype: np.ndarray of tuples (h, w)
 
 
 
@@ -219,5 +242,59 @@ Attributes
    :param fuel_fn: A callable function that converts (x, y) coorindates to
                    elevations.
    :param name: The name of the fuel layer (e.g.: 'chaparral')
+
+
+.. py:class:: HistoricalLayer(year, state, fire, path, height, width)
+
+   
+   Functionality to load the apporpriate/available historical data
+   given a fire name, the state, and year of the fire.
+
+   NOTE: Currently, this layer supports adding ALL mitigations to the
+       firemap at initialization
+   TODO: Add mitigations based upon runtime and implementation time
+
+   NOTE: This layer includes functionality to calculate IoU of final perimeter
+   given the BurnMD timestamp and simulation duration for validation
+   purposes.
+   TODO: Move this functionality to a utilities file
+   TODO: Include intermediary perimeters and simulation runtime
+
+   :param year: The year of the historical fire.
+   :param state: The state of teh historical fire. This is the full name of the state
+                 and is case-sensitive.
+   :param fire: The individual fire given the year and state. This is case-sensitive.
+   :param path: The path to the BurnMD dataset.
+   :param height: The height of the screen size (meters).
+   :param width: The width of the screen size (meters).
+
+   .. py:method:: get_mitigations_by_time(start_time, end_time)
+
+      Retrieve all mitigations between the start and end times
+
+
+   .. py:method:: convert_to_datetime(bmd_time)
+
+      Convert a BurnMD dataset time to a Python datetime.datetime object
+
+      :param bmd_time: The BurmMD time string
+
+      :returns: A Python datetime.datetime object of the input BurnMD time
+
+
+
+.. py:function:: get_closest_indice(lat_lon_data, point)
+
+   Utility function to help find the closest index for the geospatial point.
+
+   :param lat_lon_data: array of the (h, w, (lat, lon)) data of the screen_size of the
+                        simulation
+   :param point: a tuple pair of lat/lon point. [latitude, longitude]
+
+   :returns:
+
+             tuple pair of index in lat/lon array that corresponds to
+                 the simulation array index
+   :rtype: y, x
 
 

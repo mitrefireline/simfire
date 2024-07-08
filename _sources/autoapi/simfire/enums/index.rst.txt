@@ -43,6 +43,7 @@ Attributes
    simfire.enums.BURNED_RGB_COLOR
    simfire.enums.FuelModelToFuel
    simfire.enums.FuelModelRGB13
+   simfire.enums.COLORS
    simfire.enums.HandLineRate
    simfire.enums.DozerType
    simfire.enums.DozerLineRates
@@ -304,6 +305,11 @@ Attributes
    
 
 .. py:data:: FuelModelRGB13
+   
+
+   
+
+.. py:data:: COLORS
    
 
    

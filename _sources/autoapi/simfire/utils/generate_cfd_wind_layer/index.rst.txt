@@ -54,6 +54,6 @@ Attributes
 .. py:function:: generate_direction_array(velocity_x, velocity_y)
 
 
-.. py:function:: generate_cfd_wind_layer(display = False)
+.. py:function:: generate_cfd_wind_layer(time_to_train, cfd_setup, display = False)
 
 

@@ -283,10 +283,13 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#simfire.utils.units.str_to_minutes" title="simfire.utils.units.str_to_minutes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str_to_minutes</span></code></a>(string)</p></td>
 <td><p>Convert any string representation of time ('1d 2h 3m') into a number of minutes</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#simfire.utils.units.chains_to_feet_handline" title="simfire.utils.units.chains_to_feet_handline"><code class="xref py py-obj docutils literal notranslate"><span class="pre">chains_to_feet_handline</span></code></a>(chains)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#simfire.utils.units.meters_to_feet" title="simfire.utils.units.meters_to_feet"><code class="xref py py-obj docutils literal notranslate"><span class="pre">meters_to_feet</span></code></a>(meters)</p></td>
+<td><p>Convert meters to feet</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#simfire.utils.units.chains_to_feet_handline" title="simfire.utils.units.chains_to_feet_handline"><code class="xref py py-obj docutils literal notranslate"><span class="pre">chains_to_feet_handline</span></code></a>(chains)</p></td>
 <td><p>Convert &quot;chains&quot; to (width x hieght) / hour per individual firefighters.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#simfire.utils.units.chains_to_feet_dozerline" title="simfire.utils.units.chains_to_feet_dozerline"><code class="xref py py-obj docutils literal notranslate"><span class="pre">chains_to_feet_dozerline</span></code></a>(chains)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#simfire.utils.units.chains_to_feet_dozerline" title="simfire.utils.units.chains_to_feet_dozerline"><code class="xref py py-obj docutils literal notranslate"><span class="pre">chains_to_feet_dozerline</span></code></a>(chains)</p></td>
 <td><p>Convert &quot;chains&quot; to (width x hieght) / hour per dozer.</p></td>
 </tr>
 </tbody>
@@ -322,10 +325,10 @@
 <span class="sig-prename descclassname"><span class="pre">simfire.utils.units.</span></span><span class="sig-name descname"><span class="pre">scale_ms_to_ftpm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ms</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.utils.units.scale_ms_to_ftpm" title="Permalink to this definition">#</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>ms</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)"><em>numpy.ndarray</em></a>) – </p>
+<dd class="field-odd"><p><strong>ms</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0)"><em>numpy.ndarray</em></a>) – </p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.26)">numpy.ndarray</a></p>
+<dd class="field-even"><p><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0)">numpy.ndarray</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -399,6 +402,23 @@
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="simfire.utils.units.meters_to_feet">
+<span class="sig-prename descclassname"><span class="pre">simfire.utils.units.</span></span><span class="sig-name descname"><span class="pre">meters_to_feet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">meters</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.utils.units.meters_to_feet" title="Permalink to this definition">#</a></dt>
+<dd><p>Convert meters to feet</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>meters</strong> (<em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><em>float</em></a><em>, </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0)"><em>numpy.ndarray</em></a><em>]</em>) – The distance in meters.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The distance in feet.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Union[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)">int</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)">float</a>, <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0)">numpy.ndarray</a>]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -508,6 +528,7 @@ pgs: 114-116</p>
 <li><a class="reference internal" href="#simfire.utils.units.mph_to_ftpm"><code class="docutils literal notranslate"><span class="pre">mph_to_ftpm()</span></code></a></li>
 <li><a class="reference internal" href="#simfire.utils.units.ftpm_to_mph"><code class="docutils literal notranslate"><span class="pre">ftpm_to_mph()</span></code></a></li>
 <li><a class="reference internal" href="#simfire.utils.units.str_to_minutes"><code class="docutils literal notranslate"><span class="pre">str_to_minutes()</span></code></a></li>
+<li><a class="reference internal" href="#simfire.utils.units.meters_to_feet"><code class="docutils literal notranslate"><span class="pre">meters_to_feet()</span></code></a></li>
 <li><a class="reference internal" href="#simfire.utils.units.chains_to_feet_handline"><code class="docutils literal notranslate"><span class="pre">chains_to_feet_handline()</span></code></a></li>
 <li><a class="reference internal" href="#simfire.utils.units.chains_to_feet_dozerline"><code class="docutils literal notranslate"><span class="pre">chains_to_feet_dozerline()</span></code></a></li>
 <li><a class="reference internal" href="#simfire.utils.units.log">log</a></li>
@@ -517,6 +538,7 @@ pgs: 114-116</p>
 <li><a class="reference internal" href="#simfire.utils.units.mph_to_ftpm">mph_to_ftpm</a></li>
 <li><a class="reference internal" href="#simfire.utils.units.ftpm_to_mph">ftpm_to_mph</a></li>
 <li><a class="reference internal" href="#simfire.utils.units.str_to_minutes">str_to_minutes</a></li>
+<li><a class="reference internal" href="#simfire.utils.units.meters_to_feet">meters_to_feet</a></li>
 <li><a class="reference internal" href="#simfire.utils.units.chains_to_feet_handline">chains_to_feet_handline</a></li>
 <li><a class="reference internal" href="#simfire.utils.units.chains_to_feet_dozerline">chains_to_feet_dozerline</a></li>
 </ul>

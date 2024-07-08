@@ -284,7 +284,7 @@ due to processing limitations.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#simfire.utils.generate_cfd_wind_layer.generate_direction_array" title="simfire.utils.generate_cfd_wind_layer.generate_direction_array"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_direction_array</span></code></a>(velocity_x, velocity_y)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#simfire.utils.generate_cfd_wind_layer.generate_cfd_wind_layer" title="simfire.utils.generate_cfd_wind_layer.generate_cfd_wind_layer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_cfd_wind_layer</span></code></a>([display])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#simfire.utils.generate_cfd_wind_layer.generate_cfd_wind_layer" title="simfire.utils.generate_cfd_wind_layer.generate_cfd_wind_layer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_cfd_wind_layer</span></code></a>(time_to_train, cfd_setup[, ...])</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -339,10 +339,14 @@ due to processing limitations.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="simfire.utils.generate_cfd_wind_layer.generate_cfd_wind_layer">
-<span class="sig-prename descclassname"><span class="pre">simfire.utils.generate_cfd_wind_layer.</span></span><span class="sig-name descname"><span class="pre">generate_cfd_wind_layer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">display</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.utils.generate_cfd_wind_layer.generate_cfd_wind_layer" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">simfire.utils.generate_cfd_wind_layer.</span></span><span class="sig-name descname"><span class="pre">generate_cfd_wind_layer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_to_train</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfd_setup</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">display</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.utils.generate_cfd_wind_layer.generate_cfd_wind_layer" title="Permalink to this definition">#</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>display</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a>) – </p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>time_to_train</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a>) – </p></li>
+<li><p><strong>cfd_setup</strong> (<a class="reference internal" href="../../world/wind_mechanics/wind_controller/index.html#simfire.world.wind_mechanics.wind_controller.WindControllerCFD" title="simfire.world.wind_mechanics.wind_controller.WindControllerCFD"><em>simfire.world.wind_mechanics.wind_controller.WindControllerCFD</em></a>) – </p></li>
+<li><p><strong>display</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a>) – </p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>

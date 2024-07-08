@@ -22,6 +22,7 @@ Classes
    simfire.utils.config.SimulationConfig
    simfire.utils.config.MitigationConfig
    simfire.utils.config.OperationalConfig
+   simfire.utils.config.HistoricalConfig
    simfire.utils.config.FunctionalConfig
    simfire.utils.config.TerrainConfig
    simfire.utils.config.FireConfig
@@ -134,6 +135,44 @@ Attributes
       
 
    .. py:attribute:: year
+      :annotation: :int
+
+      
+
+
+.. py:class:: HistoricalConfig
+
+   .. py:attribute:: default
+      :annotation: :bool
+
+      
+
+   .. py:attribute:: path
+      :annotation: :Union[pathlib.Path, str]
+
+      
+
+   .. py:attribute:: year
+      :annotation: :int
+
+      
+
+   .. py:attribute:: state
+      :annotation: :str
+
+      
+
+   .. py:attribute:: fire
+      :annotation: :str
+
+      
+
+   .. py:attribute:: height
+      :annotation: :int
+
+      
+
+   .. py:attribute:: width
       :annotation: :int
 
       

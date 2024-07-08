@@ -7,8 +7,8 @@
 <meta property="og:type" content="website" />
 <meta property="og:url" content="autoapi/simfire/utils/layers/index.html" />
 <meta property="og:site_name" content="SimFire" />
-<meta property="og:description" content="Module Contents: Classes: Attributes:" />
-<meta name="description" content="Module Contents: Classes: Attributes:" />
+<meta property="og:description" content="Module Contents: Classes: Functions: Attributes:" />
+<meta name="description" content="Module Contents: Classes: Functions: Attributes:" />
 <link rel="index" title="Index" href="../../../../genindex.html" /><link rel="search" title="Search" href="../../../../search.html" /><link rel="next" title="simfire.utils.log" href="../log/index.html" /><link rel="prev" title="simfire.utils.graph" href="../graph/index.html" />
 
     <link rel="shortcut icon" href="../../../../_static/favicon.ico"/><!-- Generated with Sphinx 5.3.0 and Furo 2022.12.07 -->
@@ -304,6 +304,21 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#simfire.utils.layers.FunctionalFuelLayer" title="simfire.utils.layers.FunctionalFuelLayer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FunctionalFuelLayer</span></code></a></p></td>
 <td><p>Layer that stores fuel data computed from a function.</p></td>
 </tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#simfire.utils.layers.HistoricalLayer" title="simfire.utils.layers.HistoricalLayer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">HistoricalLayer</span></code></a></p></td>
+<td><p>Functionality to load the apporpriate/available historical data</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="functions">
+<h3>Functions<a class="headerlink" href="#functions" title="Permalink to this heading">#</a></h3>
+<div class="table-wrapper autosummary longtable docutils container">
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#simfire.utils.layers.get_closest_indice" title="simfire.utils.layers.get_closest_indice"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_closest_indice</span></code></a>(lat_lon_data, point)</p></td>
+<td><p>Utility function to help find the closest index for the geospatial point.</p></td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -363,6 +378,26 @@ caveat: ESPG 4326, WGS84</p>
 <li><p><strong>layer</strong> – the gdal layer to query</p></li>
 <li><p><strong>band</strong> – the gdal raster band that contains the data</p></li>
 </ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simfire.utils.layers.LandFireLatLongBox.create_lat_lon_array">
+<span class="sig-name descname"><span class="pre">create_lat_lon_array</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#simfire.utils.layers.LandFireLatLongBox.create_lat_lon_array" title="Permalink to this definition">#</a></dt>
+<dd><p>We will need to be able to map between the geospatial data and
+the numpy arrays that SimFire uses. To do this, we will create a
+secondary np.ndarray of tuples of lat/lon data.</p>
+<p>This will especially get used with the HistoricalLayer</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong> – </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>(lat, lon)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>np.ndarray of tuples (h, w)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -554,6 +589,95 @@ elevations.</p></li>
 </dl>
 </dd></dl>
 
+<dl class="py class">
+<dt class="sig sig-object py" id="simfire.utils.layers.HistoricalLayer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simfire.utils.layers.</span></span><span class="sig-name descname"><span class="pre">HistoricalLayer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">year</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fire</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.utils.layers.HistoricalLayer" title="Permalink to this definition">#</a></dt>
+<dd><p>Functionality to load the apporpriate/available historical data
+given a fire name, the state, and year of the fire.</p>
+<dl class="simple">
+<dt>NOTE: Currently, this layer supports adding ALL mitigations to the</dt><dd><p>firemap at initialization</p>
+</dd>
+</dl>
+<p>TODO: Add mitigations based upon runtime and implementation time</p>
+<p>NOTE: This layer includes functionality to calculate IoU of final perimeter
+given the BurnMD timestamp and simulation duration for validation
+purposes.
+TODO: Move this functionality to a utilities file
+TODO: Include intermediary perimeters and simulation runtime</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>year</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The year of the historical fire.</p></li>
+<li><p><strong>state</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The state of teh historical fire. This is the full name of the state
+and is case-sensitive.</p></li>
+<li><p><strong>fire</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The individual fire given the year and state. This is case-sensitive.</p></li>
+<li><p><strong>path</strong> (<em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.12)"><em>pathlib.Path</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>]</em>) – The path to the BurnMD dataset.</p></li>
+<li><p><strong>height</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a>) – The height of the screen size (meters).</p></li>
+<li><p><strong>width</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a>) – The width of the screen size (meters).</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="simfire.utils.layers.HistoricalLayer.get_mitigations_by_time">
+<span class="sig-name descname"><span class="pre">get_mitigations_by_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.utils.layers.HistoricalLayer.get_mitigations_by_time" title="Permalink to this definition">#</a></dt>
+<dd><p>Retrieve all mitigations between the start and end times</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>start_time</strong> (<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.12)"><em>datetime.datetime</em></a>) – </p></li>
+<li><p><strong>end_time</strong> (<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.12)"><em>datetime.datetime</em></a>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>List[Tuple[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)">int</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)">int</a>, <a class="reference internal" href="../../enums/index.html#simfire.enums.BurnStatus" title="simfire.enums.BurnStatus">simfire.enums.BurnStatus</a>]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simfire.utils.layers.HistoricalLayer.convert_to_datetime">
+<span class="sig-name descname"><span class="pre">convert_to_datetime</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bmd_time</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.utils.layers.HistoricalLayer.convert_to_datetime" title="Permalink to this definition">#</a></dt>
+<dd><p>Convert a BurnMD dataset time to a Python datetime.datetime object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>bmd_time</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The BurmMD time string</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A Python datetime.datetime object of the input BurnMD time</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.12)">datetime.datetime</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="simfire.utils.layers.get_closest_indice">
+<span class="sig-prename descclassname"><span class="pre">simfire.utils.layers.</span></span><span class="sig-name descname"><span class="pre">get_closest_indice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lat_lon_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">point</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#simfire.utils.layers.get_closest_indice" title="Permalink to this definition">#</a></dt>
+<dd><p>Utility function to help find the closest index for the geospatial point.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lat_lon_data</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.0)"><em>numpy.ndarray</em></a>) – array of the (h, w, (lat, lon)) data of the screen_size of the
+simulation</p></li>
+<li><p><strong>point</strong> (<em>Tuple</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><em>float</em></a><em>]</em>) – a tuple pair of lat/lon point. [latitude, longitude]</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>tuple pair of index in lat/lon array that corresponds to</dt><dd><p>the simulation array index</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>y, x</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 </section>
 </section>
@@ -616,10 +740,12 @@ elevations.</p></li>
 <li><a class="reference internal" href="#"><code class="xref py py-mod docutils literal notranslate"><span class="pre">simfire.utils.layers</span></code></a><ul>
 <li><a class="reference internal" href="#module-contents">Module Contents</a><ul>
 <li><a class="reference internal" href="#classes">Classes</a></li>
+<li><a class="reference internal" href="#functions">Functions</a></li>
 <li><a class="reference internal" href="#attributes">Attributes</a><ul>
 <li><a class="reference internal" href="#simfire.utils.layers.log"><code class="docutils literal notranslate"><span class="pre">log</span></code></a></li>
 <li><a class="reference internal" href="#simfire.utils.layers.LandFireLatLongBox"><code class="docutils literal notranslate"><span class="pre">LandFireLatLongBox</span></code></a><ul>
 <li><a class="reference internal" href="#simfire.utils.layers.LandFireLatLongBox.query_lat_lon_layer_data"><code class="docutils literal notranslate"><span class="pre">LandFireLatLongBox.query_lat_lon_layer_data()</span></code></a></li>
+<li><a class="reference internal" href="#simfire.utils.layers.LandFireLatLongBox.create_lat_lon_array"><code class="docutils literal notranslate"><span class="pre">LandFireLatLongBox.create_lat_lon_array()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#simfire.utils.layers.LatLongBox"><code class="docutils literal notranslate"><span class="pre">LatLongBox</span></code></a></li>
@@ -633,9 +759,16 @@ elevations.</p></li>
 <li><a class="reference internal" href="#simfire.utils.layers.FuelLayer"><code class="docutils literal notranslate"><span class="pre">FuelLayer</span></code></a></li>
 <li><a class="reference internal" href="#simfire.utils.layers.OperationalFuelLayer"><code class="docutils literal notranslate"><span class="pre">OperationalFuelLayer</span></code></a></li>
 <li><a class="reference internal" href="#simfire.utils.layers.FunctionalFuelLayer"><code class="docutils literal notranslate"><span class="pre">FunctionalFuelLayer</span></code></a></li>
+<li><a class="reference internal" href="#simfire.utils.layers.HistoricalLayer"><code class="docutils literal notranslate"><span class="pre">HistoricalLayer</span></code></a><ul>
+<li><a class="reference internal" href="#simfire.utils.layers.HistoricalLayer.get_mitigations_by_time"><code class="docutils literal notranslate"><span class="pre">HistoricalLayer.get_mitigations_by_time()</span></code></a></li>
+<li><a class="reference internal" href="#simfire.utils.layers.HistoricalLayer.convert_to_datetime"><code class="docutils literal notranslate"><span class="pre">HistoricalLayer.convert_to_datetime()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#simfire.utils.layers.get_closest_indice"><code class="docutils literal notranslate"><span class="pre">get_closest_indice()</span></code></a></li>
 <li><a class="reference internal" href="#simfire.utils.layers.log">log</a></li>
 <li><a class="reference internal" href="#simfire.utils.layers.LandFireLatLongBox">LandFireLatLongBox</a><ul>
 <li><a class="reference internal" href="#simfire.utils.layers.LandFireLatLongBox.query_lat_lon_layer_data">query_lat_lon_layer_data</a></li>
+<li><a class="reference internal" href="#simfire.utils.layers.LandFireLatLongBox.create_lat_lon_array">create_lat_lon_array</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#simfire.utils.layers.LatLongBox">LatLongBox</a></li>
@@ -649,6 +782,12 @@ elevations.</p></li>
 <li><a class="reference internal" href="#simfire.utils.layers.FuelLayer">FuelLayer</a></li>
 <li><a class="reference internal" href="#simfire.utils.layers.OperationalFuelLayer">OperationalFuelLayer</a></li>
 <li><a class="reference internal" href="#simfire.utils.layers.FunctionalFuelLayer">FunctionalFuelLayer</a></li>
+<li><a class="reference internal" href="#simfire.utils.layers.HistoricalLayer">HistoricalLayer</a><ul>
+<li><a class="reference internal" href="#simfire.utils.layers.HistoricalLayer.get_mitigations_by_time">get_mitigations_by_time</a></li>
+<li><a class="reference internal" href="#simfire.utils.layers.HistoricalLayer.convert_to_datetime">convert_to_datetime</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#simfire.utils.layers.get_closest_indice">get_closest_indice</a></li>
 </ul>
 </li>
 </ul>

@@ -91,7 +91,7 @@ def compute_rate_of_spread(
     # Reaction Intensity (BTU/ft^2-min)
     I_R = gamma_prime * w_n * h * eta_M * eta_S
     # Propagating Flux Ratio
-    xi = np.exp((0.792 + 0.681 * sigma**0.5) * (B + 0.1)) / (192 + 0.25 * sigma)
+    xi = np.exp((0.792 + 0.681 * sigma**0.5) * (B + 0.1)) / (192 + 0.2595 * sigma)
     # Wind Factor
     c = 7.47 * np.exp(-0.133 * sigma**0.55)
     b = 0.02526 * sigma**0.54

@@ -51,11 +51,9 @@ class TestRothermel(unittest.TestCase):
         el_fn = np.vectorize(flat())
         elevations = el_fn(X, Y).astype(np.float32)
 
-        grad_x, grad_y = np.gradient(elevations)
-        slope_mag = (grad_x**2 + grad_y**2) ** 0.5
-        slope_mag = slope_mag[new_loc_y, new_loc_x]
-        slope_dir = np.tan(grad_y / (grad_x + 1e-6))
-        slope_dir = slope_dir[new_loc_y, new_loc_x]
+        grad_y, grad_x = np.gradient(elevations, 1)
+        slope_mag = np.sqrt(grad_x**2 + grad_y**2)
+        slope_dir = np.arctan2(grad_y, grad_x + 0.000001)
 
         loc_x = np.array(new_loc_x, dtype=np.float32)
         loc_y = np.array(new_loc_y, dtype=np.float32)

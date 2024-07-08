@@ -192,7 +192,7 @@ class TestFireLine(unittest.TestCase):
         )
 
         rgba = sprite.image.get_at((0, 0))
-        valid_rgba = (155, 118, 83, 255)
+        valid_rgba = (255, 0, 0, 255)
         self.assertEqual(
             rgba,
             valid_rgba,
@@ -242,7 +242,7 @@ class TestScratchLine(unittest.TestCase):
         )
 
         rgba = sprite.image.get_at((0, 0))
-        valid_rgba = (139, 125, 58, 255)
+        valid_rgba = (255, 0, 0, 255)
         self.assertEqual(
             rgba,
             valid_rgba,

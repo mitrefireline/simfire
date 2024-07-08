@@ -33,6 +33,7 @@ imagecodecs = "^2023.7.10"
 landfire = "^0.5.0"
 geotiff = "^0.2.10"
 geopandas = "^0.14.4"
+geopy = "^2.4.1"
 
 [tool.poetry.group.coverage.dependencies]
 pytest-cov = "^3.0.0"

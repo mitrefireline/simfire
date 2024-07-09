@@ -8,14 +8,14 @@ from ..presets import Chaparral, TallGrass
 from ..rothermel import compute_rate_of_spread
 
 KNOWN_ROTHERMEL_OUTPUT = [
-    1087.6337458150563,
-    1087.6337458150563,
-    1087.6337458150563,
-    1087.6337458150563,
-    391.63742469666437,
-    391.63742469666437,
-    391.63742469666437,
-    391.63742469666437,
+    1059.7013711275968,
+    1059.7013711275968,
+    1059.7013711275968,
+    1059.7013711275968,
+    382.0360259132064,
+    382.0360259132064,
+    382.0360259132064,
+    382.0360259132064,
 ]
 
 
@@ -53,6 +53,7 @@ class TestRothermel(unittest.TestCase):
 
         grad_y, grad_x = np.gradient(elevations, 1)
         slope_mag = np.sqrt(grad_x**2 + grad_y**2)
+        slope_mag = slope_mag[new_loc_y, new_loc_x]
         slope_dir = np.arctan2(grad_y, grad_x + 0.000001)
         slope_dir = slope_dir[new_loc_y, new_loc_x]
 

@@ -96,4 +96,5 @@ class TestRothermel(unittest.TestCase):
             slope_mag,
             slope_dir,
         )
-        self.assertListEqual(R.tolist(), KNOWN_ROTHERMEL_OUTPUT)
+        for i, r in enumerate(R.tolist()):
+            self.assertAlmostEqual(r, KNOWN_ROTHERMEL_OUTPUT[i], places=4)

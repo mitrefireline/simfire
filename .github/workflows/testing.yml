@@ -42,7 +42,7 @@ jobs:
       - name: Build Coverage File
         run: |
           export PATH=$PATH:$HOME/.local/bin
-          poetry run pytest --junitxml=pytest.xml --cov-report=term-missing:skip-covered --cov=simfire | tee pytest-coverage.txt
+          poetry run pytest --junitxml=pytest.xml --cov-report=term-missing:skip-covered --cov=simfire --no-cov-on-fail simfire | tee pytest-coverage.txt
 
       - name: Comment on PR with Coverage
         continue-on-error: true  # To let people create forked PRs

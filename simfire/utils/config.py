@@ -146,7 +146,6 @@ class OperationalConfig:
 
 @dataclasses.dataclass
 class HistoricalConfig:
-    default: bool
     path: Union[Path, str]
     year: int
     state: str
@@ -228,12 +227,32 @@ class Config:
         # operational to functional
         self.original_screen_size = self.yaml_data["area"]["screen_size"]
 
-        if (
-            self.yaml_data["terrain"]["topography"]["type"] == "historical"
-            or self.yaml_data["terrain"]["fuel"]["type"] == "historical"
-        ):
+        # If using 'historical', BOTH topo and fuel must be 'historical'!
+        # The only use case I can imagine is using 'functional' for one and
+        # 'historical' for the other. I don't see how that would be useful,
+        # so we will force FULL usage of historical data, when specified. Otherwise,
+        # raise an error!
+        topo_type = self.yaml_data["terrain"]["topography"]["type"]
+        fuel_type = self.yaml_data["terrain"]["fuel"]["type"]
+
+        if topo_type == "historical" and fuel_type != "historical":
+            log.error(f"Invalid config: historical topography, but {fuel_type} fuel.")
+            raise ConfigError(
+                "If using 'historical' data for topography type, the fuel type must "
+                "also be 'historical'!"
+            )
+        elif fuel_type == "historical" and topo_type != "historical":
+            log.error(f"Invalid config: historical fuel, but {topo_type} topography.")
+            raise ConfigError(
+                "If using 'historical' data for fuel type, the topography type must "
+                "also be 'historical'!"
+            )
+
+        # Load the historical data layers, if necessary.
+        if topo_type == "historical" and fuel_type == "historical":
             self.historical = self._load_historical()
             self.historical_layer = self._create_historical_layer()
+
         # This can take up to 30 seconds to pull LandFire data directly from source
         self.landfire_lat_long_box = self._make_lat_long_box()
 
@@ -794,7 +813,7 @@ class Config:
             return FireConfig((pos_x, pos_y), diagonal_spread, max_fire_duration, seed)
         elif fire_init_pos_type == "historical":
             return FireConfig(
-                (self.historical_layer.fire_start_y, self.historical_layer.fire_start_x),
+                (self.historical_layer.fire_start_x, self.historical_layer.fire_start_y),
                 diagonal_spread,
                 max_fire_duration,
                 None,

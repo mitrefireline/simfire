@@ -32,6 +32,13 @@ from ..world.parameters import Fuel
 
 log = create_logger(__name__)
 
+BURNMD_STRPTIME_FORMATS = [
+    "%Y/%m/%d %H:%M:%S.%f",
+    "%Y/%m/%d",
+    "%Y-%m-%d",
+    "%m/%d/%Y %H:%M:%S.%f",
+]
+
 
 class LandFireLatLongBox:
     """
@@ -818,7 +825,7 @@ class HistoricalLayer:
         self.width = width
 
         # Format to convert BurnMD timestamp to datetime object
-        self.strptime_fmt = "%Y/%m/%d %H:%M:%S.%f"
+        self.strptime_fmt_options = BURNMD_STRPTIME_FORMATS
         # set the path
         self.fire_path = f"{self.state.title()}/{self.year}/fires/{self.fire.title()}"
         # get available geopandas dataframes
@@ -1076,12 +1083,22 @@ class HistoricalLayer:
         """Convert a BurnMD dataset time to a Python datetime.datetime object
 
         Arguments:
-            bmd_time: The BurmMD time string
+            bmd_time: The BurnMD time string
 
         Returns:
-            A Python datetime.datetime object of the input BurnMD time
+            A Python datetime.datetime object of the input BurnMD time, or None if the
+            input is None.
         """
-        return datetime.datetime.strptime(bmd_time, self.strptime_fmt)
+        if bmd_time is None:
+            return None
+
+        for fmt in self.strptime_fmt_options:
+            try:
+                return datetime.datetime.strptime(bmd_time, fmt)
+            except ValueError:
+                continue
+
+        raise ValueError(f"Time data '{bmd_time}' does not match any known format.")
 
     def _make_perimeters_image(self) -> np.ndarray:
         """

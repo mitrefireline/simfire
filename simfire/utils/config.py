@@ -146,7 +146,6 @@ class OperationalConfig:
 
 @dataclasses.dataclass
 class HistoricalConfig:
-    default: bool
     path: Union[Path, str]
     year: int
     state: str

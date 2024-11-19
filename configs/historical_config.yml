@@ -33,7 +33,6 @@ operational:
   year: 2020
 
 historical:
-  default: true
   path: '../burnmd/BurnMD'
   year: 2020
   state: "California"

@@ -4,7 +4,7 @@ import re
 from simfire.sim.simulation import FireSimulation
 from simfire.utils.config import Config
 
-config = Config("configs/historical_config.yml")
+config = Config(path="configs/historical_config.yml")
 sim = FireSimulation(config)
 
 sim.rendering = True

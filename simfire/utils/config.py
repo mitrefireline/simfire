@@ -813,7 +813,7 @@ class Config:
             return FireConfig((pos_x, pos_y), diagonal_spread, max_fire_duration, seed)
         elif fire_init_pos_type == "historical":
             return FireConfig(
-                (self.historical_layer.fire_start_y, self.historical_layer.fire_start_x),
+                (self.historical_layer.fire_start_x, self.historical_layer.fire_start_y),
                 diagonal_spread,
                 max_fire_duration,
                 None,
